@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<!--
+  Moffat Bay Marina — landing page.
+
+  Static HTML; all styling lives in site.css. The header and footer below
+  are duplicated verbatim in about.html and contact.html, so any change to
+  them has to be made in all three files.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Moffat Bay Marina — long-term moorage on the bay</title>
+  <meta name="description" content="Monthly moorage in 26, 40 and 50 foot slips at Moffat Bay Marina. Reserve a slip online.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<!-- Keyboard users land here first; the link is off-screen until focused. -->
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ==================================================================
+     Header — shared with about.html and contact.html.
+     Only difference between pages: which nav link carries
+     aria-current="page", which draws the coral underline.
+     ================================================================== -->
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img class="brand__mark" src="img/logo.svg" alt="">
+      <span class="brand__text"><span class="brand__name">Moffat Bay</span><span class="brand__sub">Marina</span></span>
+    </a>
+
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="about.html">About us</a>
+      <a href="contact.html">Contact us</a>
+    </nav>
+
+    <!-- Reserve / log in are placeholders: there is no back end yet. -->
+    <div class="header-actions">
+      <a class="link-plain" href="#">Log in</a>
+      <a class="btn btn--cta btn--sm" href="#">Reserve a slip</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================================================================
+       Hero. The photo is set inline because it is unique to this page;
+       site.css supplies the crop, the fallback colour and the scrim.
+       ================================================================ -->
+  <section class="hero" style="background-image:url('https://images.unsplash.com/photo-1562446171-e8ed1e5fcec0?auto=format&fit=crop&q=70&w=1600')">
+    <div class="hero__scrim"></div>
+    <div class="wrap">
+      <div class="hero__body">
+        <span class="hero__eyebrow">Joviedsa Island · Opening this season</span>
+        <h1>A deep-water home for your boat on Moffat Bay</h1>
+        <p class="lead">A new marina and lodge in the San Juan Islands. Monthly slips in three sizes, power and water at every finger, and a harbormaster on the pier from 6:00 am. Reserve yours before the docks open.</p>
+        <div class="hero__actions">
+          <a class="btn btn--cta" href="#">Reserve a slip</a>
+          <a class="btn btn--onDark" href="about.html#rates">See monthly rates</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       Fact strip. Four figures that recur across the site — keep them
+       in step with the rate table on about.html.
+       ================================================================ -->
+  <section class="facts">
+    <div class="wrap">
+      <div class="fact"><span class="fact__k">214</span><span class="fact__v">New slips on five docks</span></div>
+      <div class="fact"><span class="fact__k">3 sizes</span><span class="fact__v">26, 40 and 50 feet</span></div>
+      <div class="fact"><span class="fact__k">$10 / ft</span><span class="fact__v">Per month, plus $10 power</span></div>
+      <div class="fact"><span class="fact__k">Ch 68</span><span class="fact__v">Harbormaster on VHF</span></div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       Slip sizes. One card per size; the prices below assume a boat at
+       the top of each range ($10/ft + $10 power). Linked to from the
+       footer of every page as index.html#slips.
+       ================================================================ -->
+  <section class="section" id="slips">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Slip sizes</span>
+        <h2>Three sizes. Reserve the one your boat fits in.</h2>
+        <p class="lead">Slips are assigned by length overall. Pick the smallest slip your boat fits — a 34 ft boat takes a 40 ft slip.</p>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1703871974921-51931a05496a?auto=format&fit=crop&q=70&w=1600')">
+            <span class="pill pill--glass">Dock A &amp; B</span>
+          </div>
+          <div class="card__body">
+            <span class="eyebrow">26 ft slip</span>
+            <h3>Boats up to 26 feet</h3>
+            <p class="muted">Inside docks, closest to the ramp and the parking lot.</p>
+            <div class="chips"><span class="chip">30 amp power</span><span class="chip">Fresh water</span><span class="chip">Single finger</span></div>
+          </div>
+          <div class="card__foot"><span class="price mono">$270</span><span class="muted">per month, 26 ft boat</span></div>
+        </article>
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1554924620-f56d407fe4da?auto=format&fit=crop&q=70&w=1600')">
+            <span class="pill pill--glass">Dock C &amp; D</span>
+          </div>
+          <div class="card__body">
+            <span class="eyebrow">40 ft slip</span>
+            <h3>Boats 27 to 40 feet</h3>
+            <p class="muted">Our most common slip, with double fingers and a dock box.</p>
+            <div class="chips"><span class="chip">30 amp power</span><span class="chip">Fresh water</span><span class="chip">Dock box</span></div>
+          </div>
+          <div class="card__foot"><span class="price mono">$410</span><span class="muted">per month, 40 ft boat</span></div>
+        </article>
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1505802641929-aeef461d81eb?auto=format&fit=crop&q=70&w=1600')">
+            <span class="pill pill--glass">Outer float</span>
+          </div>
+          <div class="card__body">
+            <span class="eyebrow">50 ft slip</span>
+            <h3>Boats 41 to 50 feet</h3>
+            <p class="muted">Deep-water end ties on the outer float, easy in and out.</p>
+            <div class="chips"><span class="chip">50 amp power</span><span class="chip">Fresh water</span><span class="chip">End tie</span></div>
+          </div>
+          <div class="card__foot"><span class="price mono">$510</span><span class="muted">per month, 50 ft boat</span></div>
+        </article>
+      </div>
+
+      <p class="muted" style="margin-top:22px;font-size:14.5px">Rates shown are for a boat at the top of each range: $10 per foot of boat length plus $10 for electric power. Boats over 50 feet, call the harbormaster.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       How it works — three steps to a reservation.
+       ================================================================ -->
+  <section class="section section--sand-light">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Reserving a slip takes three steps</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <span class="step__n">Step 1</span>
+          <h3>Create a free account</h3>
+          <p class="muted">You can read every page without an account. You need one to reserve, so we know whose boat is on which dock.</p>
+        </div>
+        <div class="step">
+          <span class="step__n">Step 2</span>
+          <h3>Choose a slip that fits</h3>
+          <p class="muted">Tell us your length overall and we show the slips still open in the right size for the season.</p>
+        </div>
+        <div class="step">
+          <span class="step__n">Step 3</span>
+          <h3>Confirm the reservation</h3>
+          <p class="muted">One click confirms and records it. No payment online — you settle the first month at the office.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       The bay — prose beside a tall photo (1.3fr / 1fr split).
+       ================================================================ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="grid-2 grid-2--wide">
+        <div class="prose">
+          <span class="eyebrow">The bay</span>
+          <h2>A working marina beside the lodge</h2>
+          <p>Moffat Bay is a protected bay on Joviedsa Island, out of the summer chop and a short run from the main channel. The docks are new concrete and steel, the fairway is dredged to 14 feet at zero tide, and there is a harbormaster on the pier every day of the year.</p>
+          <p>The marina shares the point with the new Moffat Bay Lodge, so the fuel dock, the chandlery and the restaurant are a short walk from your slip. Moorage here is by the month, for the season or longer.</p>
+          <p><a href="about.html">More about the marina</a></p>
+        </div>
+        <div class="photo photo--tall">
+          <img src="https://images.unsplash.com/photo-1734517262233-9db83c21a2ec?auto=format&fit=crop&q=70&w=1600" alt="Boats tied up along the docks at the harbor building" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       Closing call to action.
+       ================================================================ -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="callout">
+        <div>
+          <h2>Ready to reserve?</h2>
+          <p>Create a free account, pick a slip that fits your boat, and confirm. It takes about five minutes.</p>
+        </div>
+        <div class="callout__actions">
+          <a class="btn btn--cta" href="#">Reserve a slip</a>
+          <a class="btn btn--onDark" href="contact.html">Talk to the harbormaster</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================================================================
+     Footer — shared verbatim with the other two pages.
+     Its links depend on anchor ids that live elsewhere in the site
+     (about.html#rates, about.html#dock, contact.html#hours,
+     contact.html#radio), so do not rename those ids without updating
+     the footer on all three pages.
+     ================================================================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="img/logo-mark-white-tile.svg" alt="" width="42" height="42" style="display:block;border-radius:9px">
+        <div>
+          <span class="brand__name" style="font-family:var(--serif);color:#fff;font-size:22px">Moffat Bay</span>
+          <div class="brand__sub" style="color:var(--golden)">Marina</div>
+        </div>
+      </div>
+      <p class="footer-note">1400 Harbor Loop Road<br>Joviedsa Island, WA 98250<br>48°32.1′N 123°01.4′W</p>
+    </div>
+
+    <div>
+      <h4>Moorage</h4>
+      <a href="index.html#slips">Slip sizes</a>
+      <a href="about.html#rates">Rates</a>
+      <a href="#">Reserve a slip</a>
+      <a href="#">Log in</a>
+    </div>
+
+    <div>
+      <h4>On the dock</h4>
+      <a href="about.html#dock">Fuel dock</a>
+      <a href="about.html#dock">Pump-out</a>
+      <a href="about.html#dock">Showers &amp; laundry</a>
+      <a href="about.html#dock">Parking</a>
+    </div>
+
+    <div>
+      <h4>Visiting</h4>
+      <a href="contact.html">Contact us</a>
+      <a href="contact.html#hours">Office hours</a>
+      <a href="contact.html#radio">VHF radio</a>
+      <a href="about.html">About the marina</a>
+    </div>
+  </div>
+
+  <div class="legal">
+    <div class="wrap">
+      <span>© 2026 Moffat Bay Marina. All rights reserved.</span>
+      <!-- Legal links render inline, so they stay on one source line. -->
+      <span>Photography from <a href="https://unsplash.com/license">Unsplash</a><a href="#">Moorage agreement</a><a href="#">Privacy</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

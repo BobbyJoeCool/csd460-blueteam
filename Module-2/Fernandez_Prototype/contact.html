@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!--
+  Moffat Bay Marina — contact page.
+
+  Carries the #radio and #hours anchor ids the site footer links to. The
+  form posts to "#": there is no back end, so it is markup and styling
+  only. The header and footer are duplicated from index.html.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Contact us — Moffat Bay Marina</title>
+  <meta name="description" content="Harbor office address, phone, email and VHF channel 68 for the Moffat Bay Marina harbormaster.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ==================================================================
+     Header — shared with index.html and about.html.
+     ================================================================== -->
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img class="brand__mark" src="img/logo.svg" alt="">
+      <span class="brand__text"><span class="brand__name">Moffat Bay</span><span class="brand__sub">Marina</span></span>
+    </a>
+
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="about.html">About us</a>
+      <a href="contact.html" aria-current="page">Contact us</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="link-plain" href="#">Log in</a>
+      <a class="btn btn--cta btn--sm" href="#">Reserve a slip</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Page title. -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="section-head" style="margin-bottom:0">
+        <span class="eyebrow">Contact us</span>
+        <h1 style="font-size:clamp(34px,4.2vw,52px)">Reach the harbor office</h1>
+        <p class="lead">The office is on the pier at the head of the ramp, below the lodge. If you are on the water, call the harbormaster on the radio before you enter the fairway.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       Contact details beside the message form.
+
+       Left column: address list, the VHF panel (#radio) and the office
+       hours table (#hours) — both footer link targets.
+       ================================================================ -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="contact-grid">
+        <div>
+          <dl style="margin:0">
+            <div class="detail-block"><dt>Harbor office</dt><dd>1400 Harbor Loop Road<br>Joviedsa Island, WA 98250</dd></div>
+            <div class="detail-block"><dt>Telephone</dt><dd><a href="tel:+13605550142">(360) 555-0142</a></dd></div>
+            <div class="detail-block"><dt>Email</dt><dd><a href="mailto:office@moffatbaymarina.com">office@moffatbaymarina.com</a></dd></div>
+            <div class="detail-block"><dt>Position</dt><dd class="mono">48°32.1′N 123°01.4′W</dd></div>
+          </dl>
+
+          <div class="vhf" id="radio" style="margin-top:28px">
+            <span class="eyebrow" style="color:var(--golden)">Harbormaster on VHF</span>
+            <span class="vhf__ch">Channel 68</span>
+            <p style="font-size:15.5px;line-height:1.6;color:rgba(250,247,240,.9)">Hail <b>Moffat Bay Marina</b> on <b>VHF channel 68</b> for slip assignments, the fuel dock, and help on the docks. We monitor 68 from 6:00 am to 7:00 pm daily.</p>
+            <p style="font-size:14px;color:rgba(250,247,240,.75)">In an emergency, call the Coast Guard on channel 16 first, then let us know.</p>
+          </div>
+
+          <table class="hours" id="hours" style="margin-top:32px">
+            <caption class="eyebrow" style="text-align:left;padding-bottom:12px">Office hours</caption>
+            <tr><td>Monday – Friday</td><td>6:00 am – 7:00 pm</td></tr>
+            <tr><td>Saturday</td><td>6:00 am – 7:00 pm</td></tr>
+            <tr><td>Sunday</td><td>7:00 am – 5:00 pm</td></tr>
+            <tr><td>Fuel dock</td><td>7:00 am – dusk, daily</td></tr>
+          </table>
+        </div>
+
+        <!-- Every control follows the same shape: a .field wrapper with a
+             <label for> tied to the control id. Paired fields sit in a
+             .form-row, which collapses to one column under 900px. -->
+        <form class="form-card" action="#" method="post">
+          <div>
+            <h2 style="font-size:26px">Send us a message</h2>
+            <p class="muted" style="font-size:14.5px;margin-top:6px">We answer within one business day. For anything urgent, use the radio or the office line.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="field"><label for="first">First name</label><input id="first" name="first" type="text" required></div>
+            <div class="field"><label for="last">Last name</label><input id="last" name="last" type="text" required></div>
+          </div>
+
+          <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required></div>
+
+          <div class="form-row">
+            <div class="field"><label for="boat">Boat name</label><input id="boat" name="boat" type="text"></div>
+            <div class="field"><label for="length">Length overall</label><input id="length" name="length" type="number" min="1" max="120" placeholder="34"><span class="hint">In feet, bow to stern</span></div>
+          </div>
+
+          <div class="field">
+            <label for="topic">What is this about?</label>
+            <select id="topic" name="topic">
+              <option>Reserving a slip</option>
+              <option>An existing reservation</option>
+              <option>Rates and billing</option>
+              <option>Boats over 50 feet</option>
+              <option>Fuel dock or services</option>
+              <option>Something else</option>
+            </select>
+          </div>
+
+          <div class="field"><label for="message">Message</label><textarea id="message" name="message" placeholder="Tell us what you need."></textarea></div>
+
+          <button class="btn btn--cta" type="submit">Send message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       Getting here.
+       ================================================================ -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Getting here</span>
+        <h2>Finding the marina</h2>
+        <p class="lead">Joviedsa Island is reached by the Washington State Ferries from Anacortes; the marina is at the end of Harbor Loop Road on the south shore of Moffat Bay. By water, round the point and enter the dredged fairway between the green and red markers.</p>
+      </div>
+      <div class="photo photo--band">
+        <img src="https://images.unsplash.com/photo-1703871974921-51931a05496a?auto=format&fit=crop&q=70&w=1600" alt="The dredged fairway into the marina, seen from the water" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================================================================
+     Footer — shared verbatim with the other two pages.
+     Its links depend on anchor ids that live elsewhere in the site
+     (about.html#rates, about.html#dock, contact.html#hours,
+     contact.html#radio), so do not rename those ids without updating
+     the footer on all three pages.
+     ================================================================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="img/logo-mark-white-tile.svg" alt="" width="42" height="42" style="display:block;border-radius:9px">
+        <div>
+          <span class="brand__name" style="font-family:var(--serif);color:#fff;font-size:22px">Moffat Bay</span>
+          <div class="brand__sub" style="color:var(--golden)">Marina</div>
+        </div>
+      </div>
+      <p class="footer-note">1400 Harbor Loop Road<br>Joviedsa Island, WA 98250<br>48°32.1′N 123°01.4′W</p>
+    </div>
+
+    <div>
+      <h4>Moorage</h4>
+      <a href="index.html#slips">Slip sizes</a>
+      <a href="about.html#rates">Rates</a>
+      <a href="#">Reserve a slip</a>
+      <a href="#">Log in</a>
+    </div>
+
+    <div>
+      <h4>On the dock</h4>
+      <a href="about.html#dock">Fuel dock</a>
+      <a href="about.html#dock">Pump-out</a>
+      <a href="about.html#dock">Showers &amp; laundry</a>
+      <a href="about.html#dock">Parking</a>
+    </div>
+
+    <div>
+      <h4>Visiting</h4>
+      <a href="contact.html">Contact us</a>
+      <a href="contact.html#hours">Office hours</a>
+      <a href="contact.html#radio">VHF radio</a>
+      <a href="about.html">About the marina</a>
+    </div>
+  </div>
+
+  <div class="legal">
+    <div class="wrap">
+      <span>© 2026 Moffat Bay Marina. All rights reserved.</span>
+      <!-- Legal links render inline, so they stay on one source line. -->
+      <span>Photography from <a href="https://unsplash.com/license">Unsplash</a><a href="#">Moorage agreement</a><a href="#">Privacy</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

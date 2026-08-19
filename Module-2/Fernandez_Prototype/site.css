@@ -1,0 +1,899 @@
+/* ===================================================================
+   Moffat Bay Marina — site styles
+
+   Plain CSS for three hand-written pages. No build step, no framework:
+   what is here is what the browser gets, so edits show up on reload.
+
+   Palette
+     Ocean Blue   #0A6E8C  primary — links, buttons
+     Deep Marine  #0D3B4D  dark primary — headings, nav, footer
+     Sunset Coral #FF6F59  accent — calls to action
+     Golden Hour  #F4A261  secondary accent — hover, focus ring
+     Sand         #E8DFD0  page background
+
+   Type: Newsreader (serif) for headings, Archivo (sans) for everything
+   else, both pulled from Google Fonts by the @import below.
+
+   Conventions
+     - Loose BEM: .block, .block__part, .block--modifier.
+     - Sections run base -> components -> responsive. Add new rules to
+       the matching section and leave both media queries at the very
+       bottom of the file.
+     - Build pages from the blocks already defined here before writing
+       new CSS; the pages carry only a handful of one-off inline styles.
+   =================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap");
+
+/* ------------------------------------------------------------------
+   Design variables
+
+   These short names are the ONLY variables the pages see. Changing a
+   colour or size means changing it here.
+   ------------------------------------------------------------------ */
+:root {
+  --ocean: #0A6E8C;
+  --ocean-dark: #085A73;
+  --ocean-light: #0E85A6;
+  --ocean-pale: #E2F3F8;
+  --marine: #0D3B4D;
+  --marine-deep: #071F2A;
+  --marine-mid: #14536B;
+  --marine-muted: #5A7D8B;
+  --coral: #FF6F59;
+  --coral-dark: #E4553F;
+  --golden: #F4A261;
+  --golden-dark: #DA8845;
+  --golden-pale: #FDECD9;
+  --sand: #E8DFD0;
+  --sand-light: #FAF7F0;
+  --sand-mid: #DED3C0;
+  --sand-line: #CDBFA6;
+  --white: #fff;
+  --moss: #2F7D5C;
+  --moss-pale: #DCEDE2;
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --serif: "Newsreader", Georgia, serif;
+  --shadow-card: 0 2px 4px rgba(7,31,42,.06), 0 8px 20px -12px rgba(7,31,42,.16);
+  --shadow-lift: 0 12px 32px -10px rgba(7,31,42,.3);
+  --gutter: clamp(20px,5vw,64px);
+  --max: 1180px;
+}
+
+/* ==================================================================
+   Base & utilities
+
+   Element defaults, the page container, and the small text helpers
+   (.eyebrow / .lead / .muted / .mono) that every section reuses.
+   ================================================================== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--sand);
+  color: var(--marine);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  text-wrap: pretty;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -.02em;
+  line-height: 1.12;
+  margin: 0;
+  color: var(--marine-deep);
+}
+h1 { font-size: clamp(38px,5vw,62px); }
+h2 { font-size: clamp(28px,3.4vw,40px); }
+h3 { font-size: 22px; }
+p { margin: 0; }
+a {
+  color: var(--ocean);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--golden-dark);
+  text-decoration: underline;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+/* Centred content column shared by every section, with a fluid gutter
+   that shrinks from 64px to 20px on narrow screens. */
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ocean);
+}
+.lead {
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--marine-mid);
+  max-width: 60ch;
+}
+.muted { color: var(--marine-muted); }
+.mono { font-variant-numeric: tabular-nums; }
+.center { text-align: center; }
+.section { padding: 88px 0; }
+.section--tight { padding: 56px 0; }
+.section--sand-light { background: var(--sand-light); }
+.section--marine {
+  background: var(--marine);
+  color: var(--sand-light);
+}
+.section--marine h2,
+.section--marine h3 {
+  color: var(--white);
+}
+.section-head {
+  max-width: 60ch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+/* Skip link: parked off-screen until keyboard focus pulls it back. */
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 16px;
+  top: 16px;
+  background: var(--white);
+  padding: 10px 14px;
+  border-radius: 6px;
+  z-index: 100;
+}
+
+/* ==================================================================
+   Buttons
+
+   Compose as `.btn` plus exactly one colour variant — `--cta` (coral,
+   for the primary action on a page), `--primary` (ocean), `--outline`,
+   or `--onDark` (for marine/photo backgrounds) — and optionally
+   `--sm` for the 40px header size.
+   ================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  height: 48px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: background-color .14s ease,
+              color .14s ease,
+              border-color .14s ease,
+              transform .08s ease;
+}
+.btn:hover { text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: 2px solid var(--golden);
+  outline-offset: 2px;
+}
+.btn--cta {
+  background: var(--coral);
+  color: var(--white);
+}
+.btn--cta:hover {
+  background: var(--golden);
+  color: var(--marine-deep);
+}
+.btn--primary {
+  background: var(--ocean);
+  color: var(--white);
+}
+.btn--primary:hover {
+  background: var(--ocean-light);
+  color: var(--white);
+}
+.btn--outline {
+  border-color: var(--marine);
+  color: var(--marine);
+}
+.btn--outline:hover {
+  background: var(--marine);
+  color: var(--white);
+}
+.btn--onDark {
+  border-color: rgba(250,247,240,.55);
+  color: var(--white);
+}
+.btn--onDark:hover {
+  background: rgba(250,247,240,.14);
+  color: var(--white);
+}
+.btn--sm {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14.5px;
+}
+
+/* ==================================================================
+   Site header
+
+   Sticky marine bar duplicated verbatim on all three pages. The active
+   page is marked with aria-current="page", which drives the coral
+   underline below.
+   ================================================================== */
+.site-header {
+  background: var(--marine);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-height: 78px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  line-height: 1;
+  text-decoration: none;
+}
+.brand__mark {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: block;
+}
+.brand__text {
+  display: flex;
+  flex-direction: column;
+}
+.brand:hover { text-decoration: none; }
+.brand__name {
+  font-family: var(--serif);
+  font-size: 25px;
+  color: var(--white);
+}
+.brand__sub {
+  font-size: 9.5px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--golden);
+  margin-top: 4px;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.site-nav a {
+  color: var(--sand);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.site-nav a:hover {
+  color: var(--white);
+  border-bottom-color: var(--golden);
+  text-decoration: none;
+}
+.site-nav a[aria-current="page"] {
+  color: var(--white);
+  border-bottom-color: var(--coral);
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.header-actions a.link-plain {
+  color: var(--sand);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.header-actions a.link-plain:hover { color: var(--golden); }
+
+/* ==================================================================
+   Hero (landing page only)
+
+   The photo itself is set inline on the <section> in index.html; the
+   rule below supplies the fallback colour, crop and framing, and
+   .hero__scrim lays a dark gradient over it so white text stays
+   legible whatever the image.
+   ================================================================== */
+.hero {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--marine-deep) center 72%/cover no-repeat;
+  color: var(--white);
+  overflow: hidden;
+}
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,rgba(7,31,42,.35) 0%,rgba(7,31,42,.55) 45%,rgba(7,31,42,.88) 100%);
+}
+.hero__tag {
+  position: absolute;
+  top: 24px;
+  right: var(--gutter);
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(250,247,240,.5);
+}
+.hero__body {
+  position: relative;
+  padding: 96px 0 72px;
+  max-width: 44ch;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.hero h1 { color: var(--white); }
+.hero .lead {
+  color: rgba(250,247,240,.9);
+  max-width: 52ch;
+}
+.hero__eyebrow {
+  color: var(--golden);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ==================================================================
+   Fact strip & grid primitives
+   ================================================================== */
+.facts {
+  background: var(--marine-deep);
+  color: var(--sand-light);
+}
+/* Turns the shared container into a 4-up grid for this strip only. */
+.facts .wrap {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 28px;
+  padding-top: 26px;
+  padding-bottom: 26px;
+}
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fact__k {
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--white);
+}
+.fact__v {
+  font-size: 13.5px;
+  color: rgba(250,247,240,.7);
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 28px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+/* Asymmetric split for prose beside a photo or sidebar. */
+.grid-2--wide { grid-template-columns: 1.3fr 1fr; }
+
+/* ==================================================================
+   Cards, pills & chips
+
+   A card is a column: .card__media (photo), .card__body (copy), and an
+   optional .card__foot pinned to the bottom so that cards sitting side
+   by side line their price rows up regardless of copy length.
+   ================================================================== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--sand-line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card__media {
+  position: relative;
+  aspect-ratio: 16/10;
+  background: var(--marine-deep) center/cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+}
+/* Gradient scrim under the media, keeping a .pill readable on a light
+   photo; the sibling rule lifts real children above it. */
+.card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,rgba(7,31,42,0) 40%,rgba(7,31,42,.6) 100%);
+}
+.card__media > * {
+  position: relative;
+  z-index: 1;
+}
+.card__body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* margin-top:auto pushes the price row to the bottom of the card. */
+.card__foot {
+  margin-top: auto;
+  padding: 16px 22px;
+  border-top: 1px solid var(--sand-line);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--sand-light);
+}
+.price {
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--marine-deep);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ocean-pale);
+  color: var(--ocean-dark);
+  white-space: nowrap;
+}
+.pill--ok {
+  background: var(--moss-pale);
+  color: var(--moss);
+}
+.pill--glass {
+  background: rgba(250,247,240,.16);
+  color: var(--white);
+}
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip {
+  font-size: 13px;
+  padding: 4px 12px;
+  border: 1px solid var(--sand-line);
+  border-radius: 999px;
+  background: var(--white);
+  white-space: nowrap;
+}
+
+/* ==================================================================
+   Numbered steps (how it works)
+   ================================================================== */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 28px;
+}
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 2px solid var(--golden);
+}
+.step__n {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ocean);
+}
+
+/* ==================================================================
+   Rate table, pricing formula & plain lists
+   ================================================================== */
+.rate-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.rate-table caption {
+  text-align: left;
+  font-size: 13.5px;
+  color: var(--marine-muted);
+  padding-bottom: 12px;
+}
+.rate-table th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--marine-muted);
+  font-weight: 600;
+  padding: 0 12px 10px 0;
+  border-bottom: 1px solid var(--sand-line);
+}
+.rate-table td {
+  padding: 14px 12px 14px 0;
+  border-bottom: 1px solid var(--sand-line);
+  font-size: 15.5px;
+}
+/* Money column right-aligned and flush to the table edge. */
+.rate-table td:last-child,
+.rate-table th:last-child {
+  text-align: right;
+  padding-right: 0;
+}
+.rate-table tr:last-child td { border-bottom: none; }
+.rate-table .total {
+  font-weight: 600;
+  color: var(--marine-deep);
+}
+/* Coral-ruled panel that states the $10/ft + $10 power rule. */
+.formula {
+  background: var(--sand-mid);
+  border-left: 3px solid var(--coral);
+  border-radius: 0 8px 8px 0;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.formula__eq {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--marine-deep);
+}
+.plain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.plain-list li {
+  display: flex;
+  gap: 12px;
+  font-size: 15.5px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--sand-line);
+}
+.plain-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+/* min-width gives the labels a shared column edge, so the list reads
+   as two columns without a table. */
+.plain-list b {
+  color: var(--marine-deep);
+  white-space: nowrap;
+  min-width: 150px;
+}
+/* Long-form copy: slightly larger type, looser leading, and a line
+   length capped at 62 characters for readability. */
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 62ch;
+  font-size: 16.5px;
+  line-height: 1.65;
+}
+
+/* ==================================================================
+   Contact page: detail list, VHF panel, form controls & photos
+   ================================================================== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--sand-line);
+}
+.detail-block:first-of-type { padding-top: 0; }
+.detail-block dt {
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--marine-muted);
+  font-weight: 600;
+}
+.detail-block dd {
+  margin: 0;
+  font-size: 17px;
+  color: var(--marine-deep);
+}
+/* Dark panel calling out the harbormaster radio channel. */
+.vhf {
+  background: var(--marine);
+  color: var(--sand-light);
+  border-radius: 10px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vhf__ch {
+  font-family: var(--serif);
+  font-size: 44px;
+  color: var(--golden);
+  line-height: 1;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.field label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--marine-deep);
+}
+/* One shared appearance for every control type, so inputs, selects
+   and textareas stay identical apart from height. */
+.field input,
+.field select,
+.field textarea {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  color: var(--marine);
+  background: var(--white);
+  border: 1px solid var(--sand-line);
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 46px;
+  box-shadow: inset 0 1px 2px rgba(7,31,42,.07);
+  width: 100%;
+}
+.field textarea {
+  height: auto;
+  min-height: 120px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: var(--marine-muted);
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--ocean);
+  box-shadow: 0 0 0 3px var(--ocean-pale);
+}
+.field .hint {
+  font-size: 12.5px;
+  color: var(--marine-muted);
+}
+.form-card {
+  background: var(--white);
+  border: 1px solid var(--sand-line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.photo {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--marine-deep);
+}
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Fixed frame heights; the image inside is cropped with object-fit,
+   so swapping in a photo of any aspect ratio is safe. */
+.photo--tall { height: 420px; }
+.photo--wide { height: 340px; }
+.photo--band { height: 300px; }
+.hours {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15.5px;
+}
+.hours td {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--sand-line);
+}
+.hours td:last-child {
+  text-align: right;
+  color: var(--marine-mid);
+}
+.hours tr:last-child td { border-bottom: none; }
+
+/* ==================================================================
+   Closing callout & site footer
+
+   The footer, like the header, is duplicated verbatim on all three
+   pages — edit it in index.html, about.html and contact.html together.
+   ================================================================== */
+.callout {
+  background: var(--ocean);
+  color: var(--white);
+  border-radius: 12px;
+  padding: 44px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.callout h2 { color: var(--white); }
+.callout p {
+  color: rgba(250,247,240,.9);
+  max-width: 46ch;
+}
+.callout__actions {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.site-footer {
+  background: var(--marine-deep);
+  color: var(--sand);
+  margin-top: 0;
+}
+.site-footer .wrap {
+  padding-top: 56px;
+  padding-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.site-footer h4 {
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--golden);
+  margin: 0 0 16px;
+}
+.site-footer a {
+  color: var(--sand);
+  font-size: 15px;
+  display: block;
+  margin-bottom: 12px;
+  white-space: nowrap;
+}
+.site-footer a:hover {
+  color: var(--golden);
+  text-decoration: none;
+}
+.site-footer .brand__name { font-size: 22px; }
+.footer-note {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: rgba(232,223,208,.75);
+  margin-top: 18px;
+}
+.legal { border-top: 1px solid var(--marine-mid); }
+.legal .wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+  padding-bottom: 26px;
+  font-size: 13px;
+  color: rgba(232,223,208,.6);
+  flex-wrap: wrap;
+}
+/* Legal row links run inline, unlike the stacked column links above. */
+.legal a {
+  color: rgba(232,223,208,.6);
+  font-size: 13px;
+  display: inline;
+  margin: 0 0 0 20px;
+}
+
+/* ==================================================================
+   Responsive
+
+   Two breakpoints, both kept here at the end of the file:
+     900px - three-up grids drop to two, two-up grids stack.
+     620px - everything becomes a single column and sections tighten.
+   ================================================================== */
+/* Tablet: 3-up becomes 2-up, side-by-side layouts stack. */
+@media (max-width:900px) {
+  .grid-3,
+  .steps,
+  .facts .wrap {
+    grid-template-columns: 1fr 1fr;
+  }
+  .grid-2,
+  .grid-2--wide,
+  .contact-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .site-footer .wrap { grid-template-columns: 1fr 1fr; }
+  .callout { padding: 32px; }
+  .callout__actions { margin-left: 0; }
+}
+/* Phone: single column throughout, with tighter vertical rhythm. */
+@media (max-width:620px) {
+  .grid-3,
+  .steps,
+  .facts .wrap,
+  .site-footer .wrap {
+    grid-template-columns: 1fr;
+  }
+  .section { padding: 56px 0; }
+  .hero__body { padding: 64px 0 48px; }
+  .header-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+.credit {
+  font-size: 12.5px;
+  color: rgba(232,223,208,.5);
+  margin-top: 14px;
+}
+.credit a {
+  color: rgba(232,223,208,.6);
+  font-size: 12.5px;
+  display: inline;
+  margin: 0;
+}
