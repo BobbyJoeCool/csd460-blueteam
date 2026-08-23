@@ -5,7 +5,7 @@
 | Address | 1400 Harbor Loop Road, Joviedsa Island, WA 98250 |
 | Phone | (360) 555-0142 |
 | Email | office@moffatbaymarina.com |
-| VHF | Channel 68 (Coast Guard emergencies: Channel 16) |
+| VHF | Channel 16 |
 
 ## Hours
 
