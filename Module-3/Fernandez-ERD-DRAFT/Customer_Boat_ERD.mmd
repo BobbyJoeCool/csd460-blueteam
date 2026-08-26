@@ -1,3 +1,6 @@
+%% Note: Mermaid has no composite key syntax. regState and regNumber each show
+%% a UK marker below, but they form ONE composite unique constraint, not two.
+
 erDiagram
     customer ||--o{ boat : owns
 
@@ -5,8 +8,8 @@ erDiagram
         int customerId PK "Unique ID for each customer"
         varchar firstName "Customer first name"
         varchar lastName "Customer last name"
-        varchar email "Login and contact email, unique"
-        varchar passwordHash "Hashed password for login"
+        varchar email UK "Login username and contact email"
+        varchar passwordHash "Hashed password, validated in Java before hashing"
         varchar phone "Contact phone number"
         varchar streetAddress "Mailing street address"
         varchar city "Mailing city"
@@ -19,9 +22,10 @@ erDiagram
         int boatId PK "Unique ID for each boat"
         int customerId FK "Owner, references customer.customerId"
         varchar boatName "Name of the vessel"
-        varchar registrationNumber "State registration or doc number"
+        char regState UK "State the boat is registered in"
+        varchar regNumber UK "State registration number, unique with regState"
         varchar boatType "Sailboat, powerboat, catamaran, etc"
         decimal boatLength "Length in feet, for slip fit"
         decimal boatBeam "Width in feet, for slip fit"
-        year boatYear "Model year"
+        int boatYear "Model year"
     }
