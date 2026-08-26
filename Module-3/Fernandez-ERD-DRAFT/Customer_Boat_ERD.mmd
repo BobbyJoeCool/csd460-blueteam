@@ -1,0 +1,27 @@
+erDiagram
+    customer ||--o{ boat : owns
+
+    customer {
+        int customerId PK "Unique ID for each customer"
+        varchar firstName "Customer first name"
+        varchar lastName "Customer last name"
+        varchar email "Login and contact email, unique"
+        varchar passwordHash "Hashed password for login"
+        varchar phone "Contact phone number"
+        varchar streetAddress "Mailing street address"
+        varchar city "Mailing city"
+        char state "Two letter state code"
+        varchar zipCode "Zip code, varchar for leading zeros"
+        date dateJoined "Date account was created"
+    }
+
+    boat {
+        int boatId PK "Unique ID for each boat"
+        int customerId FK "Owner, references customer.customerId"
+        varchar boatName "Name of the vessel"
+        varchar registrationNumber "State registration or doc number"
+        varchar boatType "Sailboat, powerboat, catamaran, etc"
+        decimal boatLength "Length in feet, for slip fit"
+        decimal boatBeam "Width in feet, for slip fit"
+        year boatYear "Model year"
+    }
