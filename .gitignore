@@ -53,5 +53,8 @@ hs_err_pid*
 *.MYD
 *.dump
 
+# ---- Environment ----
+.env
+
 # ---- Personal Files ----
 DevNotes/
