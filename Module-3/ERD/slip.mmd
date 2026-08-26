@@ -12,7 +12,7 @@ erDiagram
 
     dock {
         int dockID PK "Unique identifier for the dock in the DB"
-        int dockNumber "Customer facing dock number."
+        varchar dockNumber "Customer facing dock letter, e.g. A-F."
         varchar dockDescription "A customer facing brief description of the dock."
     }
 
