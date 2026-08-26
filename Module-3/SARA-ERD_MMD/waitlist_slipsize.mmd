@@ -1,0 +1,19 @@
+---
+config:
+  theme: redux
+---
+erDiagram
+    slipSize {
+        int sizeFt PK
+    }
+
+    waitList {
+        int waitListID PK
+        int boatID FK
+        int sizeFt FK
+        timestamp timeJoined
+        timestamp timeClosed
+        string status
+    }
+    
+    slipSize ||--o{ waitList : requestedFor
