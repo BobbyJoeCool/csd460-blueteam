@@ -10,9 +10,9 @@
 -- Comment citation: Inline comments in this file were drafted with the
 --          assistance of Claude (Anthropic) and reviewed by the
 --          database lead, Breutzmann, R.
--- Version: 0.5.0 (in progress - moves to 1.0.0 once every team member's
---          tables/seed data are in)
--- Date: 2026-08-25
+-- Version: 1.1.0 (tracks ERD.md; White, S. and Rodriguez, C. sections still
+--          in progress - see the TODOs below)
+-- Date: 2026-08-27
 -- =============================================================================
 
 USE moffatBayMarinaDB;
