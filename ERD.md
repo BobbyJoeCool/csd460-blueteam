@@ -14,10 +14,6 @@ This is the official ERD for the Moffat Bay Marina database (`moffatBayMarinaDB`
 ## Entity Relationship Diagram
 
 ```mermaid
----
-config:
-    layout: redux color, ELK
----
 %% Combined ERD - every team member's tables in one diagram.
 %% Per-section sources are listed below. Table names are PascalCase and
 %% type keywords are UPPERCASE throughout; column/PK/FK naming still
