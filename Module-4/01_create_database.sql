@@ -38,10 +38,10 @@ USE moffatBayMarinaDB;
 -- =============================================================================
 -- Section: Breutzmann, R. - Slip & Dock Tables
 -- =============================================================================
--- See Module-3/ERD/slip.mmd for the source ERD.
+
 CREATE TABLE IF NOT EXISTS dock (
     dockID INT AUTO_INCREMENT PRIMARY KEY,
-    dockNumber VARCHAR(1) NOT NULL UNIQUE COMMENT 'Customer facing dock letter, e.g. A-F.',
+    dockNumber VARCHAR(1) NOT NULL UNIQUE COMMENT 'Customer facing dock letter, e.g. A-C.',
     dockDescription VARCHAR(255) COMMENT 'A customer facing brief description of the dock.'
 );
 
@@ -60,14 +60,17 @@ CREATE TABLE IF NOT EXISTS slip (
 -- Section: White, S. - Tables TBD
 -- =============================================================================
 -- TODO (White, S.): add this section's CREATE TABLE statements here.
+
 -- =============================================================================
 -- Section: Fernandez, M. - Tables TBD
 -- =============================================================================
 -- TODO (Fernandez, M.): add this section's CREATE TABLE statements here.
+
 -- =============================================================================
 -- Section: Rodriguez, C. - Tables TBD
 -- =============================================================================
 -- TODO (Rodriguez, C.): add this section's CREATE TABLE statements here.
+
 -- =============================================================================
 -- Foreign Keys (all team members)
 -- =============================================================================
@@ -94,5 +97,23 @@ SET @ddl = IF(@fk_exists = 0,
 PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+-- Pending: slip.slipSize -> SlipSize(sizeFt), once White, S. creates the
+-- SlipSize table (see ERD.md). Commented out for now since that table
+-- doesn't exist yet - uncomment once it does. Note: ERD.md currently shows
+-- two different SlipSize designs (a surrogate slipSizeID PK vs. sizeFt
+-- itself as the PK) - confirm with White which one lands, since whichever
+-- column this references has to be UNIQUE/PK on SlipSize for the FK below
+-- to be valid.
+-- SET @fk_exists = (
+--     SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+--     WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fkSlipSlipSize'
+-- );
+-- SET @ddl = IF(@fk_exists = 0,
+--     'ALTER TABLE slip ADD CONSTRAINT fkSlipSlipSize FOREIGN KEY (slipSize) REFERENCES SlipSize (sizeFt)',
+--     'SELECT 1');
+-- PREPARE stmt FROM @ddl;
+-- EXECUTE stmt;
+-- DEALLOCATE PREPARE stmt;
 
 -- TODO: add remaining FKs here using the same guarded pattern as more tables are created.

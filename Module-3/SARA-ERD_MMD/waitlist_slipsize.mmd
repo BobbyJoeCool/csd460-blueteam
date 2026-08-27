@@ -3,17 +3,17 @@ config:
   theme: redux
 ---
 erDiagram
-    slipSize {
-        int sizeFt PK
+    SlipSize {
+        INT sizeFt PK
     }
 
-    waitList {
-        int waitListID PK
-        int boatID FK
-        int sizeFt FK
-        timestamp timeJoined
-        timestamp timeClosed
-        string status
+    WaitList {
+        INT waitListID PK
+        INT boatID FK
+        INT sizeFt FK
+        TIMESTAMP timeJoined
+        TIMESTAMP timeClosed
+        STRING status
     }
-    
-    slipSize ||--o{ waitList : requestedFor
+
+    SlipSize ||--o{ WaitList : requestedFor

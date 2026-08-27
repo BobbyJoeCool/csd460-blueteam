@@ -1,0 +1,22 @@
+%% Robert Breutzmann - Slip and Dock Tables First Draft
+
+erDiagram
+    Slip {
+        INT slipId PK "Unique identifier for the slip in the DB"
+        INT slipNumber "Customer facing slip number."
+        VARCHAR slipDescription "A customer facing brief description of the slip."
+        INT dockID FK "The dock ID that the slip is on, links to dockID."
+        VARCHAR slipStatus "For the occupied status of the slip.  Can be an enum or predefined value"
+        INT slipSize "An enum of (26, 40, 50), stored in feet."
+    }
+
+    Dock {
+        INT dockID PK "Unique identifier for the dock in the DB"
+        VARCHAR dockNumber "Customer facing dock letter, e.g. A-C."
+        VARCHAR dockDescription "A customer facing brief description of the dock."
+    }
+
+    Dock ||--o{ Slip : "has"
+
+%% A specific slip's location to a customer will be dockNumber-slipNumber.
+%% The Descriptions are a short description for the customer about where to find the dock or slip.
