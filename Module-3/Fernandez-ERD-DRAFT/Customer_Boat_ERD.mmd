@@ -2,30 +2,30 @@
 %% a UK marker below, but they form ONE composite unique constraint, not two.
 
 erDiagram
-    customer ||--o{ boat : owns
+    Customer ||--o{ Boat : owns
 
-    customer {
-        int customerId PK "Unique ID for each customer"
-        varchar firstName "Customer first name"
-        varchar lastName "Customer last name"
-        varchar email UK "Login username and contact email"
-        varchar passwordHash "Hashed password, validated in Java before hashing"
-        varchar phone "Contact phone number"
-        varchar streetAddress "Mailing street address"
-        varchar city "Mailing city"
-        char state "Two letter state code"
-        varchar zipCode "Zip code, varchar for leading zeros"
-        date dateJoined "Date account was created"
+    Customer {
+        INT customerId PK "Unique ID for each customer"
+        VARCHAR firstName "Customer first name"
+        VARCHAR lastName "Customer last name"
+        VARCHAR email UK "Login username and contact email"
+        VARCHAR passwordHash "Hashed password, validated in Java before hashing"
+        VARCHAR phone "Contact phone number"
+        VARCHAR streetAddress "Mailing street address"
+        VARCHAR city "Mailing city"
+        CHAR state "Two letter state code"
+        VARCHAR zipCode "Zip code, varchar for leading zeros"
+        DATE dateJoined "Date account was created"
     }
 
-    boat {
-        int boatId PK "Unique ID for each boat"
-        int customerId FK "Owner, references customer.customerId"
-        varchar boatName "Name of the vessel"
-        char regState UK "State the boat is registered in"
-        varchar regNumber UK "State registration number, unique with regState"
-        varchar boatType "Sailboat, powerboat, catamaran, etc"
-        decimal boatLength "Length in feet, for slip fit"
-        decimal boatBeam "Width in feet, for slip fit"
-        int boatYear "Model year"
+    Boat {
+        INT boatId PK "Unique ID for each boat"
+        INT customerId FK "Owner, references customer.customerId"
+        VARCHAR boatName "Name of the vessel"
+        CHAR regState UK "State the boat is registered in"
+        VARCHAR regNumber UK "State registration number, unique with regState"
+        VARCHAR boatType "Sailboat, powerboat, catamaran, etc"
+        DECIMAL boatLength "Length in feet, for slip fit"
+        DECIMAL boatBeam "Width in feet, for slip fit"
+        INT boatYear "Model year"
     }

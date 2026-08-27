@@ -25,15 +25,14 @@ Rather than looking to a different page to see what it has, developers can look 
 
 ## Dock and Slip Sizes
 
-- There are 6 Docks, A, B, C, D, E, and F.  
-- The docks are all th same length, with 10 slips each (60 total)
-- Each Dock has 4-26 ft, 4-40 ft, and 2-50 ft slips
+Source of truth: the client's marina map 
+![[Source_Information/marina_a.png]]
 
-| Size | Total | PerDock |
-| --- | --- | --- |
-| 26 ft | 24 | 4 |
-| 40 ft | 24 | 4 |
-| 50 ft | 12 | 2 |
+| Size | Total | Per Dock | Slip numbers (per dock) |
+| --- | --- | --- | --- |
+| 26 ft | 30 | 10 | 8-12, 20-24 |
+| 40 ft | 24 | 8 | 4-7, 16-19 |
+| 50 ft | 18 | 6 | 1-3, 13-15 |
 
 ## Tag Line
 

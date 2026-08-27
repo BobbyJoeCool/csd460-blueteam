@@ -21,10 +21,10 @@ USE moffatBayMarinaDB;
 -- =============================================================================
 -- Section: Breutzmann, R. - Dock & Slip Tables
 -- =============================================================================
--- dock: 6 rows seeded (docks A-F).
+-- dock: 3 rows seeded (docks A-C).
 SELECT * FROM dock;
 
--- slip: 60 rows seeded (10 per dock).
+-- slip: 72 rows seeded (24 per dock).
 SELECT * FROM slip;
 
 -- =============================================================================

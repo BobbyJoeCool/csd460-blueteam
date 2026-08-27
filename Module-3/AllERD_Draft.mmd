@@ -1,12 +1,4 @@
 erDiagram
-    customer ||--o{ boat : owns
-    slipSize ||--o{ waitList : requestedFor
-    boat ||--o{ reservation : assignedTo
-    customer ||--o{ reservation : makes
-    boat ||--o{ waitList : joins
-    dock ||--o{ slip : has
-    slip ||--o{ reservation : reservedFor
-    reservation ||--o| terminationNotice : mayHave
 
     customer {
         int customerId PK "Unique ID for each customer"
@@ -80,3 +72,12 @@ erDiagram
         DATE terminationDate "Date the lease is scheduled to end"
         VARCHAR noticeStatus "Current status of the termination notice"
     }
+
+    customer ||--o{ boat : owns
+    slipSize ||--o{ waitList : requestedFor
+    boat ||--o{ reservation : assignedTo
+    customer ||--o{ reservation : makes
+    boat ||--o{ waitList : joins
+    dock ||--o{ slip : has
+    slip ||--o{ reservation : reservedFor
+    reservation ||--o| terminationNotice : mayHave
