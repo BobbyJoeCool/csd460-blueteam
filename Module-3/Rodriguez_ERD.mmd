@@ -5,7 +5,6 @@ erDiagram
     Reservation {
         INT reservationId PK "Unique internal identifier for the reservation"
         VARCHAR confirmationNumber "Unique confirmation number shown to the customer"
-        INT customerId FK "References the customer who made the reservation"
         INT boatId FK "References the boat assigned to the reservation"
         INT slipId FK "References the reserved marina slip"
         DATE startDate "Date the month-to-month lease begins"
