@@ -13,9 +13,8 @@
 -- Comment citation: Inline comments in this file were drafted with the
 --          assistance of Claude (Anthropic) and reviewed by the
 --          database lead, Breutzmann, R.
--- Version: 0.5.0 (in progress - moves to 1.0.0 once every team member's
---          tables/seed data are in)
--- Date: 2026-08-25
+-- Version: 1.1.0
+-- Date: 2026-08-27
 -- =============================================================================
 -- Run this script as a MySQL admin/root user (e.g. `mysql -u root -p < 01_create_database.sql`).
 -- Each teammate runs this once against their own local MySQL instance.
@@ -98,19 +97,19 @@ PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
--- Pending: slip.slipSize -> SlipSize(sizeFt), once White, S. creates the
--- SlipSize table (see ERD.md). Commented out for now since that table
--- doesn't exist yet - uncomment once it does. Note: ERD.md currently shows
--- two different SlipSize designs (a surrogate slipSizeID PK vs. sizeFt
--- itself as the PK) - confirm with White which one lands, since whichever
--- column this references has to be UNIQUE/PK on SlipSize for the FK below
--- to be valid.
+-- Pending: slip.slipSizeID -> SlipSize(slipSizeID), once White, S. creates
+-- the SlipSize table (see ERD.md v1.1.0). Commented out for now since that
+-- table doesn't exist yet - uncomment once it does. ERD.md v1.1.0 settles
+-- SlipSize on a surrogate slipSizeID PK (sizeFt is UNIQUE but not the PK),
+-- and slip's own column is now slipSizeID (FK), not the old slipSize enum
+-- column - update this block if slip's column name changes when the table
+-- is actually created.
 -- SET @fk_exists = (
 --     SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
 --     WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fkSlipSlipSize'
 -- );
 -- SET @ddl = IF(@fk_exists = 0,
---     'ALTER TABLE slip ADD CONSTRAINT fkSlipSlipSize FOREIGN KEY (slipSize) REFERENCES SlipSize (sizeFt)',
+--     'ALTER TABLE slip ADD CONSTRAINT fkSlipSlipSize FOREIGN KEY (slipSizeID) REFERENCES SlipSize (slipSizeID)',
 --     'SELECT 1');
 -- PREPARE stmt FROM @ddl;
 -- EXECUTE stmt;

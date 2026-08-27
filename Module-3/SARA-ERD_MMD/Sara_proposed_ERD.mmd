@@ -19,7 +19,7 @@ erDiagram
     boat {
         int boatId PK "Unique ID for each boat"
         varchar boatName "Name of the vessel - may change with boat ownership."
-	varchar hin UK "Hull identification number. Can be null for qualifying older boats without a HIN, other proof of ownership still required."
+	    varchar hin UK "Hull identification number. Can be null for qualifying older boats without a HIN, other proof of ownership still required."
         char regState "State the boat is registered in"
         varchar regNumber "State registration number, unique with regState"
         varchar boatType "Sailboat, powerboat, catamaran, etc"
@@ -75,7 +75,7 @@ erDiagram
     reservation {
         INT reservationId PK "Unique internal identifier for the reservation"
         VARCHAR confirmationNumber UK "Unique confirmation number shown to the customer"
-	INT customerId FK "References customer who made the reservation"
+	    INT customerId FK "References customer who made the reservation"
         INT boatId FK "References the boat assigned to the reservation"
         INT slipId FK "References the reserved marina slip"
         DATE startDate "Date the month-to-month lease begins"
@@ -91,7 +91,6 @@ erDiagram
         VARCHAR noticeStatus "Current status of the termination notice"
     }
 
-   
     slipSize ||--o{ waitList : requestedFor
     boat ||--o{ reservation : assignedTo
     customer ||--o{ reservation : makes
