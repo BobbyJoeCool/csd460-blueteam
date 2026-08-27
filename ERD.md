@@ -4,7 +4,7 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers.  Changelog maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.1.0
+- Version: 1.2.0
 - Date: 2026-08-27
 
 ## Overview
@@ -14,6 +14,10 @@ This is the official ERD for the Moffat Bay Marina database (`moffatBayMarinaDB`
 ## Entity Relationship Diagram
 
 ```mermaid
+---
+config:
+    layout: redux color, ELK
+---
 %% Combined ERD - every team member's tables in one diagram.
 %% Per-section sources are listed below. Table names are PascalCase and
 %% type keywords are UPPERCASE throughout; column/PK/FK naming still
@@ -35,6 +39,24 @@ erDiagram
         INT dockID PK "Unique identifier for the dock in the DB"
         VARCHAR dockNumber "Customer facing dock letter, e.g. A-C."
         VARCHAR dockDescription "A customer facing brief description of the dock."
+    }
+
+    %% --- Breutzmann, R. - Contact (added v1.2.0) ---
+    %% Holds submissions from the marina site's Contact Us page. Intentionally
+    %% has no FK to Customer/Boat - a submitter may not be a registered
+    %% customer yet, so boatName/boatLength are free text, not references.
+    Contact {
+        INT contactId PK "Unique identifier for the contact-us submission"
+        VARCHAR firstName "Contact's first name, required"
+        VARCHAR lastName "Contact's last name, required"
+        VARCHAR email "Contact's email address, required"
+        VARCHAR boatName "Name of the contact's boat, optional - free text, not a Boat reference"
+        DECIMAL boatLength "Length of the contact's boat in feet, optional"
+        VARCHAR reasonForContact "Enum of common reasons (e.g. reservation question, waitlist question, billing, maintenance) plus Other"
+        TEXT message "Full text of the message submitted"
+        BOOLEAN responded "Whether marina staff has responded to this submission"
+        TIMESTAMP respondedDate "Date/time staff responded, null until responded"
+        TEXT respondedMessage "Staff's response message, null until responded"
     }
 
     %% --- Fernandez, M. - Customer & Boat ---
@@ -137,9 +159,9 @@ erDiagram
 %% customer can join the wait list before registering the boat that will fill it.
 ```
 
-Sources (one `.mmd` per team member, merged above; see Changelog for v1.1.0 updates):
+Sources (one `.mmd` per team member, merged above; see Changelog for v1.1.0/v1.2.0 updates):
 
-- `Module-3/Breutzmann-ERD-Draft/slip.mmd` - dock, slip
+- `Module-3/Breutzmann-ERD-Draft/Breutzmann.mmd` - dock, slip, contact (contact added v1.2.0)
 - `Module-3/Fernandez-ERD-DRAFT/Customer_Boat_ERD.mmd` - customer, boat
 - `Module-3/SARA-ERD_MMD/waitlist_slipsize.mmd` - original slipSize, waitList draft
 - `Module-3/SARA-ERD_MMD/Sara_proposed_ERD.mmd` - v1.1.0: adds BoatOwnership, and reworks slip/waitList/reservation FKs (see Changelog)
@@ -163,8 +185,16 @@ Sources (one `.mmd` per team member, merged above; see Changelog for v1.1.0 upda
 - **`Slip.slipSizeID` FK added (v1.1.0), replacing the old `slipSize` enum-style column.** Slip size is now defined once in `SlipSize` and referenced from `Slip`, instead of being duplicated inline as a checked `(26, 40, 50)` value.
 - **`WaitList.customerId` replaces `WaitList.boatID` (v1.1.0).** The wait list tracks which customer is waiting for a slip size, not which boat, since a customer can join the wait list before registering the boat that will occupy the slip.
 - **`Reservation.customerId` added as a direct FK (v1.1.0).** Previously the customer tied to a reservation was only reachable by joining through `Boat`; this is now a stored column, matching how `Customer` "makes" `Reservation` is drawn in the diagram.
+- **`Contact` table added (v1.2.0), with no FK to `Customer` or `Boat`.** It holds Contact Us page submissions, and a submitter may not be a registered customer yet, so `boatName`/`boatLength` are free text the visitor typed in, not references into `Boat`. Owned by Breutzmann, R.
+- **`Contact.message`/`Contact.respondedMessage` use `TEXT`, not `VARCHAR`.** A contact-us message (and a staff reply to it) has no natural length cap, so an unbounded `TEXT` column was used instead of guessing at a `VARCHAR` limit.
+- **`Contact.reasonForContact` is a `VARCHAR` holding an enum-style value (common reasons plus "Other"), not a dedicated lookup table**, matching how `Slip.slipStatus` already represents its enum in this diagram - the exact reason list is an implementation detail for the `CREATE TABLE` script, not the ERD.
 
 ## Changelog
+
+### v1.2.0 - 2026-08-27
+
+- **Added the `Contact` table**, holding submissions from the marina site's Contact Us page: required `firstName`/`lastName`/`email`, optional `boatName`/`boatLength`, an enum-style `reasonForContact`, a `TEXT` `message`, and staff-response tracking (`responded`, `respondedDate`, `respondedMessage`). No FK to `Customer`/`Boat` - a submitter may not be a registered customer.
+- Source: `Module-3/Breutzmann-ERD-Draft/Breutzmann.mmd` (Breutzmann, R.)
 
 ### v1.1.0 - 2026-08-27
 

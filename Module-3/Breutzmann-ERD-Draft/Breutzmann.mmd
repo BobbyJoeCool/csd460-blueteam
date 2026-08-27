@@ -1,0 +1,40 @@
+%% Robert Breutzmann - Slip and Dock Tables First Draft
+
+erDiagram
+    Slip {
+        INT slipId PK "Unique identifier for the slip in the DB"
+        INT slipNumber "Customer facing slip number."
+        VARCHAR slipDescription "A customer facing brief description of the slip."
+        INT dockID FK "The dock ID that the slip is on, links to dockID."
+        VARCHAR slipStatus "For the occupied status of the slip.  Can be an enum or predefined value"
+        INT slipSize "An enum of (26, 40, 50), stored in feet."
+    }
+
+    Dock {
+        INT dockID PK "Unique identifier for the dock in the DB"
+        VARCHAR dockNumber "Customer facing dock letter, e.g. A-C."
+        VARCHAR dockDescription "A customer facing brief description of the dock."
+    }
+
+    %% Robert Breutzmann - Contact Table (added v1.2.0)
+    %% Holds submissions from the marina site's Contact Us page. Intentionally
+    %% has no FK to Customer/Boat - a submitter may not be a registered
+    %% customer yet, so boatName/boatLength are free text, not references.
+    Contact {
+        INT contactId PK "Unique identifier for the contact-us submission"
+        VARCHAR firstName "Contact's first name, required"
+        VARCHAR lastName "Contact's last name, required"
+        VARCHAR email "Contact's email address, required"
+        VARCHAR boatName "Name of the contact's boat, optional - free text, not a Boat reference"
+        DECIMAL boatLength "Length of the contact's boat in feet, optional"
+        VARCHAR reasonForContact "Enum of common reasons (e.g. reservation question, waitlist question, billing, maintenance) plus Other"
+        TEXT message "Full text of the message submitted"
+        BOOLEAN responded "Whether marina staff has responded to this submission"
+        TIMESTAMP respondedDate "Date/time staff responded, null until responded"
+        TEXT respondedMessage "Staff's response message, null until responded"
+    }
+
+    Dock ||--o{ Slip : "has"
+
+%% A specific slip's location to a customer will be dockNumber-slipNumber.
+%% The Descriptions are a short description for the customer about where to find the dock or slip.
