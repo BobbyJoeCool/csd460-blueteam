@@ -1,0 +1,104 @@
+erDiagram
+
+    customer {
+        int customerId PK "Unique ID for each customer"
+        varchar firstName "Customer first name"
+        varchar lastName "Customer last name"
+        varchar email UK "Login username and contact email"
+        varchar passwordHash "Hashed password, validated in Java before hashing"
+        varchar phone "Contact phone number"
+        varchar streetAddress "Mailing street address"
+        varchar city "Mailing city"
+        char state "Two-letter state code"
+        varchar zipCode "ZIP code, varchar for leading zeros"
+        date dateJoined "Date account was created"
+    }
+
+
+%% Composite UNIQUE constraint on (regState, regNumber)
+    boat {
+        int boatId PK "Unique ID for each boat"
+        varchar boatName "Name of the vessel - may change with boat ownership."
+	varchar hin UK "Hull identification number. Can be null for qualifying older boats without a HIN, other proof of ownership still required."
+        char regState "State the boat is registered in"
+        varchar regNumber "State registration number, unique with regState"
+        varchar boatType "Sailboat, powerboat, catamaran, etc"
+        decimal boatLength "Length in feet, for slip fit"
+        decimal boatBeam "Width in feet, for slip fit"
+        int boatYear "Model year, can be null"
+    }
+
+
+    boatOwnership {
+	int ownershipId PK "Unique ID for each record of boat ownership"
+	int boatId FK "Unique ID for boat, references boat.boatId"
+	int customerId FK "Unique ID for customer with proof of ownership of boat, references customer.customerId"
+	date startDate "Date that boat ownership begins, not null."
+	date endDate "Date that boat ownership ends - null if current owner"
+    }
+	
+	
+
+    slipSize {
+    int slipSizeId PK "Unique identifier for slip size category"
+    int sizeFt UK "Slip size in feet"
+    
+    }
+
+    waitList {
+        int waitListId PK "Unique wait list entry identifier"
+        int customerId FK "Customer requesting a slip"
+        int slipSizeId FK "Requested slip size"
+        timestamp timeJoined "Time added to the wait list"
+        timestamp timeClosed "Time removed from the wait list; null while active"
+        varchar status "Current wait list status"
+    }
+
+    dock {
+        int dockId PK "Unique identifier for the dock in the DB"
+        varchar dockNumber UK "Customer facing dock letter, e.g. A-C"
+        varchar dockDescription "A customer facing brief description of the dock"
+    }
+
+
+%% Composite UNIQUE constraint on slip(dockId, slipNumber)
+    slip {
+        int slipId PK "Unique identifier for the slip in the DB"
+        int slipNumber "Customer facing slip number"
+        varchar slipDescription "A customer facing brief description of the slip"
+        int dockId FK "The dock ID that the slip is on, links to dockID."
+        varchar slipStatus "Current availability of slip (occupied, available, under maintenance, unavailable).  Can be an enum or predefined value"
+        int slipSizeId FK "References slipSize.slipSizeId"
+    }
+
+
+    reservation {
+        INT reservationId PK "Unique internal identifier for the reservation"
+        VARCHAR confirmationNumber UK "Unique confirmation number shown to the customer"
+	INT customerId FK "References customer who made the reservation"
+        INT boatId FK "References the boat assigned to the reservation"
+        INT slipId FK "References the reserved marina slip"
+        DATE startDate "Date the month-to-month lease begins"
+        DECIMAL monthlyRate "Monthly rental rate at the time of reservation"
+        VARCHAR reservationStatus "Current status of the reservation"
+    }
+
+    terminationNotice {
+        INT terminationNoticeId PK "Unique identifier for the termination notice"
+        INT reservationId FK "References the reservation being terminated"
+        DATE noticeDate "Date the customer submitted the 30-day notice"
+        DATE terminationDate "Date the lease is scheduled to end"
+        VARCHAR noticeStatus "Current status of the termination notice"
+    }
+
+   
+    slipSize ||--o{ waitList : requestedFor
+    boat ||--o{ reservation : assignedTo
+    customer ||--o{ reservation : makes
+    customer ||--o{ waitList : joins
+    dock ||--o{ slip : has
+    slip ||--o{ reservation : reservedFor
+    reservation ||--o{ terminationNotice : mayHave
+    customer ||--o{ boatOwnership : ownsThrough
+    boat ||--|{ boatOwnership : ownershipHistory
+    slipSize ||--o{ slip : categorizes
