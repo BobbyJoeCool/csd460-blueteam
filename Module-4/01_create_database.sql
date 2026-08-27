@@ -70,6 +70,33 @@ CREATE TABLE IF NOT EXISTS slip (
 -- =============================================================================
 -- TODO (Rodriguez, C.): add this section's CREATE TABLE statements here.
 
+CREATE TABLE Reservation (
+    reservationId INT AUTO_INCREMENT PRIMARY KEY,
+    confirmationNumber VARCHAR(30) NOT NULL UNIQUE,
+    customerId INT NOT NULL,
+    boatId INT NOT NULL,
+    slipId INT NOT NULL,
+    startDate DATE NOT NULL,
+    monthlyRate DECIMAL(10,2) NOT NULL,
+
+    reservationStatus ENUM(
+        'Active',
+        'Cancelled',
+        'Terminated'
+    ) NOT NULL
+);
+CREATE TABLE TerminationNotice (
+    terminationNoticeId INT AUTO_INCREMENT PRIMARY KEY,
+    reservationId INT NOT NULL UNIQUE,
+    noticeDate DATE NOT NULL,
+    terminationDate DATE NULL,
+
+    noticeStatus ENUM(
+        'Submitted',
+        'Pending',
+        'Approved'
+    ) NOT NULL
+);
 -- =============================================================================
 -- Foreign Keys (all team members)
 -- =============================================================================
@@ -93,6 +120,68 @@ SET @fk_exists = (
 SET @ddl = IF(@fk_exists = 0,
     'ALTER TABLE slip ADD CONSTRAINT fkSlipDockID FOREIGN KEY (dockID) REFERENCES dock (dockID)',
     'SELECT 1');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Reservation -> Customer
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fk_reservation_customer'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE Reservation ADD CONSTRAINT fk_reservation_customer FOREIGN KEY (customerId) REFERENCES customer(customerId)',
+    'SELECT 1'
+);
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+-- Reservation -> Boat
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fk_reservation_boat'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE Reservation ADD CONSTRAINT fk_reservation_boat FOREIGN KEY (boatId) REFERENCES boat(boatId)',
+    'SELECT 1'
+);
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+-- Reservation -> Slip
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fk_reservation_slip'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE Reservation ADD CONSTRAINT fk_reservation_slip FOREIGN KEY (slipId) REFERENCES slip(slipId)',
+    'SELECT 1'
+);
+
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+-- TerminationNotice -> Reservation
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fk_terminationNotice_reservation'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE TerminationNotice ADD CONSTRAINT fk_terminationNotice_reservation FOREIGN KEY (reservationId) REFERENCES Reservation(reservationId)',
+    'SELECT 1'
+);
+
 PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;

@@ -151,3 +151,17 @@ JOIN (
 -- Section: Rodriguez, C. - Seed Data TBD
 -- =============================================================================
 -- TODO (Rodriguez, C.): add this section's INSERT statements here.
+
+INSERT INTO Reservation
+    (reservationId, confirmationNumber, customerId, boatId, slipId, startDate, monthlyRate, reservationStatus)
+VALUES
+    (1, 'MB-00001', 1, 1, 8, '2026-06-01', 485.00, 'Active'),
+    (2, 'MB-00002', 2, 2, 4, '2026-07-01', 585.00, 'Active'),
+    (3, 'MB-00003', 3, 3, 1, '2026-05-15', 685.00, 'Active');
+    
+INSERT INTO TerminationNotice
+    (terminationNoticeId, reservationId, noticeDate, terminationDate, noticeStatus)
+VALUES
+    (1, 1, '2026-08-01', NULL, 'Submitted'),
+    (2, 2, '2026-08-10', NULL, 'Pending'),
+    (3, 3, '2026-08-15', '2026-09-14', 'Approved');

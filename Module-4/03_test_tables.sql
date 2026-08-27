@@ -41,3 +41,6 @@ SELECT * FROM slip;
 -- Section: Rodriguez, C. - Tables TBD
 -- =============================================================================
 -- TODO (Rodriguez, C.): add SELECT * FROM <table>; for each of your tables here.
+SELECT * FROM Reservation;
+
+SELECT * FROM TerminationNotice;
