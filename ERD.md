@@ -53,6 +53,20 @@ erDiagram
         BOOLEAN responded "Whether marina staff has responded to this submission"
         TIMESTAMP respondedDate "Date/time staff responded, null until responded"
         TEXT respondedMessage "Staff's response message, null until responded"
+        INT respondedEmployeeId FK "References Employee.employeeId - the employee who responded, null until responded"
+    }
+
+    %% --- Breutzmann, R. - Employee ---
+    %% Staff accounts for logging in and responding to Contact submissions.
+    Employee {
+        INT employeeId PK "Unique ID for each employee"
+        VARCHAR firstName "Employee first name"
+        VARCHAR lastName "Employee last name"
+        VARCHAR email UK "Login username and contact email"
+        VARCHAR passwordHash "Hashed password, validated in Java before hashing"
+        VARCHAR phone "Contact phone number"
+        VARCHAR role "Employee job role/title"
+        DATE hireDate "Date employee was hired"
     }
 
     %% --- Fernandez, M. - Customer & Boat ---
@@ -140,6 +154,7 @@ erDiagram
     Reservation ||--o{ TerminationNotice : "may have"
     Customer ||--o{ BoatOwnership : "owns through"
     Boat ||--|{ BoatOwnership : "ownership history"
+    Employee ||--o{ Contact : "responds to"
 
 %% A specific slip's location to a customer will be dockNumber-slipNumber.
 %% The Descriptions are a short description for the customer about where to find the dock or slip.
@@ -157,7 +172,7 @@ erDiagram
 
 Sources (one `.mmd` per team member, merged above; see Design Decisions for the reasoning behind each change):
 
-- `Module-3/Breutzmann-ERD-Draft/Breutzmann.mmd` - dock, slip, contact
+- `Module-3/Breutzmann-ERD-Draft/Breutzmann.mmd` - dock, slip, contact, employee
 - `Module-3/Fernandez-ERD-DRAFT/Customer_Boat_ERD.mmd` - customer, boat
 - `Module-3/SARA-ERD_MMD/waitlist_slipsize.mmd` - original slipSize, waitList draft
 - `Module-3/SARA-ERD_MMD/Sara_proposed_ERD.mmd` - adds BoatOwnership and reworks the slip/waitList/reservation FKs
@@ -184,3 +199,5 @@ Sources (one `.mmd` per team member, merged above; see Design Decisions for the 
 - **`Contact` table has no FK to `Customer` or `Boat`.** It holds Contact Us page submissions, and a submitter may not be a registered customer yet, so `boatName`/`boatLength` are free text the visitor typed in, not references into `Boat`. Owned by Breutzmann, R.
 - **`Contact.message`/`Contact.respondedMessage` use `TEXT`, not `VARCHAR`.** A contact-us message (and a staff reply to it) has no natural length cap, so an unbounded `TEXT` column was used instead of guessing at a `VARCHAR` limit.
 - **`Contact.reasonForContact` is a `VARCHAR` holding an enum-style value (common reasons plus "Other"), not a dedicated lookup table**, matching how `Slip.slipStatus` already represents its enum in this diagram - the exact reason list is an implementation detail for the `CREATE TABLE` script, not the ERD.
+- **`Employee` table mirrors `Customer`'s account fields** (`email` as a `UNIQUE` login username, `passwordHash`, `phone`) plus `role` and `hireDate`, since staff need to log in and respond to `Contact` submissions the same way customers log in to make reservations.
+- **`Contact.respondedEmployeeId` is a nullable FK to `Employee.employeeId`** (`Employee ||--o{ Contact : "responds to"`), null until a submission is answered - mirroring how `responded`/`respondedDate`/`respondedMessage` are already null until responded.

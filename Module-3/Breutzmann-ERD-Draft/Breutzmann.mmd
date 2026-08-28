@@ -28,9 +28,23 @@ erDiagram
         BOOLEAN responded "Whether marina staff has responded to this submission"
         TIMESTAMP respondedDate "Date/time staff responded, null until responded"
         TEXT respondedMessage "Staff's response message, null until responded"
+        INT respondedEmployeeId FK "References Employee.employeeId - the employee who responded, null until responded"
+    }
+
+    %% Staff accounts for logging in and responding to Contact submissions.
+    Employee {
+        INT employeeId PK "Unique ID for each employee"
+        VARCHAR firstName "Employee first name"
+        VARCHAR lastName "Employee last name"
+        VARCHAR email UK "Login username and contact email"
+        VARCHAR passwordHash "Hashed password, validated in Java before hashing"
+        VARCHAR phone "Contact phone number"
+        VARCHAR role "Employee job role/title"
+        DATE hireDate "Date employee was hired"
     }
 
     Dock ||--o{ Slip : "has"
+    Employee ||--o{ Contact : "responds to"
 
 %% A specific slip's location to a customer will be dockNumber-slipNumber.
 %% The Descriptions are a short description for the customer about where to find the dock or slip.

@@ -10,6 +10,12 @@
 --          in the Foreign Keys section at the end, once all tables
 --          exist, so table creation order and cross-table references
 --          never conflict.
+--          TEMPORARY EXCEPTION: while the schema is still changing shape
+--          across team members, this file drops and recreates the database
+--          on every run (see the DROP DATABASE line below) so nobody is
+--          stuck with a stale table left over from an earlier version.
+--          That line makes the whole script destructive to existing data -
+--          remove it once the database is fully up and running.
 -- Comment citation: Inline comments in this file were drafted with the
 --          assistance of Claude (Anthropic) and reviewed by the
 --          database lead, Breutzmann, R.
@@ -21,6 +27,11 @@
 -- =============================================================================
 -- Shared Setup - Database & Admin User (Database Lead: Breutzmann, R.)
 -- =============================================================================
+-- TODO: remove this line once the database is fully up and running. Until
+-- then, every run wipes the database clean so schema changes never leave
+-- behind a table/column shaped the old way - this deletes all data on every
+-- run, do not leave it in past active development.
+DROP DATABASE IF EXISTS moffatBayMarinaDB;
 CREATE DATABASE IF NOT EXISTS moffatBayMarinaDB;
 
 -- Shared dev/test app user. Password is intentionally simple for local
@@ -49,7 +60,7 @@ CREATE TABLE IF NOT EXISTS slip (
     slipNumber INT NOT NULL COMMENT 'Customer facing slip number.',
     slipDescription VARCHAR(255) COMMENT 'A customer facing brief description of the slip.',
     dockID INT NOT NULL,
-    slipStatus ENUM ('available', 'occupied', 'maintenance') NOT NULL DEFAULT 'available' COMMENT 'Occupied status of the slip.',
+    slipStatus ENUM ('operational', 'maintenance', 'unavailable') NOT NULL DEFAULT 'operational' COMMENT 'Occupied status of the slip.',
     slipSize INT NOT NULL COMMENT 'Slip length in feet: 26, 40, or 50.',
     CONSTRAINT chkSlipSize CHECK (slipSize IN (26, 40, 50)),
     CONSTRAINT uqDockSlipNumber UNIQUE (dockID, slipNumber)
@@ -69,7 +80,21 @@ CREATE TABLE IF NOT EXISTS contact (
     message TEXT NOT NULL COMMENT 'Full text of the message submitted.',
     responded BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether marina staff has responded to this submission.',
     respondedDate TIMESTAMP NULL COMMENT 'Date/time staff responded, null until responded.',
-    respondedMessage TEXT COMMENT 'Staff''s response message, null until responded.'
+    respondedMessage TEXT COMMENT 'Staff''s response message, null until responded.',
+    respondedEmployeeID INT NULL COMMENT 'References employee.employeeID - the employee who responded, null until responded.'
+);
+
+-- Staff accounts (see ERD.md). Employees log in and respond to Contact
+-- submissions via contact.respondedEmployeeID.
+CREATE TABLE IF NOT EXISTS employee (
+    employeeID INT AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL COMMENT 'Employee first name.',
+    lastName VARCHAR(50) NOT NULL COMMENT 'Employee last name.',
+    email VARCHAR(255) NOT NULL UNIQUE COMMENT 'Login username and contact email.',
+    passwordHash VARCHAR(255) NOT NULL COMMENT 'Hashed password, validated in Java before hashing.',
+    phone VARCHAR(20) COMMENT 'Contact phone number.',
+    role VARCHAR(50) COMMENT 'Employee job role/title.',
+    hireDate DATE COMMENT 'Date employee was hired.'
 );
 
 -- =============================================================================
@@ -136,6 +161,21 @@ SET @fk_exists = (
 );
 SET @ddl = IF(@fk_exists = 0,
     'ALTER TABLE slip ADD CONSTRAINT fkSlipDockID FOREIGN KEY (dockID) REFERENCES dock (dockID)',
+    'SELECT 1');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Contact -> Employee
+-- Placed here (rather than after the Reservation FKs below) so it still
+-- runs even while Reservation's FKs fail for lack of a customer/boat table -
+-- contact and employee both already exist, so this one doesn't need to wait.
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fkContactRespondedEmployeeID'
+);
+SET @ddl = IF(@fk_exists = 0,
+    'ALTER TABLE contact ADD CONSTRAINT fkContactRespondedEmployeeID FOREIGN KEY (respondedEmployeeID) REFERENCES employee (employeeID)',
     'SELECT 1');
 PREPARE stmt FROM @ddl;
 EXECUTE stmt;

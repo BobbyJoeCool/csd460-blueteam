@@ -196,6 +196,30 @@ SELECT * FROM (
 ) AS seedRows
 WHERE NOT EXISTS (SELECT 1 FROM contact);
 
+-- ---------------------------------------------------------------------------
+-- Employee - staff accounts
+-- ---------------------------------------------------------------------------
+-- Placeholder dev data: 5 staff accounts. Passwords are the SHA1 hashes of
+-- the plaintext 'AHAB1' through 'AHAB5' - a fast, unsalted hash used here
+-- only as a local-dev placeholder, matching the 'captainAhab' theme of the
+-- shared dev user above. Not suitable for production; swap for real
+-- (salted, slow) password hashing once actual employee authentication is
+-- implemented.
+--
+-- Hashed with SHA1() as literal values, not the SHA1() SQL function: this
+-- MySQL build (9.6.0 Homebrew) errors on SHA1()/MD5() entirely
+-- ("FUNCTION db.SHA1 does not exist" - confirmed with a bare
+-- `SELECT SHA1('test')`, so it is not specific to this script), likely an
+-- OpenSSL/FIPS restriction in how it was built. SHA2() still works, so this
+-- appears to only affect the two legacy digests. Hashes below were
+-- precomputed with `printf '%s' AHAB1 | shasum -a 1`.
+INSERT IGNORE INTO employee (firstName, lastName, email, passwordHash, phone, role, hireDate) VALUES
+    ('Maria', 'Alvarez', 'maria.alvarez@moffatbaymarina.com', '75b83b5f8301a44673ddacb0aab933cce6cd4d1a', '360-555-0101', 'Marina Manager', '2019-03-01'),
+    ('Tom', 'Whitfield', 'tom.whitfield@moffatbaymarina.com', '8150dce58a4c75046f0f7b6c9bfa047aefd5825f', '360-555-0102', 'Dockmaster', '2020-06-15'),
+    ('Priya', 'Nair', 'priya.nair@moffatbaymarina.com', '5581f9758ff000c517915a396941837f8a231974', '360-555-0103', 'Customer Service Rep', '2022-01-10'),
+    ('Derek', 'Simmons', 'derek.simmons@moffatbaymarina.com', '63562e70d4a27bbbcda3a7627fdbaa0c06e2589c', '360-555-0104', 'Maintenance Technician', '2021-09-01'),
+    ('Lena', 'Cho', 'lena.cho@moffatbaymarina.com', '93b0651d5db78917cb4d7f9d66b3c5dae1283c22', '360-555-0105', 'Billing Clerk', '2023-04-20');
+
 -- =============================================================================
 -- Section: White, S. - Seed Data TBD
 -- =============================================================================
