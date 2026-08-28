@@ -153,7 +153,7 @@ JOIN (
 -- TODO (Rodriguez, C.): add this section's INSERT statements here.
 
 INSERT INTO Reservation
-    (reservationId, confirmationNumber, customerId, boatId, slipId, startDate, monthlyRate, reservationStatus)
+    (reservationId, confirmationNumber, customerId, boatId, slipId, startDate, monthlyRate)
 VALUES
     (1, 'MB-00001', 1, 1, 8, '2026-06-01', 485.00),
     (2, 'MB-00002', 2, 2, 4, '2026-07-01', 585.00),
