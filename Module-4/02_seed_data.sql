@@ -155,9 +155,9 @@ JOIN (
 INSERT INTO Reservation
     (reservationId, confirmationNumber, customerId, boatId, slipId, startDate, monthlyRate, reservationStatus)
 VALUES
-    (1, 'MB-00001', 1, 1, 8, '2026-06-01', 485.00, 'Active'),
-    (2, 'MB-00002', 2, 2, 4, '2026-07-01', 585.00, 'Active'),
-    (3, 'MB-00003', 3, 3, 1, '2026-05-15', 685.00, 'Active');
+    (1, 'MB-00001', 1, 1, 8, '2026-06-01', 485.00),
+    (2, 'MB-00002', 2, 2, 4, '2026-07-01', 585.00),
+    (3, 'MB-00003', 3, 3, 1, '2026-05-15', 685.00);
     
 INSERT INTO TerminationNotice
     (terminationNoticeId, reservationId, noticeDate, terminationDate, noticeStatus)

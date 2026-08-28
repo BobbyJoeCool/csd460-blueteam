@@ -77,13 +77,7 @@ CREATE TABLE Reservation (
     boatId INT NOT NULL,
     slipId INT NOT NULL,
     startDate DATE NOT NULL,
-    monthlyRate DECIMAL(10,2) NOT NULL,
-
-    reservationStatus ENUM(
-        'Active',
-        'Cancelled',
-        'Terminated'
-    ) NOT NULL
+    monthlyRate DECIMAL(10,2) NOT NULL
 );
 CREATE TABLE TerminationNotice (
     terminationNoticeId INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,7 +88,9 @@ CREATE TABLE TerminationNotice (
     noticeStatus ENUM(
         'Submitted',
         'Pending',
-        'Approved'
+        'Approved',
+        'Withdrawn',
+        'Completed'
     ) NOT NULL
 );
 -- =============================================================================
