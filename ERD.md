@@ -3,8 +3,8 @@
 - Team: Blue Team
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
-- Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers.  Changelog maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.1.0
+- Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
+- Version: 1.0.0
 - Date: 2026-08-27
 
 ## Overview
@@ -37,6 +37,38 @@ erDiagram
         VARCHAR dockDescription "A customer facing brief description of the dock."
     }
 
+    %% --- Breutzmann, R. - Contact ---
+    %% Holds submissions from the marina site's Contact Us page. Intentionally
+    %% has no FK to Customer/Boat - a submitter may not be a registered
+    %% customer yet, so boatName/boatLength are free text, not references.
+    Contact {
+        INT contactId PK "Unique identifier for the contact-us submission"
+        VARCHAR firstName "Contact's first name, required"
+        VARCHAR lastName "Contact's last name, required"
+        VARCHAR email "Contact's email address, required"
+        VARCHAR boatName "Name of the contact's boat, optional - free text, not a Boat reference"
+        DECIMAL boatLength "Length of the contact's boat in feet, optional"
+        VARCHAR reasonForContact "Enum of common reasons (e.g. reservation question, waitlist question, billing, maintenance) plus Other"
+        TEXT message "Full text of the message submitted"
+        BOOLEAN responded "Whether marina staff has responded to this submission"
+        TIMESTAMP respondedDate "Date/time staff responded, null until responded"
+        TEXT respondedMessage "Staff's response message, null until responded"
+        INT respondedEmployeeId FK "References Employee.employeeId - the employee who responded, null until responded"
+    }
+
+    %% --- Breutzmann, R. - Employee ---
+    %% Staff accounts for logging in and responding to Contact submissions.
+    Employee {
+        INT employeeId PK "Unique ID for each employee"
+        VARCHAR firstName "Employee first name"
+        VARCHAR lastName "Employee last name"
+        VARCHAR email UK "Login username and contact email"
+        VARCHAR passwordHash "Hashed password, validated in Java before hashing"
+        VARCHAR phone "Contact phone number"
+        VARCHAR role "Employee job role/title"
+        DATE hireDate "Date employee was hired"
+    }
+
     %% --- Fernandez, M. - Customer & Boat ---
     Customer {
         INT customerId PK "Unique ID for each customer"
@@ -64,7 +96,7 @@ erDiagram
         INT boatYear "Model year, can be null"
     }
 
-    %% --- White, S. - Boat Ownership (added v1.1.0) ---
+    %% --- White, S. - Boat Ownership ---
     %% Replaces the old direct Boat.customerId FK with a Customer<->Boat
     %% many-to-many relationship, so the marina can keep ownership history
     %% instead of only the current owner.
@@ -122,27 +154,28 @@ erDiagram
     Reservation ||--o{ TerminationNotice : "may have"
     Customer ||--o{ BoatOwnership : "owns through"
     Boat ||--|{ BoatOwnership : "ownership history"
+    Employee ||--o{ Contact : "responds to"
 
 %% A specific slip's location to a customer will be dockNumber-slipNumber.
 %% The Descriptions are a short description for the customer about where to find the dock or slip.
 %% Mermaid has no composite key syntax: regState/regNumber each show a UK
 %% marker below, but together they form ONE composite unique constraint.
-%% Reservation.customerId is a direct FK as of v1.1.0 (previously reached only
-%% by joining Reservation.boatId -> Boat.customerId -> Customer.email).
-%% Boat ownership moved to BoatOwnership (added v1.1.0) instead of a direct
+%% Reservation.customerId is a direct FK (previously reached only by joining
+%% Reservation.boatId -> Boat.customerId -> Customer.email).
+%% Boat ownership is tracked via BoatOwnership instead of a direct
 %% Boat.customerId column, since a boat can change hands and the marina needs
 %% ownership history, not just the current owner - current owner is the
 %% BoatOwnership row with endDate IS NULL.
-%% WaitList now references Customer directly (v1.1.0) instead of Boat, since a
-%% customer can join the wait list before registering the boat that will fill it.
+%% WaitList references Customer directly instead of Boat, since a customer can
+%% join the wait list before registering the boat that will fill it.
 ```
 
-Sources (one `.mmd` per team member, merged above; see Changelog for v1.1.0 updates):
+Sources (one `.mmd` per team member, merged above; see Design Decisions for the reasoning behind each change):
 
-- `Module-3/Breutzmann-ERD-Draft/slip.mmd` - dock, slip
+- `Module-3/Breutzmann-ERD-Draft/Breutzmann.mmd` - dock, slip, contact, employee
 - `Module-3/Fernandez-ERD-DRAFT/Customer_Boat_ERD.mmd` - customer, boat
 - `Module-3/SARA-ERD_MMD/waitlist_slipsize.mmd` - original slipSize, waitList draft
-- `Module-3/SARA-ERD_MMD/Sara_proposed_ERD.mmd` - v1.1.0: adds BoatOwnership, and reworks slip/waitList/reservation FKs (see Changelog)
+- `Module-3/SARA-ERD_MMD/Sara_proposed_ERD.mmd` - adds BoatOwnership and reworks the slip/waitList/reservation FKs
 - `Module-3/Rodriguez-ERD/Rodriguez_ERD.mmd` - Reservation, TerminationNotice
 
 ## Design Decisions
@@ -158,24 +191,13 @@ Sources (one `.mmd` per team member, merged above; see Changelog for v1.1.0 upda
 - **Boat `year` is stored as `INT`, not MySQL's `YEAR` type.** `YEAR` isn't standard SQL and maps awkwardly through JDBC, so a plain `INT` was used instead - simpler on both the SQL and Java sides.
 - **Boat table adds a `regState` column, with a composite `UNIQUE (regState, regNumber)`.** Registration numbers are only unique per state (e.g. FL and GA could issue the same number), so a single-column `UNIQUE` on the number alone wasn't correct. Decided and owned by Fernandez, M. rather than needing full team sign-off, since the change is contained to the `boat` table and nothing else references it.
 - **All foreign keys are added at the end of the create script**, after every team member's tables are created, via `ALTER TABLE ... ADD CONSTRAINT` in `01_create_database.sql`'s Foreign Keys section - not inline on the `CREATE TABLE` statements. This avoids FK creation failing due to table-creation order as more people's tables are added.
-- **`BoatOwnership` table added (v1.1.0)** to track boat ownership over time, replacing the direct `Boat.customerId` FK with a `Customer` <-> `Boat` many-to-many relationship. This lets the marina keep ownership history when a boat changes hands, instead of only ever knowing the current owner. The current owner is the `BoatOwnership` row with `endDate IS NULL`. Proposed by White, S.
-- **`Boat.hin` added (v1.1.0)**, a nullable `UNIQUE` Hull Identification Number, as an additional way to identify a boat alongside `regState`/`regNumber`. Nullable to allow qualifying older boats without a HIN, provided other proof of ownership is on file.
-- **`Slip.slipSizeID` FK added (v1.1.0), replacing the old `slipSize` enum-style column.** Slip size is now defined once in `SlipSize` and referenced from `Slip`, instead of being duplicated inline as a checked `(26, 40, 50)` value.
-- **`WaitList.customerId` replaces `WaitList.boatID` (v1.1.0).** The wait list tracks which customer is waiting for a slip size, not which boat, since a customer can join the wait list before registering the boat that will occupy the slip.
-- **`Reservation.customerId` added as a direct FK (v1.1.0).** Previously the customer tied to a reservation was only reachable by joining through `Boat`; this is now a stored column, matching how `Customer` "makes" `Reservation` is drawn in the diagram.
-
-## Changelog
-
-### v1.1.0 - 2026-08-27
-
-- **Added the `BoatOwnership` table**, tracking the history of who owns each boat via a `Customer` <-> `Boat` many-to-many relationship (`Customer ||--o{ BoatOwnership`, `Boat ||--|{ BoatOwnership`), replacing the previous direct `Boat.customerId` foreign key. A boat's current owner is the `BoatOwnership` row with `endDate IS NULL`.
-- Added `Boat.hin` (nullable, `UNIQUE` Hull Identification Number).
-- Added `Slip.slipSizeID` FK (`SlipSize ||--o{ Slip : "categorizes"`), replacing the `slipSize` enum-style column on `Slip`.
-- Added `SlipSize.sizeFt` `UNIQUE` constraint.
-- Changed `WaitList.boatID` to `WaitList.customerId` - the wait list now tracks the requesting customer rather than a specific boat.
-- Added `Reservation.customerId` as a direct FK, replacing the earlier join-through-`Boat` design.
-- Source: `Module-3/SARA-ERD_MMD/Sara_proposed_ERD.mmd` (White, S.)
-
-### v1.0.0 - 2026-08-26
-
-- Initial combined ERD merging all four team members' table designs (Dock/Slip, Customer/Boat, SlipSize/WaitList, Reservation/TerminationNotice).
+- **`BoatOwnership` table** tracks boat ownership over time via a `Customer` <-> `Boat` many-to-many relationship, rather than a direct `Boat.customerId` FK. This lets the marina keep ownership history when a boat changes hands, instead of only ever knowing the current owner. The current owner is the `BoatOwnership` row with `endDate IS NULL`. Proposed by White, S.
+- **`Boat.hin`**, a nullable `UNIQUE` Hull Identification Number, is an additional way to identify a boat alongside `regState`/`regNumber` (proposed by White, S. alongside `BoatOwnership`). Nullable to allow qualifying older boats without a HIN, provided other proof of ownership is on file.
+- **`Slip.slipSizeID` FK replaces the old `slipSize` enum-style column.** Slip size is now defined once in `SlipSize` - which also carries a `UNIQUE` constraint on `sizeFt` so the same size can't be entered twice - and referenced from `Slip`, instead of being duplicated inline as a checked `(26, 40, 50)` value.
+- **`WaitList.customerId` replaces `WaitList.boatID`.** The wait list tracks which customer is waiting for a slip size, not which boat, since a customer can join the wait list before registering the boat that will occupy the slip.
+- **`Reservation.customerId` is a direct FK.** The customer tied to a reservation is reachable directly, rather than only by joining through `Boat`, matching how `Customer` "makes" `Reservation` is drawn in the diagram.
+- **`Contact` table has no FK to `Customer` or `Boat`.** It holds Contact Us page submissions, and a submitter may not be a registered customer yet, so `boatName`/`boatLength` are free text the visitor typed in, not references into `Boat`. Owned by Breutzmann, R.
+- **`Contact.message`/`Contact.respondedMessage` use `TEXT`, not `VARCHAR`.** A contact-us message (and a staff reply to it) has no natural length cap, so an unbounded `TEXT` column was used instead of guessing at a `VARCHAR` limit.
+- **`Contact.reasonForContact` is a `VARCHAR` holding an enum-style value (common reasons plus "Other"), not a dedicated lookup table**, matching how `Slip.slipStatus` already represents its enum in this diagram - the exact reason list is an implementation detail for the `CREATE TABLE` script, not the ERD.
+- **`Employee` table mirrors `Customer`'s account fields** (`email` as a `UNIQUE` login username, `passwordHash`, `phone`) plus `role` and `hireDate`, since staff need to log in and respond to `Contact` submissions the same way customers log in to make reservations.
+- **`Contact.respondedEmployeeId` is a nullable FK to `Employee.employeeId`** (`Employee ||--o{ Contact : "responds to"`), null until a submission is answered - mirroring how `responded`/`respondedDate`/`respondedMessage` are already null until responded.

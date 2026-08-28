@@ -27,6 +27,12 @@ SELECT * FROM dock;
 -- slip: 72 rows seeded (24 per dock).
 SELECT * FROM slip;
 
+-- contact: 10 rows seeded (fictional ship captains testing the Contact Us form).
+SELECT * FROM contact;
+
+-- employee: 5 rows seeded (staff accounts).
+SELECT * FROM employee;
+
 -- =============================================================================
 -- Section: White, S. - Tables TBD
 -- =============================================================================

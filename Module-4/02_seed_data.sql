@@ -6,7 +6,9 @@
 -- Purpose: Populate each team member's tables with placeholder dev data.
 --          Safe to re-run - INSERT IGNORE plus the unique constraints on
 --          dock.dockNumber and slip(dockID, slipNumber) skip rows that
---          already exist.
+--          already exist. contact has no natural unique key (a real visitor
+--          could submit more than once), so its block is instead guarded by
+--          "only seed if the table is currently empty".
 -- Comment citation: Inline comments in this file were drafted with the
 --          assistance of Claude (Anthropic) and reviewed by the
 --          database lead, Breutzmann, R.
@@ -136,6 +138,87 @@ JOIN (
     UNION ALL SELECT 23, '26 ft slip on Dock C.', 26
     UNION ALL SELECT 24, '26 ft slip on Dock C.', 26
 ) v ON d.dockNumber = 'C';
+
+-- ---------------------------------------------------------------------------
+-- Contact - Contact Us submissions
+-- ---------------------------------------------------------------------------
+-- Placeholder dev data: 10 fictional ship captains submit the marina's
+-- Contact Us form, each in character. No natural unique key on this table,
+-- so this block is guarded by "only seed if the table is currently empty"
+-- instead of INSERT IGNORE, to keep it safe to re-run without piling up
+-- duplicate rows.
+INSERT INTO contact (firstName, lastName, email, boatName, boatLength, reasonForContact, message, responded, respondedDate, respondedMessage)
+SELECT * FROM (
+    SELECT 'Jack' AS firstName, 'Sparrow' AS lastName, 'jack.sparrow@blackpearl.sea' AS email, 'Black Pearl' AS boatName, 145.00 AS boatLength, 'General Inquiry' AS reasonForContact,
+        'Savvy? Before I so much as consider a slip, I require a straight answer: how abundant is the rum supply at your marina? And I do mean rum, not "spiced rum-adjacent beverage" - I know the difference, mate, even when the room is spinning. A pirate has priorities.' AS message,
+        TRUE AS responded, '2026-06-14 10:15:00' AS respondedDate,
+        'Mr. Sparrow - the Ship Store keeps a modest selection of spiced rum for sale, though we do not provide complimentary rum with slip rentals. We look forward to your visit (and kindly ask that the Black Pearl not depart under cover of a "borrowed" longboat).' AS respondedMessage
+    UNION ALL
+    SELECT 'The', 'Captain', 'thecaptain@majesticmetaphors.com', NULL, NULL, 'Reservation Question',
+        'A ship, you see, is never just a ship - it is a vessel for who we are becoming. I do not yet possess a physical craft, but a Captain must always secure his harbor before he secures his heart. Reserve me your finest slip, on indefinite hold, so that when my vessel arrives - and it will arrive - I am ready to meet it as a Captain should: standing on the dock, unafraid.',
+        TRUE, '2026-05-02 16:40:00',
+        'Thank you for your submission. As we have no boat on file to assign a slip to, we are unable to hold a reservation at this time - please reach back out once you have a vessel and its dimensions, and we would be glad to assist.'
+    UNION ALL
+    SELECT 'Han', 'Solo', 'han.solo@corellianfreighter.com', 'Millennium Falcon', 114.00, 'Maintenance Issue',
+        'Look, she may not look like much, but she is the fastest hunk of junk in this galaxy, and right now her hyperdrive is acting up again. I need a mechanic who will not ask questions about the "modifications" under the deck plating, and I need it done fast - I have got people who are not exactly patient looking for me.',
+        FALSE, NULL, NULL
+    UNION ALL
+    SELECT 'Malcolm', 'Reynolds', 'mal.reynolds@serenity.verse', 'Serenity', 265.00, 'Billing',
+        'I run a crew, not a charity, so before Serenity so much as clips a line to one of your slips I want to know exactly what this is gonna cost me, and whether you will take payment in platinum. I would also take it kindly if your paperwork did not find its way into any Alliance hands - a captain likes to keep his business his own.',
+        FALSE, NULL, NULL
+    UNION ALL
+    SELECT 'Jean-Luc', 'Picard', 'jl.picard@starfleet.ufp', 'USS Enterprise (NCC-1701-D)', 2108.00, 'General Inquiry',
+        'I am given to understand that your largest slip accommodates a vessel of some fifty feet. The Enterprise measures rather more than that - upward of two thousand, in point of fact - so before we make first contact with your marina in truth, I should like to know whether some manner of exception, or at minimum a very long dock, might be arranged.',
+        TRUE, '2026-07-20 09:05:00',
+        'Captain Picard - we are flattered by the inquiry, but must respectfully report that no slip in this marina, nor any marina we are aware of, could accommodate a vessel of that scale. We would, however, be delighted to have the Enterprise anchor offshore while the crew enjoys the Ship Store by shuttle.'
+    UNION ALL
+    SELECT 'Ahab', 'of the Pequod', 'ahab@pequodwhaling.com', 'Pequod', 104.00, 'Waitlist Question',
+        'I am told your slips are all spoken for and that I must be content to wait. Wait I will not - not for a berth, and certainly not for the white whale I have hunted these many years across every ocean there is. Tell me plainly where I stand on your list, and do not test the patience of a man who has already given a leg to this pursuit.',
+        FALSE, NULL, NULL
+    UNION ALL
+    SELECT 'Nemo', 'N/A', 'captain.nemo@nautilus.sea', 'Nautilus', 229.66, 'Other',
+        'I have no nation, no name that matters, and no interest in the questions your paperwork tends to ask. I require a berth for the Nautilus, discretion regarding her comings and goings, and no undue curiosity about what lies beneath her waterline. I trust this is not an unreasonable arrangement for a man who owes nothing to the surface world.',
+        TRUE, '2026-04-11 22:30:00',
+        'Captain Nemo - we can offer a quiet, end-of-dock slip and can keep your registration details confidential per our standard privacy policy. We would ask, however, that the Nautilus surface for a standard hull inspection, same as any vessel.'
+    UNION ALL
+    SELECT 'James', 'Hook', 'james.hook@jollyroger.sea', 'Jolly Roger', 100.00, 'Other',
+        'A most pressing concern, and one I do not raise lightly: is there, to your knowledge, a large crocodile in these waters? One with, shall we say, a rather punctual disposition and an old score to settle with my left hand? I require an honest answer before the Jolly Roger comes anywhere near your docks - a codfish such as myself cannot be too careful.',
+        FALSE, NULL, NULL
+    UNION ALL
+    SELECT 'Odysseus', 'of Ithaca', 'odysseus@ithacashipping.gr', 'The Ithacan Galley', 100.00, 'Reservation Question',
+        'I have been rather a long time at sea - longer, I confess, than I intended, and not for lack of trying to get home. I require a single night''s berth for my ship and crew, safe from any singing women on nearby rocks and any establishment offering suspiciously excellent hospitality. One night only; my wife is waiting.',
+        TRUE, '2026-08-01 11:00:00',
+        'Mr. of Ithaca - a one-night slip is reserved as requested. We can confirm there are no sirens native to this marina, though we cannot speak for the karaoke night at the dockside restaurant on Fridays. Safe travels home.'
+    UNION ALL
+    SELECT 'Noah', 'of the Ark', 'noah@thearkmarine.com', 'The Ark', 450.00, 'Other',
+        'I am inquiring on behalf of a somewhat larger party than usual - two of every kind, to be precise, so I will need more than the standard amount of deck space and, frankly, a very serious answer on whether your slips can hold a vessel three hundred cubits long. Also, does your marina have a policy on livestock?',
+        FALSE, NULL, NULL
+) AS seedRows
+WHERE NOT EXISTS (SELECT 1 FROM contact);
+
+-- ---------------------------------------------------------------------------
+-- Employee - staff accounts
+-- ---------------------------------------------------------------------------
+-- Placeholder dev data: 5 staff accounts. Passwords are the SHA1 hashes of
+-- the plaintext 'AHAB1' through 'AHAB5' - a fast, unsalted hash used here
+-- only as a local-dev placeholder, matching the 'captainAhab' theme of the
+-- shared dev user above. Not suitable for production; swap for real
+-- (salted, slow) password hashing once actual employee authentication is
+-- implemented.
+--
+-- Hashed with SHA1() as literal values, not the SHA1() SQL function: this
+-- MySQL build (9.6.0 Homebrew) errors on SHA1()/MD5() entirely
+-- ("FUNCTION db.SHA1 does not exist" - confirmed with a bare
+-- `SELECT SHA1('test')`, so it is not specific to this script), likely an
+-- OpenSSL/FIPS restriction in how it was built. SHA2() still works, so this
+-- appears to only affect the two legacy digests. Hashes below were
+-- precomputed with `printf '%s' AHAB1 | shasum -a 1`.
+INSERT IGNORE INTO employee (firstName, lastName, email, passwordHash, phone, role, hireDate) VALUES
+    ('Maria', 'Alvarez', 'maria.alvarez@moffatbaymarina.com', '75b83b5f8301a44673ddacb0aab933cce6cd4d1a', '360-555-0101', 'Marina Manager', '2019-03-01'),
+    ('Tom', 'Whitfield', 'tom.whitfield@moffatbaymarina.com', '8150dce58a4c75046f0f7b6c9bfa047aefd5825f', '360-555-0102', 'Dockmaster', '2020-06-15'),
+    ('Priya', 'Nair', 'priya.nair@moffatbaymarina.com', '5581f9758ff000c517915a396941837f8a231974', '360-555-0103', 'Customer Service Rep', '2022-01-10'),
+    ('Derek', 'Simmons', 'derek.simmons@moffatbaymarina.com', '63562e70d4a27bbbcda3a7627fdbaa0c06e2589c', '360-555-0104', 'Maintenance Technician', '2021-09-01'),
+    ('Lena', 'Cho', 'lena.cho@moffatbaymarina.com', '93b0651d5db78917cb4d7f9d66b3c5dae1283c22', '360-555-0105', 'Billing Clerk', '2023-04-20');
 
 -- =============================================================================
 -- Section: White, S. - Seed Data TBD
