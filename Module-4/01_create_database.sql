@@ -98,9 +98,30 @@ CREATE TABLE IF NOT EXISTS employee (
 );
 
 -- =============================================================================
--- Section: White, S. - Tables TBD
+-- Section: White, S. - Tables SlipSize, WaitList, BoatOwnership
 -- =============================================================================
--- TODO (White, S.): add this section's CREATE TABLE statements here.
+
+CREATE TABLE IF NOT EXISTS SlipSize (
+    slipSizeId INT AUTO_INCREMENT PRIMARY KEY,
+    sizeFt INT NOT NULL UNIQUE COMMENT 'Slip size category in feet.'
+);
+
+CREATE TABLE IF NOT EXISTS WaitList (
+    waitListId INT AUTO_INCREMENT PRIMARY KEY,
+    customerId INT NOT NULL COMMENT 'Customer requesting a slip.',
+    slipSizeId INT NOT NULL COMMENT 'Requested slip size category.',
+    timeJoined TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time customer joined the wait list.',
+    timeClosed TIMESTAMP NULL COMMENT 'Date and time wait list entry was closed; null while active.',
+    status ENUM('Waiting', 'Offered', 'Fulfilled', 'Cancelled') NOT NULL DEFAULT 'Waiting' COMMENT 'Current status of the wait list entry.');
+
+CREATE TABLE IF NOT EXISTS BoatOwnership (
+    ownershipId INT AUTO_INCREMENT PRIMARY KEY,
+    boatId INT NOT NULL COMMENT 'References the physical boat.',
+    customerId INT NOT NULL COMMENT 'References the customer who owns or owned the boat.',
+startDate DATE NOT NULL COMMENT 'Date ownership began.',
+    endDate DATE NULL COMMENT 'Date ownership ended; NULL for current ownership.',
+    CONSTRAINT chkOwnershipDates CHECK (endDate IS NULL OR endDate >= startDate)
+);
 
 -- =============================================================================
 -- Section: Fernandez, M. - Tables TBD
