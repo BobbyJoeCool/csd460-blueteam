@@ -39,9 +39,13 @@ SELECT * FROM employee;
 -- TODO (White, S.): add SELECT * FROM <table>; for each of your tables here.
 
 -- =============================================================================
--- Section: Fernandez, M. - Tables TBD
+-- Section: Fernandez, M. - Customer & Boat Tables
 -- =============================================================================
--- TODO (Fernandez, M.): add SELECT * FROM <table>; for each of your tables here.
+-- Customer: 6 rows seeded.
+SELECT * FROM Customer;
+
+-- Boat: 6 rows seeded (one with a NULL hin - pre-1972 HIN exemption).
+SELECT * FROM Boat;
 
 -- =============================================================================
 -- Section: Rodriguez, C. - Tables TBD

@@ -103,9 +103,52 @@ CREATE TABLE IF NOT EXISTS employee (
 -- TODO (White, S.): add this section's CREATE TABLE statements here.
 
 -- =============================================================================
--- Section: Fernandez, M. - Tables TBD
+-- Section: Fernandez, M. - Customer & Boat Tables
 -- =============================================================================
--- TODO (Fernandez, M.): add this section's CREATE TABLE statements here.
+-- Customer holds the account. email doubles as the login username per the
+-- project requirements, so the UNIQUE constraint lives at the database level -
+-- an app-level "is this taken" check can be beaten by two signups landing at
+-- the same moment. The password rule (8+ chars, one upper, one lower) is
+-- validated in Java with a regex before hashing; this column only ever holds
+-- the hash, so there is nothing for SQL to enforce.
+CREATE TABLE IF NOT EXISTS Customer (
+    customerId INT AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL COMMENT 'Customer first name.',
+    lastName VARCHAR(50) NOT NULL COMMENT 'Customer last name.',
+    email VARCHAR(100) NOT NULL UNIQUE COMMENT 'Login username and contact email.',
+    passwordHash VARCHAR(255) NOT NULL COMMENT 'Hashed password, validated in Java before hashing.',
+    phone VARCHAR(20) COMMENT 'Contact phone number.',
+    streetAddress VARCHAR(100) COMMENT 'Mailing street address.',
+    city VARCHAR(50) COMMENT 'Mailing city.',
+    state CHAR(2) COMMENT 'Two letter state code.',
+    zipCode VARCHAR(10) COMMENT 'Zip code, varchar to keep leading zeros and allow +4.',
+    dateJoined DATE NOT NULL COMMENT 'Date the account was created.'
+);
+
+-- Boat holds the vessel only. It deliberately has no customerId column -
+-- ownership is tracked in BoatOwnership (White, S.) so a boat can change
+-- hands without losing its identity or its history. The current owner is the
+-- BoatOwnership row with endDate IS NULL.
+--
+-- hin is UNIQUE but nullable: boats built before 1972 are exempt from
+-- carrying a Hull Identification Number, and MySQL allows multiple NULLs in
+-- a UNIQUE column, so every exempt boat can sit as NULL without colliding.
+--
+-- Registration numbers are only unique within a state (FL and GA can issue
+-- the same digits), so regState + regNumber form one composite UNIQUE rather
+-- than a UNIQUE on the number by itself.
+CREATE TABLE IF NOT EXISTS Boat (
+    boatId INT AUTO_INCREMENT PRIMARY KEY,
+    hin VARCHAR(12) NULL UNIQUE COMMENT 'Hull Identification Number, immutable ID of the physical vessel. Null allowed for qualifying pre-1972 boats.',
+    boatName VARCHAR(50) NOT NULL COMMENT 'Name of the vessel, may change with ownership.',
+    regState CHAR(2) NOT NULL COMMENT 'State the boat is registered in.',
+    regNumber VARCHAR(20) NOT NULL COMMENT 'State registration number.',
+    boatType VARCHAR(30) COMMENT 'Sailboat, powerboat, catamaran, etc.',
+    boatLength DECIMAL(4,1) NOT NULL COMMENT 'Length in feet, used to check slip fit.',
+    boatBeam DECIMAL(4,1) COMMENT 'Width in feet, used to check slip fit.',
+    boatYear INT COMMENT 'Model year. INT rather than MySQL YEAR for portability and JDBC mapping.',
+    CONSTRAINT uqBoatRegistration UNIQUE (regState, regNumber)
+);
 
 -- =============================================================================
 -- Section: Rodriguez, C. - Tables TBD

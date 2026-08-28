@@ -226,9 +226,53 @@ INSERT IGNORE INTO employee (firstName, lastName, email, passwordHash, phone, ro
 -- TODO (White, S.): add this section's INSERT statements here.
 
 -- =============================================================================
--- Section: Fernandez, M. - Seed Data TBD
+-- Section: Fernandez, M. - Customer & Boat Seed Data
 -- =============================================================================
--- TODO (Fernandez, M.): add this section's INSERT statements here.
+-- NOTE (Fernandez, M.): this block must run BEFORE White, S. (BoatOwnership
+-- has FKs into Boat) and BEFORE Rodriguez, C. (the Reservation seed hardcodes
+-- customerId and boatId 1-3). If White, S.'s section above ends up with
+-- inserts in it, these two sections need to swap places.
+--
+-- INSERT IGNORE plus the UNIQUE constraints on Customer.email and
+-- Boat(regState, regNumber) make this safe to re-run - rows that already
+-- exist are skipped rather than duplicated.
+--
+-- Placeholder dev data. passwordHash values are SHA-256 hashes of throwaway
+-- plaintexts (Password1, Sailor22, Harbor33, Anchor44, Voyage55, Compass66),
+-- precomputed as literals rather than calling SHA2() inline. Fast, unsalted,
+-- local dev only - swap for real salted hashing when auth is built.
+
+INSERT IGNORE INTO Customer
+    (firstName, lastName, email, passwordHash, phone, streetAddress, city, state, zipCode, dateJoined)
+VALUES
+    ('Elena', 'Marsh', 'elena.marsh@example.com', '19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd', '360-555-0201', '412 Harborview Dr', 'Moffat Bay', 'WA', '98110', '2025-03-14'),
+    ('Desmond', 'Okafor', 'desmond.okafor@example.com', '79dbca7f9123dfe0a3fa9dc73f1bb2d15be4363f132670bd59dde0855399ae5d', '360-555-0202', '87 Tidewater Ln', 'Port Grayson', 'WA', '98221', '2025-06-02'),
+    ('Yuki', 'Tanaka', 'yuki.tanaka@example.com', '9f823135be67747e31b1d0ef1126de84fad87acc965a2858de4194f18854894f', '360-555-0203', '1550 Anchorage Way', 'Moffat Bay', 'WA', '98110', '2025-09-19'),
+    ('Rosa', 'Delgado', 'rosa.delgado@example.com', '6d1a72e73d6d9069b02d52e122975f56875599c9fa7163589cd1f134369f6de7', '360-555-0204', '23 Gull Point Rd', 'Sable Cove', 'OR', '97103', '2026-01-08'),
+    ('Arthur', 'Penhale', 'arthur.penhale@example.com', '97bc5815a0ef8755209f00d17491c06776d378195e413b35d39b242a8ab19e65', '360-555-0205', '9 Old Pier St', 'Moffat Bay', 'WA', '98110', '2026-02-27'),
+    ('Nadia', 'Brennan', 'nadia.brennan@example.com', '2318dad6a5fd33325059d18e9e2df1ed22fcd8cae3d30a6f69fa033f014194c2', '360-555-0206', '744 Saltgrass Ave', 'Port Grayson', 'WA', '98221', '2026-05-30');
+
+-- Boats 1-3 are sized to the slips Rodriguez, C. reserved for them in the
+-- Reservation seed: boatId 1 -> slip 8 (26 ft), boatId 2 -> slip 4 (40 ft),
+-- boatId 3 -> slip 1 (50 ft). Every boat below is shorter than its slip.
+--
+-- boatId 6 (Wandering Albatross, 1968) is intentionally seeded with a NULL
+-- hin to exercise the pre-1972 exemption case.
+--
+-- Intended ownership, for whoever writes the BoatOwnership rows: boats 1-3
+-- belong to customers 1-3 respectively, boat 4 to customer 4, boats 5 and 6
+-- both to customer 5 (one customer, two boats), leaving customer 6 with no
+-- boat registered yet - a valid state, since a customer can join the wait
+-- list before registering a vessel.
+INSERT IGNORE INTO Boat
+    (hin, boatName, regState, regNumber, boatType, boatLength, boatBeam, boatYear)
+VALUES
+    ('MFT412A3B404', 'Salt Whisper',       'WA', 'WN1204JT', 'Sailboat',  24.5,  8.2, 2014),
+    ('BNT52C7D8188', 'Second Wind',        'WA', 'WN3391RK', 'Powerboat', 38.0, 13.5, 2019),
+    ('CRS63E9F2224', 'Meridian',           'WA', 'WN0087PL', 'Catamaran', 47.5, 22.0, 2021),
+    ('HLM74G1H6360', 'Gullwing',           'OR', 'OR5540BM', 'Sailboat',  31.0, 10.4, 2008),
+    ('SBK85J3K0504', 'Little Bear',        'WA', 'WN7712DF', 'Powerboat', 22.0,  8.0, 2016),
+    (NULL,           'Wandering Albatross','WA', 'WN0431XG', 'Sailboat',  36.0, 11.0, 1968);
 
 -- =============================================================================
 -- Section: Rodriguez, C. - Seed Data TBD
