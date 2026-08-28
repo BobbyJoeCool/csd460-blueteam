@@ -55,6 +55,23 @@ CREATE TABLE IF NOT EXISTS slip (
     CONSTRAINT uqDockSlipNumber UNIQUE (dockID, slipNumber)
 );
 
+-- Contact Us page submissions (see ERD.md v1.2.0). Deliberately has no FK to
+-- customer/boat - a submitter may not be a registered customer yet, so
+-- boatName/boatLength are free text the visitor typed in, not references.
+CREATE TABLE IF NOT EXISTS contact (
+    contactID INT AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL COMMENT 'Contact''s first name, required.',
+    lastName VARCHAR(50) NOT NULL COMMENT 'Contact''s last name, required.',
+    email VARCHAR(255) NOT NULL COMMENT 'Contact''s email address, required.',
+    boatName VARCHAR(100) COMMENT 'Name of the contact''s boat, optional - free text, not a link to the boat table.',
+    boatLength DECIMAL(6,2) COMMENT 'Length of the contact''s boat in feet, optional.',
+    reasonForContact ENUM ('Reservation Question', 'Waitlist Question', 'Billing', 'Maintenance Issue', 'General Inquiry', 'Other') NOT NULL COMMENT 'Reason the contact form was submitted.',
+    message TEXT NOT NULL COMMENT 'Full text of the message submitted.',
+    responded BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether marina staff has responded to this submission.',
+    respondedDate TIMESTAMP NULL COMMENT 'Date/time staff responded, null until responded.',
+    respondedMessage TEXT COMMENT 'Staff''s response message, null until responded.'
+);
+
 -- =============================================================================
 -- Section: White, S. - Tables TBD
 -- =============================================================================

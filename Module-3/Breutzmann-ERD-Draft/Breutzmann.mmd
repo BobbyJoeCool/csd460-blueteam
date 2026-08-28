@@ -16,10 +16,6 @@ erDiagram
         VARCHAR dockDescription "A customer facing brief description of the dock."
     }
 
-    %% Robert Breutzmann - Contact Table (added v1.2.0)
-    %% Holds submissions from the marina site's Contact Us page. Intentionally
-    %% has no FK to Customer/Boat - a submitter may not be a registered
-    %% customer yet, so boatName/boatLength are free text, not references.
     Contact {
         INT contactId PK "Unique identifier for the contact-us submission"
         VARCHAR firstName "Contact's first name, required"
