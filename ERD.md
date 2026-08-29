@@ -100,7 +100,51 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 5: Slip | Owner: Breutzmann, R. |
+    %% Table 5: Slip Size (SlipSize) | Owner: White, S. |
+    %% Inward FKs SlipSize.slipSizeID <- Slip.slipSizeID,
+    %%            SlipSize.slipSizeID <- WaitList.slipSizeID
+    %% Outward FKs (none)
+    %% Lookup of valid slip sizes in feet (26/40/50). Created before Slip and
+    %% WaitList since both hold a slipSizeID FK into this table.
+    %% =============================================================================
+    SlipSize {
+        INT slipSizeID PK "Unique ID for the slip Size"
+        INT sizeFt UK "Slip size in feet"
+    }
+
+    %% =============================================================================
+    %% Table 6: Wait List (WaitList) | Owner: White, S. |
+    %% Inward FKs (none)
+    %% Outward FKs WaitList.customerID FK -> Customer.customerID,
+    %%             WaitList.slipSizeID FK -> SlipSize.slipSizeID
+    %% Customers waiting for a slip of a given size when none are available.
+    %% =============================================================================
+    WaitList {
+        INT waitListID PK "Unique wait list entry identifier"
+        INT customerID FK "Customer requesting a slip"
+        INT slipSizeID FK "Requested slip size, references SlipSize.slipSizeID"
+        TIMESTAMP timeJoined "Time added to the wait list"
+        TIMESTAMP timeClosed "Time removed from the wait list; null while active"
+        STRING status "Current wait list status"
+    }
+
+    %% =============================================================================
+    %% Table 7: Boat Ownership (BoatOwnership) | Owner: White, S. |
+    %% Inward FKs (none)
+    %% Outward FKs BoatOwnership.boatID FK -> Boat.boatID,
+    %%             BoatOwnership.customerID FK -> Customer.customerID
+    %% Customer<->Boat ownership history; current owner has endDate NULL.
+    %% =============================================================================
+    BoatOwnership {
+        INT ownershipID PK "Unique ID for each record of boat ownership"
+        INT boatID FK "References the boat being owned, references Boat.boatID"
+        INT customerID FK "References the customer with proof of ownership, references Customer.customerID"
+        DATE startDate "Date that boat ownership begins, not null"
+        DATE endDate "Date that boat ownership ends - null if current owner"
+    }
+
+    %% =============================================================================
+    %% Table 8: Slip | Owner: Breutzmann, R. |
     %% Inward FKs Slip.slipID <- Reservation.slipID
     %% Outward FKs Slip.dockID FK -> Dock.dockID,
     %%             Slip.slipSizeID FK -> SlipSize.slipSizeID
@@ -116,7 +160,7 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 6: Contact | Owner: Breutzmann, R. |
+    %% Table 9: Contact | Owner: Breutzmann, R. |
     %% Inward FKs (none)
     %% Outward FKs Contact.respondedEmployeeID FK -> Employee.employeeID
     %% Contact Us submissions; visitor may not be a registered Customer/Boat yet.
@@ -137,7 +181,7 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 7: Reservation | Owner: Rodriguez, C. |
+    %% Table 10: Reservation | Owner: Rodriguez, C. |
     %% Inward FKs Reservation.reservationID <- TerminationNotice.reservationID
     %% Outward FKs Reservation.customerID FK -> Customer.customerID,
     %%             Reservation.boatID FK -> Boat.boatID,
@@ -156,7 +200,7 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 8: Termination Notice (TerminationNotice) | Owner: Rodriguez, C. |
+    %% Table 11: Termination Notice (TerminationNotice) | Owner: Rodriguez, C. |
     %% Inward FKs (none)
     %% Outward FKs TerminationNotice.reservationID FK -> Reservation.reservationID
     %% 30-day notice a customer files to end a Reservation's lease.
@@ -167,49 +211,6 @@ erDiagram
         DATE noticeDate "Date the customer submitted the 30-day notice"
         DATE terminationDate "Date the lease is scheduled to end"
         VARCHAR noticeStatus "Current status of the termination notice"
-    }
-
-    %% =============================================================================
-    %% Table 9: Slip Size (SlipSize) | Owner: White, S. |
-    %% Inward FKs SlipSize.slipSizeID <- Slip.slipSizeID,
-    %%            SlipSize.slipSizeID <- WaitList.slipSizeID
-    %% Outward FKs (none)
-    %% Lookup of valid slip sizes in feet (26/40/50). NOT YET IN THE SQL SCRIPT.
-    %% =============================================================================
-    SlipSize {
-        INT slipSizeID PK "Unique ID for the slip Size"
-        INT sizeFt UK "Slip size in feet"
-    }
-
-    %% =============================================================================
-    %% Table 10: Wait List (WaitList) | Owner: White, S. |
-    %% Inward FKs (none)
-    %% Outward FKs WaitList.customerID FK -> Customer.customerID,
-    %%             WaitList.slipSizeID FK -> SlipSize.slipSizeID
-    %% Customers waiting for a slip size when none are available. NOT YET BUILT.
-    %% =============================================================================
-    WaitList {
-        INT waitListID PK "Unique wait list entry identifier"
-        INT customerID FK "Customer requesting a slip"
-        INT slipSizeID FK "Requested slip size, references SlipSize.slipSizeID"
-        TIMESTAMP timeJoined "Time added to the wait list"
-        TIMESTAMP timeClosed "Time removed from the wait list; null while active"
-        STRING status "Current wait list status"
-    }
-
-    %% =============================================================================
-    %% Table 11: Boat Ownership (BoatOwnership) | Owner: White, S. |
-    %% Inward FKs (none)
-    %% Outward FKs BoatOwnership.boatID FK -> Boat.boatID,
-    %%             BoatOwnership.customerID FK -> Customer.customerID
-    %% Customer<->Boat ownership history; current owner has endDate NULL. TBD.
-    %% =============================================================================
-    BoatOwnership {
-        INT ownershipID PK "Unique ID for each record of boat ownership"
-        INT boatID FK "References the boat being owned, references Boat.boatID"
-        INT customerID FK "References the customer with proof of ownership, references Customer.customerID"
-        DATE startDate "Date that boat ownership begins, not null"
-        DATE endDate "Date that boat ownership ends - null if current owner"
     }
 
     %% --- Relationships ---
