@@ -34,11 +34,6 @@ SELECT * FROM contact;
 SELECT * FROM employee;
 
 -- =============================================================================
--- Section: White, S. - Tables TBD
--- =============================================================================
--- TODO (White, S.): add SELECT * FROM <table>; for each of your tables here.
-
--- =============================================================================
 -- Section: Fernandez, M. - Customer & Boat Tables
 -- =============================================================================
 -- Customer: 6 rows seeded.
@@ -54,3 +49,14 @@ SELECT * FROM Boat;
 SELECT * FROM Reservation;
 
 SELECT * FROM TerminationNotice;
+
+-- =============================================================================
+-- Section: White, S. - SlipSize, WaitList, BoatOwnership
+-- =============================================================================
+-- TODO (White, S.): add SELECT * FROM <table>; for each of your tables here.
+
+SELECT * FROM SlipSize;
+
+SELECT * FROM WaitList;
+
+SELECT * FROM BoatOwnership;
