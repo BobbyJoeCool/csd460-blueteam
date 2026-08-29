@@ -322,3 +322,34 @@ DEALLOCATE PREPARE stmt;
 -- DEALLOCATE PREPARE stmt;
 
 -- TODO: add remaining FKs here using the same guarded pattern as more tables are created.
+
+-- BoatOwnership -> Boat
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fkBoatOwnershipBoat'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE boatOwnership ADD CONSTRAINT fkBoatOwnershipBoat FOREIGN KEY (boatId) REFERENCES boat(boatId)',
+    'SELECT 1'
+);
+
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+-- BoatOwnership -> Customer
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'moffatBayMarinaDB' AND CONSTRAINT_NAME = 'fkBoatOwnershipCustomer'
+);
+
+SET @ddl = IF(
+    @fk_exists = 0,
+    'ALTER TABLE boatOwnership ADD CONSTRAINT fkBoatOwnershipCustomer FOREIGN KEY (customerId) REFERENCES customer(customerId)',
+    'SELECT 1'
+);
+
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
