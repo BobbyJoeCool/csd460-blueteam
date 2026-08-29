@@ -221,11 +221,6 @@ INSERT IGNORE INTO employee (firstName, lastName, email, passwordHash, phone, ro
     ('Lena', 'Cho', 'lena.cho@moffatbaymarina.com', '93b0651d5db78917cb4d7f9d66b3c5dae1283c22', '360-555-0105', 'Billing Clerk', '2023-04-20');
 
 -- =============================================================================
--- Section: White, S. - Seed Data TBD
--- =============================================================================
--- TODO (White, S.): add this section's INSERT statements here.
-
--- =============================================================================
 -- Section: Fernandez, M. - Customer & Boat Seed Data
 -- =============================================================================
 -- NOTE (Fernandez, M.): this block must run BEFORE White, S. (BoatOwnership
@@ -292,3 +287,62 @@ VALUES
     (1, 1, '2026-08-01', NULL, 'Submitted'),
     (2, 2, '2026-08-10', NULL, 'Pending'),
     (3, 3, '2026-08-15', '2026-09-14', 'Approved');
+    
+-- =============================================================================
+-- Section: White, S. - SlipSize, WaitList, BoatOwnership
+-- =============================================================================
+INSERT IGNORE INTO SlipSize (sizeFt)
+VALUES
+    (26),
+    (40),
+    (50);
+    
+INSERT INTO BoatOwnership
+    (boatId, customerId, startDate, endDate)
+VALUES
+    (1, 1, '2023-04-15', NULL),
+    (2, 2, '2024-02-10', NULL),
+    (3, 3, '2024-08-22', NULL),
+
+    -- Gullwing was sold by customer 4 to customer 6
+    (4, 4, '2022-06-01', '2026-06-15'),
+    (4, 6, '2026-06-15', NULL),
+
+    -- Customer 5 currently owns two boats
+    (5, 5, '2023-09-12', NULL),
+    (6, 5, '2021-05-20', NULL);
+    
+    
+    
+    INSERT INTO WaitList
+    (customerId, slipSizeId, timeJoined, timeClosed, status)
+VALUES
+    (
+        2,
+        (SELECT slipSizeId FROM SlipSize WHERE sizeFt = 40),
+        '2026-01-15 09:00:00',
+        '2026-07-01 09:00:00',
+        'Fulfilled'
+    ),
+    (
+        4,
+        (SELECT slipSizeId FROM SlipSize WHERE sizeFt = 40),
+        '2026-06-20 11:30:00',
+        NULL,
+        'Waiting'
+    ),
+    (
+        5,
+        (SELECT slipSizeId FROM SlipSize WHERE sizeFt = 40),
+        '2026-07-05 14:15:00',
+        NULL,
+        'Waiting'
+    ),
+    (
+        6,
+        (SELECT SlipSizeId FROM slipSize WHERE sizeFt = 40),
+        '2026-07-18 08:45:00',
+        NULL,
+        'Waiting'
+    );
+    
