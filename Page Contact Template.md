@@ -11,6 +11,10 @@
 - Database:
 - Testing:
 
+## Open Questions / Decisions Needed
+
+-
+
 ## Front End Variables
 
 Every field or control the page's UI sends to the Back End (form fields, query-string params on a lookup page, etc.).
@@ -29,7 +33,7 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 ## Database Returns
 
-Every query or DAO method the Back End calls for this page, and its exact return shape - including what it returns on "no match" (null vs. empty object vs. exception).
+Every query or DAO method the Back End calls for this page, and its exact return shape — including what it returns on "no match" (null vs. empty object vs. exception).
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
@@ -47,7 +51,3 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
 | | | |
-
-## Open Questions / Decisions Needed
-
--
