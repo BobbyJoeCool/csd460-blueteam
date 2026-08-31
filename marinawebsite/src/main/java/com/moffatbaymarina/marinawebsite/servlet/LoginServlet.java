@@ -22,6 +22,17 @@ import jakarta.servlet.http.HttpSession;
  * "What the Front End Sees on Failure", "Where the User Lands After
  * Login".
  *
+ * <p>Deviates from the contract's literal "simple error page with a
+ * link back to the homepage" on one point (team decision, not yet
+ * reflected in the contract doc): there is no separate error page.
+ * Login is a modal that can be opened from any page, so on failure
+ * this servlet forwards back to whatever page the modal was opened
+ * on - the same {@code redirectTo} field used for a success redirect
+ * - with {@code loginError} (and {@code accountLocked}) set as
+ * request attributes. Whatever page that is needs to check for those
+ * attributes and re-open the modal with the error shown inline; that
+ * part is Front End's to build.
+ *
  * @author Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
@@ -37,12 +48,6 @@ public class LoginServlet extends HttpServlet {
     /* Fixed by the Login contract's demo reset flow: /login?action=reset. */
     private static final String PARAM_ACTION = "action";
     private static final String ACTION_RESET = "reset";
-
-    /* PLACEHOLDER - login-error.jsp doesn't exist yet; this is the path the Login contract says it should live at. */
-    private static final String ERROR_PAGE = "/login-error.jsp";
-
-    /* PLACEHOLDER - the Login contract doesn't say where the browser goes after a successful demo reset, only that clicking Reset clears the lock. Landing page is a guess. */
-    private static final String POST_RESET_REDIRECT = "/";
 
     private static final String DEFAULT_REDIRECT = "/";
     private static final int MAX_FAILED_ATTEMPTS = 3;
@@ -116,8 +121,10 @@ public class LoginServlet extends HttpServlet {
     /**
      * Clears the lockout for the submitted email via
      * {@link CustomerDAO#unlockAccount(String)}, then redirects the browser
-     * to {@link #POST_RESET_REDIRECT}. A blank/missing email is silently
-     * ignored rather than treated as an error.
+     * back to {@link #safeRedirectTarget(HttpServletRequest)} - the same
+     * page the modal was opened on, same as a successful login. A
+     * blank/missing email is silently ignored rather than treated as an
+     * error.
      *
      * @param request the demo-reset request
      * @param response the response to redirect
@@ -134,7 +141,7 @@ public class LoginServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Account reset failed", e);
         }
-        response.sendRedirect(request.getContextPath() + POST_RESET_REDIRECT);
+        response.sendRedirect(request.getContextPath() + safeRedirectTarget(request));
     }
 
     /**
@@ -177,8 +184,8 @@ public class LoginServlet extends HttpServlet {
 
     /**
      * Sets the generic "username or password" loginError message (the
-     * one that never reveals which field was wrong) and forwards to
-     * the error page.
+     * one that never reveals which field was wrong) and forwards back
+     * to the page the modal was opened on.
      *
      * @param request the request to attach the error message to
      * @param response the response to forward
@@ -188,13 +195,14 @@ public class LoginServlet extends HttpServlet {
     private void showInvalidCredentials(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("loginError", "The username or password you entered is incorrect.");
-        forwardToErrorPage(request, response);
+        forwardToOriginPage(request, response);
     }
 
     /**
      * Sets the account-locked loginError message plus the
-     * accountLocked flag the error page checks to show the demo Reset
-     * button, then forwards to the error page.
+     * accountLocked flag the modal checks to show the demo Unlock
+     * Account button, then forwards back to the page the modal was
+     * opened on.
      *
      * @param request the request to attach the error message and flag to
      * @param response the response to forward
@@ -205,22 +213,24 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("loginError", "This account has been locked after multiple failed login attempts.");
         request.setAttribute("accountLocked", Boolean.TRUE);
-        forwardToErrorPage(request, response);
+        forwardToOriginPage(request, response);
     }
 
     /**
      * Shared last step for both failure cases: forwards the request to
-     * {@link #ERROR_PAGE} so whatever attributes were just set are
-     * available to it.
+     * {@link #safeRedirectTarget(HttpServletRequest)} - the same page
+     * the login modal was submitted from - so whatever attributes were
+     * just set are available to it and the modal can re-open with the
+     * error shown inline. There is no separate error page.
      *
      * @param request the request carrying the error attributes
      * @param response the response to forward
      * @throws ServletException if the forward fails
      * @throws IOException if the forward fails
      */
-    private void forwardToErrorPage(HttpServletRequest request, HttpServletResponse response)
+    private void forwardToOriginPage(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(ERROR_PAGE);
+        RequestDispatcher dispatcher = request.getRequestDispatcher(safeRedirectTarget(request));
         dispatcher.forward(request, response);
     }
 }

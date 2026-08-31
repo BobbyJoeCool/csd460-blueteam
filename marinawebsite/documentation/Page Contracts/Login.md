@@ -19,8 +19,8 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 ### Front End Owns
 
 - [ ] **Login field `name` attributes:** What are the exact `name` values for the email/username and password form fields? Front End picks these, Back End just needs to know what they're called so it can read what got submitted.
-- [ ] **Form submission method:** Does the modal submit via a standard form POST (page reloads) or AJAX/fetch (modal stays open for inline error display)? This changes how both sides handle the request/response cycle.
-- [ ] **Error display location:** Where in the modal does the error message render? Front End reads the error attribute Back End sets (see below) and places it.
+- [x] **Form submission method:** Decided — standard form POST. Login is a modal that can be opened from any page, so Back End forwards (not redirects) back to whichever page the modal was submitted from on failure, keeping the URL unchanged. See [What the Front End Sees on Failure](#what-the-front-end-sees-on-failure).
+- [x] **Error display location:** Decided — inline in the modal itself, on the same page it was opened from. There is no separate error page/JSP. Front End reads `loginError` (and `accountLocked`, for the lockout case) as request attributes on that forwarded request and re-opens the modal with the message shown inline.
 - [ ] **Client-side email format validation:** Since the login identifier is the `email` column, Front End needs to check the username field looks like a real email address (`type="email"` and/or a pattern check) before letting the form submit. This is just for UX, it's not trusted. The back end still does its own lookup and treats a non-match the same as any other bad login.
 
 ### Back End Owns
@@ -74,8 +74,8 @@ The password comes along too, in hashed form, since it's part of the same record
 
 Two different failure messages, so the user knows what's going on. Neither one ever says which of username or password was wrong though, only whether the account is now locked:
 
-- **Wrong username or password:** "The username or password you entered is incorrect." Shows on a simple error page with a link back to the homepage.
-- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shows on that same error page, but with the demo "Reset" button added so the user can unlock it right there.
+- **Wrong username or password:** "The username or password you entered is incorrect." Shown inline in the login modal, on whatever page the modal was submitted from — there is no separate error page.
+- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login?action=reset` and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
 
 ### Where the User Lands After Login
 
@@ -126,6 +126,6 @@ Every user-facing error condition this page can hit, and exactly what the user s
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | `login-error.jsp`, with a link back to the landing page |
-| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | `login-error.jsp`, with the demo "Reset" button in place of (or alongside) the landing-page link |
+| Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Inline in the login modal, on the page it was submitted from. No separate error page — Back End forwards back to that same page with `loginError` set as a request attribute. |
+| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the demo "Unlock Account" button |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |

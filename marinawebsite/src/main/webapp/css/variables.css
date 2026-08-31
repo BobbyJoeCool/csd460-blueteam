@@ -91,6 +91,13 @@
 	/* Borders / dividers */
 	--color-border: var(--color-charcoal-navy);
 
+	/* Overlays — dark layer behind an open modal (Login modal, etc.) */
+	--color-overlay-backdrop: color-mix(
+		in srgb,
+		var(--color-charcoal-navy) 70%,
+		transparent
+	);
+
 	/* Status colors */
 	--color-error: #b3261e;
 	--color-success: var(--color-ocean-blue);
