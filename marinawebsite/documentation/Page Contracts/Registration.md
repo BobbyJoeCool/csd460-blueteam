@@ -70,7 +70,9 @@ The visible Phone box always shows the number formatted as `(###)-###-####` no m
 
 What actually gets submitted isn't that visible field though. The formatted text is just for the user to look at. Underneath it there's a hidden field, still named `phone`, that always holds just the raw 10 digits, no parens or dashes, kept in sync with the visible one on every keystroke. So Back End always gets a clean 10-digit `phone`, never has to deal with parsing out a formatted string.
 
-Country Code is a separate small box in front of Phone, defaulting to `1`, since that's not really part of the 10-digit number itself. It's a plain text field, digits only, up to 3 of them, in case anyone outside the US/Canada ever needs to register. Comes across as its own `phoneCountryCode` field, not bundled into `phone`.
+Country Code is a separate small box in front of Phone, defaulting to `1`, since that's not really part of the 10-digit number itself. Comes across as its own `phoneCountryCode` field, not bundled into `phone`.
+
+**Update, built form deviates from this section:** in `registration.jsp` this field is `readonly`, fixed at `1` — not the editable, digits-only-up-to-3 field this paragraph originally described. As built, there's currently no way to register with a non-US/Canada country code. Flagging it since it wasn't a documented decision either.
 
 The 10-digit `phone` value fits fine in the existing `Customer.phone` column, but there's nowhere for `phoneCountryCode` to land, that column doesn't exist yet. Needs a schema change, see the schema doc.
 
@@ -79,6 +81,8 @@ The 10-digit `phone` value fits fine in the existing `Customer.phone` column, bu
 The wireframe has one "Address (Optional)" text box, but the Customer table needs `streetAddress`, `city`, `state`, and `zipCode` as separate columns. Rather than have the back end try to parse one free-text box into four pieces, the form is splitting it into four separate fields up front: Street Address, City, State, and Zip Code. All four stay optional, matching both the wireframe's "(Optional)" tag and the fact that none of those columns are required on the Customer table.
 
 There's also a second line under Street Address (`streetAddress2`) for apartment number, suite, PO box, that kind of thing, since that's a standard part of any address form and the single Street Address box shouldn't have to carry both. This one doesn't have a column on the Customer table yet at all, not even a single combined one, so it needs a new `streetAddress2` column added alongside the schema change already flagged above. Always optional.
+
+**Update, built form deviates from this section:** `registration.jsp` as built marks Street Address, City, State, and Zip Code `required` — only `streetAddress2` is actually optional. That's a change from "(Optional)" on the Module 2 wireframe and from what this section originally said; flagging it here since it wasn't a documented decision. Confirm with the team whether that's intentional before Back End writes server-side validation against it.
 
 ### Boat Fields
 
@@ -98,9 +102,13 @@ One more thing worth flagging to Carolina: Registration State and Registration N
 
 Email has to be unique on the Customer table, so submitting with an email that's already registered has to fail. The front end has no way to know ahead of time what emails are taken, it can't catch this one live like the password fields, so this depends entirely on the back end actually checking for it and telling the front end it happened. Carolina needs a function on her end that checks the email against existing accounts (either a lookup before the INSERT, or catching the database's unique constraint if the INSERT is attempted anyway) and reports back specifically that it was a duplicate email, not some other failure.
 
-Once that signal exists, the front end shows it as a popup once the response comes back, rather than the live inline style used for the password fields, since it's only knowable after submit. Back End still owns the exact attribute name and wording that trigger it, see the open checklist item above.
+**Update, built form deviates from this section:** this section originally called for a popup. What's actually built in `registration.jsp` is a plain sticky-form redisplay instead — the form re-shows itself with every field's value carried over from `param.*` (works with a server-side forward, not a redirect, since a forward preserves the original request's parameters), plus three request-scope attributes the JSP already reads:
 
-Since a duplicate email almost always means the person already has an account, the popup also offers to log in instead of just closing. It includes a button that opens the Login modal (per the [Login contract](login-contract.md)) with its `redirectTo` field set to the landing page, so once they actually log in, they land on the homepage instead of getting sent back to a half-filled-out registration form.
+- `formError` — a general banner at the top of the form (`role="alert"`)
+- `emailError` — shown inline under the Email field; this is where a duplicate-email message would go
+- `passwordError` — shown inline under the Password field
+
+So the concrete answer to "what attribute name and message does Back End set" (still an open checklist item below) is: **Back End should set `emailError`** on a duplicate-email failure and forward back to `registration.jsp` (not redirect), so the request parameters and this attribute are both still available to render. Whether that should instead be a popup, per the original plan, is a question for the team — the same modal-vs-page discussion that came up for the Login error display. There's a static "Already have an account? Log in" link on the page already, but it's just a placeholder (`preventDefault()`, does nothing yet) and isn't wired to the duplicate-email case specifically — the "opens the Login modal with `redirectTo` set to the landing page" behavior described below isn't implemented yet either way.
 
 ### Back End Owns
 
@@ -109,9 +117,9 @@ Since a duplicate email almost always means the person already has an account, t
 - [ ] **DAO method signature:** What does the registration method look like? (e.g., `registerCustomer(Customer c)` returning what — new customer ID, boolean, the full Bean?) Front End needs to know what's available after success.
 - [ ] **Duplicate email response:** Needs a function that actually checks the submitted email against existing accounts and reports back specifically that it was a duplicate, see [Duplicate Email](#duplicate-email) above. Once that exists, what request attribute name and message does it set so Front End knows to show the popup?
 - [ ] **Auto-login after registration:** After a successful INSERT, does Back End set session attributes (same as Login contract) so the user is immediately logged in, or redirect to the login modal?
-- [ ] **Post-registration redirect/forward:** Where does Back End send the response — forward to the same JSP with a success attribute, redirect to landing, or something else? What attribute names carry the success state?
+- [ ] **Post-registration redirect/forward:** Where does Back End send the response — forward to the same JSP with a success attribute, redirect to landing, or something else? What attribute names carry the success state? On failure specifically, the built JSP expects a **forward** back to `registration.jsp` (not a redirect) — see [Duplicate Email](#duplicate-email) above — so the sticky-form values and `formError`/`emailError`/`passwordError` attributes survive.
 - [ ] **Input length limits (DB/server side):** Max lengths for each field must match the database column sizes and the HTML `maxlength` — coordinate with Front End.
-- [ ] **Servlet URL mapping:** What URL does the registration form POST to? (e.g., `/register`)
+- [x] **Servlet URL mapping:** Decided by Front End's form markup — `/register` (the form's `action`).
 
 ## Front End Variables
 
@@ -122,13 +130,13 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `firstName` | text | Yes | `maxlength="50"`, matches `Customer.firstName` |
 | `lastName` | text | Yes | `maxlength="50"`, matches `Customer.lastName` |
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`; also gets checked client-side for a valid email shape |
-| `phoneCountryCode` | text | Yes | `maxlength="3"`, digits only, defaults to `1`; no matching column on Customer yet, see [Phone Number](#phone-number) above |
+| `phoneCountryCode` | text, `readonly` | Fixed value | Built as a fixed, read-only field always `"1"`, not the editable up-to-3-digit field this contract originally described; no matching column on Customer yet, see [Phone Number](#phone-number) above |
 | `phone` | text (hidden, formatted display shown separately) | Yes on the wireframe (not marked optional like Address is) | Always exactly 10 raw digits, no formatting characters; matches `Customer.phone`, see [Phone Number](#phone-number) above |
-| `streetAddress` | text | **No, Optional** | `maxlength="100"`, matches `Customer.streetAddress`, see [The Address Field](#the-address-field) above |
+| `streetAddress` | text | **Yes** — built as required, deviating from this contract's original "Optional," see [The Address Field](#the-address-field) above | `maxlength="100"`, matches `Customer.streetAddress` |
 | `streetAddress2` | text | **No, Optional** | `maxlength="100"`; no matching column on Customer yet, see [The Address Field](#the-address-field) above |
-| `city` | text | **No, Optional** | `maxlength="50"`, matches `Customer.city` |
-| `state` | text | **No, Optional** | `maxlength="2"`, matches `Customer.state` (2-letter code) |
-| `zipCode` | text | **No, Optional** | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
+| `city` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="50"`, matches `Customer.city` |
+| `state` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="2"`, matches `Customer.state` (2-letter code) |
+| `zipCode` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
 | `boatName` | text | Yes | `maxlength="50"`, matches `Boat.boatName` (NOT NULL on that table) |
 | `regState` | text | Yes | `maxlength="2"`, matches `Boat.regState` (NOT NULL, 2-letter code) |
 | `regNumber` | text | Yes | `maxlength="20"`, matches `Boat.regNumber` (NOT NULL); combined with `regState` this has to be unique, see [Boat Fields](#boat-fields) above |
