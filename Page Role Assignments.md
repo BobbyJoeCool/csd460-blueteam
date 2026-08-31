@@ -67,28 +67,30 @@ Before coding starts: agree on and record field/variable names for all three pag
 
 | Role | Assigned To |
 | --- | --- |
-| Landing Page (content + any backend) | |
-| Shared Header/Footer Scaffold | |
+| Landing Page (content + any backend) | Carolina |
+| Shared Header/Footer Scaffold | Sara |
 
-> Landing is static, so it doesn't need a standard Front End/Back End pair. Instead: one person builds the Landing page itself (hero, highlights row, CTAs - Front End and whatever minimal backend it needs), and the other builds the shared header/footer scaffold that every later page will plug into. Agree on the scaffolding's structure (container names, layout regions) before the two of you start in parallel, so the pieces actually fit together on the first merge.
+> Landing is static, so it doesn't need a standard Front End/Back End pair. Instead: one person builds the Landing page itself (hero, highlights row, CTAs - Front End and whatever minimal backend it needs, like the `loggedIn` to know if the Login Button says "Log In" or "Welcome {user}"), and the other builds the shared header/footer scaffold that every later page will plug into. Agree on the scaffolding's structure (container names, layout regions) before the two of you start in parallel, so the pieces actually fit together on the first merge.
 
 **Login**
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Miguel |
+| Back End | Robert |
 
-> Confirmed as a popup/modal in the finalized wireframes (`Module-2/Finalized WireFrames/Login Page.png`), not a standalone page. **Front End** here means building the modal itself (trigger, overlay, focus/close behavior) - it does not inherit the shared header/footer/nav scaffolding the way a full page does, so don't assume this is the lighter of the three Module 5 pages.
+> Confirmed as a popup/modal in the finalized wireframes (`Module-2/Finalized WireFrames/Login Page.png`), not a standalone page. **Front End** here means building the modal itself (trigger, overlay, focus/close behavior) - it does not inherit the shared header/footer/nav scaffolding the way a full page does.
 
 **Registration**
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Robert |
+| Back End |  Carolina|
 
 **Testing - Module 5**
+
+- To be determined between Sara and Miguel
 
 | Page | Tester |
 | --- | --- |
@@ -108,8 +110,6 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 | --- | --- |
 | Front End | |
 | Back End | |
-
-> Confirm this is in fact the Module 6 page before assigning - the README only says "one additional page per project" without naming it, but the finalized wireframes (`Reservation Page.png`) and its dependency on Reservation Summary (Module 7) make Reservation the most likely fit.
 
 ### Module Seven: Web Development 3
 
@@ -150,8 +150,6 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | Front End | |
 | Back End | |
 
-> Confirm as a team whether Contact Us messages get stored (real Back End/database work) or just emailed out (they don't). Settle this in the page contract doc, not after someone's already built it one way.
-
 **Look Up Reservation**
 
 | Role | Assigned To |
@@ -179,6 +177,13 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 | Front End | |
 | Back End | |
 
+**Edit User Info**
+
+| Role | Assigned To |
+| --- | --- |
+| Front End | |
+| Back End | |
+
 **Testing - Module 9**
 
 | Page | Tester |
@@ -191,14 +196,7 @@ Running tally so nobody ends up on Back End (or Testing) every single week. Upda
 
 | Person | Front End | Back End | Testing |
 | --- | --- | --- | --- |
-| Robert | | | |
-| Jose | | | |
-| Sarah | | | |
-| Carolina | | | |
-
-## Related Documents
-
-- `page-contract-template.md` (this folder) - copy per page before coding starts; the actual source of truth for field names, parameter types, and DB return shapes.
-- `TestPlanTemplate.docx` in `Course-Info` - required format for every module's test plan.
-- `group-todos-workload-split.md` (this folder) - the hour-estimate version of the workload split, for reference on relative page weight.
-- `marina-wireframe-instructions.md` (this folder) - page-by-page layout spec; cross-check against `Module-2/Finalized WireFrames` for anything that changed since (e.g. Login as a popup).
+| Robert | 1 | 1 | |
+| Jose | 1 | | 1 |
+| Sarah | 1 | | 1 |
+| Carolina | 1 | | 1 |

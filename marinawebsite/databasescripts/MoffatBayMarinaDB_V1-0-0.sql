@@ -22,13 +22,13 @@
 -- so every run starts from a clean, empty schema.
 -- =============================================================================
 
--- ******************************************************
--- *NOTICE TO DEVELOPER RUNNING THIS SCRIPT!!!!!        *
--- *This script DELETES THE DATABASE and starts fresh!  *
--- *ALL DATA INSIDE WILL BE LOST AND CANNOT BE UNDONE!  *
--- *This script is for inital database creation ONLY.   *
--- *For updating live database, use an update script.   *
--- ******************************************************
+-- *********************************************************
+-- *   NOTICE TO DEVELOPER RUNNING THIS SCRIPT!!!!!        *
+-- *   This script DELETES THE DATABASE and starts fresh!  *
+-- *   ALL DATA INSIDE WILL BE LOST AND CANNOT BE UNDONE!  *
+-- *   This script is for inital database creation ONLY.   *
+-- *   For updating live database, use an update script.   *
+-- *********************************************************
 
 -- =============================================================================
 -- Shared Setup - Database & Admin User (Database Lead: Breutzmann, R.)
