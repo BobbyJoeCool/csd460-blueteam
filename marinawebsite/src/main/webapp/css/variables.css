@@ -41,7 +41,12 @@
 	--color-bg-footer: var(--color-deep-marine);
 	--color-bg-surface: var(
 		--color-surface-neutral
-	); /* cards, form fields, modals */
+	); /* form fields, modals - full white, for input contrast */
+	--color-bg-card: color-mix(
+		in srgb,
+		var(--color-ocean-blue) 6%,
+		var(--color-surface-neutral)
+	); /* card/panel grouping backgrounds - a light ocean-blue tint, distinct from both plain white and the sand page background */
 
 	/* Text */
 	--color-text-body: var(--color-charcoal-navy);

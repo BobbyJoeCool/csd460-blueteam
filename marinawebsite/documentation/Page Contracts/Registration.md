@@ -33,8 +33,10 @@ The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) i
 - First Name
 - Last Name
 - E-mail
+- Country Code (defaults to 1)
 - Phone
 - Street Address (Optional)
+- Address Line 2 (Optional, apartment/suite/PO box)
 - City (Optional)
 - State (Optional)
 - Zip Code (Optional)
@@ -50,7 +52,7 @@ The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) i
 - Re-type Password
 - a Submit button
 
-Field names I'm using, matched to what they map to later: `firstName`, `lastName`, `email`, `phone`, `streetAddress`, `city`, `state`, `zipCode`, `boatName`, `regState`, `regNumber`, `boatLength`, `hin`, `boatType`, `boatBeam`, `boatYear`, `password`, `confirmPassword`.
+Field names I'm using, matched to what they map to later: `firstName`, `lastName`, `email`, `phoneCountryCode`, `phone`, `streetAddress`, `streetAddress2`, `city`, `state`, `zipCode`, `boatName`, `regState`, `regNumber`, `boatLength`, `hin`, `boatType`, `boatBeam`, `boatYear`, `password`, `confirmPassword`.
 
 ### Password Rules
 
@@ -62,16 +64,33 @@ The "Re-type Password" field only exists to catch typos before the user submits.
 
 The confirm password value itself never gets sent to the back end. There's nothing useful for the server to do with a second copy of the same password once the browser's already confirmed they match, so only `password` goes in the POST.
 
+### Phone Number
+
+The visible Phone box always shows the number formatted as `(###)-###-####` no matter how it's typed in, pasted, with dashes, dots, spaces, parens, or none of that, since a little JavaScript strips everything down to digits on every keystroke and rebuilds the display from those digits. Only digits ever matter; anything else typed just gets thrown away.
+
+What actually gets submitted isn't that visible field though. The formatted text is just for the user to look at. Underneath it there's a hidden field, still named `phone`, that always holds just the raw 10 digits, no parens or dashes, kept in sync with the visible one on every keystroke. So Back End always gets a clean 10-digit `phone`, never has to deal with parsing out a formatted string.
+
+Country Code is a separate small box in front of Phone, defaulting to `1`, since that's not really part of the 10-digit number itself. It's a plain text field, digits only, up to 3 of them, in case anyone outside the US/Canada ever needs to register. Comes across as its own `phoneCountryCode` field, not bundled into `phone`.
+
+The 10-digit `phone` value fits fine in the existing `Customer.phone` column, but there's nowhere for `phoneCountryCode` to land, that column doesn't exist yet. Needs a schema change, see the schema doc.
+
 ### The Address Field
 
 The wireframe has one "Address (Optional)" text box, but the Customer table needs `streetAddress`, `city`, `state`, and `zipCode` as separate columns. Rather than have the back end try to parse one free-text box into four pieces, the form is splitting it into four separate fields up front: Street Address, City, State, and Zip Code. All four stay optional, matching both the wireframe's "(Optional)" tag and the fact that none of those columns are required on the Customer table.
+
+There's also a second line under Street Address (`streetAddress2`) for apartment number, suite, PO box, that kind of thing, since that's a standard part of any address form and the single Street Address box shouldn't have to carry both. This one doesn't have a column on the Customer table yet at all, not even a single combined one, so it needs a new `streetAddress2` column added alongside the schema change already flagged above. Always optional.
 
 ### Boat Fields
 
 The wireframe only asked for Boat Name and Boat Length, but the Boat table has more columns than that, and some of them are required to insert a row at all. So the form is collecting every column the Boat table has, not just the two from the original mockup:
 
-- **Boat Name, Registration State, Registration Number, and Boat Length are required.** The Boat table won't accept a row without them.
-- **HIN (Hull ID Number), Boat Type, Boat Beam, and Boat Year are all optional.** The table allows them to be blank. HIN in particular is allowed to be blank on purpose, older boats built before 1972 aren't required to have one.
+- **Boat Name and Boat Length are always required.** The Boat table won't accept a row without them.
+- **Identification depends on the boat's year.** HIN wasn't required (and on some boats didn't exist) before 1972, so:
+  - Boat Year 1972 or later: either the HIN by itself, or Registration State + Registration Number together, satisfies it.
+  - Boat Year before 1972, or left blank: Registration State + Registration Number are required, HIN alone doesn't count.
+
+  A note box under the Boat Year field updates live to tell the user which rule currently applies.
+- **Boat Type and Boat Beam are always optional**, no conditions attached.
 
 One more thing worth flagging to Carolina: Registration State and Registration Number together have to be unique on the Boat table (no two boats can share the same registration in the same state), so that's a possible error case on submit that isn't just "this field is blank."
 
@@ -103,8 +122,10 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `firstName` | text | Yes | `maxlength="50"`, matches `Customer.firstName` |
 | `lastName` | text | Yes | `maxlength="50"`, matches `Customer.lastName` |
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`; also gets checked client-side for a valid email shape |
-| `phone` | tel | Yes on the wireframe (not marked optional like Address is) | `maxlength="20"`, matches `Customer.phone` |
+| `phoneCountryCode` | text | Yes | `maxlength="3"`, digits only, defaults to `1`; no matching column on Customer yet, see [Phone Number](#phone-number) above |
+| `phone` | text (hidden, formatted display shown separately) | Yes on the wireframe (not marked optional like Address is) | Always exactly 10 raw digits, no formatting characters; matches `Customer.phone`, see [Phone Number](#phone-number) above |
 | `streetAddress` | text | **No, Optional** | `maxlength="100"`, matches `Customer.streetAddress`, see [The Address Field](#the-address-field) above |
+| `streetAddress2` | text | **No, Optional** | `maxlength="100"`; no matching column on Customer yet, see [The Address Field](#the-address-field) above |
 | `city` | text | **No, Optional** | `maxlength="50"`, matches `Customer.city` |
 | `state` | text | **No, Optional** | `maxlength="2"`, matches `Customer.state` (2-letter code) |
 | `zipCode` | text | **No, Optional** | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
@@ -137,7 +158,7 @@ Every query or DAO method the Back End calls for this page, and its exact return
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** First name, last name, email, phone, boat name, registration state, registration number, and boat length are all required before the form lets you submit. Everything else (street address, city, state, zip, HIN, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match.
+- **Client-side (UX only, not trusted):** First name, last name, email, phone, country code, boat name, registration state, registration number, and boat length are all required before the form lets you submit. Everything else (street address, address line 2, city, state, zip, HIN, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Phone isn't submittable until all 10 digits are entered, formatting happens live as you type, see [Phone Number](#phone-number) above. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match.
 - **Server-side (source of truth):** TBD, this is Carolina's call. Whatever she lands on has to enforce the same rules as above, since none of the client-side checks can be trusted on their own.
 
 ## Error Handling
