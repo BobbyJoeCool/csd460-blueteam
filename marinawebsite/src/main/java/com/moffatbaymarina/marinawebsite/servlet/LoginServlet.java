@@ -1,0 +1,226 @@
+package com.moffatbaymarina.marinawebsite.servlet;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
+import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.Utils;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+/**
+ * Implements the flow documented in the Login contract
+ * (marinawebsite/documentation/Page Contracts/Login.md): "Locking an
+ * Account After Repeated Failures", "What the Session Remembers",
+ * "What the Front End Sees on Failure", "Where the User Lands After
+ * Login".
+ *
+ * @author Robert Breutzmann
+ * @implNote JavaDoc comments in this file were added with the assistance of Claude.
+ */
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+
+    private static final String PARAM_IDENTIFIER = "email";
+    private static final String PARAM_PASSWORD = "password";
+
+    /* Fixed by the Login contract's "Where the User Lands After Login" - Front End sets this hidden field's value, not its name. */
+    private static final String PARAM_REDIRECT_TO = "redirectTo";
+
+    /* Fixed by the Login contract's demo reset flow: /login?action=reset. */
+    private static final String PARAM_ACTION = "action";
+    private static final String ACTION_RESET = "reset";
+
+    /* PLACEHOLDER - login-error.jsp doesn't exist yet; this is the path the Login contract says it should live at. */
+    private static final String ERROR_PAGE = "/login-error.jsp";
+
+    /* PLACEHOLDER - the Login contract doesn't say where the browser goes after a successful demo reset, only that clicking Reset clears the lock. Landing page is a guess. */
+    private static final String POST_RESET_REDIRECT = "/";
+
+    private static final String DEFAULT_REDIRECT = "/";
+    private static final int MAX_FAILED_ATTEMPTS = 3;
+
+    private final CustomerDAO customerDAO = new CustomerDAO();
+
+    /**
+     * Entry point for every POST to /login. Routes a demo reset click
+     * to {@link #handleDemoReset(HttpServletRequest, HttpServletResponse)},
+     * otherwise runs the full login check (lookup, lockout, password
+     * compare, attempt counting) and either logs the user in or shows one
+     * of the two failure pages. Every outcome ends in a redirect or a
+     * forward to the response.
+     *
+     * @param request the incoming login request
+     * @param response the response to redirect or forward
+     * @throws ServletException if the login lookup/update fails
+     * @throws IOException if the redirect or forward fails
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        if (ACTION_RESET.equals(request.getParameter(PARAM_ACTION))) {
+            handleDemoReset(request, response);
+            return;
+        }
+
+        String identifier = request.getParameter(PARAM_IDENTIFIER);
+        String password = request.getParameter(PARAM_PASSWORD);
+
+        if (identifier == null || identifier.isBlank() || password == null || password.isBlank()) {
+            showInvalidCredentials(request, response);
+            return;
+        }
+
+        try {
+            Customer customer = customerDAO.findByEmail(identifier);
+
+            if (customer == null) {
+                // No account with this email - no attempt to record, there's nothing to attach it to.
+                showInvalidCredentials(request, response);
+                return;
+            }
+
+            if (customer.isAccountLocked()) {
+                // Already locked - don't even check the password.
+                showAccountLocked(request, response);
+                return;
+            }
+
+            String submittedHash = Utils.hashPassword(password);
+            if (customerDAO.verifyPassword(identifier, submittedHash)) {
+                customerDAO.resetFailedAttempts(customer.getCustomerId());
+                logInAndRedirect(request, response, customer);
+                return;
+            }
+
+            int attempts = customerDAO.recordFailedAttempt(customer.getCustomerId());
+            if (attempts >= MAX_FAILED_ATTEMPTS) {
+                customerDAO.lockAccount(customer.getCustomerId());
+                showAccountLocked(request, response);
+            } else {
+                showInvalidCredentials(request, response);
+            }
+        } catch (SQLException e) {
+            throw new ServletException("Login lookup/update failed", e);
+        }
+    }
+
+    /**
+     * Clears the lockout for the submitted email via
+     * {@link CustomerDAO#unlockAccount(String)}, then redirects the browser
+     * to {@link #POST_RESET_REDIRECT}. A blank/missing email is silently
+     * ignored rather than treated as an error.
+     *
+     * @param request the demo-reset request
+     * @param response the response to redirect
+     * @throws ServletException if the account reset fails
+     * @throws IOException if the redirect fails
+     */
+    private void handleDemoReset(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String identifier = request.getParameter(PARAM_IDENTIFIER);
+        try {
+            if (identifier != null && !identifier.isBlank()) {
+                customerDAO.unlockAccount(identifier);
+            }
+        } catch (SQLException e) {
+            throw new ServletException("Account reset failed", e);
+        }
+        response.sendRedirect(request.getContextPath() + POST_RESET_REDIRECT);
+    }
+
+    /**
+     * Stores the four session attributes from the Login contract's
+     * "What the Session Remembers" (loggedIn, customer, customerId,
+     * displayName), then redirects to wherever
+     * {@link #safeRedirectTarget(HttpServletRequest)} says is safe.
+     *
+     * @param request the login request, used to obtain the session and redirect target
+     * @param response the response to redirect
+     * @param customer the customer who just logged in
+     * @throws IOException if the redirect fails
+     */
+    private void logInAndRedirect(HttpServletRequest request, HttpServletResponse response, Customer customer)
+            throws IOException {
+        HttpSession session = request.getSession();
+        session.setAttribute("loggedIn", Boolean.TRUE);
+        session.setAttribute("customer", customer);
+        session.setAttribute("customerId", customer.getCustomerId());
+        session.setAttribute("displayName", customer.getDisplayName());
+
+        response.sendRedirect(request.getContextPath() + safeRedirectTarget(request));
+    }
+
+    /**
+     * Same-site-only guard from the Login contract's "Where the User
+     * Lands After Login".
+     *
+     * @param request the login request
+     * @return the submitted redirectTo value if it looks like a same-site
+     *         relative path, otherwise {@link #DEFAULT_REDIRECT}
+     */
+    private String safeRedirectTarget(HttpServletRequest request) {
+        String redirectTo = request.getParameter(PARAM_REDIRECT_TO);
+        boolean looksSafe = redirectTo != null && !redirectTo.isBlank()
+                && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+                && !redirectTo.contains("://");
+        return looksSafe ? redirectTo : DEFAULT_REDIRECT;
+    }
+
+    /**
+     * Sets the generic "username or password" loginError message (the
+     * one that never reveals which field was wrong) and forwards to
+     * the error page.
+     *
+     * @param request the request to attach the error message to
+     * @param response the response to forward
+     * @throws ServletException if the forward fails
+     * @throws IOException if the forward fails
+     */
+    private void showInvalidCredentials(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("loginError", "The username or password you entered is incorrect.");
+        forwardToErrorPage(request, response);
+    }
+
+    /**
+     * Sets the account-locked loginError message plus the
+     * accountLocked flag the error page checks to show the demo Reset
+     * button, then forwards to the error page.
+     *
+     * @param request the request to attach the error message and flag to
+     * @param response the response to forward
+     * @throws ServletException if the forward fails
+     * @throws IOException if the forward fails
+     */
+    private void showAccountLocked(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("loginError", "This account has been locked after multiple failed login attempts.");
+        request.setAttribute("accountLocked", Boolean.TRUE);
+        forwardToErrorPage(request, response);
+    }
+
+    /**
+     * Shared last step for both failure cases: forwards the request to
+     * {@link #ERROR_PAGE} so whatever attributes were just set are
+     * available to it.
+     *
+     * @param request the request carrying the error attributes
+     * @param response the response to forward
+     * @throws ServletException if the forward fails
+     * @throws IOException if the forward fails
+     */
+    private void forwardToErrorPage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher(ERROR_PAGE);
+        dispatcher.forward(request, response);
+    }
+}
