@@ -23,6 +23,23 @@ import java.util.Properties;
  */
 public final class DBConnection {
 
+    /*
+     * The JDBC spec says a driver on the classpath registers itself, but under
+     * Tomcat that doesn't reliably happen for a driver sitting in the webapp's
+     * WEB-INF/lib - DriverManager runs from the system classloader, which can't
+     * see the webapp's jars, and the result is a confusing
+     * "No suitable driver found for jdbc:mysql://..." at the first getConnection
+     * call even though the jar is right there. Loading the class explicitly
+     * forces registration in the webapp's own classloader.
+     */
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("MySQL driver not on the classpath", e);
+        }
+    }
+
     private static final Properties ENV = loadEnv();
 
     private static final String HOST = env("DB_HOST", "localhost");
@@ -41,6 +58,10 @@ public final class DBConnection {
      * lines starting with {@code #} are skipped; a missing file yields an
      * empty (not null) set of properties, since {@link #env(String, String)}
      * falls back to real environment variables in that case.
+     * <p>
+     * Note that "current working directory" is the module root when running
+     * via Maven, but Tomcat's bin directory when running deployed, so the
+     * deployed app looks for the file somewhere other than the repo.
      *
      * @return the key/value pairs parsed from the {@code .env} file
      */
