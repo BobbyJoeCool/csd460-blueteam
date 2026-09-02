@@ -1,0 +1,186 @@
+/*
+ * src/main/webapp/css/loginModal.css
+ * Author: Miguel Fernandez
+ * CSD 460 - Capstone Project - Marina Website Project
+ *
+ * Login modal styles. Depends on variables.css being linked first.
+ * Every color here comes from a semantic variable - no hex values, no
+ * per-page fallbacks.
+ *
+ * Button note: the modal uses the SECONDARY cta colors, not primary.
+ * The wireframe rule is one primary CTA per page, and the modal opens
+ * on top of a page that already has its own (on registration.jsp the
+ * nav Log In control is itself the primary).
+ */
+
+/* ==========================================================================
+   Shell
+   ========================================================================== */
+
+.login-modal {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+}
+
+.login-modal.is-open {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+}
+
+.login-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	background: var(--color-overlay-backdrop);
+}
+
+.login-modal__panel {
+	position: relative;
+	width: 100%;
+	max-width: 26rem;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 2rem 1.75rem 1.75rem;
+}
+
+.login-modal__close {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.75rem;
+	background: none;
+	border: none;
+	font-size: 1.6rem;
+	line-height: 1;
+	color: var(--color-text-muted);
+	opacity: 0.6;
+	cursor: pointer;
+}
+
+.login-modal__close:hover {
+	opacity: 1;
+}
+
+.login-modal__title {
+	margin: 0 0 1.25rem;
+	font-size: 1.4rem;
+	color: var(--color-text-heading);
+}
+
+/* ==========================================================================
+   Server messages
+   ========================================================================== */
+
+.login-modal__error {
+	margin: 0 0 1.25rem;
+	padding: 0.75rem 0.9rem;
+	border: 1px solid var(--color-error);
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
+	color: var(--color-error);
+	font-size: 0.9rem;
+}
+
+.login-modal__note {
+	margin: 0 0 1.25rem;
+	font-size: 0.9rem;
+	color: var(--color-text-muted);
+	opacity: 0.8;
+}
+
+/* ==========================================================================
+   Form
+   ========================================================================== */
+
+.login-modal__form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.login-modal__field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.login-modal__field label {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--color-text-heading);
+}
+
+.login-modal__field input {
+	padding: 0.7rem 0.8rem;
+	border: 1px solid var(--color-input-border);
+	border-radius: 6px;
+	background: var(--color-input-bg);
+	color: var(--color-input-text);
+	font-size: 0.95rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.login-modal__field input:focus {
+	outline: none;
+	border-color: var(--color-input-border-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
+}
+
+.login-modal__field input.field-invalid {
+	border-color: var(--color-error);
+}
+
+.login-modal__field-error {
+	margin: 0;
+	min-height: 1.1em;
+	font-size: 0.82rem;
+	color: var(--color-error);
+}
+
+.login-modal__submit {
+	margin-top: 0.25rem;
+	padding: 0.8rem 1.5rem;
+	border: none;
+	border-radius: 6px;
+	background: var(--color-cta-secondary-bg);
+	color: var(--color-cta-secondary-text);
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.login-modal__submit:hover {
+	background: var(--color-cta-secondary-bg-hover);
+}
+
+.login-modal__alt {
+	margin: 1.25rem 0 0;
+	font-size: 0.9rem;
+	color: var(--color-text-body);
+}
+
+.login-modal__alt a {
+	color: var(--color-link);
+}
+
+.login-modal__alt a:hover {
+	color: var(--color-link-hover);
+}
+
+/* ==========================================================================
+   Phones
+   ========================================================================== */
+
+@media (max-width: 480px) {
+	.login-modal.is-open {
+		padding: 0.75rem;
+	}
+
+	.login-modal__panel {
+		padding: 1.75rem 1.25rem 1.5rem;
+	}
+}
