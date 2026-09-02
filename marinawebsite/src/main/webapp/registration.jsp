@@ -62,8 +62,11 @@
             <div class="form-row-split form-row-split-phone">
                 <div class="form-group">
                     <label for="phoneCountryCode" class="visually-hidden">Country Code</label>
-                    <input type="text" id="phoneCountryCode" name="phoneCountryCode"
-                           value="1" readonly aria-label="Country Code">
+                    <input type="text" id="phoneCountryCode" name="phoneCountryCode" required
+                           inputmode="numeric" maxlength="3"
+                           value="${empty param.phoneCountryCode ? '1' : fn:escapeXml(param.phoneCountryCode)}"
+                           aria-label="Country Code">
+                    <div class="field-error" id="phoneCountryCodeError"></div>
                 </div>
                 <div class="form-group">
                     <label for="phoneDisplay">Phone <span class="required-mark">*</span></label>
@@ -277,6 +280,8 @@
         var phoneDisplay = document.getElementById("phoneDisplay");
         var phoneHidden = document.getElementById("phone");
         var phoneError = document.getElementById("phoneError");
+        var countryCode = document.getElementById("phoneCountryCode");
+        var countryCodeError = document.getElementById("phoneCountryCodeError");
         var zipCode = document.getElementById("zipCode");
         var zipError = document.getElementById("zipError");
 
@@ -311,6 +316,16 @@
                 ? "Phone number needs all 10 digits."
                 : "";
             return complete;
+        }
+
+        function countryCodeIsValid() {
+            countryCode.value = countryCode.value.replace(/\D/g, "").slice(0, 3);
+            var value = countryCode.value;
+            var valid = MoffatBay.form.isValidCountryCode(value);
+            var message = "Enter a 1 to 3 digit country code (no leading zero).";
+            countryCode.setCustomValidity(valid ? "" : message);
+            countryCodeError.textContent = (value.length > 0 && !valid) ? message : "";
+            return valid;
         }
 
         // Populate the display field from whatever raw digits came back
@@ -437,6 +452,7 @@
             var pwValid = MoffatBay.form.checkPasswordRules(pwValue, ruleElements);
             var matches = confirmValue.length > 0 && pwValue === confirmValue;
             var phoneComplete = syncPhoneFromDisplay();
+            var countryCodeValid = countryCodeIsValid();
             var emailValid = emailIsValid();
             var zipValid = zipIsValid();
             var hinValid = hinIsValid();
@@ -456,7 +472,7 @@
             });
 
             submitBtn.disabled = !(
-                pwValid && matches && phoneComplete && emailValid && zipValid &&
+                pwValid && matches && phoneComplete && countryCodeValid && emailValid && zipValid &&
                 hinValid && regNumberValid && boatYearValid && boatValid && requiredFieldsFilled
             );
         }
@@ -464,6 +480,7 @@
         password.addEventListener("input", updateFormState);
         confirmPassword.addEventListener("input", updateFormState);
         phoneDisplay.addEventListener("input", updateFormState);
+        countryCode.addEventListener("input", updateFormState);
         zipCode.addEventListener("input", updateFormState);
         form.addEventListener("input", updateFormState);
 

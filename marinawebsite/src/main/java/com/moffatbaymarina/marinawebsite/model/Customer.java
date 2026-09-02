@@ -24,7 +24,9 @@ public class Customer implements Serializable {
     private String lastName;
     private String email;
     private String phone;
+    private String phoneCountryCode;
     private String streetAddress;
+    private String streetAddress2;
     private String city;
     private String state;
     private String zipCode;
@@ -103,6 +105,20 @@ public class Customer implements Serializable {
     }
 
     /**
+     * @return the customer's phone dialing country code (e.g. "1" for US/Canada)
+     */
+    public String getPhoneCountryCode() {
+        return phoneCountryCode;
+    }
+
+    /**
+     * @param phoneCountryCode the customer's phone dialing country code
+     */
+    public void setPhoneCountryCode(String phoneCountryCode) {
+        this.phoneCountryCode = phoneCountryCode;
+    }
+
+    /**
      * @return the customer's street address
      */
     public String getStreetAddress() {
@@ -114,6 +130,20 @@ public class Customer implements Serializable {
      */
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
+    }
+
+    /**
+     * @return the customer's optional second address line (apartment, suite, PO box)
+     */
+    public String getStreetAddress2() {
+        return streetAddress2;
+    }
+
+    /**
+     * @param streetAddress2 the customer's optional second address line
+     */
+    public void setStreetAddress2(String streetAddress2) {
+        this.streetAddress2 = streetAddress2;
     }
 
     /**

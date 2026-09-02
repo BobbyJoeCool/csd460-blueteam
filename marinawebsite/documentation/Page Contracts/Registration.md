@@ -72,9 +72,7 @@ What actually gets submitted isn't that visible field though. The formatted text
 
 Country Code is a separate small box in front of Phone, defaulting to `1`, since that's not really part of the 10-digit number itself. Comes across as its own `phoneCountryCode` field, not bundled into `phone`.
 
-**Update, built form deviates from this section:** in `registration.jsp` this field is `readonly`, fixed at `1` — not the editable, digits-only-up-to-3 field this paragraph originally described. As built, there's currently no way to register with a non-US/Canada country code. Flagging it since it wasn't a documented decision either.
-
-The 10-digit `phone` value fits fine in the existing `Customer.phone` column, but there's nowhere for `phoneCountryCode` to land, that column doesn't exist yet. Needs a schema change, see the schema doc.
+The 10-digit `phone` value fits fine in the existing `Customer.phone` column. `phoneCountryCode` now has its own column too — `Customer.phoneCountryCode VARCHAR(3) NOT NULL DEFAULT '1'`, added in `MoffatBayMarinaDB_V1-1-0_update.sql`.
 
 ### The Address Field
 
@@ -130,10 +128,10 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `firstName` | text | Yes | `maxlength="50"`, matches `Customer.firstName` |
 | `lastName` | text | Yes | `maxlength="50"`, matches `Customer.lastName` |
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`; also gets checked client-side for a valid email shape |
-| `phoneCountryCode` | text, `readonly` | Fixed value | Built as a fixed, read-only field always `"1"`, not the editable up-to-3-digit field this contract originally described; no matching column on Customer yet, see [Phone Number](#phone-number) above |
+| `phoneCountryCode` | text | Yes, defaults to `"1"` | `inputmode="numeric"`, `maxlength="3"`; 1 to 3 digits, no leading zero; matches `Customer.phoneCountryCode`, see [Phone Number](#phone-number) above |
 | `phone` | text (hidden, formatted display shown separately) | Yes on the wireframe (not marked optional like Address is) | Always exactly 10 raw digits, no formatting characters; matches `Customer.phone`, see [Phone Number](#phone-number) above |
 | `streetAddress` | text | **Yes** — built as required, deviating from this contract's original "Optional," see [The Address Field](#the-address-field) above | `maxlength="100"`, matches `Customer.streetAddress` |
-| `streetAddress2` | text | **No, Optional** | `maxlength="100"`; no matching column on Customer yet, see [The Address Field](#the-address-field) above |
+| `streetAddress2` | text | **No, Optional** | `maxlength="100"`, matches `Customer.streetAddress2`, see [The Address Field](#the-address-field) above |
 | `city` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="50"`, matches `Customer.city` |
 | `state` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="2"`, matches `Customer.state` (2-letter code) |
 | `zipCode` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
