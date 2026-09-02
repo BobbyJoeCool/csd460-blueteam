@@ -62,6 +62,22 @@ MoffatBay.form = (function () {
         return "(" + d.slice(0, 3) + ")-" + d.slice(3, 6) + "-" + d.slice(6);
     }
 
+    // Requires 1 to 3 digits, the first of which can't be 0 - matches the
+    // shape of a real E.164 country calling code (e.g. "1", "44", "351")
+    // and the Customer.phoneCountryCode column's VARCHAR(3).
+    var COUNTRY_CODE_PATTERN = /^[1-9]\d{0,2}$/;
+
+    /**
+     * Checks whether value is a plausible phone country calling code:
+     * 1 to 3 digits, no leading zero (see COUNTRY_CODE_PATTERN above).
+     * Doesn't check it against the actual ITU-T assigned list, just the shape.
+     * @param {string} value - the country code to check
+     * @returns {boolean} true if value matches COUNTRY_CODE_PATTERN
+     */
+    function isValidCountryCode(value) {
+        return COUNTRY_CODE_PATTERN.test(value || "");
+    }
+
     /**
      * A boat's model year: 4 digits, starting with 18, 19, or 20 (no
      * boat has a model year before 1800, and typing garbage like
@@ -148,6 +164,7 @@ MoffatBay.form = (function () {
     return {
         isValidEmail: isValidEmail,
         isValidZip: isValidZip,
+        isValidCountryCode: isValidCountryCode,
         isValidBoatYear: isValidBoatYear,
         isValidRegNumber: isValidRegNumber,
         isValidHIN: isValidHIN,

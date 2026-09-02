@@ -297,9 +297,6 @@ main {
 
 #phoneCountryCode {
 	text-align: center;
-	color: var(--color-text-muted);
-	opacity: 0.55;
-	cursor: default;
 }
 
 /* Password column */

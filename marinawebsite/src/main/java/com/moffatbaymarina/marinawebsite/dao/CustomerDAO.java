@@ -29,8 +29,8 @@ public class CustomerDAO {
      * @throws SQLException if the lookup fails
      */
     public Customer findByEmail(String email) throws SQLException {
-        String sql = "SELECT customerID, firstName, lastName, email, phone, "
-                + "streetAddress, city, state, zipCode, dateJoined, failedLoginAttempts, accountLocked "
+        String sql = "SELECT customerID, firstName, lastName, email, phone, phoneCountryCode, "
+                + "streetAddress, streetAddress2, city, state, zipCode, dateJoined, failedLoginAttempts, accountLocked "
                 + "FROM Customer WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -154,7 +154,9 @@ public class CustomerDAO {
         customer.setLastName(rs.getString("lastName"));
         customer.setEmail(rs.getString("email"));
         customer.setPhone(rs.getString("phone"));
+        customer.setPhoneCountryCode(rs.getString("phoneCountryCode"));
         customer.setStreetAddress(rs.getString("streetAddress"));
+        customer.setStreetAddress2(rs.getString("streetAddress2"));
         customer.setCity(rs.getString("city"));
         customer.setState(rs.getString("state"));
         customer.setZipCode(rs.getString("zipCode"));
