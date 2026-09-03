@@ -25,5 +25,4 @@
     </nav>
 </header>
 
-<jsp:include page="/includes/loginModal.jsp" />
 
