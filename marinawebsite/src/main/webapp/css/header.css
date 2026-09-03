@@ -1,10 +1,111 @@
-.header {}
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--color-bg-header);
+    color: var(--color-text-inverse);
+    padding: 0.9rem 1.5rem;
+    /* sticky header */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
 
-.header-brand {}
+.header-brand {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
 
-.header-nav {}
+.header-brand .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--color-text-inverse);
+    text-decoration: none;
+}
 
-.nav-active {
-    border-bottom: 2px solid #fff;
-    font-weight: bold;
+.header-brand .logo img {
+    display: block;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.header-nav a {
+    color: var(--color-nav-text);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.header-nav a:hover {
+    color: var(--color-nav-text-hover);
+}
+
+/* highlights current page viewed */
+.header-nav a.nav-active {
+    color: var(--color-nav-text-active);
+    border-bottom: 2px solid var(--color-nav-text-active);
+    font-weight: 600;
+}
+
+.nav-cta {
+    background: transparent;
+    color: var(--color-nav-text);
+    border: 1px solid var(--color-nav-text);
+    padding: 0.5rem 1.1rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.nav-cta:hover {
+    background: var(--color-cta-secondary-bg-hover);
+    border-color: var(--color-cta-secondary-bg-hover);
+    color: var(--color-cta-secondary-text);
+}
+
+.nav-welcome {
+    color: var(--color-nav-text);
+    font-size: 0.95rem;
+}
+
+/* =============================================================
+   Responsive header
+   ========================================================== */
+
+@media (max-width: 768px) {
+    .site-header {
+        align-items: flex-start;
+    }
+
+    .header-nav {
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .site-header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header-nav {
+        justify-content: center;
+    }
 }

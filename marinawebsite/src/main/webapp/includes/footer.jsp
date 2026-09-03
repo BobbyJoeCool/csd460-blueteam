@@ -1,32 +1,57 @@
-<footer class="footer">
-    <div class="footer-address">
-        <h3>Moffat Bay Marina</h3>
-        <address>
-            123 Marina Drive<br>
-            Moffat Bay, WA 32000<br>
-            (555)123-4567
-        </address>
-    </div>
-    <div class="footer-office-hours">
-        <h3>OFFICE HOURS</h3>
-        <p>
-            Mon-Fri 7 am &mdash; 7 pm<br>
-            Sat-Sun 6 am &mdash; 8 pm<br>
-            SELF-SERVICE MARINA<br> 
-            OPEN 24 HRS.
-        </p>
-    </div>
-    <div class="footer-quick-links">
-        <h3>Quick Links</h3>
+<footer class="site-footer">
 
-        <nav class="footer-nav" aria-label="Footer navigation">
-            <a href="index.jsp">Home</a>
-            <a href="#">About Us</a>
-            <a href="#">Reservations</a>
-            <a href="#">Contact</a>
-        </nav>
+    <div class="footer-columns">
+
+        <section class="footer-address">
+            <h2>Moffat Bay Marina</h2>
+
+            <address>
+                123 Marina Drive<br>
+                Moffat Bay, WA 32000<br>
+                <a href="tel:+15551234567">(555) 123-4567</a>
+            </address>
+        </section>
+
+        <section class="footer-office-hours">
+            <h2>Office Hours</h2>
+
+            <p>Mon&ndash;Fri: 7 am &ndash; 7 pm</p>
+            <p>Sat&ndash;Sun: 6 am &ndash; 8 pm</p>
+
+            <h2 class="self-service-heading">
+                Self-Service Marina<br>
+                Open 24 Hrs.
+            </h2>
+        </section>
+
+        <section class="footer-quick-links">
+            <h2>Quick Links</h2>
+
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="${pageContext.request.contextPath}/index.jsp">
+                    Home
+                </a>
+
+                <a href="#">
+                    About Us
+                </a>
+
+                <a href="#">
+                    Reservations
+                </a>
+
+                <a href="#">
+                    Contact
+                </a>
+            </nav>
+        </section>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p>
+            &copy; 2026 Moffat Bay Marina. All rights reserved.
+        </p>
     </div>
 
 </footer>
-
-
