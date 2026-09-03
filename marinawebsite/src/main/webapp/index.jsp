@@ -16,45 +16,15 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	<title>Moffat Bay Marina</title>
 
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/variables.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginModal.css">
+	<jsp:include page="/includes/styles.jsp" />
+
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
 </head>
 <body>
 
-	<!-- Header / navigation -->
-	<header class="site-header">
-        <a class="logo" href="${pageContext.request.contextPath}/">
-            <img
-                src="${pageContext.request.contextPath}/images/AnchorLogo.png"
-                alt="">
-            <span>Moffat Bay Marina</span>
-        </a>
-
-		<nav class="site-nav" aria-label="Main navigation">
-			<a class="active" href="${pageContext.request.contextPath}/">
-				Home
-			</a>
-
-			<a href="${pageContext.request.contextPath}/contact">
-				Contact Us
-
-			</a>
-
-			<a href="${pageContext.request.contextPath}/lookupReservation">
-				Look Up Reservation 
-			</a>
-
-
-
-			<button
-				class="nav-cta"
-				type="button"
-				onclick="MoffatBay.loginModal.open()">
-				Login / Register
-			</button>
-		</nav>
-	</header>
+	<jsp:include page="/includes/header.jsp">
+    <jsp:param name="activePage" value="home" />
+</jsp:include>
 
 	<main class="landing-main">
 
@@ -169,63 +139,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	</main>
 
-	<!-- Footer -->
-	
-	<footer class="site-footer">
-		<div class="footer-columns">
-
-			<section class="footer-contact">
-				<h2>Moffat Bay Marina</h2>
-
-				<address>
-					<p>123 Marina Drive</p>
-					<p>Moffat Bay, WA 32000</p>
-					<p>
-						<a href="tel:5551234567">
-							(555) 123-4567
-						</a>
-					</p>
-				</address>
-			</section>
-
-			<section class="footer-hours">
-				<h2>Office Hours</h2>
-
-				<p>Mon&ndash;Fri: 7 am &ndash; 7 pm</p>
-				<p>Sat&ndash;Sun: 6 am &ndash; 8 pm</p>
-
-				<h2 class="self-service-heading">
-					Self-Service Marina<br>
-					Open 24hrs.
-				</h2>
-			</section>
-
-			<nav class="footer-links" aria-label="Footer navigation">
-				<h2>Quick Links</h2>
-
-				<a href="${pageContext.request.contextPath}/">
-					Home
-				</a>
-
-				<a href="${pageContext.request.contextPath}/">
-					Contact Us
-				</a>
-
-				<button
-					type="button"
-					onclick="MoffatBay.loginModal.open()">
-					Reserve a Slip
-				</button>
-			</nav>
-
-		</div>
-
-		<div class="footer-bottom">
-			<p>
-				&copy; 2026 Moffat Bay Marina. All rights reserved.
-			</p>
-		</div>
-	</footer>
+	<jsp:include page="/includes/footer.jsp" />
 
 	<!-- Reusable login modal -->
 	<jsp:include page="/includes/loginModal.jsp" />
