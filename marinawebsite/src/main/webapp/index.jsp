@@ -18,7 +18,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/variables.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginModal.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/landingPage.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
 </head>
 <body>
 
