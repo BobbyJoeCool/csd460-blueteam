@@ -1,0 +1,474 @@
+/*
+ * Author: Carolina Rodriguez 
+ * CSD 460 - Capstone Project - Marina Website Project
+ * Landing Page styles. 
+ */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: "Segoe UI", Arial, sans-serif;
+	background: var(--color-bg-page);
+	color: var(--color-text-body);
+}
+
+a {
+	color: var(--color-link);
+}
+
+a:hover {
+	color: var(--color-link-hover);
+}
+
+/* ==========================================================================
+   Header / nav — identical across every page per wireframe instructions
+   ========================================================================== */
+
+.site-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+	background: var(--color-bg-header);
+	color: var(--color-text-inverse);
+	padding: 0.9rem 1.5rem;
+}
+
+.site-header .logo {
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.65rem;
+	color: var(--color-text-inverse);
+	text-decoration: none;
+	font-size: 1.1rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.site-header .logo img {
+	display: block;
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+	object-fit: contain;
+}
+
+.site-nav {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+}
+
+
+.site-nav a {
+	color: var(--color-nav-text);
+	text-decoration: none;
+	font-size: 0.95rem;
+}
+
+.site-nav a:hover {
+	color: var(--color-nav-text-hover);
+}
+
+.site-nav a.active {
+	color: var(--color-nav-text-active);
+	font-weight: 600;
+}
+
+.nav-cta {
+	background: transparent;
+	color: var(--color-nav-text);
+	border: 1px solid var(--color-nav-text);
+	padding: 0.5rem 1.1rem;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.nav-cta:hover {
+	background: var(--color-cta-secondary-bg-hover);
+	border-color: var(--color-cta-secondary-bg-hover);
+	color: var(--color-cta-secondary-text);
+}
+
+.nav-welcome {
+	color: var(--color-nav-text);
+	font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Landing page layout
+   ========================================================================== */
+
+.landing-main {
+	margin: 0;
+	padding: 0;
+	max-width: none;
+}
+
+/* ==========================================================================
+   Hero section
+   ========================================================================== */
+
+.hero-section {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	background-color: var(--color-bg-header);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	color: var(--color-text-inverse);
+	text-align: center;
+	padding: 4rem 1.5rem;
+}
+
+.hero-content {
+	max-width: 780px;
+}
+
+.hero-content h1 {
+	margin: 0 0 1.25rem;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: clamp(2.4rem, 5vw, 3.8rem);
+	line-height: 1.1;
+	text-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.95),
+		0 0 12px rgba(0, 0, 0, 0.75);
+}
+
+.hero-description,
+.hero-tagline {
+	color: var(--color-text-inverse);
+	font-size: clamp(1.15rem, 2vw, 1.55rem);
+	font-weight: 700;
+	line-height: 1.35;
+	text-shadow:
+		0 2px 4px rgba(0, 0, 0, 1),
+		0 0 10px rgba(0, 0, 0, 0.9);
+}
+
+.hero-description {
+	margin: 0;
+}
+
+.hero-tagline {
+	margin: 0.4rem 0 0;
+}
+
+.hero-cta {
+	margin-top: 2.5rem;
+}
+
+/* ==========================================================================
+   Shared landing page content
+   ========================================================================== */
+
+.section-container {
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+/* ==========================================================================
+   Benefits section
+   ========================================================================== */
+
+.benefits-section {
+	background: var(--color-bg-page);
+	padding: 4rem 1.5rem;
+}
+
+.benefits-section h2 {
+	margin: 0 0 2.5rem;
+	color: var(--color-text-heading);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 2rem;
+	text-align: center;
+}
+
+.benefits-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+}
+
+.benefit-card {
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 1.5rem;
+	box-shadow:
+		0 6px 14px
+		color-mix(
+			in srgb,
+			var(--color-charcoal-navy) 10%,
+			transparent
+		);
+}
+
+.benefit-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	margin-bottom: 1.25rem;
+	background: var(--color-cta-secondary-bg);
+	color: var(--color-cta-secondary-text);
+	border-radius: 7px;
+	font-size: 1.1rem;
+}
+
+.benefit-card h3 {
+	margin: 0 0 0.75rem;
+	color: var(--color-text-heading);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.1rem;
+}
+
+.benefit-card p {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 0.88rem;
+	line-height: 1.55;
+}
+
+/* ==========================================================================
+   Reservation call to action
+   ========================================================================== */
+
+.reservation-section {
+	background: var(--color-cta-secondary-bg);
+	color: var(--color-text-inverse);
+	text-align: center;
+	padding: 3.5rem 1.5rem;
+}
+
+.reservation-section h2 {
+	margin: 0 0 0.75rem;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 2rem;
+}
+
+.reservation-section p {
+	max-width: 520px;
+	margin: 0 auto 1.5rem;
+	color: var(--color-text-inverse);
+	font-size: 0.95rem;
+	line-height: 1.5;
+	opacity: 0.85;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn-primary {
+	display: inline-block;
+	background: var(--color-cta-primary-bg);
+	color: var(--color-cta-primary-text);
+	border: none;
+	padding: 0.85rem 1.5rem;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: 1rem;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.btn-primary:hover {
+	background: var(--color-cta-primary-bg-hover);
+	color: var(--color-cta-primary-text);
+}
+
+.btn-secondary {
+	display: inline-block;
+	background: transparent;
+	color: var(--color-cta-secondary-text);
+	border: 1px solid var(--color-cta-secondary-text);
+	padding: 0.75rem 1.4rem;
+	border-radius: 6px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.btn-secondary:hover {
+	background: var(--color-cta-secondary-bg-hover);
+	border-color: var(--color-cta-secondary-bg-hover);
+	color: var(--color-charcoal-navy);
+}
+
+/* ==========================================================================
+   Footer -
+   ========================================================================== */
+
+.site-footer {
+	background: var(--color-bg-footer);
+	color: var(--color-text-inverse);
+	border-top: 2px solid var(--color-cta-secondary-bg);
+}
+
+.footer-columns {
+	max-width: 1880px;
+	min-height: 360px;
+	margin: 0 auto;
+	padding: 4.5rem 5rem;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 5rem;
+}
+
+.site-footer h2 {
+	margin: 0 0 1.25rem;
+	color: var(--color-text-inverse);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.footer-contact h2 {
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.25rem;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+.footer-contact address {
+	font-style: normal;
+}
+
+.site-footer p {
+	margin: 0 0 0.65rem;
+	color: var(--color-nav-text);
+	font-size: 1rem;
+	line-height: 1.4;
+	opacity: 0.65;
+}
+
+.site-footer a {
+	color: var(--color-nav-text);
+	text-decoration: none;
+}
+
+.site-footer a:hover {
+	color: var(--color-nav-text-hover);
+}
+
+.self-service-heading {
+	margin-top: 1.5rem !important;
+	line-height: 1.25;
+}
+
+.footer-links {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.footer-links a,
+.footer-links button {
+	margin-bottom: 0.85rem;
+	color: var(--color-nav-text);
+	font-family: inherit;
+	font-size: 1rem;
+	opacity: 0.65;
+}
+
+.footer-links button {
+	padding: 0;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.footer-links a:hover,
+.footer-links button:hover {
+	color: var(--color-nav-text-hover);
+	opacity: 1;
+}
+
+.footer-bottom {
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	padding: 1.75rem 1.5rem;
+	text-align: center;
+}
+
+.footer-bottom p {
+	margin: 0;
+	font-size: 0.9rem;
+	opacity: 0.5;
+}
+
+/* ==========================================================================
+   Responsive layout
+   ========================================================================== */
+
+@media (max-width: 900px) {
+	.benefits-grid {
+		grid-template-columns: 1fr;
+		max-width: 520px;
+		margin: 0 auto;
+	}
+}
+
+@media (max-width: 768px) {
+	.site-header {
+		align-items: flex-start;
+	}
+
+	.site-nav {
+		justify-content: flex-end;
+		gap: 0.75rem;
+	}
+
+	.footer-columns {
+		min-height: auto;
+		padding: 3rem 1.5rem;
+		grid-template-columns: 1fr;
+		gap: 2.5rem;
+	}
+
+	.footer-bottom {
+		padding: 1.5rem;
+	}
+}
+
+@media (max-width: 600px) {
+	.site-header {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.site-nav {
+		justify-content: center;
+	}
+
+	.hero-section {
+		min-height: 360px;
+		padding: 3rem 1.25rem;
+	}
+
+	.hero-content h1 {
+		font-size: 2.4rem;
+	}
+
+	.benefits-section,
+	.reservation-section {
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+}
