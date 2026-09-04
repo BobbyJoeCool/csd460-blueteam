@@ -30,6 +30,7 @@ public class Customer implements Serializable {
     private String city;
     private String state;
     private String zipCode;
+    private String country;
     private LocalDate dateJoined;
     private int failedLoginAttempts;
     private boolean accountLocked;
@@ -186,6 +187,22 @@ public class Customer implements Serializable {
      */
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    /**
+     * @return the customer's country - one of {@code "US"}, {@code "CA"},
+     *         or {@code "OTHER"}
+     */
+    public String getCountry() {
+        return country;
+    }
+
+    /**
+     * @param country the customer's country - one of {@code "US"},
+     *                {@code "CA"}, or {@code "OTHER"}
+     */
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     /**

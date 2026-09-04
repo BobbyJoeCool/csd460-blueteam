@@ -8,7 +8,6 @@
     Course:      CSD 460 - Capstone Project
     Module:      (module / week)
     Page:        (Page Name) (yourFileName.jsp)
-    Contract:    DevNotes/Contracts/your-page-contract.md
 
     Every page shares this same shell:
       1. /includes/styles.jsp   - site.css, header.css, footer.css, loginModal.css

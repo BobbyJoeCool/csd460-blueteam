@@ -60,16 +60,25 @@ Every page must use its assigned string exactly. Update this table as pages are 
 
 | Page | `activePage` value |
 | --- | --- |
-| Landing |  |
-| About Us |  |
-| Reservation (Book a Slip) |  |
-| Reservation Summary |  |
-| Contact Us |  |
-| Look Up Reservation |  |
-| Wait List Lookup |  |
-| Edit User Info | |
+| Landing | `home` |
+| About Us | `about` |
+| Reservation (Book a Slip) | `reservation` |
+| Reservation Summary | *(none — not a nav link)* |
+| Contact Us | `contact` |
+| Look Up Reservation | *(none — not a nav link)* |
+| Wait List Lookup | *(none — not a nav link)* |
+| Edit User Info | *(none — not a nav link)* |
 
 > Login is a modal, not a nav destination — it doesn't set `activePage`.
+
+**Update, 2026-09-04:** the header/footer `About Us` / `Reservations` /
+`Contact` links no longer use the placeholder `href="#"` from the general
+rule above — they now point at `aboutUs.jsp` / `reservation.jsp` /
+`contact.jsp`, since those pages exist (as "Coming Soon" placeholders, see
+`includes/comingSoon.jsp`). `Reservation Summary`, `Look Up Reservation`,
+`Wait List Lookup`, and `Edit User Info` also have placeholder pages now,
+but were never nav links to begin with, so nothing to rewire for those
+four.
 
 ## Front/Back End
 

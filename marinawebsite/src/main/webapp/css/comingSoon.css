@@ -1,0 +1,193 @@
+/*
+ * CSD 460 - Capstone Project - Marina Website Project
+ * "Coming Soon" placeholder styling (includes/comingSoon.jsp). Pirate /
+ * under-construction motif, built entirely from CSS and original inline
+ * SVG (see the JSP) rather than external images, so there's no license
+ * to track and every color still comes from site.css's palette.
+ * Depends on site.css being linked first.
+ */
+
+.coming-soon {
+	position: relative;
+	max-width: 720px;
+	margin: 3rem auto 4rem;
+	padding: 0 1.5rem;
+}
+
+/* ==========================================================================
+   Caution-tape banner - the "under construction" motif
+   ========================================================================== */
+
+.coming-soon-caution {
+	display: flex;
+	overflow: hidden;
+	margin-bottom: 2rem;
+	padding: 0.6rem 0;
+	background: repeating-linear-gradient(
+		135deg,
+		var(--color-golden-hour),
+		var(--color-golden-hour) 22px,
+		var(--color-charcoal-navy) 22px,
+		var(--color-charcoal-navy) 44px
+	);
+	border-radius: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.coming-soon-caution span {
+	flex: 0 0 auto;
+	padding: 0 1.5rem;
+	color: var(--color-surface-neutral);
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   Parchment card - the pirate "ship's notice" motif
+   ========================================================================== */
+
+.coming-soon-parchment {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	padding: 2.5rem 2rem 3rem;
+	background: color-mix(in srgb, var(--color-sand) 88%, var(--color-golden-hour));
+	border: 3px solid var(--color-deep-marine);
+	border-radius: 10px;
+	outline: 1px solid var(--color-golden-hour);
+	outline-offset: -8px;
+	box-shadow: 0 10px 30px rgba(13, 59, 77, 0.25);
+}
+
+.coming-soon-emblem {
+	width: 84px;
+	height: 84px;
+	margin-bottom: 0.5rem;
+}
+
+.coming-soon-emblem .emblem-ring {
+	fill: none;
+	stroke: var(--color-golden-hour);
+	stroke-width: 3;
+}
+
+.coming-soon-emblem .emblem-mark {
+	fill: var(--color-charcoal-navy);
+}
+
+.coming-soon-emblem .emblem-eye {
+	fill: var(--color-sand);
+}
+
+.coming-soon-emblem .emblem-jaw {
+	fill: none;
+	stroke: var(--color-sand);
+	stroke-width: 3;
+}
+
+.coming-soon-emblem .emblem-bone {
+	stroke: var(--color-charcoal-navy);
+	stroke-width: 6;
+	stroke-linecap: round;
+}
+
+.coming-soon-parchment h1 {
+	margin: 0.25rem 0 0.75rem;
+	color: var(--color-deep-marine);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.9rem;
+}
+
+.coming-soon-divider {
+	width: 160px;
+	height: 14px;
+	margin: 0 auto 1.25rem;
+	fill: none;
+	stroke: var(--color-sunset-coral);
+	stroke-width: 3;
+	stroke-linecap: round;
+}
+
+.coming-soon-message {
+	margin: 0 auto 0.5rem;
+	max-width: 34rem;
+	color: var(--color-text-body);
+	font-size: 1.1rem;
+}
+
+.coming-soon-submessage {
+	margin: 0 0 1.75rem;
+	color: var(--color-text-muted);
+	opacity: 0.8;
+	font-size: 0.95rem;
+}
+
+.coming-soon-home-link {
+	display: inline-block;
+	padding: 0.75rem 1.6rem;
+	border-radius: 6px;
+	background: var(--color-cta-secondary-bg);
+	color: var(--color-cta-secondary-text);
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.coming-soon-home-link:hover {
+	background: var(--color-cta-secondary-bg-hover);
+	color: var(--color-charcoal-navy);
+}
+
+.coming-soon-credit {
+	margin: 1.5rem 0 0;
+	color: var(--color-text-muted);
+	opacity: 0.6;
+	font-size: 0.75rem;
+	font-style: italic;
+}
+
+/* ==========================================================================
+   Ship's wheel - decorative, sits behind the parchment card
+   ========================================================================== */
+
+.coming-soon-wheel {
+	position: absolute;
+	top: -2.5rem;
+	right: -2.5rem;
+	z-index: 0;
+	width: 140px;
+	height: 140px;
+	opacity: 0.16;
+	fill: none;
+	stroke: var(--color-ocean-blue);
+	stroke-width: 3;
+	animation: coming-soon-spin 40s linear infinite;
+}
+
+.coming-soon-wheel .wheel-peg {
+	fill: var(--color-ocean-blue);
+	stroke: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.coming-soon-wheel {
+		animation: none;
+	}
+}
+
+@keyframes coming-soon-spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+	.coming-soon-wheel {
+		display: none;
+	}
+
+	.coming-soon-parchment {
+		padding: 2rem 1.25rem 2.5rem;
+	}
+}

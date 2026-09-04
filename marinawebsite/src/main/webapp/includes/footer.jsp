@@ -6,9 +6,9 @@
             <h2>Moffat Bay Marina</h2>
 
             <address>
-                123 Marina Drive<br>
-                Moffat Bay, WA 32000<br>
-                <a href="tel:+15551234567">(555) 123-4567</a>
+                1400 Harbor Loop Road<br>
+                Joviedsa Island, WA 98250<br>
+                <a href="tel:+13605550142">(360) 555-0142</a>
             </address>
         </section>
 
@@ -32,15 +32,15 @@
                     Home
                 </a>
 
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/aboutUs.jsp">
                     About Us
                 </a>
 
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/reservation.jsp">
                     Reservations
                 </a>
 
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/contact.jsp">
                     Contact
                 </a>
             </nav>

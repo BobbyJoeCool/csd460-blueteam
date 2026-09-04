@@ -64,6 +64,16 @@ Once someone logs in, the rest of the site needs an easy way to know they're log
 
 Logging out clears all of it at once.
 
+**Update 2026-09-04:** `LoginServlet.logInAndRedirect` now invalidates any
+pre-existing session and starts a fresh one before setting the four
+attributes above, rather than reusing whatever session the browser
+already had. This is session ID regeneration on authentication, per
+OWASP's Session Management Cheat Sheet — without it, a session ID an
+attacker fixed in the visitor's browser before login (session fixation)
+would carry straight through into their now-authenticated session.
+`RegisterServlet` doesn't log the new customer in, so it has no session to
+regenerate.
+
 ### Customer Data Passed to the Front End
 
 After login, this is the account info the rest of the site has access to: first name, last name, email, phone, mailing address (street, city, state, zip), and the date they joined. There's also a short "First L." display name (like "Robert B.") built automatically from the first and last name, so no page has to build it on its own.

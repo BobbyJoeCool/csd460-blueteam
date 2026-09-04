@@ -31,7 +31,7 @@ public class CustomerDAO {
      */
     public Customer findByEmail(String email) throws SQLException {
         String sql = "SELECT customerID, firstName, lastName, email, phone, phoneCountryCode, "
-                + "streetAddress, streetAddress2, city, state, zipCode, dateJoined, failedLoginAttempts, accountLocked "
+                + "streetAddress, streetAddress2, city, state, zipCode, country, dateJoined, failedLoginAttempts, accountLocked "
                 + "FROM Customer WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -165,12 +165,13 @@ public class CustomerDAO {
                     city,
                     state,
                     zipCode,
+                    country,
                     passwordHash,
                     dateJoined,
                     failedLoginAttempts,
                     accountLocked
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, 0, 0)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, 0, 0)
                 """;
 
         try (PreparedStatement stmt = conn.prepareStatement(
@@ -187,7 +188,8 @@ public class CustomerDAO {
             stmt.setString(8, customer.getCity());
             stmt.setString(9, customer.getState());
             stmt.setString(10, customer.getZipCode());
-            stmt.setString(11, passwordHash);
+            stmt.setString(11, customer.getCountry());
+            stmt.setString(12, passwordHash);
 
             if (stmt.executeUpdate() != 1) {
                 throw new SQLException(
@@ -225,6 +227,7 @@ public class CustomerDAO {
         customer.setCity(rs.getString("city"));
         customer.setState(rs.getString("state"));
         customer.setZipCode(rs.getString("zipCode"));
+        customer.setCountry(rs.getString("country"));
         Date dateJoined = rs.getDate("dateJoined");
         customer.setDateJoined(dateJoined != null ? dateJoined.toLocalDate() : null);
         customer.setFailedLoginAttempts(rs.getInt("failedLoginAttempts"));

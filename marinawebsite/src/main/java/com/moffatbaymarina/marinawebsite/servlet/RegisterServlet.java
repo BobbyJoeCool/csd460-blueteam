@@ -53,6 +53,18 @@ public class RegisterServlet extends HttpServlet {
 	private static final Pattern REG_NUMBER_PATTERN =
 			Pattern.compile("^\\d{4,7}\\s?[A-Za-z]{2}$");
 
+	/*
+	 * Canadian Pleasure Craft Licence numbers carry a literal leading "C"
+	 * (the country code) that the US format has no equivalent for, plus a
+	 * wider digit range - see the Registration contract's "Boat Fields"
+	 * section for why US and Canadian registrations use different patterns.
+	 */
+	private static final Pattern CA_REG_NUMBER_PATTERN =
+			Pattern.compile("^C\\d{4,8}\\s?[A-Za-z]{2}$");
+
+	private static final java.util.Set<String> VALID_COUNTRIES =
+			java.util.Set.of("US", "CA", "OTHER");
+
     //Data access objects for customer and boat operations----------------------------------------------------------
 
 	private final CustomerDAO customerDAO = new CustomerDAO();
@@ -97,6 +109,8 @@ public class RegisterServlet extends HttpServlet {
 		String state = clean(request.getParameter("state"))
 				.toUpperCase(Locale.ROOT);
 		String zipCode = clean(request.getParameter("zipCode"));
+		String country = clean(request.getParameter("country"))
+				.toUpperCase(Locale.ROOT);
 
 		String boatName = clean(request.getParameter("boatName"));
 		String regState = clean(request.getParameter("regState"))
@@ -127,6 +141,7 @@ public class RegisterServlet extends HttpServlet {
 				city,
 				state,
 				zipCode,
+				country,
 				password,
 				confirmPassword);
 
@@ -164,7 +179,8 @@ public class RegisterServlet extends HttpServlet {
 					boatBeamText,
 					boatBeam,
 					boatYearText,
-					boatYear);
+					boatYear,
+					country);
 
 			if (boatError != null) {
 				forwardWithError(
@@ -201,8 +217,9 @@ public class RegisterServlet extends HttpServlet {
 			customer.setStreetAddress(streetAddress);
 			customer.setStreetAddress2(emptyToNull(streetAddress2));
 			customer.setCity(city);
-			customer.setState(state);
+			customer.setState(emptyToNull(state));
 			customer.setZipCode(zipCode);
+			customer.setCountry(country);
 
             saveRegistration(
                 customer,
@@ -316,6 +333,7 @@ public class RegisterServlet extends HttpServlet {
 			String city,
 			String state,
 			String zipCode,
+			String country,
 			String password,
 			String confirmPassword) {
 
@@ -326,11 +344,24 @@ public class RegisterServlet extends HttpServlet {
 				|| isBlank(phone)
 				|| isBlank(streetAddress)
 				|| isBlank(city)
-				|| isBlank(state)
 				|| isBlank(zipCode)
+				|| isBlank(country)
 				|| isBlank(password)
 				|| isBlank(confirmPassword)) {
 
+			return "Please complete all required fields.";
+		}
+
+		if (!VALID_COUNTRIES.contains(country)) {
+			return "Select a valid Country.";
+		}
+
+		// State/Province follows Country, the same way Registration
+		// State/Province does for a boat (see validateBoat below): OTHER
+		// has no state/province concept, so the field is disabled
+		// client-side and not required here - see the Registration
+		// contract's "Country" section.
+		if (!"OTHER".equals(country) && isBlank(state)) {
 			return "Please complete all required fields.";
 		}
 
@@ -353,7 +384,7 @@ public class RegisterServlet extends HttpServlet {
 
 		if (streetAddress.length() > 100
 				|| city.length() > 50
-				|| state.length() != 2) {
+				|| (!isBlank(state) && state.length() != 2)) {
 			return "Enter valid address information.";
 		}
 
@@ -384,7 +415,8 @@ public class RegisterServlet extends HttpServlet {
 			String boatBeamText,
 			BigDecimal boatBeam,
 			String boatYearText,
-			Integer boatYear) {
+			Integer boatYear,
+			String country) {
 
         if (isBlank(boatName) || isBlank(boatLengthText)) {
             return "Boat Name and Boat Length are required when adding a boat.";
@@ -419,21 +451,47 @@ public class RegisterServlet extends HttpServlet {
 			return "Enter a valid four-digit boat year.";
 		}
 
-		boolean validHin =
-				!isBlank(hin) && HIN_PATTERN.matcher(hin).matches();
+		/*
+		 * HIN is the primary identifier and Registration State/Number is
+		 * the fallback (Registration contract's "Boat Fields"), but as of
+		 * this rework neither is ever required to submit - a boat with
+		 * neither is still saved, and the front end shows a note directing
+		 * the owner to call the Marina instead of blocking submission.
+		 * Each one, if actually provided, still has to be well-formed.
+		 */
+		if (!isBlank(hin) && !HIN_PATTERN.matcher(hin).matches()) {
+			return "HIN should be 12 characters: 3 letters, then 9 more "
+					+ "letters or numbers.";
+		}
 
-		boolean validRegistration =
-				regState.length() == 2
-				&& REG_NUMBER_PATTERN.matcher(regNumber).matches();
+		boolean regStateGiven = !isBlank(regState);
+		boolean regNumberGiven = !isBlank(regNumber);
 
-		if (boatYear == null || boatYear < 1972) {
-			if (!validRegistration) {
-				return "Boats built before 1972, or without a year, "
-						+ "require Registration State and Number.";
+		if (regStateGiven != regNumberGiven) {
+			return "Provide both Registration State/Province and Number, "
+					+ "or leave both blank.";
+		}
+
+		if (regStateGiven) {
+			if (regState.length() != 2) {
+				return "Enter a valid two-letter Registration "
+						+ "State/Province code.";
 			}
-		} else if (!validHin && !validRegistration) {
-			return "Provide either a valid HIN or Registration State "
-					+ "and Number.";
+
+			if ("CA".equals(country)
+					&& !CA_REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+				return "Enter a valid Canadian Registration Number, "
+						+ "e.g. C1234 AB.";
+			}
+
+			if ("US".equals(country)
+					&& !REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+				return "Enter a valid Registration Number, e.g. 1234 AB.";
+			}
+
+			// OTHER has no defined Registration Number format - accepted
+			// as entered, since the field is province/state-system
+			// specific and Registration is disabled client-side for it.
 		}
 
 		return null;

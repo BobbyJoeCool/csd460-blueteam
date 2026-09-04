@@ -24,6 +24,15 @@
   Registration.jsp includes this with none of them, so every field just
   falls back to empty on first load, same as before this was pulled out.
 
+  Registration State/Number is also driven by the "country" request
+  parameter, which this card doesn't own - it belongs to the Country field
+  in personalInfoCard.jsp, but both cards render inside the same <form>/
+  request, so this card just reads param.country directly. Country=CA
+  swaps in provinceOptions.jsp and Canadian-format placeholders;
+  Country=OTHER disables the field entirely and shows
+  #foreignRegistrationBadge instead. See the Registration contract's
+  "Boat Fields" section.
+
   Expects to render inside a <form>; doesn't declare its own <form> tag.
 --%>
 <%@ page isELIgnored="false" %>
@@ -39,6 +48,14 @@
 <c:set var="regNumberValue" value="${not empty param.regNumber ? param.regNumber : param.defaultRegNumber}" />
 <c:set var="boatYearValue" value="${not empty param.boatYear ? param.boatYear : param.defaultBoatYear}" />
 
+<%--
+  Registration State/Province tracks the Country field over in
+  personalInfoCard.jsp - both fields read the same request parameter
+  ("country"), it's just the other include that owns rendering the
+  <select> itself. See the Registration contract's "Boat Fields" section.
+--%>
+<c:set var="countryValue" value="${not empty param.country ? param.country : 'US'}" />
+
 <div class="form-column" id="boatInfoColumn">
 
     <h2 class="column-heading">Boat Information</h2>
@@ -47,6 +64,12 @@
         <p class="optional-mark">Optional</p>
         <p class="column-note">(you may add a boat later, or do it now)</p>
     </div>
+
+    <output class="callout-badge" id="foreignRegistrationBadge" ${countryValue == 'OTHER' ? '' : 'hidden'}>
+        If your boat is not registered in the United States or Canada,
+        please call the Marina to register your boat after you make an
+        account.
+    </output>
 
     <div class="form-group" id="boatNameGroup">
         <label for="boatName">Boat Name <span class="required-mark">*</span></label>
@@ -79,8 +102,15 @@
         </div>
     </div>
 
+    <%--
+      HIN is the primary/default way to identify a boat - listed first,
+      no longer marked required. Registration State/Number below is the
+      fallback for an owner without a HIN handy. Neither is required to
+      submit; #identificationNote below covers the "have neither" case.
+      See the Registration contract's "Boat Fields" section.
+    --%>
     <div class="form-group" id="hinGroup">
-        <label for="hin">HIN</label>
+        <label for="hin">HIN <span class="field-hint">(recommended)</span></label>
         <input type="text" id="hin" name="hin" maxlength="12"
                placeholder="e.g. BPL123456789"
                value="${fn:escapeXml(hinValue)}">
@@ -89,37 +119,56 @@
 
     <div class="form-row-split">
         <div class="form-group" id="regStateGroup">
-            <label for="regState">Registration State <span class="required-mark">*</span></label>
-            <select id="regState" name="regState">
-                <jsp:include page="/includes/stateOptions.jsp">
-                    <jsp:param name="fieldName" value="regState" />
-                    <jsp:param name="regState" value="${regStateValue}" />
-                </jsp:include>
+            <label for="regState" id="regStateLabel">${countryValue == 'CA' ? 'Registration Province' : 'Registration State'}</label>
+            <select id="regState" name="regState" ${countryValue == 'OTHER' ? 'disabled' : ''}>
+                <c:choose>
+                    <c:when test="${countryValue == 'CA'}">
+                        <jsp:include page="/includes/provinceOptions.jsp">
+                            <jsp:param name="fieldName" value="regState" />
+                            <jsp:param name="regState" value="${regStateValue}" />
+                        </jsp:include>
+                    </c:when>
+                    <c:when test="${countryValue == 'OTHER'}">
+                        <option value="">Not applicable</option>
+                    </c:when>
+                    <c:otherwise>
+                        <jsp:include page="/includes/stateOptions.jsp">
+                            <jsp:param name="fieldName" value="regState" />
+                            <jsp:param name="regState" value="${regStateValue}" />
+                        </jsp:include>
+                    </c:otherwise>
+                </c:choose>
             </select>
         </div>
         <div class="form-group" id="regNumberGroup">
-            <label for="regNumber">Registration Number <span class="required-mark">*</span></label>
+            <label for="regNumber">Registration Number</label>
             <input type="text" id="regNumber" name="regNumber" maxlength="20"
-                   placeholder="e.g. 0007 JS"
-                   value="${fn:escapeXml(regNumberValue)}">
+                   placeholder="${countryValue == 'CA' ? 'e.g. C1234 AB' : 'e.g. 0007 JS'}"
+                   value="${fn:escapeXml(regNumberValue)}"
+                   ${countryValue == 'OTHER' ? 'disabled' : ''}>
             <div class="field-error" id="regNumberError"></div>
         </div>
     </div>
 
-    <div class="year-with-note" id="boatYearGroup">
-        <div class="form-group field-narrow">
-            <label for="boatYear">Boat Year</label>
-            <input type="text" id="boatYear" name="boatYear"
-                   inputmode="numeric" maxlength="4"
-                   placeholder="2003"
-                   value="${fn:escapeXml(boatYearValue)}">
-            <div class="field-error" id="boatYearError"></div>
-        </div>
-        <p class="boat-id-note" id="boatIdNote" aria-live="polite">
-            Enter a Boat Year above to see whether you need the HIN or Registration State &amp; Number.
-        </p>
+    <output class="callout-badge" id="identificationNote" hidden>
+        If you don't have a HIN or Boat Registration, you can call the
+        Marina at <a href="tel:+13605550142">(360) 555-0142</a> for other
+        options.
+    </output>
+
+    <div class="form-group" id="boatYearGroup">
+        <label for="boatYear">Boat Year</label>
+        <input type="text" id="boatYear" name="boatYear"
+               inputmode="numeric" maxlength="4"
+               placeholder="2003"
+               value="${fn:escapeXml(boatYearValue)}">
+        <div class="field-error" id="boatYearError"></div>
     </div>
 
     <div class="field-error" id="boatSectionError"></div>
+
+    <button type="button" class="btn-clear-section" id="clearBoatInfo">
+        Clear Boat Info
+    </button>
 
 </div>

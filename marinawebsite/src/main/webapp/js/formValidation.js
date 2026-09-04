@@ -103,14 +103,28 @@ MoffatBay.form = (function () {
     // Requires 4 to 7 digits, an optional hyphen or space, then exactly 2 letters.
     var REG_NUMBER_PATTERN = /^\d{4,7}[- ]?[A-Za-z]{2}$/;
 
-    /**
-     * Checks whether value matches the state vessel Certificate of
-     * Number format (see REG_NUMBER_PATTERN above).
-     * @param {string} value - the registration number to check; "" counts as valid, the field is optional
-     * @returns {boolean} true if value is empty or matches REG_NUMBER_PATTERN
+    /*
+     * Canadian Pleasure Craft Licence format: a literal leading "C"
+     * (Canada's country code), then 4 to 8 digits, an optional hyphen or
+     * space, then exactly 2 letters - see RegisterServlet's
+     * CA_REG_NUMBER_PATTERN, which this has to match exactly.
      */
-    function isValidRegNumber(value) {
-        return value === "" || REG_NUMBER_PATTERN.test(value);
+    var CA_REG_NUMBER_PATTERN = /^C\d{4,8}[- ]?[A-Za-z]{2}$/;
+
+    /**
+     * Checks whether value matches the Registration Number format for the
+     * given country (see REG_NUMBER_PATTERN / CA_REG_NUMBER_PATTERN above).
+     * "OTHER" has no defined format, so anything non-empty passes - the
+     * field is disabled client-side for that case anyway.
+     * @param {string} value - the registration number to check; "" counts as valid, the field is optional
+     * @param {string} [country] - "US", "CA", or "OTHER"; defaults to the US format
+     * @returns {boolean} true if value is empty or matches the country's format
+     */
+    function isValidRegNumber(value, country) {
+        if (value === "") { return true; }
+        if (country === "CA") { return CA_REG_NUMBER_PATTERN.test(value); }
+        if (country === "OTHER") { return true; }
+        return REG_NUMBER_PATTERN.test(value);
     }
 
     /*

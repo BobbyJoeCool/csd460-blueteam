@@ -78,6 +78,7 @@ erDiagram
         VARCHAR city "Mailing city"
         CHAR state "Two letter state code"
         VARCHAR zipCode "Zip code, varchar for leading zeros"
+        VARCHAR country "US, CA, or OTHER - added in V1-2-0, drives the Registration page's foreign-registration badge"
         DATE dateJoined "Date account was created"
     }
 
@@ -91,7 +92,7 @@ erDiagram
         INT boatID PK "Unique ID for each boat"
         VARCHAR boatName "Name of the vessel - may change with boat ownership."
         VARCHAR HIN UK "Hull identification number. Can be null for qualifying older boats without a HIN, other proof of ownership still required."
-        CHAR regState UK "State the boat is registered in"
+        CHAR regState UK "State or Canadian province the boat is registered in - see owning Customer.country"
         VARCHAR regNumber UK "State registration number, unique with regState"
         VARCHAR boatType "Sailboat, powerboat, catamaran, etc"
         DECIMAL boatLength "Length in feet, for slip fit"

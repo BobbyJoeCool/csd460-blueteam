@@ -23,6 +23,7 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 - [x] **Input length limits (HTML side):** Set, see the table below. Matched against the Customer and Boat columns from Module 3/4.
 - [x] **Address field shape:** Decided, splitting into four separate fields instead of one box. See [The Address Field](#the-address-field) below.
 - [x] **Boat registration fields:** Decided, adding every column the Boat table has, not just Boat Name and Boat Length. See [Boat Fields](#boat-fields) below.
+- [x] **Country field:** Decided, 2026-09-04. See [Country](#country) below.
 
 ---
 
@@ -40,6 +41,7 @@ The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) i
 - City (Optional)
 - State (Optional)
 - Zip Code (Optional)
+- Country
 - Boat Name
 - Registration State
 - Registration Number
@@ -52,7 +54,7 @@ The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) i
 - Re-type Password
 - a Submit button
 
-Field names I'm using, matched to what they map to later: `firstName`, `lastName`, `email`, `phoneCountryCode`, `phone`, `streetAddress`, `streetAddress2`, `city`, `state`, `zipCode`, `boatName`, `regState`, `regNumber`, `boatLength`, `hin`, `boatType`, `boatBeam`, `boatYear`, `password`, `confirmPassword`.
+Field names I'm using, matched to what they map to later: `firstName`, `lastName`, `email`, `phoneCountryCode`, `phone`, `streetAddress`, `streetAddress2`, `city`, `state`, `zipCode`, `country`, `boatName`, `regState`, `regNumber`, `boatLength`, `hin`, `boatType`, `boatBeam`, `boatYear`, `password`, `confirmPassword`.
 
 ### Password Rules
 
@@ -80,17 +82,38 @@ There's also a second line under Street Address (`streetAddress2`) for apartment
 
 **Update, built form deviates from this section:** `registration.jsp` as built marks Street Address, City, State, and Zip Code `required` — only `streetAddress2` is actually optional. That's a change from "(Optional)" on the Module 2 wireframe and from what this section originally said; flagging it here since it wasn't a documented decision. Confirm with the team whether that's intentional before Back End writes server-side validation against it.
 
+### Country
+
+**Added 2026-09-04**, not on the original Module 2 wireframe. A required `country` `<select>` in `personalInfoCard.jsp` — one of three options: `US` (United States, the default), `CA` (Canada), or `OTHER`. `OTHER` deliberately doesn't capture which country the customer is actually in; it exists only to drive things elsewhere on the page:
+
+- **Moved 2026-09-04** to right after Phone, before the address fields, since Country now also drives the mailing address's own State/Province field immediately below it — reads more naturally decided before the fields it affects instead of after.
+- A badge above Boat Registration (`#foreignRegistrationBadge` in `boatInfoCard.jsp`), shown only when Country is `OTHER`: *"If your boat is not registered in the United States or Canada, please call the Marina to register your boat after you make an account."*
+- Which option list, label, and Registration Number format Boat Registration's Registration State/Province field uses — see [Boat Fields](#boat-fields) below.
+- **Added 2026-09-04:** which option list, label, and required/disabled state the mailing address's own State field uses — same three-way swap as Registration State/Province: `US` shows `includes/stateOptions.jsp` labeled "State" (required); `CA` shows `includes/provinceOptions.jsp` labeled "Province" (required); `OTHER` disables the field entirely (labeled "State", not applicable — no state/province concept for an unspecified country) and it's not required server-side in that case. `registration.js`'s `applyCountryToAddressSection` mirrors `applyCountryToBoatSection` for this field; `RegisterServlet.validateCustomer` only requires `state` when `country` isn't `OTHER`, and stores it as `NULL` when blank.
+
+`Customer.country VARCHAR(5) NOT NULL DEFAULT 'US'` was added in `MoffatBayMarinaDB_V1-2-0_update.sql` (`VARCHAR(5)`, not `CHAR(2)`, since `OTHER` is a literal stored value, not an ISO country code). `RegisterServlet.validateCustomer` requires it be one of the three values.
+
+**Zip Code is not similarly affected — flagging for the team:** Canada doesn't have "zip codes"; it uses alphanumeric postal codes (e.g. `V8V 3K1`), a different shape than the US's 5-digit/ZIP+4 format. `zipCode`'s validation (`ZIP_PATTERN` client- and server-side) still only accepts the US shape regardless of Country, so a real Canadian or foreign postal code currently fails registration. Not fixed as part of this change — decide with the team whether Zip Code should become format-aware per Country (or just relabeled/loosened for `CA`/`OTHER`) before it comes up for a real customer.
+
 ### Boat Fields
 
 The wireframe only asked for Boat Name and Boat Length, but the Boat table has more columns than that, and some of them are required to insert a row at all. So the form is collecting every column the Boat table has, not just the two from the original mockup:
 
 - **Boat Name and Boat Length are always required.** The Boat table won't accept a row without them.
-- **Identification depends on the boat's year.** HIN wasn't required (and on some boats didn't exist) before 1972, so:
-  - Boat Year 1972 or later: either the HIN by itself, or Registration State + Registration Number together, satisfies it.
-  - Boat Year before 1972, or left blank: Registration State + Registration Number are required, HIN alone doesn't count.
-
-  A note box under the Boat Year field updates live to tell the user which rule currently applies.
 - **Boat Type and Boat Beam are always optional**, no conditions attached.
+- **HIN is the primary/default way to identify a boat; Registration State/Province + Number is the fallback** for an owner without a HIN handy — labeled and ordered that way in `boatInfoCard.jsp` (HIN field comes first).
+
+**Update 2026-09-04, supersedes this section's original identification rule:** identification used to depend on the boat's year (pre-1972 boats required Registration State + Number; 1972-or-later boats could use either). That rule is gone. **Neither HIN nor Registration State/Province + Number is ever required to submit** — each one is still validated for format *if provided*, but a boat with neither is saved as-is. When the Boat Info card has been touched but has neither, `#identificationNote` shows instead of a validation error: *"If you don't have a HIN or Boat Registration, you can call the Marina at (360) 555-0142 for other options."* A "Clear Boat Info" button (`#clearBoatInfo`) lets someone who started the card without ID handy drop it in one click instead of getting stuck on the Boat Name/Length requirement with a half-filled card. Boat Year has no bearing on any of this anymore — it's just an optional field with no attached identification logic.
+
+**Registration State/Province follows the Country field above:**
+
+| Country | Field label | Option list | Registration Number format |
+| --- | --- | --- | --- |
+| `US` (default) | "Registration State" | `includes/stateOptions.jsp` — US states | `\d{4,7}[- ]?[A-Za-z]{2}` (unchanged), e.g. `1234 AB` |
+| `CA` | "Registration Province" | `includes/provinceOptions.jsp` — 13 provinces/territories | `C\d{4,8}[- ]?[A-Za-z]{2}` — leading `C` is literal (Canada's country code), e.g. `C1234 AB` |
+| `OTHER` | "Registration State" (unchanged) | *(field disabled — not applicable)* | not validated |
+
+`registration.js` swaps the `<select>`'s option list, `#regStateLabel`'s text, and the field's `disabled` state live when Country changes, mirroring whichever list `boatInfoCard.jsp` rendered server-side for the initial load/round-trip. `RegisterServlet.validateBoat` takes the same `country` value to decide which pattern (`REG_NUMBER_PATTERN` or the new `CA_REG_NUMBER_PATTERN`) to check Registration Number against, and rejects the field's value entirely if not exactly two characters when provided.
 
 One more thing worth flagging to Carolina: Registration State and Registration Number together have to be unique on the Boat table (no two boats can share the same registration in the same state), so that's a possible error case on submit that isn't just "this field is blank."
 
@@ -134,13 +157,14 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `streetAddress` | text | **Yes** — built as required, deviating from this contract's original "Optional," see [The Address Field](#the-address-field) above | `maxlength="100"`, matches `Customer.streetAddress` |
 | `streetAddress2` | text | **No, Optional** | `maxlength="100"`, matches `Customer.streetAddress2`, see [The Address Field](#the-address-field) above |
 | `city` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="50"`, matches `Customer.city` |
-| `state` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="2"`, matches `Customer.state` (2-letter code) |
+| `state` | select | **Conditionally required** — required unless Country is `OTHER` (disabled, not applicable, in that case); see [Country](#country) above | `maxlength="2"`, matches `Customer.state` (2-letter state/province code); option list, label ("State"/"Province"), and disabled state follow `country`, same as `regState` below |
 | `zipCode` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
-| `boatName` | text | Yes | `maxlength="50"`, matches `Boat.boatName` (NOT NULL on that table) |
-| `regState` | text | Yes | `maxlength="2"`, matches `Boat.regState` (NOT NULL, 2-letter code) |
-| `regNumber` | text | Yes | `maxlength="20"`, matches `Boat.regNumber` (NOT NULL); combined with `regState` this has to be unique, see [Boat Fields](#boat-fields) above |
-| `boatLength` | number | Yes | Matches `Boat.boatLength`, a decimal up to 999.9 feet, one decimal place |
-| `hin` | text | **No, Optional** | `maxlength="12"`, matches `Boat.HIN`; blank is expected for pre-1972 boats |
+| `country` | select | Yes, defaults to `"US"` | One of `US` / `CA` / `OTHER`; matches `Customer.country`, see [Country](#country) above |
+| `boatName` | text | Yes, when adding a boat | `maxlength="50"`, matches `Boat.boatName` (NOT NULL on that table) |
+| `regState` | select | **No, Optional** — see [Boat Fields](#boat-fields) above | `maxlength="2"`, matches `Boat.regState`; option list and label depend on `country` (US states, Canadian provinces, or disabled) |
+| `regNumber` | text | **No, Optional** — see [Boat Fields](#boat-fields) above | `maxlength="20"`, matches `Boat.regNumber`; format depends on `country`, see [Boat Fields](#boat-fields) above; combined with `regState` this has to be unique when both are supplied |
+| `boatLength` | number | Yes, when adding a boat | Matches `Boat.boatLength`, a decimal up to 999.9 feet, one decimal place |
+| `hin` | text | **No, Optional** | `maxlength="12"`, matches `Boat.HIN`; the primary/default identifier, see [Boat Fields](#boat-fields) above |
 | `boatType` | text | **No, Optional** | `maxlength="30"`, matches `Boat.boatType` (e.g. sailboat, powerboat, catamaran) |
 | `boatBeam` | number | **No, Optional** | Matches `Boat.boatBeam`, a decimal up to 999.9 feet, one decimal place |
 | `boatYear` | number | **No, Optional** | Matches `Boat.boatYear`, a whole number model year |
@@ -161,13 +185,14 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | `streetAddress` | `String` | Form field | Required by the currently built form and servlet |
 | `streetAddress2` | `String` | Form field | Optional; blank value stored as `NULL` |
 | `city` | `String` | Form field | Required; maximum 50 characters |
-| `state` | `String` | Form field | Required; converted to uppercase; exactly two characters |
+| `state` | `String` | Form field | Required unless `country` is `OTHER`; converted to uppercase; exactly two characters if supplied; blank value stored as `NULL` |
 | `zipCode` | `String` | Form field | Required; five-digit or ZIP+4 format |
+| `country` | `String` | Form field | Required; converted to uppercase; must be `US`, `CA`, or `OTHER` |
 | `boatName` | `String` | Form field | Conditionally required when adding a boat |
-| `regState` | `String` | Form field | Converted to uppercase; conditionally required |
-| `regNumber` | `String` | Form field | Converted to uppercase; conditionally required |
+| `regState` | `String` | Form field | Converted to uppercase; optional, but if supplied must be exactly two characters and `regNumber` must also be supplied |
+| `regNumber` | `String` | Form field | Converted to uppercase; optional, but if supplied `regState` must also be supplied; format checked against `country`'s pattern (see [Boat Fields](#boat-fields) above) |
 | `boatLength` | `BigDecimal` | Form field | Conditionally required; must be greater than zero and no more than 999.9 |
-| `hin` | `String` | Form field | Optional depending on the boat identification rule; converted to uppercase |
+| `hin` | `String` | Form field | Optional; if supplied, converted to uppercase and checked against the HIN format |
 | `boatType` | `String` | Form field | Optional |
 | `boatBeam` | `BigDecimal` | Form field | Optional; if supplied, must be greater than zero and no more than 999.9 |
 | `boatYear` | `Integer` | Form field | Optional; if supplied, must be between 1800 and the current year |
@@ -188,8 +213,8 @@ Every query or DAO method the Back End calls for this page, and its exact return
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** First name, last name, email, phone, country code, boat name, registration state, registration number, and boat length are all required before the form lets you submit. Everything else (street address, address line 2, city, state, zip, HIN, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Phone isn't submittable until all 10 digits are entered, formatting happens live as you type, see [Phone Number](#phone-number) above. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match.
-- **Server-side (source of truth):** `RegisterServlet` validates all required customer fields, email format, country code, 10-digit phone number, address lengths, state length, ZIP format, password rules, and matching passwords. Boat registration is optional. If every boat field is blank, no boat is created. If any boat field is entered, Boat Name and Boat Length are required. A boat built in 1972 or later requires either a valid HIN or Registration State and Registration Number. A boat built before 1972, or one with no year supplied, requires Registration State and Registration Number. Boat length, beam, and year must also be valid numeric values within the accepted ranges.
+- **Client-side (UX only, not trusted):** First name, last name, email, phone, country code, country, boat name, and boat length (the last two only once any boat field is touched) are required before the form lets you submit. Everything else (street address, address line 2, city, state, zip, HIN, registration state/province, registration number, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Phone isn't submittable until all 10 digits are entered, formatting happens live as you type, see [Phone Number](#phone-number) above. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match. Both Registration State/Province (Boat Fields) and the mailing address's own State/Province field have their option list, label, required-ness, and disabled state switch live with Country, see [Country](#country) and [Boat Fields](#boat-fields) above.
+- **Server-side (source of truth):** `RegisterServlet` validates all required customer fields, email format, country code, 10-digit phone number, address lengths, state length (only enforced/required when supplied — see [Country](#country) above), ZIP format, country value, password rules, and matching passwords. Boat registration is optional. If every boat field is blank, no boat is created. If any boat field is entered, Boat Name and Boat Length are required. HIN, if supplied, must match the HIN format. Registration State/Province and Number, if either is supplied, both must be supplied together and Registration Number must match the format for the customer's `country` (see [Boat Fields](#boat-fields) above) — but neither HIN nor Registration is ever required outright. Boat length, beam, and year must also be valid numeric values within the accepted ranges.
 
 ## Error Handling
 
