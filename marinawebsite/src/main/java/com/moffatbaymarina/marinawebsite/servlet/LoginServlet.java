@@ -163,6 +163,12 @@ public class LoginServlet extends HttpServlet {
      * displayName), then redirects to wherever
      * {@link #safeRedirectTarget(HttpServletRequest)} says is safe.
      *
+     * <p>Invalidates any pre-existing session and starts a fresh one first,
+     * per OWASP's Session Management Cheat Sheet guidance to regenerate the
+     * session ID on authentication - otherwise a session ID an attacker
+     * fixed before login (session fixation) would carry straight through
+     * into an authenticated session.
+     *
      * @param request the login request, used to obtain the session and redirect target
      * @param response the response to redirect
      * @param customer the customer who just logged in
@@ -170,7 +176,11 @@ public class LoginServlet extends HttpServlet {
      */
     private void logInAndRedirect(HttpServletRequest request, HttpServletResponse response, Customer customer)
             throws IOException {
-        HttpSession session = request.getSession();
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+        HttpSession session = request.getSession(true);
         session.setAttribute("loggedIn", Boolean.TRUE);
         session.setAttribute("customer", customer);
         session.setAttribute("customerId", customer.getCustomerId());

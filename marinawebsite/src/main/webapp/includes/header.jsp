@@ -11,11 +11,11 @@
     <nav class="header-nav" aria-label="Main navigation">
         <a href="${pageContext.request.contextPath}/index.jsp"
         class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
-        <a href="#"
+        <a href="${pageContext.request.contextPath}/aboutUs.jsp"
         class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-        <a href="#"
+        <a href="${pageContext.request.contextPath}/reservation.jsp"
         class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
-        <a href="#"
+        <a href="${pageContext.request.contextPath}/contact.jsp"
         class="${param.activePage == 'contact' ? 'nav-active' : ''}">Contact</a>
 
         <button type="button"

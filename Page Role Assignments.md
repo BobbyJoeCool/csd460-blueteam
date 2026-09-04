@@ -100,6 +100,26 @@ Before coding starts: agree on and record field/variable names for all three pag
 
 ## Week Five (Sep 7 - Sep 13, 2026)
 
+> [!Info] Note about assignments for Week Five.
+> To come up with the assignments, I looked at who did what last week:
+>
+> - Robert did a Front End and Back End
+> - Miguel did a Front End and Testing
+> - Sara Had a shared Header/Footer that was heavily Front End only, and Testing
+> - Carolina both did Front End and Back End
+>
+> So I tried to rotate it as best I could.  Since Sara and Miguel didn't get to do back end work in Week 4, I gave them the back end of the 2 pages that require it, then assigned me and Carolina to the front end of those pages.
+>
+> About Us is a back end lite or non-existant page, like the landing page, so only one person assigned to it and the other three are testers.
+>
+> Since Miguel already did testing, and Both Sara and Carolina did a front end only design (Header/Footer, Landing Page), And the About Us was Miguel's wireframe, it made sense that he take that one.  Leaving Carolina, Sara, and myself for testing.
+> 
+> I also assigned testers to pages that were not involved is making them (having an additional developer look at it after flagging it "complete" to see if the "it should respond this way" bias exists.)
+>
+> Obviously, I'm not trying to say "This is what you are going to do." And the purpose of my putting this note here isn't me saying "this is why you WILL be doing this." I'm just putting my thought process down so if anyone spots something I missed, or has a better plan, I am 110% open to hearing it!  (Or if you want to swap the page you are on with the other person!).
+>
+> ~Robert
+
 ### Module Six: Web Development 2
 
 Agree on and record field/variable names for this page in its Page Contract doc before coding. Branch and PR as above.
@@ -108,8 +128,8 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Robert |
+| Back End | Sara |
 
 ### Module Seven: Web Development 3
 
@@ -119,24 +139,24 @@ Agree on and record field/variable names for both pages below in their Page Cont
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
+| Full Page | Miguel |
 
-> There is very little back end to About Us, so this page is very much going to be Front End only.  As such, one person assigned to it, and then 3 people assigned for testing this week.  
+> There is very little back end to About Us, so this page is very much going to be Front End only.  As such, one person assigned to it, and then the other 3 people assigned for testing this week.  
 
 **Reservation Summary**
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Carolina |
+| Back End | Miguel |
 
 **Testing - Modules 6 & 7**
 
 | Page | Tester |
 | --- | --- |
-| Reservation (Book a Slip) | |
-| About Us | |
-| Reservation Summary | |
+| Reservation (Book a Slip) | Carolina |
+| About Us | Sara |
+| Reservation Summary | Robert |
 
 ## Week Six (Sep 14 - Sep 20, 2026)
 
@@ -193,11 +213,11 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 
 ## Appendix: Rotation Tracker
 
-Running tally so nobody ends up on Back End (or Testing) every single week. Update after each module's assignments are locked in - a simple count is enough to spot an imbalance before it's three weeks deep.
+This keeps track of who does what task in each week.  `(#)` being the week they did this task.  Should be easy to see if one person has done more of something than everyone else, and balance the workload evenly.
 
-| Person | Front End | Back End | Testing |
-| --- | --- | --- | --- |
-| Robert | 1 | 1 | |
-| Jose | 1 | | 1 |
-| Sarah | 1 | | 1 |
-| Carolina | 1 | | 1 |
+| Person   | Front End | Back End | Testing |
+| -------- | ----------| -------- | ------- |
+| Robert   | (4)(5)    | (4)      | (5)     |
+| Miguel   | (4)(5)    | (5)      | (4)     |
+| Sara     | (4)       | (5)      | (4)(5)  |
+| Carolina | (4)(5)    | (4)      | (5)     |

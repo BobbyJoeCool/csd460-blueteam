@@ -63,6 +63,16 @@ The database has no dedicated ENUM type support for lookup tables beyond `SlipSi
 | `General Inquiry` |
 | `Other` |
 
+### Customer.country
+
+Not a SQL `ENUM` (plain `VARCHAR(5)`, see `MoffatBayMarinaDB_V1-2-0_update.sql`), but application code enforces this fixed list the same way, so it's listed here too.
+
+| Value | Meaning |
+| --- | --- |
+| `US` | United States. Default. |
+| `CA` | Canada. Drives Boat Registration's Registration Province option list and number format, see the Registration contract's "Boat Fields" section. |
+| `OTHER` | Anywhere else. Doesn't capture which country — only used to show the "call the Marina" badge above Boat Registration and disable that section's Registration State/Province field. |
+
 ### TerminationNotice.noticeStatus
 
 | Value | Meaning |

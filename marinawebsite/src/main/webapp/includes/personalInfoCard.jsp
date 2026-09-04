@@ -18,6 +18,7 @@
         <jsp:param name="defaultCity" value="${customer.city}" />
         <jsp:param name="defaultState" value="${customer.state}" />
         <jsp:param name="defaultZipCode" value="${customer.zipCode}" />
+        <jsp:param name="defaultCountry" value="${customer.country}" />
     </jsp:include>
 
   Every default* param is optional (fine to leave unset/null) -
@@ -39,6 +40,7 @@
 <c:set var="cityValue" value="${not empty param.city ? param.city : param.defaultCity}" />
 <c:set var="stateValue" value="${not empty param.state ? param.state : param.defaultState}" />
 <c:set var="zipCodeValue" value="${not empty param.zipCode ? param.zipCode : param.defaultZipCode}" />
+<c:set var="countryValue" value="${not empty param.country ? param.country : (not empty param.defaultCountry ? param.defaultCountry : 'US')}" />
 
 <div class="form-column" id="personalInfoColumn">
 
@@ -77,6 +79,16 @@
         </div>
     </div>
 
+    <div class="form-group" id="countryGroup">
+        <label for="country">Country <span class="required-mark">*</span></label>
+        <select id="country" name="country" required>
+            <jsp:include page="/includes/countryOptions.jsp">
+                <jsp:param name="fieldName" value="country" />
+                <jsp:param name="country" value="${countryValue}" />
+            </jsp:include>
+        </select>
+    </div>
+
     <div class="form-group" id="streetAddressGroup">
         <label for="streetAddress">Street Address <span class="required-mark">*</span></label>
         <input type="text" id="streetAddress" name="streetAddress" required
@@ -98,13 +110,34 @@
                    placeholder="Tortuga"
                    value="${fn:escapeXml(cityValue)}">
         </div>
+        <%--
+          State/Province follows the Country field above, same pattern as
+          Boat Registration's regState in boatInfoCard.jsp: CA swaps in
+          provinceOptions.jsp and the "Province" label, OTHER disables the
+          field (no state/province concept applies) - see registration.js's
+          applyCountryToAddressSection and the Registration contract's
+          "Country" section.
+        --%>
         <div class="form-group" id="stateGroup">
-            <label for="state">State <span class="required-mark">*</span></label>
-            <select id="state" name="state" required>
-                <jsp:include page="/includes/stateOptions.jsp">
-                    <jsp:param name="fieldName" value="state" />
-                    <jsp:param name="state" value="${stateValue}" />
-                </jsp:include>
+            <label for="state" id="stateLabel">${countryValue == 'CA' ? 'Province' : 'State'}</label>
+            <select id="state" name="state" ${countryValue == 'OTHER' ? 'disabled' : 'required'}>
+                <c:choose>
+                    <c:when test="${countryValue == 'CA'}">
+                        <jsp:include page="/includes/provinceOptions.jsp">
+                            <jsp:param name="fieldName" value="state" />
+                            <jsp:param name="state" value="${stateValue}" />
+                        </jsp:include>
+                    </c:when>
+                    <c:when test="${countryValue == 'OTHER'}">
+                        <option value="">Not applicable</option>
+                    </c:when>
+                    <c:otherwise>
+                        <jsp:include page="/includes/stateOptions.jsp">
+                            <jsp:param name="fieldName" value="state" />
+                            <jsp:param name="state" value="${stateValue}" />
+                        </jsp:include>
+                    </c:otherwise>
+                </c:choose>
             </select>
         </div>
     </div>
@@ -117,5 +150,9 @@
                value="${fn:escapeXml(zipCodeValue)}">
         <div class="field-error" id="zipError"></div>
     </div>
+
+    <button type="button" class="btn-clear-section" id="clearPersonalInfo">
+        Clear Personal Info
+    </button>
 
 </div>
