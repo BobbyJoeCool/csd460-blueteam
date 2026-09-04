@@ -33,6 +33,12 @@ import jakarta.servlet.http.HttpSession;
  * attributes and re-open the modal with the error shown inline; that
  * part is Front End's to build.
  *
+ * <p>On a failed attempt against a real account that hasn't locked yet,
+ * {@code attemptsRemaining} is also set, so the modal can warn the user
+ * how many tries are left. It is deliberately never set for an unknown
+ * email - no account, no count, and no way to use the warning to work
+ * out which addresses are registered.
+ *
  * @author Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
@@ -111,6 +117,13 @@ public class LoginServlet extends HttpServlet {
                 customerDAO.lockAccount(customer.getCustomerId());
                 showAccountLocked(request, response);
             } else {
+                /*
+                 * Only set on a real account with a real failed attempt, so the
+                 * warning can never appear for an email that isn't registered -
+                 * that would turn the modal into a way of testing which
+                 * addresses exist.
+                 */
+                request.setAttribute("attemptsRemaining", MAX_FAILED_ATTEMPTS - attempts);
                 showInvalidCredentials(request, response);
             }
         } catch (SQLException e) {
