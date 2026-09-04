@@ -25,4 +25,5 @@
     </nav>
 </header>
 
-
+	<!-- Reusable login modal (pulls in its own scripts) -->
+	<jsp:include page="/includes/loginModal.jsp" />

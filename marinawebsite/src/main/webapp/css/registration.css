@@ -1,92 +1,8 @@
 /*
  * Author: Robert Breutzmann
  * CSD 460 - Capstone Project - Marina Website Project
- * Registration Page styles. Depends on variables.css being linked first.
+ * Registration Page styles. Depends on site.css being linked first.
  */
-
-* {
-	box-sizing: border-box;
-}
-
-body {
-	margin: 0;
-	font-family: "Segoe UI", Arial, sans-serif;
-	background: var(--color-bg-page);
-	color: var(--color-text-body);
-}
-
-a {
-	color: var(--color-link);
-}
-
-a:hover {
-	color: var(--color-link-hover);
-}
-
-/* ==========================================================================
-   Header / nav — identical across every page per wireframe instructions
-   ========================================================================== */
-
-.site-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	gap: 1rem;
-	background: var(--color-bg-header);
-	color: var(--color-text-inverse);
-	padding: 0.9rem 1.5rem;
-}
-
-.site-header .logo {
-	font-weight: 700;
-	letter-spacing: 0.04em;
-	color: var(--color-text-inverse);
-	text-decoration: none;
-	font-size: 1.1rem;
-}
-
-.site-nav {
-	display: flex;
-	align-items: center;
-	gap: 1.5rem;
-	flex-wrap: wrap;
-}
-
-.site-nav a {
-	color: var(--color-nav-text);
-	text-decoration: none;
-	font-size: 0.95rem;
-}
-
-.site-nav a:hover {
-	color: var(--color-nav-text-hover);
-}
-
-.site-nav a.active {
-	color: var(--color-nav-text-active);
-	font-weight: 600;
-}
-
-.nav-cta {
-	background: var(--color-cta-primary-bg);
-	color: var(--color-cta-primary-text);
-	padding: 0.5rem 1.1rem;
-	border-radius: 999px;
-	text-decoration: none;
-	font-size: 0.9rem;
-	font-weight: 600;
-}
-
-.nav-cta:hover {
-	background: var(--color-cta-primary-bg-hover);
-	color: var(--color-cta-primary-text);
-}
-
-.nav-welcome {
-	color: var(--color-nav-text);
-	font-size: 0.95rem;
-}
 
 /* ==========================================================================
    Intro band
@@ -127,7 +43,7 @@ a:hover {
 	margin: 1.5rem auto 0;
 	padding: 0.9rem 1.2rem;
 	border-radius: 6px;
-	background: #fbeceb;
+	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
 	border: 1px solid var(--color-error);
 	color: var(--color-error);
 	font-size: 0.95rem;
@@ -250,7 +166,7 @@ main {
 .form-group select:focus {
 	outline: none;
 	border-color: var(--color-input-border-focus);
-	box-shadow: 0 0 0 3px rgba(10, 110, 140, 0.15);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
 }
 
 .form-group input.field-invalid,
@@ -307,60 +223,6 @@ main {
 	gap: 0.4rem;
 }
 
-.password-rules {
-	/* Deliberately distinct from a form field: a warm coral/golden
-	   accent instead of a form-field surface, smaller and centered
-	   rather than a full-width bordered box that reads as another
-	   entry. */
-	background: color-mix(in srgb, var(--color-golden-hour) 18%, var(--color-surface-neutral));
-	color: var(--color-charcoal-navy);
-	border: 1px solid var(--color-sunset-coral);
-	border-radius: 8px;
-	max-width: 80%;
-	margin: 0.25rem auto 0;
-	padding: 0.75rem 1rem;
-	font-size: 0.78rem;
-	text-align: center;
-}
-
-.password-rules p {
-	margin: 0 0 0.4rem;
-	font-weight: 600;
-}
-
-.password-rules ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	display: inline-block;
-	text-align: left;
-}
-
-.password-rules li {
-	position: relative;
-	padding-left: 1.2rem;
-	margin-bottom: 0.3rem;
-	color: var(--color-charcoal-navy);
-	opacity: 0.6;
-}
-
-.password-rules li::before {
-	content: "\2022";
-	position: absolute;
-	left: 0.3rem;
-	color: currentColor;
-}
-
-.password-rules li.met {
-	opacity: 1;
-	color: var(--color-charcoal-navy);
-}
-
-.password-rules li.met::before {
-	content: "\2713";
-	color: var(--color-ocean-blue);
-}
-
 .submit-row {
 	margin-top: 0.5rem;
 	display: flex;
@@ -392,56 +254,4 @@ main {
 .login-link {
 	font-size: 0.9rem;
 	color: var(--color-text-body);
-}
-
-/* ==========================================================================
-   Footer — identical across every page
-   ========================================================================== */
-
-.site-footer {
-	background: var(--color-bg-footer);
-	color: var(--color-text-inverse);
-	padding: 2.5rem 1.5rem 1.5rem;
-}
-
-.footer-columns {
-	max-width: 960px;
-	margin: 0 auto;
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 2rem;
-}
-
-@media (max-width: 768px) {
-	.footer-columns {
-		grid-template-columns: 1fr;
-	}
-}
-
-.site-footer h3 {
-	margin: 0 0 0.5rem;
-	font-size: 1rem;
-}
-
-.site-footer p,
-.site-footer a {
-	margin: 0.2rem 0;
-	font-size: 0.85rem;
-	color: var(--color-nav-text);
-	text-decoration: none;
-}
-
-.site-footer a:hover {
-	color: var(--color-nav-text-hover);
-}
-
-.footer-bottom {
-	max-width: 960px;
-	margin: 2rem auto 0;
-	padding-top: 1rem;
-	border-top: 1px solid rgba(232, 217, 176, 0.2);
-	text-align: center;
-	font-size: 0.78rem;
-	color: var(--color-nav-text);
-	opacity: 0.7;
 }

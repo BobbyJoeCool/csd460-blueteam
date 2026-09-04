@@ -16,8 +16,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	<title>Moffat Bay Marina</title>
 
-	<jsp:include page="/includes/styles.jsp" />
-
+	<jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
 </head>
 <body>
@@ -140,9 +139,6 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 	</main>
 
 	<jsp:include page="/includes/footer.jsp" />
-
-	<!-- Reusable login modal (pulls in its own scripts) -->
-	<jsp:include page="/includes/loginModal.jsp" />
 
 </body>
 </html>
