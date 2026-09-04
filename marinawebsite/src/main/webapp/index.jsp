@@ -141,10 +141,8 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	<jsp:include page="/includes/footer.jsp" />
 
-	<!-- Reusable login modal -->
+	<!-- Reusable login modal (pulls in its own scripts) -->
 	<jsp:include page="/includes/loginModal.jsp" />
-
-	<script src="${pageContext.request.contextPath}/js/loginModal.js"></script>
 
 </body>
 </html>

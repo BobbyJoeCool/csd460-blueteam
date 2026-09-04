@@ -13,11 +13,14 @@
        just never closed.
 
   Reads from the request (all set by LoginServlet):
-    loginError     - the message to show. Its presence is what opens the modal.
-    accountLocked  - TRUE only on the lockout case; swaps the Sign in form
-                     for the demo Reset button.
-    param.email    - what they typed. Survives the forward, so the field
-                     refills without the servlet having to hand it back.
+    loginError        - the message to show. Its presence is what opens the modal.
+    accountLocked     - TRUE only on the lockout case; swaps the Sign in form
+                        for the Unlock Account button.
+    attemptsRemaining - how many tries are left before the account locks. Only
+                        set on a failed attempt against a real, unlocked
+                        account, so it never appears for an unknown email.
+    param.email       - what they typed. Survives the forward, so the field
+                        refills without the servlet having to hand it back.
 
   Author: Miguel Fernandez
 --%>
@@ -64,6 +67,23 @@
             </p>
         </c:if>
 
+        <%-- Set by LoginServlet only after a failed attempt on a real,
+             still-unlocked account. Warns before the lock rather than
+             after it, so the lockout isn't a surprise. --%>
+        <c:if test="${not empty attemptsRemaining}">
+            <p class="login-modal__warning" role="status">
+                <c:choose>
+                    <c:when test="${attemptsRemaining == 1}">
+                        One more failed attempt will lock this account.
+                    </c:when>
+                    <c:otherwise>
+                        <c:out value="${attemptsRemaining}"/> more failed attempts
+                        will lock this account.
+                    </c:otherwise>
+                </c:choose>
+            </p>
+        </c:if>
+
         <c:choose>
 
             <%-- Locked out: no point offering the form, the servlet rejects
@@ -71,17 +91,20 @@
             <c:when test="${accountLocked}">
 
                 <p class="login-modal__note">
-                    Reset the account to unlock it and try again.
+                    Unlock the account to try again.
                 </p>
 
                 <%-- POST, not a link. LoginServlet only implements doPost,
-                     so a GET to /login?action=reset would 405. --%>
+                     so a GET to /login?action=reset would 405.
+                     redirectTo rides along so the unlock lands the user back
+                     on the page they were on, not the homepage. --%>
                 <form class="login-modal__form"
                       action="${pageContext.request.contextPath}/login"
                       method="post">
                     <input type="hidden" name="action" value="reset">
                     <input type="hidden" name="email" value="${fn:escapeXml(param.email)}">
-                    <button type="submit" class="login-modal__submit">Reset account</button>
+                    <input type="hidden" name="redirectTo" value="${fn:escapeXml(loginRedirectTo)}">
+                    <button type="submit" class="login-modal__submit">Unlock Account</button>
                 </form>
 
             </c:when>

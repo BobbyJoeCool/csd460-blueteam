@@ -18,10 +18,10 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 
 ### Front End Owns
 
-- [ ] **Login field `name` attributes:** What are the exact `name` values for the email/username and password form fields? Front End picks these, Back End just needs to know what they're called so it can read what got submitted.
+- [x] **Login field `name` attributes:** Decided — `email` and `password`, matching what `LoginServlet` already reads. Full list in [Front End Variables](#front-end-variables) below.
 - [x] **Form submission method:** Decided — standard form POST. Login is a modal that can be opened from any page, so Back End forwards (not redirects) back to whichever page the modal was submitted from on failure, keeping the URL unchanged. See [What the Front End Sees on Failure](#what-the-front-end-sees-on-failure).
 - [x] **Error display location:** Decided — inline in the modal itself, on the same page it was opened from. There is no separate error page/JSP. Front End reads `loginError` (and `accountLocked`, for the lockout case) as request attributes on that forwarded request and re-opens the modal with the message shown inline.
-- [ ] **Client-side email format validation:** Since the login identifier is the `email` column, Front End needs to check the username field looks like a real email address (`type="email"` and/or a pattern check) before letting the form submit. This is just for UX, it's not trusted. The back end still does its own lookup and treats a non-match the same as any other bad login.
+- [x] **Client-side email format validation:** Decided — `MoffatBay.form.isValidEmail` from the shared `js/formValidation.js`, checked on submit. It uses the same pattern as `Utils.isValidEmail` on the server, so the two can't disagree about what counts as a valid address. UX only; the back end still re-checks and treats a bad format exactly like a non-match.
 
 ### Back End Owns
 
@@ -75,6 +75,7 @@ The password comes along too, in hashed form, since it's part of the same record
 Two different failure messages, so the user knows what's going on. Neither one ever says which of username or password was wrong though, only whether the account is now locked:
 
 - **Wrong username or password:** "The username or password you entered is incorrect." Shown inline in the login modal, on whatever page the modal was submitted from — there is no separate error page.
+- **Approaching lockout:** on a failed attempt against a real account that hasn't locked yet, Back End also sets `attemptsRemaining` (an int) so the modal can warn the user before the lock happens rather than after — "2 more failed attempts will lock this account", or "One more failed attempt will lock this account" on the last try. It is deliberately never set for an email that isn't registered, since a warning that only appears for real accounts would turn the modal into a way of testing which addresses exist.
 - **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login?action=reset` and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
 
 ### Where the User Lands After Login
@@ -98,7 +99,14 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `email` | email | Yes | `maxlength="100"`, matches `Customer.email`. Trimmed before submit and checked with `MoffatBay.form.isValidEmail` |
+| `password` | password | Yes | No `maxlength` — the stored value is a hash, and Registration's rule is a *minimum* of 10 characters, not a maximum |
+| `redirectTo` | hidden | Yes | Context-relative path (`/index.jsp`, never `/marinawebsite/index.jsp`), since the servlet prepends `getContextPath()`. Defaults to the current page; reuses the submitted value on a retry so a failed attempt doesn't reset the target to `/login` |
+| `action` | hidden | Only on the Unlock Account form | Fixed value `reset`. Sent as a POST field, not a query string — the servlet only implements `doPost`, so a GET would 405 |
+
+The Unlock Account form resubmits `email` and `redirectTo` as hidden fields
+alongside `action`, so the servlet knows whose account to unlock and where to
+send them afterward.
 
 ## Back End Parameters
 
@@ -106,10 +114,10 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Parameter Name | Type | Source (form field / session / query string) | Notes |
 | --- | --- | --- | --- |
-| (identifier, email) | text | Form field | Exact field name still TBD by Front End; treated as the email no matter what the field is labeled |
-| (password) | text | Form field | Exact field name still TBD by Front End |
+| `email` | text | Form field | The login identifier; treated as the email no matter what the field is labeled |
+| `password` | text | Form field | Compared as a hash, never as plain text |
 | `redirectTo` | text | Form field (hidden) | Fixed name, required for [Where the User Lands After Login](#where-the-user-lands-after-login) to work. Front End sets its value, not its name |
-| `action` | text | Query string, only on the demo reset click | e.g. `/login?action=reset`, tells the servlet this is the "unlock account" click and not a normal login submit |
+| `action` | text | Form field (hidden), only on the Unlock Account submit | Value `reset`; tells the servlet this is the "unlock account" click and not a normal login submit. Sent as a POST field rather than the query string in the original spec, since the servlet only implements `doPost` |
 
 ## Validation Rules
 
@@ -127,5 +135,6 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
 | Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Inline in the login modal, on the page it was submitted from. No separate error page — Back End forwards back to that same page with `loginError` set as a request attribute. |
+| Wrong password on a real account that hasn't locked yet | "2 more failed attempts will lock this account." / "One more failed attempt will lock this account." | Directly under the error message in the modal, driven by the `attemptsRemaining` request attribute. Never shown for an unregistered email |
 | Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the demo "Unlock Account" button |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |
