@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
@@ -14,7 +15,7 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  * Data access object for the {@code Customer} table, covering account lookup
  * and the login-attempt / lockout bookkeeping used during authentication.
  *
- * @author Robert Breutzmann
+ * @author Robert Breutzmann & Carolina Rodriguez
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class CustomerDAO {
@@ -138,7 +139,71 @@ public class CustomerDAO {
             stmt.executeUpdate();
         }
     }
+    /**
+     * Inserts a new customer and returns the generated customer ID.
+     *
+     * @param conn active transaction connection
+     * @param customer customer being registered
+     * @param passwordHash hashed customer password
+     * @return generated customer ID
+     * @throws SQLException if the insert fails
+     */
+    public int insertCustomer(
+            Connection conn,
+            Customer customer,
+            String passwordHash) throws SQLException {
 
+        String sql = """
+                INSERT INTO Customer (
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    phoneCountryCode,
+                    streetAddress,
+                    streetAddress2,
+                    city,
+                    state,
+                    zipCode,
+                    passwordHash,
+                    dateJoined,
+                    failedLoginAttempts,
+                    accountLocked
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, 0, 0)
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(
+                sql,
+                Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, customer.getFirstName());
+            stmt.setString(2, customer.getLastName());
+            stmt.setString(3, customer.getEmail());
+            stmt.setString(4, customer.getPhone());
+            stmt.setString(5, customer.getPhoneCountryCode());
+            stmt.setString(6, customer.getStreetAddress());
+            stmt.setString(7, customer.getStreetAddress2());
+            stmt.setString(8, customer.getCity());
+            stmt.setString(9, customer.getState());
+            stmt.setString(10, customer.getZipCode());
+            stmt.setString(11, passwordHash);
+
+            if (stmt.executeUpdate() != 1) {
+                throw new SQLException(
+                        "Customer registration did not insert one row.");
+            }
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+
+            throw new SQLException(
+                    "Customer registration did not return an ID.");
+        }
+    }
     /**
      * Maps the current row of the given result set to a {@link Customer}.
      * Never reads {@code passwordHash}.
