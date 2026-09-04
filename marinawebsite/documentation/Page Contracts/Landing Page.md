@@ -42,37 +42,42 @@ This page includes the shared header/footer and identifies itself for nav highli
 
 ## Front End Variables
 
-Every field or control the page's UI sends to the Back End (form fields, query-string params on a lookup page, etc.).
+The landing page does not contain a form and does not submit landing-page fields to a servlet.
 
-| Field Name | Input Type | Required? | Format / Notes |
+| Field or Control | Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `activePage` | JSP include parameter | Yes | Passes `"home"` to `header.jsp` so Home can be highlighted |
+| Reserve a Slip | Button | No | Calls `MoffatBay.loginModal.open()`; does not submit form data |
+| Create an Account | Link | No | Navigates to `${pageContext.request.contextPath}/registration.jsp` |
 
 ## Back End Parameters
 
-What the Back End reads for each Front End field, plus anything it pulls from elsewhere (session, query string) rather than the form itself.
+The landing page does not currently read form values or call a dedicated servlet.
 
-| Parameter Name | Type | Source (form field / session / query string) | Notes |
+| Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `activePage` | `String` | JSP include parameter | Passed to `header.jsp` with the value `"home"` |
+| `registered` | `String` | Query string | `RegisterServlet` redirects with `registered=true`; currently not displayed by `index.jsp` |
+| Login session attribute | TBD | HTTP session | Read by the shared header; exact name must match `LoginServlet` |
 
 ## Database Returns
 
-Every query or DAO method the Back End calls for this page, and its exact return shape — including what it returns on "no match" (null vs. empty object vs. exception).
+The landing page does not query the database directly.
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| None | None | None | Authentication and database operations are handled by the login and registration servlets |
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):**
-- **Server-side (source of truth):**
+- **Client-side (UX only, not trusted):** The landing page has no input fields requiring validation. Button and modal behavior is handled by `loginModal.js`.
+- **Server-side (source of truth):** The landing page submits no data and requires no server-side validation. Login and registration validation are handled by their respective servlets.
 
 ## Error Handling
 
-Every user-facing error condition this page can hit, and exactly what the user sees.
-
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| | | |
+| Login fails | Defined by the Login page contract | Reusable login modal |
+| Registration succeeds | No message currently displayed | `RegisterServlet` redirects to `/?registered=true`, but `index.jsp` does not yet read it |
+| Hero image cannot load | No message; background color remains visible | Hero section |
+| Landing page fails to load | Standard Tomcat error response | Browser |
