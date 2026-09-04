@@ -60,9 +60,7 @@ The wireframe spells out the password rule right on the page: at least 10 charac
 
 ### Confirm Password
 
-The "Re-type Password" field only exists to catch typos before the user submits. I'm checking client-side that it matches the password field, live, the same way the password rules get checked. Once it matches, the form's good to submit.
-
-The confirm password value itself never gets sent to the back end. There's nothing useful for the server to do with a second copy of the same password once the browser's already confirmed they match, so only `password` goes in the POST.
+The `confirmPassword` field is checked client-side to give the user immediate feedback and is also submitted to the Back End. `RegisterServlet` verifies that it matches `password`. The confirmation value is used only for validation and is never stored in the database.
 
 ### Phone Number
 
@@ -110,14 +108,17 @@ So the concrete answer to "what attribute name and message does Back End set" (s
 
 ### Back End Owns
 
-- [ ] **Password hashing:** Back End hashes before INSERT — same algorithm as Login's comparison. Confirm they match.
-- [ ] **Customer table column mapping:** Which `customers` table columns does each form field map to? The INSERT statement and Bean must match the schema from Module 3/4.
-- [ ] **DAO method signature:** What does the registration method look like? (e.g., `registerCustomer(Customer c)` returning what — new customer ID, boolean, the full Bean?) Front End needs to know what's available after success.
-- [ ] **Duplicate email response:** Needs a function that actually checks the submitted email against existing accounts and reports back specifically that it was a duplicate, see [Duplicate Email](#duplicate-email) above. Once that exists, what request attribute name and message does it set so Front End knows to show the popup?
-- [ ] **Auto-login after registration:** After a successful INSERT, does Back End set session attributes (same as Login contract) so the user is immediately logged in, or redirect to the login modal?
-- [ ] **Post-registration redirect/forward:** Where does Back End send the response — forward to the same JSP with a success attribute, redirect to landing, or something else? What attribute names carry the success state? On failure specifically, the built JSP expects a **forward** back to `registration.jsp` (not a redirect) — see [Duplicate Email](#duplicate-email) above — so the sticky-form values and `formError`/`emailError`/`passwordError` attributes survive.
-- [ ] **Input length limits (DB/server side):** Max lengths for each field must match the database column sizes and the HTML `maxlength` — coordinate with Front End.
-- [x] **Servlet URL mapping:** Decided by Front End's form markup — `/register` (the form's `action`).
+
+- [x] **Password hashing:** `RegisterServlet` hashes the submitted password with `Utils.hashPassword()` before inserting it. `LoginServlet` uses the same hashing method when checking a password.
+- [x] **Customer table column mapping:** Form values are placed into a `Customer` object and inserted by `CustomerDAO.insertCustomer()`.
+- [x] **DAO method signature:** `CustomerDAO.insertCustomer(Connection, Customer, String)` returns the generated `customerID`.
+- [x] **Duplicate email response:** `CustomerDAO.findByEmail()` checks for an existing account. On a match, Back End sets `emailError` to `"An account with this email already exists."` and forwards to `registration.jsp`.
+- [x] **Optional boat registration:** When any boat information is entered, `RegisterServlet` validates the boat and uses `BoatDAO.insertBoat()` to return the generated `boatID`.
+- [x] **Boat ownership:** After inserting a boat, `BoatDAO.insertOwnership()` connects its `boatID` to the new `customerID` through the `BoatOwnership` table.
+- [x] **Auto-login after registration:** The customer is not automatically logged in. Registration redirects to the landing page after success.
+- [x] **Post-registration redirect/forward:** Success redirects to `/?registered=true`. Validation or database failures forward to `/registration.jsp` so request parameters and error attributes remain available.
+- [ ] **Input length limits:** Most database limits are enforced server-side. Validation still needs to confirm `streetAddress2` does not exceed 100 characters and `boatType` does not exceed 30 characters.
+- [x] **Servlet URL mapping:** `/register`.
 
 ## Front End Variables
 
@@ -152,7 +153,26 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Parameter Name | Type | Source (form field / session / query string) | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `firstName` | `String` | Form field | Required; maximum 50 characters |
+| `lastName` | `String` | Form field | Required; maximum 50 characters |
+| `email` | `String` | Form field | Required; converted to lowercase; maximum 100 characters |
+| `phoneCountryCode` | `String` | Form field | Required; 1–3 digits with no leading zero |
+| `phone` | `String` | Form field | Required; exactly 10 digits |
+| `streetAddress` | `String` | Form field | Required by the currently built form and servlet |
+| `streetAddress2` | `String` | Form field | Optional; blank value stored as `NULL` |
+| `city` | `String` | Form field | Required; maximum 50 characters |
+| `state` | `String` | Form field | Required; converted to uppercase; exactly two characters |
+| `zipCode` | `String` | Form field | Required; five-digit or ZIP+4 format |
+| `boatName` | `String` | Form field | Conditionally required when adding a boat |
+| `regState` | `String` | Form field | Converted to uppercase; conditionally required |
+| `regNumber` | `String` | Form field | Converted to uppercase; conditionally required |
+| `boatLength` | `BigDecimal` | Form field | Conditionally required; must be greater than zero and no more than 999.9 |
+| `hin` | `String` | Form field | Optional depending on the boat identification rule; converted to uppercase |
+| `boatType` | `String` | Form field | Optional |
+| `boatBeam` | `BigDecimal` | Form field | Optional; if supplied, must be greater than zero and no more than 999.9 |
+| `boatYear` | `Integer` | Form field | Optional; if supplied, must be between 1800 and the current year |
+| `password` | `String` | Form field | Required; validated and hashed before storage |
+| `confirmPassword` | `String` | Form field | Required by the current servlet; must equal `password` |
 
 ## Database Returns
 
@@ -160,12 +180,16 @@ Every query or DAO method the Back End calls for this page, and its exact return
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `CustomerDAO.findByEmail()` | `String email` | `Customer` or `null` | Used to detect an already registered email |
+| `CustomerDAO.insertCustomer()` | `Connection`, `Customer`, `String passwordHash` | Generated `customerID` as `int` | Uses the registration transaction connection |
+| `BoatDAO.insertBoat()` | `Connection`, `Boat` | Generated `boatID` as `int` | Called only when boat information was entered |
+| `BoatDAO.insertOwnership()` | `Connection`, `boatID`, `customerID` | No return value | Inserts the customer/boat relationship into `BoatOwnership` |
+| Registration transaction | Customer and optional boat data | Commit or `SQLException` | All inserts commit together; any failure rolls back the complete registration |
 
 ## Validation Rules
 
 - **Client-side (UX only, not trusted):** First name, last name, email, phone, country code, boat name, registration state, registration number, and boat length are all required before the form lets you submit. Everything else (street address, address line 2, city, state, zip, HIN, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Phone isn't submittable until all 10 digits are entered, formatting happens live as you type, see [Phone Number](#phone-number) above. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match.
-- **Server-side (source of truth):** TBD, this is Carolina's call. Whatever she lands on has to enforce the same rules as above, since none of the client-side checks can be trusted on their own.
+- **Server-side (source of truth):** `RegisterServlet` validates all required customer fields, email format, country code, 10-digit phone number, address lengths, state length, ZIP format, password rules, and matching passwords. Boat registration is optional. If every boat field is blank, no boat is created. If any boat field is entered, Boat Name and Boat Length are required. A boat built in 1972 or later requires either a valid HIN or Registration State and Registration Number. A boat built before 1972, or one with no year supplied, requires Registration State and Registration Number. Boat length, beam, and year must also be valid numeric values within the accepted ranges.
 
 ## Error Handling
 

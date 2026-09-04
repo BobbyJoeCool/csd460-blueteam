@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- * Matches the Customer table 1:1 (see
- * databasescripts/MoffatBayMarinaDB_V1-0-0.sql), minus passwordHash,
- * plus the failedLoginAttempts/accountLocked columns from
- * DevNotes/SchemaChanges.md (not applied to the schema yet), plus one
- * derived field. Serializable since this gets stored as a session
- * attribute - passwordHash is deliberately never loaded onto this
- * bean so it can't ride along in the session or get echoed by a JSP.
- * Password checks go through CustomerDAO.verifyPassword instead,
- * which returns a boolean and never exposes the hash itself.
+ * Represents a customer record from the Customer database table,
+ * excluding {@code passwordHash}. This class also includes the
+ * login-attempt and account-lock fields used during authentication.
+ *
+ * Implements {@link Serializable} because customer objects may be stored
+ * as session attributes. The password hash is deliberately never loaded
+ * into this object, preventing it from being stored in the session or
+ * displayed by a JSP. Password verification is handled by
+ * {@code CustomerDAO.verifyPassword()}, which returns only a boolean.
  *
  * @author Robert Breutzmann
- * @implNote JavaDoc comments in this file were added with the assistance of Claude.
+ * @implNote JavaDoc comments in this file were added with the assistance of Claude..
  */
 public class Customer implements Serializable {
 
