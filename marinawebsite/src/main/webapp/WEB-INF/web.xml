@@ -3,4 +3,27 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
   <display-name>Moffat Bay Marina</display-name>
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+      <!-- Not marking this Secure: the class deployment runs over plain
+           HTTP (local Tomcat), and a Secure cookie is silently dropped by
+           the browser on a non-HTTPS connection - that would break every
+           login instead of hardening it. Turn this on once the site is
+           actually served over HTTPS. -->
+    </cookie-config>
+  </session-config>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error.jsp</location>
+  </error-page>
+
 </web-app>

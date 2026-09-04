@@ -120,7 +120,8 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | Role | Assigned To |
 | --- | --- |
 | Front End | |
-| Back End | |
+
+> There is very little back end to About Us, so this page is very much going to be Front End only.  As such, one person assigned to it, and then 3 people assigned for testing this week.  
 
 **Reservation Summary**
 
@@ -177,7 +178,7 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 | Front End | |
 | Back End | |
 
-**Edit User Info**
+**Edit User Info/Register a New Boat**
 
 | Role | Assigned To |
 | --- | --- |

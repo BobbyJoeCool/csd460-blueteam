@@ -1,3 +1,108 @@
+/* 
+ * Blue Team: Breutzmann, R.; Fernandez, M.; Rodriguez, C.; White, S.
+ * CSD 460 - Capstone Project - Marina Website Project
+ * CSS Master File, Root Variables, Overall Site Styling
+ */
+
+/* ==========================================================================
+   Moffat Bay Marina — Root Color Variables
+   Link this file BEFORE any other stylesheet in the scaffold's <head>,
+   so every page/component can reference these variables.
+
+   Naming convention for anything added later:
+      --color-<purpose>-<variant>, 
+      e.g. --color-<cta>-<secondary-bg-hover>.
+   ========================================================================== */
+
+:root {
+	/* --------------------------------------------------------------------
+     1. Raw palette — the 6 approved colors, exactly as specified.
+     Nothing outside this section should reference a hex value directly;
+     everything else in this file (and every page's CSS) should reference
+     the semantic variables below instead.
+     -------------------------------------------------------------------- */
+	--color-ocean-blue: #0a6e8c;
+	--color-deep-marine: #0d3b4d;
+	--color-sunset-coral: #ff6f59;
+	--color-golden-hour: #f4a261;
+	--color-sand: #e8d9b0;
+	--color-charcoal-navy: #16262e;
+	--color-surface-neutral: #ffffff;
+
+	/* --------------------------------------------------------------------
+     2. Semantic variables — what pages and components should actually
+     reference. Grouped by purpose, not by color, so a page's CSS reads
+     as "background: page background" instead of "background: sand."
+     -------------------------------------------------------------------- */
+
+	/* Page-level backgrounds */
+	--color-bg-page: var(--color-sand);
+	--color-bg-header: var(--color-deep-marine);
+	--color-bg-footer: var(--color-deep-marine);
+	--color-bg-surface: var(
+		--color-surface-neutral
+	); /* form fields, modals - full white, for input contrast */
+	--color-bg-card: color-mix(
+		in srgb,
+		var(--color-ocean-blue) 6%,
+		var(--color-surface-neutral)
+	); /* card/panel grouping backgrounds - a light ocean-blue tint, distinct from both plain white and the sand page background */
+
+	/* Text */
+	--color-text-body: var(--color-charcoal-navy);
+	--color-text-heading: var(--color-charcoal-navy);
+	--color-text-inverse: var(
+		--color-sand
+	); /* text placed on header/footer/nav */
+	--color-text-muted: var(
+		--color-charcoal-navy
+	); /* apply opacity in-context, e.g. color: var(--color-text-muted); opacity: 0.7; */
+
+	/* Links (body copy, not nav — see Navigation below) */
+	--color-link: var(--color-ocean-blue);
+	--color-link-hover: var(--color-golden-hour);
+	--color-link-visited: var(--color-ocean-blue);
+
+	/* Primary CTA — per the wireframe rules, only ONE per page */
+	--color-cta-primary-bg: var(--color-sunset-coral);
+	--color-cta-primary-text: var(--color-surface-neutral);
+	--color-cta-primary-bg-hover: var(--color-golden-hour);
+
+	/* Secondary buttons — every button on a page after the one primary CTA */
+	--color-cta-secondary-bg: var(--color-ocean-blue);
+	--color-cta-secondary-text: var(--color-surface-neutral);
+	--color-cta-secondary-bg-hover: var(--color-golden-hour);
+
+	/* Navigation (header nav links, distinct from body links above since
+     they sit on a dark background) */
+	--color-nav-bg: var(--color-deep-marine);
+	--color-nav-text: var(--color-sand);
+	--color-nav-text-hover: var(--color-golden-hour);
+	--color-nav-text-active: var(
+		--color-golden-hour
+	); /* pairs with the activePage highlighting from header.jsp */
+
+	/* Forms / inputs (Registration, Login modal, Contact, Reservation, etc.) */
+	--color-input-bg: var(--color-bg-surface);
+	--color-input-border: var(--color-charcoal-navy);
+	--color-input-border-focus: var(--color-ocean-blue);
+	--color-input-text: var(--color-charcoal-navy);
+
+	/* Borders / dividers */
+	--color-border: var(--color-charcoal-navy);
+
+	/* Overlays — dark layer behind an open modal (Login modal, etc.) */
+	--color-overlay-backdrop: color-mix(
+		in srgb,
+		var(--color-charcoal-navy) 70%,
+		transparent
+	);
+
+	/* Status colors */
+	--color-error: #b3261e;
+	--color-success: var(--color-ocean-blue);
+}
+
 /* ==========================================================================
    Global site styles
    ========================================================================== */

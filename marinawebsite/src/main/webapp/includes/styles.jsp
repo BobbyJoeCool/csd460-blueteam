@@ -8,10 +8,6 @@
     after this include.
 --%>
 
-
-<link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/variables.css">
-
 <link rel="stylesheet"
       href="${pageContext.request.contextPath}/css/site.css">
 
