@@ -25,7 +25,7 @@
     var state = document.getElementById("state");
     var stateLabel = document.getElementById("stateLabel");
 
-    var boatCoreIds = ["boatName", "regState", "regNumber", "boatLength"];
+    var boatCoreIds = ["boatName", "regNumber", "boatLength"];
     var boatOptionalIds = ["hin", "boatType", "boatBeam", "boatYear"];
     var boatFields = {};
     boatCoreIds.concat(boatOptionalIds).forEach(function (id) {
@@ -34,7 +34,7 @@
     var boatSectionError = document.getElementById("boatSectionError");
     var identificationNote = document.getElementById("identificationNote");
     var foreignRegistrationBadge = document.getElementById("foreignRegistrationBadge");
-    var regStateLabel = document.getElementById("regStateLabel");
+    var regNumberLabel = document.getElementById("regNumberLabel");
     var hinError = document.getElementById("hinError");
     var regNumberError = document.getElementById("regNumberError");
     var boatYearError = document.getElementById("boatYearError");
@@ -72,34 +72,26 @@
     ];
 
     /**
-     * Rebuilds the Registration State/Province <select>'s options, its
-     * label text, and its (and Registration Number's) disabled state to
-     * match the given country - "US" (states), "CA" (provinces), or
-     * "OTHER" (disabled, nothing applies). Keeps a previously selected
-     * value selected if it still exists in the new option list.
+     * Updates Registration Number's label, placeholder, and disabled
+     * state to match the given country - "US" or "CA" (enabled, format
+     * differs) or "OTHER" (disabled, nothing applies). The field no
+     * longer has a separate State/Province <select>; the owner types
+     * the state/province prefix as part of the number itself.
      */
     function applyCountryToBoatSection() {
         var value = country.value;
-        var regState = boatFields.regState;
-        var previousValue = regState.value;
 
         if (value === "CA") {
-            regStateLabel.textContent = "Registration Province";
-            regState.disabled = false;
+            regNumberLabel.textContent = "Registration Number (Province)";
             boatFields.regNumber.disabled = false;
             boatFields.regNumber.placeholder = "e.g. C1234 AB";
-            rebuildRegionOptions(regState, CA_PROVINCES, previousValue);
         } else if (value === "OTHER") {
-            regStateLabel.textContent = "Registration State";
-            regState.disabled = true;
+            regNumberLabel.textContent = "Registration Number (State)";
             boatFields.regNumber.disabled = true;
-            rebuildRegionOptions(regState, [], previousValue);
         } else {
-            regStateLabel.textContent = "Registration State";
-            regState.disabled = false;
+            regNumberLabel.textContent = "Registration Number (State)";
             boatFields.regNumber.disabled = false;
-            boatFields.regNumber.placeholder = "e.g. 0007 JS";
-            rebuildRegionOptions(regState, US_STATES, previousValue);
+            boatFields.regNumber.placeholder = "e.g. WN1234 AB";
         }
 
         foreignRegistrationBadge.hidden = value !== "OTHER";
@@ -221,7 +213,7 @@
         var valid = MoffatBay.form.isValidRegNumber(value, country.value);
         var message = country.value === "CA"
             ? "Registration Number should be a C followed by 4 to 8 digits then 2 letters, e.g. C1234 AB."
-            : "Registration Number should be 4 to 7 digits followed by 2 letters, e.g. 1234 AB.";
+            : "Registration Number should be a 2-letter state code, 4 to 7 digits, then 2 letters, e.g. WN1234 AB.";
         boatFields.regNumber.setCustomValidity(valid ? "" : message);
         regNumberError.textContent = (value.length > 0 && !valid) ? message : "";
         return valid;
@@ -237,13 +229,13 @@
     }
 
     // HIN is the primary/default way to identify a boat, Registration
-    // State + Number is the fallback - but as of the Registration
-    // contract's HIN-first rework, neither is ever required to submit.
+    // Number is the fallback - but as of the Registration contract's
+    // HIN-first rework, neither is ever required to submit.
     // #identificationNote just tells an owner who has neither that they
     // can call the Marina, instead of blocking the form.
     function identificationMissing() {
         var hinFilled = boatFields.hin.value.trim() !== "";
-        var regFilled = boatFields.regState.value.trim() !== "" && boatFields.regNumber.value.trim() !== "";
+        var regFilled = boatFields.regNumber.value.trim() !== "";
         return !hinFilled && !regFilled;
     }
 

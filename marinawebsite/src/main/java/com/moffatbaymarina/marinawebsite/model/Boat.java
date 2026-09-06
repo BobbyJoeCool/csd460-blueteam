@@ -15,7 +15,6 @@ public class Boat {
 
     private int boatId;
     private String boatName;
-    private String regState;
     private String regNumber;
     private BigDecimal boatLength;
     private String hin;
@@ -42,14 +41,6 @@ public class Boat {
 
     public void setBoatName(String boatName) {
         this.boatName = boatName;
-    }
-
-    public String getRegState() {
-        return regState;
-    }
-
-    public void setRegState(String regState) {
-        this.regState = regState;
     }
 
     public String getRegNumber() {

@@ -30,7 +30,6 @@ public class BoatDAO {
         String sql = """
                 INSERT INTO Boat (
                     boatName,
-                    regState,
                     regNumber,
                     boatLength,
                     HIN,
@@ -38,7 +37,7 @@ public class BoatDAO {
                     boatBeam,
                     boatYear
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
         //Insert the boat and request the generated primary key.--------------------------------------------------------------
@@ -50,13 +49,12 @@ public class BoatDAO {
         //Map the boat model values to the SQL parameters-------------------------------------------------------------------
 
             stmt.setString(1, boat.getBoatName());
-            setNullableString(stmt, 2, boat.getRegState());
-            setNullableString(stmt, 3, boat.getRegNumber());
-            stmt.setBigDecimal(4, boat.getBoatLength());
-            setNullableString(stmt, 5, boat.getHIN());
-            setNullableString(stmt, 6, boat.getBoatType());
-            setNullableDecimal(stmt, 7, boat.getBoatBeam());
-            setNullableInteger(stmt, 8, boat.getBoatYear());
+            setNullableString(stmt, 2, boat.getRegNumber());
+            stmt.setBigDecimal(3, boat.getBoatLength());
+            setNullableString(stmt, 4, boat.getHIN());
+            setNullableString(stmt, 5, boat.getBoatType());
+            setNullableDecimal(stmt, 6, boat.getBoatBeam());
+            setNullableInteger(stmt, 7, boat.getBoatYear());
 
             if (stmt.executeUpdate() != 1) {
                 throw new SQLException(
