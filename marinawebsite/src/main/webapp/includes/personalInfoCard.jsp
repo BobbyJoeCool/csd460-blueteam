@@ -111,8 +111,7 @@
                    value="${fn:escapeXml(cityValue)}">
         </div>
         <%--
-          State/Province follows the Country field above, same pattern as
-          Boat Registration's regState in boatInfoCard.jsp: CA swaps in
+          State/Province follows the Country field above: CA swaps in
           provinceOptions.jsp and the "Province" label, OTHER disables the
           field (no state/province concept applies) - see registration.js's
           applyCountryToAddressSection and the Registration contract's

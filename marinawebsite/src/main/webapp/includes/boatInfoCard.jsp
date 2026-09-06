@@ -15,7 +15,6 @@
         <jsp:param name="defaultBoatLength" value="${boat.boatLength}" />
         <jsp:param name="defaultBoatBeam" value="${boat.boatBeam}" />
         <jsp:param name="defaultHin" value="${boat.hin}" />
-        <jsp:param name="defaultRegState" value="${boat.regState}" />
         <jsp:param name="defaultRegNumber" value="${boat.regNumber}" />
         <jsp:param name="defaultBoatYear" value="${boat.boatYear}" />
     </jsp:include>
@@ -24,14 +23,15 @@
   Registration.jsp includes this with none of them, so every field just
   falls back to empty on first load, same as before this was pulled out.
 
-  Registration State/Number is also driven by the "country" request
-  parameter, which this card doesn't own - it belongs to the Country field
-  in personalInfoCard.jsp, but both cards render inside the same <form>/
+  Registration Number is also driven by the "country" request parameter,
+  which this card doesn't own - it belongs to the Country field in
+  personalInfoCard.jsp, but both cards render inside the same <form>/
   request, so this card just reads param.country directly. Country=CA
-  swaps in provinceOptions.jsp and Canadian-format placeholders;
-  Country=OTHER disables the field entirely and shows
-  #foreignRegistrationBadge instead. See the Registration contract's
-  "Boat Fields" section.
+  swaps in the Canadian-format placeholder; Country=OTHER disables the
+  field entirely and shows #foreignRegistrationBadge instead. The field
+  no longer has its own State/Province selector - the owner types the
+  state/province prefix as part of the Registration Number itself (e.g.
+  "WN1234AB"). See the Registration contract's "Boat Fields" section.
 
   Expects to render inside a <form>; doesn't declare its own <form> tag.
 --%>
@@ -44,15 +44,13 @@
 <c:set var="boatLengthValue" value="${not empty param.boatLength ? param.boatLength : param.defaultBoatLength}" />
 <c:set var="boatBeamValue" value="${not empty param.boatBeam ? param.boatBeam : param.defaultBoatBeam}" />
 <c:set var="hinValue" value="${not empty param.hin ? param.hin : param.defaultHin}" />
-<c:set var="regStateValue" value="${not empty param.regState ? param.regState : param.defaultRegState}" />
 <c:set var="regNumberValue" value="${not empty param.regNumber ? param.regNumber : param.defaultRegNumber}" />
 <c:set var="boatYearValue" value="${not empty param.boatYear ? param.boatYear : param.defaultBoatYear}" />
 
 <%--
-  Registration State/Province tracks the Country field over in
+  Registration Number's format/label tracks the Country field over in
   personalInfoCard.jsp - both fields read the same request parameter
-  ("country"), it's just the other include that owns rendering the
-  <select> itself. See the Registration contract's "Boat Fields" section.
+  ("country"). See the Registration contract's "Boat Fields" section.
 --%>
 <c:set var="countryValue" value="${not empty param.country ? param.country : 'US'}" />
 
@@ -104,7 +102,7 @@
 
     <%--
       HIN is the primary/default way to identify a boat - listed first,
-      no longer marked required. Registration State/Number below is the
+      no longer marked required. Registration Number below is the
       fallback for an owner without a HIN handy. Neither is required to
       submit; #identificationNote below covers the "have neither" case.
       See the Registration contract's "Boat Fields" section.
@@ -117,37 +115,14 @@
         <div class="field-error" id="hinError"></div>
     </div>
 
-    <div class="form-row-split">
-        <div class="form-group" id="regStateGroup">
-            <label for="regState" id="regStateLabel">${countryValue == 'CA' ? 'Registration Province' : 'Registration State'}</label>
-            <select id="regState" name="regState" ${countryValue == 'OTHER' ? 'disabled' : ''}>
-                <c:choose>
-                    <c:when test="${countryValue == 'CA'}">
-                        <jsp:include page="/includes/provinceOptions.jsp">
-                            <jsp:param name="fieldName" value="regState" />
-                            <jsp:param name="regState" value="${regStateValue}" />
-                        </jsp:include>
-                    </c:when>
-                    <c:when test="${countryValue == 'OTHER'}">
-                        <option value="">Not applicable</option>
-                    </c:when>
-                    <c:otherwise>
-                        <jsp:include page="/includes/stateOptions.jsp">
-                            <jsp:param name="fieldName" value="regState" />
-                            <jsp:param name="regState" value="${regStateValue}" />
-                        </jsp:include>
-                    </c:otherwise>
-                </c:choose>
-            </select>
-        </div>
-        <div class="form-group" id="regNumberGroup">
-            <label for="regNumber">Registration Number</label>
-            <input type="text" id="regNumber" name="regNumber" maxlength="20"
-                   placeholder="${countryValue == 'CA' ? 'e.g. C1234 AB' : 'e.g. 0007 JS'}"
-                   value="${fn:escapeXml(regNumberValue)}"
-                   ${countryValue == 'OTHER' ? 'disabled' : ''}>
-            <div class="field-error" id="regNumberError"></div>
-        </div>
+    <div class="form-group" id="regNumberGroup">
+        <label for="regNumber" id="regNumberLabel">${countryValue == 'CA' ? 'Registration Number (Province)' : 'Registration Number (State)'}</label>
+        <input type="text" id="regNumber" name="regNumber" maxlength="20"
+               placeholder="${countryValue == 'CA' ? 'e.g. C1234 AB' : 'e.g. WN1234 AB'}"
+               value="${fn:escapeXml(regNumberValue)}"
+               ${countryValue == 'OTHER' ? 'disabled' : ''}>
+        <div class="field-hint">Include the state/province prefix, e.g. "WN1234 AB" for Washington.</div>
+        <div class="field-error" id="regNumberError"></div>
     </div>
 
     <output class="callout-badge" id="identificationNote" hidden>

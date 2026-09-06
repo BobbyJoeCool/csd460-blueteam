@@ -50,8 +50,15 @@ public class RegisterServlet extends HttpServlet {
 	private static final Pattern HIN_PATTERN =
 			Pattern.compile("^[A-Za-z]{3}[A-Za-z0-9]{9}$");
 
+	/*
+	 * State vessel Certificate of Number format, per 33 CFR 174.17 -
+	 * now requires the state's 2-letter prefix as part of the typed
+	 * Registration Number, since there's no longer a separate
+	 * Registration State field. See the Registration contract's
+	 * "Boat Fields" section.
+	 */
 	private static final Pattern REG_NUMBER_PATTERN =
-			Pattern.compile("^\\d{4,7}\\s?[A-Za-z]{2}$");
+			Pattern.compile("^[A-Za-z]{2}\\s?\\d{4,7}\\s?[A-Za-z]{2}$");
 
 	/*
 	 * Canadian Pleasure Craft Licence numbers carry a literal leading "C"
@@ -113,8 +120,6 @@ public class RegisterServlet extends HttpServlet {
 				.toUpperCase(Locale.ROOT);
 
 		String boatName = clean(request.getParameter("boatName"));
-		String regState = clean(request.getParameter("regState"))
-				.toUpperCase(Locale.ROOT);
 		String regNumber = clean(request.getParameter("regNumber"))
 				.toUpperCase(Locale.ROOT);
 		String boatLengthText =
@@ -160,7 +165,6 @@ public class RegisterServlet extends HttpServlet {
 
 		boolean boatEntered = anyPresent(
 				boatName,
-				regState,
 				regNumber,
 				boatLengthText,
 				hin,
@@ -171,7 +175,6 @@ public class RegisterServlet extends HttpServlet {
 		if (boatEntered) {
 			String boatError = validateBoat(
 					boatName,
-					regState,
 					regNumber,
 					boatLengthText,
 					boatLength,
@@ -226,7 +229,6 @@ public class RegisterServlet extends HttpServlet {
                 passwordHash,
                 boatEntered,
                 boatName,
-                regState,
                 regNumber,
                 boatLength,
                 hin,
@@ -272,7 +274,6 @@ public class RegisterServlet extends HttpServlet {
 			String passwordHash,
 			boolean boatEntered,
 			String boatName,
-			String regState,
 			String regNumber,
 			BigDecimal boatLength,
 			String hin,
@@ -293,7 +294,6 @@ public class RegisterServlet extends HttpServlet {
             if (boatEntered) {
                 Boat boat = new Boat();
                 boat.setBoatName(boatName);
-                boat.setRegState(regState);
                 boat.setRegNumber(regNumber);
                 boat.setBoatLength(boatLength);
                 boat.setHIN(emptyToNull(hin));
@@ -407,7 +407,6 @@ public class RegisterServlet extends HttpServlet {
 
 	private String validateBoat(
 			String boatName,
-			String regState,
 			String regNumber,
 			String boatLengthText,
 			BigDecimal boatLength,
@@ -452,8 +451,8 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		/*
-		 * HIN is the primary identifier and Registration State/Number is
-		 * the fallback (Registration contract's "Boat Fields"), but as of
+		 * HIN is the primary identifier and Registration Number is the
+		 * fallback (Registration contract's "Boat Fields"), but as of
 		 * this rework neither is ever required to submit - a boat with
 		 * neither is still saved, and the front end shows a note directing
 		 * the owner to call the Marina instead of blocking submission.
@@ -464,20 +463,11 @@ public class RegisterServlet extends HttpServlet {
 					+ "letters or numbers.";
 		}
 
-		boolean regStateGiven = !isBlank(regState);
-		boolean regNumberGiven = !isBlank(regNumber);
-
-		if (regStateGiven != regNumberGiven) {
-			return "Provide both Registration State/Province and Number, "
-					+ "or leave both blank.";
-		}
-
-		if (regStateGiven) {
-			if (regState.length() != 2) {
-				return "Enter a valid two-letter Registration "
-						+ "State/Province code.";
-			}
-
+		/*
+		 * Registration Number carries its own state/province prefix now -
+		 * there's no separate Registration State field to pair it with.
+		 */
+		if (!isBlank(regNumber)) {
 			if ("CA".equals(country)
 					&& !CA_REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
 				return "Enter a valid Canadian Registration Number, "
@@ -486,7 +476,8 @@ public class RegisterServlet extends HttpServlet {
 
 			if ("US".equals(country)
 					&& !REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
-				return "Enter a valid Registration Number, e.g. 1234 AB.";
+				return "Enter a valid Registration Number, including the "
+						+ "state prefix, e.g. WN1234 AB.";
 			}
 
 			// OTHER has no defined Registration Number format - accepted

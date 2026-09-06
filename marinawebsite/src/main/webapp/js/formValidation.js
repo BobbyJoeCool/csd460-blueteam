@@ -94,14 +94,15 @@ MoffatBay.form = (function () {
 
     /*
      * State vessel Certificate of Number format, per 33 CFR 174.17
-     * "Format of number": 4 to 7 Arabic numerals followed by 2 capital
-     * letters, which may be separated by a hyphen or space (e.g.
-     * "1234 AB" or "1234567-CD"). The state abbreviation that's
-     * normally the first part of the full number isn't included here
-     * since Registration State is its own field on this form.
+     * "Format of number": a 2-letter state abbreviation, then 4 to 7
+     * Arabic numerals, then 2 capital letters - the state abbreviation
+     * and each numeral group may be separated by a hyphen or space
+     * (e.g. "WN1234 AB" or "WN-1234567-CD"). There's no separate
+     * Registration State field on this form - the owner types the
+     * state prefix as part of the number itself.
      */
-    // Requires 4 to 7 digits, an optional hyphen or space, then exactly 2 letters.
-    var REG_NUMBER_PATTERN = /^\d{4,7}[- ]?[A-Za-z]{2}$/;
+    // Requires 2 letters (state code), an optional hyphen or space, 4 to 7 digits, an optional hyphen or space, then exactly 2 letters.
+    var REG_NUMBER_PATTERN = /^[A-Za-z]{2}[- ]?\d{4,7}[- ]?[A-Za-z]{2}$/;
 
     /*
      * Canadian Pleasure Craft Licence format: a literal leading "C"

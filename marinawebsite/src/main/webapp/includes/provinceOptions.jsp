@@ -1,20 +1,19 @@
 <%--
   Shared <option> list for a Canadian province/territory <select> - the
-  Registration State/Province field's option set when Boat Registration's
-  country context is Canada. Same fieldName/selected pattern as
-  stateOptions.jsp:
+  mailing address's own State/Province field's option set when Country
+  is Canada. Same fieldName/selected pattern as stateOptions.jsp:
 
-    <select id="regState" name="regState">
+    <select id="state" name="state">
         <jsp:include page="/includes/provinceOptions.jsp">
-            <jsp:param name="fieldName" value="regState" />
+            <jsp:param name="fieldName" value="state" />
         </jsp:include>
     </select>
 
   registration.js keeps a matching array of these same 13 entries to
   rebuild this <select> client-side when Country changes without a page
-  reload - see js/registration.js's regionOptions data and the Registration
-  contract's "Boat Fields" section for why the option list has to swap
-  with Country instead of being fixed.
+  reload - see js/registration.js's CA_PROVINCES data and the Registration
+  contract's "Country" section for why the option list has to swap with
+  Country instead of being fixed.
 --%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
