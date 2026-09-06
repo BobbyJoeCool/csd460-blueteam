@@ -84,6 +84,14 @@
     font-size: 0.95rem;
 }
 
+/* The Log Out control is a form so it can POST, but a form is a block
+   element and would otherwise break the nav's flex row. This makes it
+   lay out like the plain button it replaces. */
+.nav-logout-form {
+    display: inline-flex;
+    margin: 0;
+}
+
 /* =============================================================
    Responsive header
    ========================================================== */

@@ -16,9 +16,10 @@
     loginError        - the message to show. Its presence is what opens the modal.
     accountLocked     - TRUE only on the lockout case; swaps the Sign in form
                         for the Unlock Account button.
-    attemptsRemaining - how many tries are left before the account locks. Only
-                        set on a failed attempt against a real, unlocked
-                        account, so it never appears for an unknown email.
+    lockoutThreshold  - how many failed attempts lock an account. Set on every
+                        failed sign-in, the same value regardless of whether
+                        the email is registered, so the message can't be used
+                        to identify real accounts.
     param.email       - what they typed. Survives the forward, so the field
                         refills without the servlet having to hand it back.
 
@@ -67,20 +68,15 @@
             </p>
         </c:if>
 
-        <%-- Set by LoginServlet only after a failed attempt on a real,
-             still-unlocked account. Warns before the lock rather than
-             after it, so the lockout isn't a surprise. --%>
-        <c:if test="${not empty attemptsRemaining}">
+        <%-- Set by LoginServlet on every failed sign-in, whether or not the
+             email belongs to a real account. It has to be the same message
+             either way: one that only showed for real accounts would tell an
+             attacker which addresses are registered, which is the exact thing
+             the generic error above is there to prevent. --%>
+        <c:if test="${not empty lockoutThreshold}">
             <p class="login-modal__warning" role="status">
-                <c:choose>
-                    <c:when test="${attemptsRemaining == 1}">
-                        One more failed attempt will lock this account.
-                    </c:when>
-                    <c:otherwise>
-                        <c:out value="${attemptsRemaining}"/> more failed attempts
-                        will lock this account.
-                    </c:otherwise>
-                </c:choose>
+                Accounts are locked after <c:out value="${lockoutThreshold}"/>
+                unsuccessful attempts.
             </p>
         </c:if>
 

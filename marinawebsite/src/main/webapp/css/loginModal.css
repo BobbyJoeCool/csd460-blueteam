@@ -3,9 +3,10 @@
  * Author: Miguel Fernandez
  * CSD 460 - Capstone Project - Marina Website Project
  *
- * Login modal styles. Depends on variables.css being linked first.
- * Every color here comes from a semantic variable - no hex values, no
- * per-page fallbacks.
+ * Login modal styles. Depends on site.css being linked first (that's
+ * where the palette variables live since variables.css was folded into
+ * it). Every color here comes from a semantic variable - no hex values,
+ * no per-page fallbacks.
  *
  * Button note: the modal uses the SECONDARY cta colors, not primary.
  * The wireframe rule is one primary CTA per page, and the modal opens
@@ -85,8 +86,9 @@
 }
 
 .login-modal__warning {
-	/* Deliberately not the error red - this is a heads-up, not a failure.
-	   Golden hour tint matches the note styling on the registration form. */
+	/* Deliberately not the error red - this is the lockout rule, not a
+	   failure. Golden hour tint matches the callout styling on the
+	   registration form. */
 	margin: -0.5rem 0 1.25rem;
 	padding: 0.65rem 0.9rem;
 	border: 1px solid var(--color-golden-hour);

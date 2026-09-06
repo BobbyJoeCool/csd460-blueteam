@@ -80,6 +80,46 @@ rule above — they now point at `aboutUs.jsp` / `reservation.jsp` /
 but were never nav links to begin with, so nothing to rewire for those
 four.
 
+## Signed-In vs Signed-Out Header
+
+**Added 2026-09-06.** The header is on every page, so it is where the site
+shows whether someone is signed in — no page has to check the session for
+itself.
+
+Signed out, the nav ends with the **Log In** button that opens the login
+modal. Signed in, that is replaced by:
+
+```jsp
+<c:choose>
+    <c:when test="${sessionScope.loggedIn}">
+        <span class="nav-welcome">Welcome, ${sessionScope.displayName}</span>
+        <form class="nav-logout-form" action="${pageContext.request.contextPath}/logout" method="post">
+            <button type="submit" class="nav-cta">Log Out</button>
+        </form>
+    </c:when>
+    <c:otherwise>
+        <!-- Log In button -->
+    </c:otherwise>
+</c:choose>
+```
+
+Both attributes come from `LoginServlet` (see the Login contract's "What the
+Session Remembers"). `displayName` already arrives formatted as `"Elena M."`,
+so the header doesn't build it.
+
+Two notes on the shape of this:
+
+- **Log Out is a form, not a link.** Logging out changes state, so it POSTs
+  to `/logout`. `.nav-logout-form` is `display: inline-flex` in `header.css`
+  purely so the form doesn't break the nav's flex row.
+- **The header now needs the JSTL core taglib**
+  (`<%@ taglib prefix="c" uri="jakarta.tags.core" %>`), since it has a
+  conditional in it.
+
+Pages with their own signed-in/signed-out controls handle those themselves —
+`index.jsp`'s hero button and reservation CTA both change target when
+`sessionScope.loggedIn` is true.
+
 ## Front/Back End
 
 There is no real front to back end connections beyond tracking whether the user is logged in with the sessionBean.  
