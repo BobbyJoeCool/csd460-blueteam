@@ -64,6 +64,17 @@ Once someone logs in, the rest of the site needs an easy way to know they're log
 
 Logging out clears all of it at once.
 
+**Added 2026-09-06.** "Logging out" is now an actual endpoint: `LogoutServlet`
+at `/logout`, POST only, which invalidates the session and redirects to the
+landing page. Invalidating clears all four attributes in one step rather than
+removing them individually and leaving the session (and its ID) alive.
+
+POST rather than a link because logging out changes state — the header submits
+a small form. And it always lands on the landing page rather than wherever the
+user was: "back where you were" is right for logging *in*, but the page someone
+logs out from may well be one that requires a session, and returning there
+signed out would just bounce them.
+
 **Update 2026-09-04:** `LoginServlet.logInAndRedirect` now invalidates any
 pre-existing session and starts a fresh one before setting the four
 attributes above, rather than reusing whatever session the browser
@@ -85,7 +96,9 @@ The password comes along too, in hashed form, since it's part of the same record
 Two different failure messages, so the user knows what's going on. Neither one ever says which of username or password was wrong though, only whether the account is now locked:
 
 - **Wrong username or password:** "The username or password you entered is incorrect." Shown inline in the login modal, on whatever page the modal was submitted from — there is no separate error page.
-- **Approaching lockout:** on a failed attempt against a real account that hasn't locked yet, Back End also sets `attemptsRemaining` (an int) so the modal can warn the user before the lock happens rather than after — "2 more failed attempts will lock this account", or "One more failed attempt will lock this account" on the last try. It is deliberately never set for an email that isn't registered, since a warning that only appears for real accounts would turn the modal into a way of testing which addresses exist.
+- **Lockout rule notice:** every failed sign-in also sets `lockoutThreshold` (an int, always 3) so the modal can add "Accounts are locked after 3 unsuccessful attempts." under the error. It is the same message on every failure, whether or not the email belongs to a real account.
+
+  **Changed 2026-09-04.** This started out as a per-account countdown — `attemptsRemaining`, rendering "2 more failed attempts will lock this account." That was a mistake. A countdown can only appear for an address that actually exists, so watching for it confirmed which emails were registered, which is precisely what the single generic error message exists to prevent. The fixed notice gives the user the same useful warning and tells an attacker nothing.
 - **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login?action=reset` and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
 
 ### Where the User Lands After Login
@@ -145,6 +158,6 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
 | Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Inline in the login modal, on the page it was submitted from. No separate error page — Back End forwards back to that same page with `loginError` set as a request attribute. |
-| Wrong password on a real account that hasn't locked yet | "2 more failed attempts will lock this account." / "One more failed attempt will lock this account." | Directly under the error message in the modal, driven by the `attemptsRemaining` request attribute. Never shown for an unregistered email |
+| Any failed sign-in that hasn't locked the account | "Accounts are locked after 3 unsuccessful attempts." | Directly under the error message in the modal, driven by the `lockoutThreshold` request attribute. Shown on every failure, including for emails that aren't registered — a notice that only appeared for real accounts would identify them |
 | Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the demo "Unlock Account" button |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |

@@ -33,11 +33,14 @@ import jakarta.servlet.http.HttpSession;
  * attributes and re-open the modal with the error shown inline; that
  * part is Front End's to build.
  *
- * <p>On a failed attempt against a real account that hasn't locked yet,
- * {@code attemptsRemaining} is also set, so the modal can warn the user
- * how many tries are left. It is deliberately never set for an unknown
- * email - no account, no count, and no way to use the warning to work
- * out which addresses are registered.
+ * <p>Every invalid-credentials failure also sets
+ * {@code lockoutThreshold}, so the modal can tell the user that accounts
+ * lock after that many tries. It is the same fixed number on every
+ * failure, whether or not the email belongs to a real account. An
+ * earlier version sent a per-account countdown ("2 more attempts...")
+ * instead, which was a mistake: a countdown only ever appears for an
+ * address that exists, so it confirmed valid accounts and undid the
+ * whole point of the single generic error message.
  *
  * @author Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
@@ -117,13 +120,6 @@ public class LoginServlet extends HttpServlet {
                 customerDAO.lockAccount(customer.getCustomerId());
                 showAccountLocked(request, response);
             } else {
-                /*
-                 * Only set on a real account with a real failed attempt, so the
-                 * warning can never appear for an email that isn't registered -
-                 * that would turn the modal into a way of testing which
-                 * addresses exist.
-                 */
-                request.setAttribute("attemptsRemaining", MAX_FAILED_ATTEMPTS - attempts);
                 showInvalidCredentials(request, response);
             }
         } catch (SQLException e) {
@@ -207,8 +203,13 @@ public class LoginServlet extends HttpServlet {
 
     /**
      * Sets the generic "username or password" loginError message (the
-     * one that never reveals which field was wrong) and forwards back
-     * to the page the modal was opened on.
+     * one that never reveals which field was wrong) plus the fixed
+     * {@code lockoutThreshold} the modal uses to mention the lockout
+     * rule, then forwards back to the page the modal was opened on.
+     *
+     * <p>The threshold is set on every failure, including ones for an
+     * email that isn't registered. That is the point: a message that only
+     * appeared for real accounts would identify them.
      *
      * @param request the request to attach the error message to
      * @param response the response to forward
@@ -218,6 +219,7 @@ public class LoginServlet extends HttpServlet {
     private void showInvalidCredentials(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("loginError", "The username or password you entered is incorrect.");
+        request.setAttribute("lockoutThreshold", MAX_FAILED_ATTEMPTS);
         forwardToOriginPage(request, response);
     }
 

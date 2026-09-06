@@ -8,6 +8,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,12 +52,25 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 			Secure your spot in paradise.
 		</p>
 
-		<button
-			class="btn-primary hero-cta"
-			type="button"
-			onclick="MoffatBay.loginModal.open()">
-			Reserve a Slip
-		</button>
+		<%-- Signed in, the modal would be pointless - send them where the
+		     button says it goes. Signed out, sign-in comes first. --%>
+		<c:choose>
+			<c:when test="${sessionScope.loggedIn}">
+				<a
+					class="btn-primary hero-cta"
+					href="${pageContext.request.contextPath}/reservation.jsp">
+					Reserve a Slip
+				</a>
+			</c:when>
+			<c:otherwise>
+				<button
+					class="btn-primary hero-cta"
+					type="button"
+					onclick="MoffatBay.loginModal.open()">
+					Reserve a Slip
+				</button>
+			</c:otherwise>
+		</c:choose>
 	</div>
 </section>
 
@@ -123,16 +137,38 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 					Ready to Reserve Your Slip?
 				</h2>
 
-				<p>
-					Create an account or sign in to check availability
-					and book your spot today.
-				</p>
+				<%-- Someone already signed in has no use for "create an
+				     account" - they have one. Same section, different
+				     wording and destination. --%>
+				<c:choose>
+					<c:when test="${sessionScope.loggedIn}">
 
-				<a
-					class="btn-secondary"
-					href="${pageContext.request.contextPath}/registration.jsp">
-					Create an Account
-				</a>
+						<p>
+							Check availability and book your spot today.
+						</p>
+
+						<a
+							class="btn-secondary"
+							href="${pageContext.request.contextPath}/reservation.jsp">
+							Book a Slip
+						</a>
+
+					</c:when>
+					<c:otherwise>
+
+						<p>
+							Create an account or sign in to check availability
+							and book your spot today.
+						</p>
+
+						<a
+							class="btn-secondary"
+							href="${pageContext.request.contextPath}/registration.jsp">
+							Create an Account
+						</a>
+
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</section>
 
