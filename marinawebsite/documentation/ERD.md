@@ -4,12 +4,12 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.4.0
-- Date: 2026-09-06
+- Version: 1.5.0
+- Date: 2026-09-07
 
 ## Overview
 
-This is the official ERD for the Moffat Bay Marina database (`moffatBayMarinaDB`). It backs the marina's slip-reservation system: matching a boat's length to one of three slip sizes, tracking slip availability across the marina's docks, and driving the wait-list flow when a size is full. The database is versioned: `DatabaseVersion` (Table 0) records which script version last built it, so a running instance can be queried to confirm what it's running without needing the `.sql` file that created it.
+This is the official ERD for the Moffat Bay Marina database (`moffatBayMarinaDB`). It backs the marina's slip-reservation system: matching a boat's length to one of three slip sizes, tracking slip availability across the marina's docks, pricing a booking from the marina's current rates, and driving the wait-list flow when a size is full. The database is versioned: `DatabaseVersion` (Table 0) records which script version last built it, so a running instance can be queried to confirm what it's running without needing the `.sql` file that created it.
 
 ## Entity Relationship Diagram
 
@@ -217,6 +217,20 @@ erDiagram
         VARCHAR noticeStatus "Current status of the termination notice"
     }
 
+    %% =============================================================================
+    %% Table 12: Rate | Owner: Breutzmann, R. (Database Lead) |
+    %% Inward FKs (none)
+    %% Outward FKs (none)
+    %% Standalone lookup of the marina's current prices. Read when pricing a
+    %% booking; the resulting figure is stored on Reservation.monthlyRate.
+    %% =============================================================================
+    Rate {
+        INT rateID PK "Unique identifier for the rate record"
+        VARCHAR rateCode UK "Stable code the application looks a rate up by, e.g. SLIP_PER_FOOT_MONTHLY"
+        DECIMAL rateAmount "Current amount in US dollars"
+        VARCHAR rateDescription "What this rate is, in plain terms"
+    }
+
     %% --- Relationships ---
     Dock ||--o{ Slip : "has"
     Customer ||--o{ Reservation : "makes"
@@ -233,7 +247,7 @@ erDiagram
 
 ## Design Decisions
 
-- **`DatabaseVersion` (Table 0)** is a standalone metadata table, no FKs in or out, holding one row that records which version of the build script last created the database (`version`, `appliedDate`, `description`). MySQL has no built-in concept of a "database version" the way some other systems do, so this is hand-rolled: it makes a running instance self-describing - anyone connected to it can query `DatabaseVersion` to confirm which schema/seed-data version they're looking at, instead of needing to track down the `.sql` file that built it. Since the whole database is dropped and recreated on every run of the script (see `DROP DATABASE IF EXISTS` in `MoffatBayMarinaDB_V1-0-0.sql`), this stays a single current-version row rather than an accumulating history/migration log.
+- **`DatabaseVersion` (Table 0)** is a standalone metadata table, no FKs in or out, holding one row that records which version of the build script last created the database (`version`, `appliedDate`, `description`). MySQL has no built-in concept of a "database version" the way some other systems do, so this is hand-rolled: it makes a running instance self-describing - anyone connected to it can query `DatabaseVersion` to confirm which schema/seed-data version they're looking at, instead of needing to track down the `.sql` file that built it. **Updated 2026-09-07:** this was originally described as holding a single current-version row, since the whole database is dropped and recreated on every run of the build script (see `DROP DATABASE IF EXISTS` in `MoffatBayMarinaDB_V1-4-0.sql`). That stopped being true once update scripts started appending their own rows. It now holds one row per version applied, and `currentVersion.sql` reads the most recent. The consolidated `V1-4-0` build script seeds all five historical rows deliberately, so a database built from that one file is indistinguishable from one built by running `V1-0-0` and the four updates in sequence.
 - **`PascalCase` and `camelCase`** Table names are `PascalCase` and column names are `camelCase` following standard conventions.
 - **`ID` is capitalized in table names** As an example `slipID` or `customerID` rather than `slipId` or `customerId`.
 - **3 docks, all on one shoreline.** Per the client's marina map (`Source_Information/marina_a.png`), the marina has 3 linear docks (A, B, C) along a single harbor-side shoreline - dock descriptions reflect relative position along that one shoreline, not a compass side.
@@ -253,6 +267,9 @@ erDiagram
 - **`Contact.reasonForContact` is a `VARCHAR` holding an enum-style value (common reasons plus "Other"), not a dedicated lookup table**, matching how `Slip.slipStatus` already represents its enum in this diagram - the exact reason list is an implementation detail for the `CREATE TABLE` script, not the ERD.
 - **`Contact.respondedEmployeeID` is a nullable FK to `Employee.employeeID`** (`Employee ||--o{ Contact : "responds to"`), null until a submission is answered - mirroring how `responded`/`respondedDate`/`respondedMessage` are already null until responded.
 - **`Employee` table mirrors `Customer`'s account fields** (`email` as a `UNIQUE` login username, `passwordHash`, `phone`) plus `jobTitle` and `hireDate`, since staff need to log in and respond to `Contact` submissions the same way customers log in to make reservations.
+- **`Rate` (Table 12) is a standalone lookup, not a column on `SlipSize` or `Slip`.** Slip rent is charged per foot of the **boat's** length ($10.50/ft/month), not per slip size, so the price has nothing to hang off `SlipSize` - a 32 ft boat and a 39 ft boat in identical 40 ft slips pay different rents. Electric is a second row in the same table, a flat $10.50/month regardless of boat size. Added in `MoffatBayMarinaDB_V1-5-0_update.sql`. Keeping these as data rather than constants in application code means a price change is two `UPDATE`s and no redeploy.
+- **`Rate` deliberately has no effective-date range or rate history.** Each `Reservation` already stores its own `monthlyRate` at the moment of booking, so past reservations keep the price they were sold at without any help from this table. Dated rates would solve a problem the snapshot already solves. If the marina ever needs to answer "what did we charge in March", that question is answerable from `Reservation` itself.
+- **Update, V1-5-0: `Boat.regNumber` data repair.** V1-3-0 folded the state prefix into the registration number with `CONCAT(regState, regNumber)`, but every seeded `regNumber` already carried its prefix (`WN1204JT`), so the concat doubled it to `WAWN1204JT`. All 60 seeded boats matched `RegisterServlet.REG_NUMBER_PATTERN` before that migration and none matched it after. V1-5-0 strips the duplicated prefix, guarded on four leading letters so boats registered through the site after V1-3-0 are untouched. The consolidated `V1-4-0` build script seeds the correct values outright.
 - **`passwordHash` (both `Employee` and `Customer`) is a SHA-256 digest**, computed with MySQL's `SHA2(<plaintext>, 256)` to match how the seed data in the database creation script is hashed. This is the project's actual password hashing scheme (unsalted) - not a placeholder to be swapped out later, since no further "real auth" phase follows this submission.
   - The password hashing done in SQL lets us load a password hash into the table using SHA-256. `SHA2('Password1', 256)` enters into the database as `19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd`.
   - This means our program MUST use SHA-256 hashing (unsalted) in order to authenticate correctly.

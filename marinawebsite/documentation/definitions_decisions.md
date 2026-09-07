@@ -34,6 +34,40 @@ Source of truth: the client's marina map
 | 40 ft | 24 | 8 | 4-7, 16-19 |
 | 50 ft | 18 | 6 | 1-3, 13-15 |
 
+## Slip Pricing
+
+Source of truth: the `Rate` table, added in `MoffatBayMarinaDB_V1-5-0_update.sql`.
+These figures are listed here so everyone quotes the same numbers, but the
+database is authoritative - if the two ever disagree, the table wins and this
+section is out of date.
+
+| What | Code in `Rate` | Amount |
+| --- | --- | --- |
+| Slip rent | `SLIP_PER_FOOT_MONTHLY` | $10.50 per foot of boat, per month |
+| Electric hookup (optional) | `ELECTRIC_MONTHLY` | $10.50 per month, flat |
+
+Both include the 5% increase applied this term; the previous $10.00 rate never
+existed in the database.
+
+Two things that are easy to get backwards:
+
+- **Rent follows the BOAT's length, not the slip's size.** A 32 ft boat in a
+  40 ft slip pays 32 x $10.50 = $336.00, not $420.00. Slip size decides whether
+  the boat fits; boat length decides what it costs.
+- **Electric is flat, not per foot.** $10.50 whether the boat is 20 ft or 50 ft.
+
+Worked example - a 32.0 ft boat with electric: $336.00 + $10.50 = **$346.50/month**.
+
+The arithmetic always lands on a whole number of cents, since boat lengths carry
+one decimal place and one decimal place times $10.50 cannot produce a fraction
+of a cent. There is no rounding rule to agree on.
+
+**The 60 seeded reservations do not follow this.** They were priced at a flat
+rate per slip size ($485 / $585 / $685) with no reference to boat length and no
+electric fee, because they predate the pricing rule. Left as-is deliberately -
+`Reservation.monthlyRate` records what each booking was actually sold at, so old
+rows keeping old prices is correct behaviour, not a bug to fix.
+
 ## Password Hashing
 
 Password hashing (for both `Employee` and `Customer` accounts) is done with SHA-256, computed in SQL via `SHA2(<plaintext>, 256)`. For example, `SHA2('Password1', 256)` enters the database as `19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd`.
