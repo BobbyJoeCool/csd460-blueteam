@@ -17,12 +17,12 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 
 ## Open Questions / Decisions Needed
 
-> **General rule:** any link pointing to a page that doesn't exist yet should use `href="#"` so the element is clickable but doesn't navigate anywhere. Replace with the real path once that page's JSP is merged.
+> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
 
-- [ ] **CTA link targets:** What `href` values do the Call-to-Action buttons use? (e.g., `reservation.jsp`, `about.jsp`) Use `href="#"` for any page not yet built.
-- [ ] **Session attribute name for login state:** What is the exact session attribute name and type the scaffold checks to toggle between "Log In" and "Welcome {name}"? (Must match the Login contract.)
-- [ ] **User display name attribute:** What Bean property or session attribute provides the display name for the greeting — `firstName`, `fullName`, something else?
-- [ ] **Does the landing page need a servlet?** If the only dynamic element is the logged-in greeting handled by the scaffold's session check, the page may be a plain JSP with no servlet. Confirm so Back End knows the scope of work.
+- [x] **CTA link targets:** Decided. "Reserve a Slip" links to `reservation.jsp` (logged in) or opens the login modal (logged out). Bottom CTA links to `reservation.jsp` as "Book a Slip" (logged in) or `registration.jsp` as "Create an Account" (logged out).
+- [x] **Session attribute name for login state:** `sessionScope.loggedIn` (boolean), set by `LoginServlet`. Matches the Login contract.
+- [x] **User display name attribute:** `sessionScope.displayName` — a pre-formatted "First L." greeting name (e.g. "Elena M."), built by the Customer bean and set by `LoginServlet`.
+- [x] **Does the landing page need a servlet?** No. The only dynamic elements are login-state checks using `<c:choose>` in the JSP and the scaffold's session-driven header swap. No dedicated servlet.
 
 ## Scaffold Include
 
@@ -47,8 +47,10 @@ The landing page does not contain a form and does not submit landing-page fields
 | Field or Control | Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
 | `activePage` | JSP include parameter | Yes | Passes `"home"` to `header.jsp` so Home can be highlighted |
-| Reserve a Slip | Button | No | Calls `MoffatBay.loginModal.open()`; does not submit form data |
-| Create an Account | Link | No | Navigates to `${pageContext.request.contextPath}/registration.jsp` |
+| Reserve a Slip (logged out) | Button | No | Calls `MoffatBay.loginModal.open()`; does not submit form data |
+| Reserve a Slip (logged in) | Link | No | Navigates directly to `reservation.jsp` |
+| Create an Account (logged out) | Link | No | Navigates to `registration.jsp` |
+| Book a Slip (logged in) | Link | No | Navigates to `reservation.jsp` |
 
 ## Back End Parameters
 
@@ -81,3 +83,10 @@ The landing page does not query the database directly.
 | Registration succeeds | No message currently displayed | `RegisterServlet` redirects to `/?registered=true`, but `index.jsp` does not yet read it |
 | Hero image cannot load | No message; background color remains visible | Hero section |
 | Landing page fails to load | Standard Tomcat error response | Browser |
+
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| Hero "Reserve a Slip" | Direct link to `reservation.jsp` | Opens the login modal |
+| Bottom CTA | "Book a Slip" linking to `reservation.jsp`, with "Check availability and book your spot today." | "Create an Account" linking to `registration.jsp`, with "Create an account or sign in to check availability and book your spot today." |

@@ -16,7 +16,7 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 
 ## Open Questions / Decisions Needed
 
-> **General rule:** any link pointing to a page that doesn't exist yet should use `href="#"` so the element is clickable but doesn't navigate anywhere. Replace with the real path once that page's JSP is merged.
+> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
 
 
 
@@ -122,4 +122,16 @@ Pages with their own signed-in/signed-out controls handle those themselves —
 
 ## Front/Back End
 
-There is no real front to back end connections beyond tracking whether the user is logged in with the sessionBean.  
+The header checks `sessionScope.loggedIn` (set by `LoginServlet`) to swap between two states:
+
+- **Logged out:** a "Log In" button that opens the login modal.
+- **Logged in:** a "Welcome, {displayName}" greeting (plain text, not a link) plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
+
+The footer has no login-state behavior.
+
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| Header account control | Shows "Welcome, {displayName}" plus Log Out button | Shows Log In button |
+| Login modal include | Still included (available for any page that needs it) | Still included |

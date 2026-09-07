@@ -4,8 +4,8 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.0.0
-- Date: 2026-08-28
+- Version: 1.3.0
+- Date: 2026-09-06
 
 ## Overview
 
@@ -78,8 +78,12 @@ erDiagram
         VARCHAR city "Mailing city"
         CHAR state "Two letter state code"
         VARCHAR zipCode "Zip code, varchar for leading zeros"
-        VARCHAR country "US, CA, or OTHER - added in V1-2-0, drives the Registration page's foreign-registration badge"
+        VARCHAR country "US, CA, or OTHER - drives the Registration page's foreign-registration badge"
         DATE dateJoined "Date account was created"
+        INT failedLoginAttempts "Consecutive failed logins since last success, reset to 0 on success"
+        BOOLEAN accountLocked "TRUE after 3 consecutive failed logins"
+        VARCHAR phoneCountryCode "Dialing country code, separate from the 10-digit phone column"
+        VARCHAR streetAddress2 "Optional second address line - apartment, suite, PO box"
     }
 
     %% =============================================================================
@@ -196,7 +200,6 @@ erDiagram
         INT slipID FK "References the reserved marina slip"
         DATE startDate "Date the month-to-month lease begins"
         DECIMAL monthlyRate "Monthly rental rate at the time of reservation"
-        VARCHAR reservationStatus "Current status of the reservation"
     }
 
     %% =============================================================================

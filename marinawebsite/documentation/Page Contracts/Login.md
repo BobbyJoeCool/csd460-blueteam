@@ -161,3 +161,9 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Any failed sign-in that hasn't locked the account | "Accounts are locked after 3 unsuccessful attempts." | Directly under the error message in the modal, driven by the `lockoutThreshold` request attribute. Shown on every failure, including for emails that aren't registered — a notice that only appeared for real accounts would identify them |
 | Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the demo "Unlock Account" button |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |
+
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| Login modal | Still available (included on every page), but typically not triggered — the user is already signed in | Primary way to sign in; opened by the Log In button or by gated actions like "Reserve a Slip" |

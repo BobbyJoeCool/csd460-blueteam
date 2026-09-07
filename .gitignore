@@ -54,7 +54,13 @@ hs_err_pid*
 *.dump
 
 # ---- Environment ----
-.env
+# .env is committed on purpose for this class project. Normally a secrets
+# file like this would stay out of the repo, but everyone on the team (and
+# whoever grades this) needs the same working MySQL connection to run the
+# site with no extra setup, and the assignment itself assigns one shared
+# database name/username/password for the whole team - there's no real
+# secret here to protect. Don't copy this pattern into a non-classroom repo.
+# .env
 
 # ---- Personal Files ----
 DevNotes/
