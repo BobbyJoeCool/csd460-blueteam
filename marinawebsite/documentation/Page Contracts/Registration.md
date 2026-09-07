@@ -223,3 +223,9 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Re-type Password doesn't match Password | "Passwords do not match." | Directly under the Re-type Password field, live as the user types |
 | A required field is left blank on submit | Browser's default "please fill out this field" prompt (native HTML `required` validation) | Next to the empty field |
 | Email already registered (caught by Back End on submit, not something Front End can check ahead of time) | Popup: something like "An account with this email already exists." Exact wording is Back End's call, see [Duplicate Email](#duplicate-email) above. Popup also includes a "Log In" button | Popup, shown once the submit response comes back. "Log In" opens the Login modal with `redirectTo` set to the landing page, so a successful login lands there |
+
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| Registration page | Page can be opened normally (no gate preventing access) | Page can be opened normally |
