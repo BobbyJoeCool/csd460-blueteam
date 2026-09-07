@@ -139,9 +139,10 @@ Agree on and record field/variable names for both pages below in their Page Cont
 
 | Role | Assigned To |
 | --- | --- |
-| Full Page | Miguel |
+| Front End | Miguel |
+| Back End | Sara |
 
-> There is very little back end to About Us, so this page is very much going to be Front End only.  As such, one person assigned to it, and then the other 3 people assigned for testing this week.  
+> **Update (Sep 7):** Professor-directed change to the syllabus — Contact Us is being cut as a standalone page, and its contact info is folding into About Us. That makes this a real Front End/Back End page now, not the back-end-lite page it was scoped as at the top of the week. Miguel keeps Front End since he already owns the wireframe. Sara moves here from Testing.  Reasoning is, Sara did testing last week, so she stays off testing this week and Robert will take on the testing for the About Us page.
 
 **Reservation Summary**
 
@@ -155,7 +156,7 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | Page | Tester |
 | --- | --- |
 | Reservation (Book a Slip) | Carolina |
-| About Us | Sara |
+| About Us | Robert |
 | Reservation Summary | Robert |
 
 ## Week Six (Sep 14 - Sep 20, 2026)
@@ -164,12 +165,7 @@ Agree on and record field/variable names for both pages below in their Page Cont
 
 Agree on and record field/variable names for both pages below in their Page Contract docs before coding. Branch and PR as above.
 
-**Contact Us**
-
-| Role | Assigned To |
-| --- | --- |
-| Front End | |
-| Back End | |
+> **Update (Sep 7):** Contact Us is cut as a standalone page per the professor's change — its content and backend moved into About Us (Module 7, this week). No separate Contact Us build or test slot needed here anymore.
 
 **Look Up Reservation**
 
@@ -178,12 +174,21 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | Front End | |
 | Back End | |
 
+**Edit User Info/Register a New Boat**
+
+| Role | Assigned To |
+| --- | --- |
+| Front End | |
+| Back End | |
+
+> **Update (Sep 7):** Moved up from Module 9 into Module 8, since Look Up Reservation was the only page left here once Contact Us was cut — keeps Module 8 and Module 9 workload closer to even instead of leaving Module 9 with two pages and Module 8 with one.
+
 **Testing - Module 8**
 
 | Page | Tester |
 | --- | --- |
-| Contact Us | |
 | Look Up Reservation | |
+| Edit User Info/Register a New Boat | |
 
 ## Week Seven (Sep 21 - Sep 27, 2026)
 
@@ -198,18 +203,13 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 | Front End | |
 | Back End | |
 
-**Edit User Info/Register a New Boat**
-
-| Role | Assigned To |
-| --- | --- |
-| Front End | |
-| Back End | |
-
 **Testing - Module 9**
 
 | Page | Tester |
 | --- | --- |
 | Wait List Lookup | |
+
+**Web Application Cleanup and Polish**
 
 ## Appendix: Rotation Tracker
 
@@ -219,5 +219,5 @@ This keeps track of who does what task in each week.  `(#)` being the week they 
 | -------- | ----------| -------- | ------- |
 | Robert   | (4)(5)    | (4)      | (5)     |
 | Miguel   | (4)(5)    | (5)      | (4)     |
-| Sara     | (4)       | (5)      | (4)(5)  |
+| Sara     | (4)       | (5)(5)   | (4)     |
 | Carolina | (4)(5)    | (4)      | (5)     |

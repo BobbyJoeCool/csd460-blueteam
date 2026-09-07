@@ -100,28 +100,48 @@ git clone https://github.com/BobbyJoeCool/csd460-blueteam.git
 cd csd460-blueteam/marinawebsite
 ```
 
-Create a `.env` file **next to `pom.xml`** — it's gitignored, so each developer
-keeps their own:
+**There's nothing to create here.** `marinawebsite/.env` is committed on
+purpose — the assignment hands the whole team one shared database name, user,
+and password, so there's no real secret in it and a fresh clone runs with no
+credential hand-off. See the "Environment" note in `.gitignore` for the full
+reasoning, and don't copy the pattern into a non-classroom repo.
+
+It already contains:
 
 ```env
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=MoffatBayMarinaDB
-DB_USER=root
-DB_PASSWORD=your_password_here
+DB_NAME=moffatBayMarinaDB
+DB_USER=captainAhab
+DB_PASSWORD=<in the committed file>
 ```
+
+`captainAhab` is created and granted rights by the database script in step 2,
+so build the database first if the site can't connect.
 
 ### 2. Build the database
 
-Run the scripts **in order**. Each update builds on the last, so skipping one
-will leave columns the application expects but can't find.
+Two scripts, in this order. The first builds everything from scratch; the
+second brings it to the current version.
 
 ```bash
-mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-0-0.sql
-mysql -u root -p MoffatBayMarinaDB < databasescripts/MoffatBayMarinaDB_V1-1-0_update.sql
-mysql -u root -p MoffatBayMarinaDB < databasescripts/MoffatBayMarinaDB_V1-2-0_update.sql
-mysql -u root -p MoffatBayMarinaDB < databasescripts/MoffatBayMarinaDB_V1-3-0_update.sql
+mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-4-0.sql
+mysql -u root -p MoffatBayMarinaDB < databasescripts/MoffatBayMarinaDB_V1-5-0_update.sql
 ```
+
+> **The first script is destructive** — it drops `MoffatBayMarinaDB` if it
+> already exists and rebuilds it empty. That's the intent for a fresh setup,
+> but don't run it against a database holding work you want to keep.
+
+`MoffatBayMarinaDB_V1-4-0.sql` replaces the old five-step sequence (`V1-0-0`
+plus four `_update` scripts). Those still exist under
+`databasescripts/Legacy/Week4/` as the record of how the schema was built, but
+they're history now — running them is not the way to stand a database up.
+
+**If you already have a database from the old five-script sequence**, don't
+rebuild: just run the `V1-5-0` update on top of it. It's written to land on the
+same end state either way, and it also repairs a data bug V1-3-0 introduced in
+`Boat.regNumber`. See `databasescripts/Legacy/Week4/README.md`.
 
 Check where you landed at any time:
 
