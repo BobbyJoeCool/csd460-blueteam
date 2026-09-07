@@ -4,7 +4,7 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.3.0
+- Version: 1.4.0
 - Date: 2026-09-06
 
 ## Overview
@@ -200,6 +200,7 @@ erDiagram
         INT slipID FK "References the reserved marina slip"
         DATE startDate "Date the month-to-month lease begins"
         DECIMAL monthlyRate "Monthly rental rate at the time of reservation"
+        VARCHAR reservationStatus "Current status of the reservation"
     }
 
     %% =============================================================================
