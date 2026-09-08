@@ -74,3 +74,8 @@
 
 	<!-- Reusable login modal (pulls in its own scripts) -->
 	<jsp:include page="/includes/loginModal.jsp" />
+
+	<!-- Shared status popup - the "that worked" message. Renders empty on
+	     every page; any page can fill it with
+	     MoffatBay.statusPopup.show("..."). Pulls in its own script. -->
+	<jsp:include page="/includes/statusPopup.jsp" />

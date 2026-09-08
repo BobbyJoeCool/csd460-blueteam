@@ -1,0 +1,94 @@
+/*
+ * Blue Team - CSD 460 Capstone - Moffat Bay Marina
+ * css/statusPopup.css
+ * Author: Robert Breutzmann
+ *
+ * The shared status popup (includes/statusPopup.jsp). Colors come from the
+ * semantic variables in site.css - site.css is explicit that nothing
+ * outside its palette section should reference a hex value directly.
+ */
+
+/* The live region itself. Always in the page, usually empty, and given no
+   paint of its own so an empty one is invisible. Only .status-popup below
+   draws anything. pointer-events: none so an empty region can never sit
+   over the header and eat clicks. */
+.status-popup-region {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    /* Below the login modal (z-index 100 in loginModal.css) so a popup can
+       never cover an open dialog. */
+    z-index: 90;
+    pointer-events: none;
+}
+
+.status-popup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: min(32rem, calc(100vw - 2rem));
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
+    border-radius: 6px;
+    /* A left bar rather than a full color wash: color is never the only
+       signal, the words carry the message, and this still reads in
+       greyscale. */
+    border-left: 4px solid var(--color-success);
+    background: var(--color-bg-surface);
+    color: var(--color-text-body);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--color-charcoal-navy) 30%, transparent);
+    pointer-events: auto;
+
+    /* Starts just above its resting place and transparent; .is-visible
+       brings it in. */
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.status-popup.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.status-popup__text {
+    flex: 1 1 auto;
+    line-height: 1.4;
+}
+
+.status-popup__close {
+    flex: 0 0 auto;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-text-body);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.status-popup__close:hover {
+    background: color-mix(in srgb, var(--color-charcoal-navy) 10%, transparent);
+}
+
+.status-popup__close:focus-visible {
+    outline: 2px solid var(--color-input-border-focus);
+    outline-offset: 2px;
+}
+
+/* Someone who has asked their machine for less animation gets the message
+   appearing and disappearing, with no sliding or fading. */
+@media (prefers-reduced-motion: reduce) {
+    .status-popup {
+        transition: none;
+        transform: none;
+    }
+    .status-popup.is-visible {
+        transform: none;
+    }
+}

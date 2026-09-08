@@ -182,7 +182,23 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("customerId", customer.getCustomerId());
         session.setAttribute("displayName", customer.getDisplayName());
 
-        response.sendRedirect(request.getContextPath() + safeRedirectTarget(request));
+        /*
+         * Tell the shared status popup to say "Logged in successfully" on
+         * whatever page they land on. A keyword, not the wording - the
+         * wording lives in js/statusPopup.js, because anything travelling
+         * in a URL is whatever was in the link somebody clicked.
+         *
+         * Appended defensively in case safeRedirectTarget ever returns a
+         * path that already carries a query string of its own.
+         *
+         * Deliberately only on this path. safeRedirectTarget is also used
+         * by the unlock-account flow, and unlocking an account is not
+         * signing in.
+         */
+        String target = safeRedirectTarget(request);
+        target += (target.contains("?") ? "&" : "?") + "notice=loggedIn";
+
+        response.sendRedirect(request.getContextPath() + target);
     }
 
     /**

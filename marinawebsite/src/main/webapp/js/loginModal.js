@@ -27,10 +27,26 @@ MoffatBay.loginModal = (function () {
 
     /**
      * Shows the modal and moves focus into it.
+     *
+     * @param {string} [redirectTo] - where to land after a successful sign
+     *   in, as a context-relative path like "/reservation.jsp" (LoginServlet
+     *   prepends the context path itself, so never "/marinawebsite/...").
+     *   Optional: leave it out and the modal falls back to the page the user
+     *   is already on, which is right for a plain "Log In" control but wrong
+     *   for a control that names somewhere else - a "Reserve a Slip" button
+     *   should land on the reservation page, not back where it was clicked.
      */
-    function open() {
+    function open(redirectTo) {
         if (!modal) { return; }
         lastFocused = document.activeElement;
+
+        if (redirectTo) {
+            // Both forms carry one - the sign-in form and the unlock-account
+            // form - so unlocking lands in the same place signing in would.
+            modal.querySelectorAll('input[name="redirectTo"]').forEach(
+                function (field) { field.value = redirectTo; });
+        }
+
         modal.classList.add("is-open");
         var email = document.getElementById("loginEmail");
         if (email) { email.focus(); }
