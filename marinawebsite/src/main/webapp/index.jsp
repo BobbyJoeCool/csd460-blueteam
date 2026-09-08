@@ -66,7 +66,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 				<button
 					class="btn-primary hero-cta"
 					type="button"
-					onclick="MoffatBay.loginModal.open()">
+					onclick="MoffatBay.loginModal.open('/reservation.jsp')">
 					Reserve a Slip
 				</button>
 			</c:otherwise>

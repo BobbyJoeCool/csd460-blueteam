@@ -14,293 +14,124 @@ Module 6 / Week 5 (Sep 7 – Sep 13, 2026)
 - Back End: Sara
 - Testing: Carolina
 
-> **How to read this contract:** this is the Front End half. It describes what the page looks like, what it asks the customer for, what it sends, and what it needs handed back to it. It deliberately does **not** describe how any of that gets saved or looked up — that's Sara's half, and the Back End Parameters and Database Returns sections below are left for her to fill in rather than guessed at here.
+## Open Questions / Decisions Needed
+
+### Front End Owns
+
+- [x] **Form field `name` attributes:** Decided, see [Front End Variables](#front-end-variables) below.
+- [x] **Date input format:** A plain `<input type="date">`, so it always submits `yyyy-MM-dd`. Won't accept anything before today.
+- [x] **Slip selection UI:** Decided, see [Choosing a Slip Size](#choosing-a-slip-size) below.
+- [x] **Boat selection UI:** Decided, see [Choosing a Boat](#choosing-a-boat) below.
+- [x] **Dock selection UI:** Decided, see [Choosing a Dock](#choosing-a-dock) below.
 
 ---
 
-## What This Page Has To Do
+### Choosing a Slip Size
 
-From the assignment, in plain terms:
+The marina's three sizes sit across the top of the page as cards, showing how many of each are free right now, what each one suits, and a name for it (Standard, Premier, Grand).
 
-- Let a customer reserve a slip. The reservation has to actually be saved.
-- The customer picks their boat's length, their boat's name, and a check-in date.
-- The marina has a fixed number of slips in each size — 30 of the 26-foot, 24 of the 40-foot, 18 of the 50-foot. Those come off the marina map, and they're written down in `definitions_decisions.md` under "Dock and Slip Sizes."
-- If every slip that fits their boat is already taken, tell them so.
-- Then ask whether they'd like to go on the wait list for that size, and if they say yes, put them on it.
-- Either way — whether they join the wait list or not — no reservation is made.
+**Nothing is picked on those cards.** They're there to show what's available. A boat only fits one size (BR-09), so the boat is what decides it. Pick a boat and the right card lights up with a "Fits your boat" tag, and the other two fade back. Nobody picks slip A-7 off a map either, the system still assigns the actual slip.
 
-Everything below is how the page delivers that.
+Correcting myself here: an earlier version of this contract said the Module 2 wireframe had no slip picker on it, and used that to justify not building one. It does have one. What it's picking is a slip *size* rather than a particular slip, so we land in the same place, but the reasoning was wrong.
 
----
+The counts on those cards are the whole marina, added up from the three docks. There's only one availability figure coming from the back end and it's per dock, so the totals can't drift away from the per-dock numbers underneath them.
 
-## How Pricing Works
+The rest of the page follows the wireframe too, four steps down the left (boat, dock, electric, start date) with the Reservation Summary adding up down the right.
 
-**$10.50 per foot of the boat, per month.** Plus an **optional electric hookup at $10.50 a month**, flat.
+### Choosing a Boat
 
-Two things that are easy to get wrong here:
+A dropdown of boats they already own, by name with the length next to it, like "Gullwing — 32.0 ft".
 
-- **The price follows the boat, not the slip.** A 32-foot boat pays for 32 feet, even though it's sitting in a 40-foot slip. Slip size decides *whether* the boat fits; boat length decides *what it costs*. These are two different numbers and the page shouldn't blur them.
-- **Electric is a flat monthly fee, not per foot.** It's $10.50 whether the boat is 20 feet or 50.
+Boat name and length aren't typed in by hand, which covers two of the three things the assignment asks for. If someone can retype them then someone can claim their 44 ft boat is 24 ft and book a slip it doesn't fit in, and it'd mean a second version of "this boat" floating around that never connects to the real one.
 
-Both figures already include the 5% increase — the rate used to be $10.00 per foot and $10.00 for electric. The page shows the new numbers; there's no old price displayed anywhere and no transition period to handle.
+Boat details are optional at signup, so a customer can arrive owning nothing. In that case the dropdown is greyed out, the button is off, and a Register a Boat panel opens by itself. If they do have boats there's a "Register another boat" button next to the dropdown.
 
-A worked example, which is also roughly what the page should show:
+That panel reuses the boat fields off the Registration page rather than me building a second copy of the same form. **Saving from it doesn't reload the page**, which is the important part. The boat gets saved in the background, turns up in the dropdown already selected, and anything already filled in is still sitting there. It's the first thing on the site that saves without reloading, and it's why the shared status popup in the header exists at all, since there's no new page for a confirmation to appear on.
 
-> **Gullwing — 32.0 ft**
-> 32.0 ft × $10.50 = **$336.00 / month**
-> Electric hookup: **+ $10.50 / month**
-> **Total: $346.50 / month**
+### Choosing a Dock
 
-The total updates live as soon as a boat is picked or the electric box is ticked. Nothing needs to be asked of the server to work that out — the boat's length is already sitting in the dropdown, and both rates are fixed.
+Added Sep 8, from the discussion about giving people a say in where they end up.
 
-The math always lands on a whole number of cents, so there's no rounding decision to make. Boat lengths carry one decimal place, and one decimal place times $10.50 can't produce a fraction of a cent.
+The three docks sit in different parts of the marina, which is a real difference worth letting someone choose. Dock A is nearest the Ship Store, C is nearest the Office, Restaurant and Fuel Dock, and B is in between. So step 2 is three cards, one per dock, with that description on each and how many slips are free there.
 
----
+**It only ever shows counts for the size the chosen boat needs.** A dock with three 26 ft slips free is no use to a 40 ft boat, so showing its total would be actively misleading. Until a boat is picked the cards can't say anything useful and sit greyed out. A dock with nothing of the right size can't be picked, and says so on the card rather than just fading.
 
-## What The Customer Fills In
+The marina map (`Source_Information/marina_a.png`, copied to `webapp/images/marina_a.png`) sits underneath the cards in that same step, since that's where someone is deciding and it's the thing that makes the choice mean anything. It carries a caption repeating which slip numbers are which size, because that information is only in the image otherwise, and a long alt description saying the same thing for anyone who can't see it.
 
-Three things, and that's the whole form:
+This doesn't change slip assignment. The customer picks a dock, and the system still picks the actual slip within it. It's only the choice that's new, not the picking.
 
-**1. Their boat** — a dropdown listing the boats they own, by name, with the length shown next to it:
+### Prices
 
-> Gullwing — 32.0 ft
-> Second Wind — 24.5 ft
+$10.50 a month for every foot of the boat, plus $10.50 a month flat if they want electric. Both live in the `Rate` table (added in `MoffatBayMarinaDB_V1-5-0_update.sql`) and neither is written into the page, so a price change doesn't mean editing JavaScript.
 
-This one control covers two of the three items the assignment asks for. Boat name and boat length aren't typed in, because they're facts about a boat the marina already has on file. Letting someone retype them would mean a customer could claim a 44-foot boat is 24 feet and book a slip it doesn't fit in, and it'd create a second, floating idea of "this boat" that never connects to the one already registered.
+Two things people get backwards, so they're stated at the top of the page rather than left to be worked out from the total. The rent goes by the **boat's** length, not the slip's size, so a 32 ft boat in a 40 ft slip pays $336.00 and not $420.00. And electric is flat, the same $10.50 whether the boat is 20 ft or 50 ft. That boat with electric comes to $346.50 a month.
 
-Each entry in the dropdown quietly carries the boat's length and the slip size it needs, so the page can price the booking and check availability the instant a boat is chosen.
+Worth knowing before it gets logged as a bug: **the 60 reservations already seeded don't follow this.** They were priced per slip size ($485 / $585 / $685) with nothing to do with boat length and no electric fee, because they predate the rule. Left alone on purpose, since every reservation records what it was actually sold at.
 
-**2. A check-in date** — a normal date picker. It won't accept a date in the past.
+### When a Size Is Full
 
-**3. Electric hookup** — an optional checkbox. Off by default. Ticking it adds $10.50 to the monthly total shown on the page.
+The page knows how many slips are free before anyone touches anything, so the moment they pick their boat it can say something. They don't fill the whole form in and find out when they press the button.
 
-Below those is a running summary of the monthly cost, and the Submit button.
+Full means every dock, not just one. If Dock A has no 40 ft slips left but B does, that isn't full, they just can't have A. It's only a wait list case when there's nowhere in the marina for that size. If they're told at submit rather than up front, the same holds: the dock they picked filling up while others still have room is a different thing from the size going, and only the second one gets the wait list question.
 
-There is **no** slip picker. The customer doesn't choose slip A-7 off a map — they say how big their boat is and one gets assigned. The Module 2 wireframe doesn't show a slip picker either, so this matches what was designed.
+If the size is full they're told, then asked whether they want the wait list for it, and either way no reservation is made. If they're already waiting for that size the Join button is replaced with a line saying so, since double-clicking shouldn't put anyone on a list twice.
 
----
+It's a courtesy though, not a promise. If the page sits open while someone else takes the last 40 ft slip, what's on screen is out of date, so the server has the final say on submit and can still come back and say the size went. Same message and same question either way, so from the customer's side it's one behaviour that turned up a bit later than usual.
 
-## If They Don't Have a Boat Yet
+**Boats over 50 ft are a separate case and get no wait list offer.** There's no size bigger to wait for, so offering it would be offering something that can never happen. They get the marina's phone number instead. Registration accepts a length up to 999.9 ft, so a 60 ft boat can genuinely exist on an account.
 
-Registering a boat is optional when someone creates their account, so a customer can easily arrive here owning nothing. They also might own several — that's allowed, and the wait list exists partly because someone can be waiting for a slip before they've even bought the boat.
+On "cancel the reservation", which the assignment asks for: the reservation just never gets made. There's nothing to cancel because nothing was booked, and a reservation can't exist without a slip attached, which is the whole problem in this situation. Making a fake one so we could immediately cancel it would put something untrue in the marina's records. "Cancelled" keeps its real meaning, a reservation that existed, held a slip, and got ended later.
 
-**Owning no boats:** the dropdown is empty and greyed out, Submit is switched off, and a "Register Your Boat" panel opens on its own with a line above it:
+### Back End Owns
 
-> You'll need a registered boat before you can reserve a slip.
+The page is built and running on stand-in data, so this list is what it's waiting for. Names are just what the stand-in uses, rename anything as long as I know before I swap it out.
 
-**Owning at least one:** the dropdown lists them, and a "Register another boat" button sits next to it to open the same panel whenever they want.
+- [x] **Authentication:** Signed in required. `sessionScope.customerId` from `LoginServlet`, never read off the form. Signed out, the page becomes the sign-in prompt.
+- [ ] **The customer's boats, on page load:** For each one an id, the name, the length, which slip size it needs (26/40/50, or 0 if it's over 50 ft), **what it costs a month in whole cents**, and whether it already has a reservation. See [Why cents](#why-cents) below. Empty list if they own none, which is what opens the boat panel, so an empty list and no answer have to look different.
+- [ ] **The docks, with how many slips of each size are free on each one:** An id, the letter, the description, and counts for all three sizes with a zero where there are none rather than the size being left out. Per dock is the only availability figure I need, the totals on the size cards get summed from it. This is the one thing that makes the instant warning possible.
+- [ ] **The two rates:** `SLIP_PER_FOOT_MONTHLY` and `ELECTRIC_MONTHLY` from the `Rate` table, in cents. Only for the wording of the note at the top, the boats arrive already priced. Careful, the per-foot one is **1050** for $10.50, not 105. There's a 105 in the arithmetic because boat lengths carry one decimal, so it's cents per tenth of a foot. I mixed those up and the page advertised slips at $1.05 a foot until I caught it.
+- [ ] **Saving a boat from the panel:** Whether it worked; if so the new boat, and if not a message plain enough to show as-is. See [How the boat list updates](#how-the-boat-list-updates) below, it matters more than it looks.
+- [ ] **A successful booking:** The confirmation number. Please send them somewhere fresh rather than leaving them on the submitted form, it's the one place where a refresh would genuinely book a second slip. See [Handing over to the summary page](#handing-over-to-the-summary-page) below.
+- [ ] **A failed booking:** These need telling apart, because they land in five different places on the page and are worded differently: the size filled up marina-wide, just the dock they picked filled up, something wrong with the boat, something wrong with the date, or anything else. If it's the dock, say which one, so I can grey out that one and leave the others alone rather than blanking the whole size. One generic failure can't be put in the right place. Also please send back what they typed, still filled in.
+- [ ] **Joining the wait list:** Takes `slipSizeFt` and **answers back**. Either it worked, or they were already on the list for that size. I need telling which, because the page can't know on its own and the second one has its own message. `WaitList` has nothing stopping duplicate rows, and two "Waiting" rows for one person would throw off the average wait time BR-20 wants, so please don't write a second one either.
+- [x] **Is electric its own figure or folded into the total?** Its own. The summary shows it on a separate line, only when the box is ticked.
+- [ ] **Servlet URL mappings:** For the booking, the boat save, and the wait list join.
 
-### The Boat Panel Saves Without Leaving The Page
+#### How the boat list updates
 
-This is the important part, and it's the one genuinely new piece of behavior on the site.
+Worth writing out, because "it appears in the dropdown" hides a few things that have to be true.
 
-When someone fills in the boat panel and saves it, **the page does not reload and nothing already typed is lost.** The boat is saved in the background. A moment later the new boat appears in the dropdown, already selected, the panel closes, and the price and availability update to match. The check-in date they'd already picked is still sitting there untouched.
+When someone saves a boat from the panel, I need back an id, the name, the length, the slip size it needs, and what it costs a month in cents. **The same shape as one entry in the page-load boat list**, because it's going into the same dropdown and the page can't have two ideas of what a boat looks like. If it comes back in a different shape I have to write a second lot of code to unpack it, and the two will drift.
 
-The panel itself reuses the boat fields from the Registration page (`includes/boatInfoCard.jsp`) rather than building a second set — same fields, same labels, same live checks as they type, so it behaves exactly the way it does on Registration. It picks up the customer's country from their account, so they don't get asked for it again.
+Given that, the page then, without reloading:
 
-If the boat can't be saved — a length that isn't a number, a registration number already on file — the panel stays open with the reason shown inside it, and again, nothing else on the page is disturbed.
+1. adds the boat to the dropdown and selects it
+2. re-does the slip size cards, so the size it needs lights up
+3. re-does the dock cards, so they show counts for that size
+4. re-does the price and the summary
+5. closes the panel and says "Boat saved" in the header popup
 
-> **Note for the team:** every form on this site currently saves by submitting the page and reloading. This panel is the first thing that doesn't, because "save it without leaving the page" can't be done any other way. Nothing else on the Reservation page needs that treatment.
+and touches nothing else. A start date typed in before the panel was opened is still sitting there afterwards. That's the whole reason this saves in the background instead of posting the page, so it's the thing to actually check when testing it.
 
----
+You can also send a refreshed `docks` array back with it and I'll use it. Registering a boat doesn't use up a slip so nothing really moves, but it's a free chance to refresh numbers that may have gone stale while the page sat open. Entirely optional, the page is fine without it.
 
-## Which Slip Size a Boat Needs
+#### Handing over to the summary page
 
-Three sizes exist. A boat goes in the smallest one it fits in:
+On success the page sends them to `reservationSummary.jsp?confirmation=MB-00061`, so the summary page looks the reservation up fresh from that number. A redirect and not a forward, because a forward would mean a refresh could book a second slip.
 
-| Boat length | Slip size it needs |
-| --- | --- |
-| Up to 26 feet | 26-foot |
-| Just over 26, up to 40 feet | 40-foot |
-| Just over 40, up to 50 feet | 50-foot |
-| Over 50 feet | *nothing here fits* |
+**This needs Carolina and Miguel to agree, it isn't mine to decide.** Their contract still has "how does this page receive the reservation data" open and calls it the most critical handshake, and the page above has effectively answered it by shipping. Happy to change what I send if they'd rather have it another way, I just need telling.
 
-**A boat is only ever offered its own size, never a bigger one.** If the 40-foot slips are full, a 32-foot boat is told the 40-foot slips are full and offered the 40-foot wait list. It doesn't quietly get dropped into a 50-foot slip.
+One thing to raise with them either way: confirmation numbers run in sequence (MB-00001 up), so anyone can put someone else's in the address bar. The summary page needs to check the reservation actually belongs to whoever is signed in before it shows anything. Their contract has that as an open question too.
 
-Two reasons. The assignment says to wait-list them "for that size slip," and a wait list entry records exactly one size — so if the page shuffled people into larger slips, nobody could say afterward what a given person was actually waiting for. It also keeps the 50-foot slips free for the boats that genuinely need them.
+#### Why cents
 
-**Boats over 50 feet are a separate case, not a wait list case.** Registration accepts a boat length up to 999.9 feet, so a 60-foot boat can exist on someone's account. There's no 60-foot category to wait for, and offering the wait list would be offering something that can never come through. Those customers get a message pointing them at the marina's phone number instead, and no wait list prompt at all.
+Send the price already worked out, and as a whole number of cents rather than dollars. Two reasons. If the page knows the rate it'll end up doing the arithmetic, and then two places know how the marina prices things and they drift apart the first time one gets fixed. And JavaScript is genuinely bad at decimal maths, 32.7 × 10.5 comes out as 343.35000000000002 and that lands on somebody's screen. Whole cents means I only ever add integers.
 
----
+#### Nothing can read the boats back yet
 
-## Telling Them Straight Away When Their Size Is Full
-
-**The customer finds out the moment they pick their boat — not after they've filled everything in and pressed Submit.**
-
-When the page loads it's already been told how many slips of each size are free. So as soon as a boat is selected, the page can react instantly, with nothing to wait for:
-
-| Situation | What the customer sees |
-| --- | --- |
-| Slips available | A quiet line: *"3 of our 50 ft slips are open."* The form works normally. |
-| None available | The full notice and the wait list question. Submit is switched off — there's nothing to submit. |
-| Boat over 50 feet | The over-50 message. Submit switched off, and no wait list offered. |
-
-Same thing happens if they register a new boat mid-visit — the numbers refresh as part of saving it, so a brand new boat gets flagged just as fast.
-
-**This is a courtesy, not a guarantee, and the page shouldn't pretend otherwise.** If someone leaves the page open while another customer books the last 40-foot slip, the count on screen is stale. The server has the final say when Submit is actually pressed, and it can still come back and say the size filled up. The page handles that by showing the exact same notice and the same wait list question it would have shown up front — so from the customer's point of view it's one consistent behavior, just arriving a few seconds later than usual.
-
----
-
-## When The Size Is Full
-
-1. **Tell them.** *"All of our 40 ft slips are currently reserved."*
-2. **Ask.** *"Would you like to be added to the wait list for a 40 ft slip? We'll contact you when one opens up."* — with a "Join the wait list" button and a "No thanks" button.
-3. **If they join,** they get confirmation and land on the wait list page.
-4. **If they don't,** the question goes away and they stay on the page. Nothing is recorded.
-5. **Either way, they do not have a reservation.**
-
-If they're already waiting for that size, the button is replaced with *"You're already on the wait list for a 40 ft slip."* rather than letting them join twice — double-clicking a button shouldn't put someone on a list twice over.
-
-### About "Cancel the Reservation"
-
-The assignment says to cancel the reservation in either case. Worth being clear about what that means here, so it doesn't read like a missed requirement in the write-up:
-
-**The reservation is never created in the first place.** There's nothing to cancel, because nothing was ever booked. A reservation record can't exist without a slip attached to it, and in this situation there is no slip — that's the entire problem. Creating a fake one just to immediately mark it cancelled would put something untrue in the marina's records.
-
-So the attempt ends with either a wait list entry or nothing at all, and "cancelled" keeps its real meaning: a reservation that genuinely existed, held a slip, and was ended later on.
-
----
-
-## Front End Variables
-
-What the page sends when the reservation form is submitted:
-
-| Field Name | Input Type | Required? | Format / Notes |
-| --- | --- | --- | --- |
-| `boatId` | select | Yes | Identifies which of the customer's boats this is for. The name and length shown in the dropdown come along with it, so neither is sent separately. Greyed out with a placeholder when they own no boats. |
-| `checkInDate` | date | Yes | A standard date picker, so it always sends `yyyy-MM-dd`. Can't be earlier than today. |
-| `wantsElectric` | checkbox | No | Off by default. Present only when ticked, the way checkboxes work. Adds $10.50 a month. |
-
-**Nothing else is sent.** No boat name, no boat length, no slip number, no customer ID, no price. Name and length belong to the boat record. Nobody picks a slip. The customer is already known from being signed in. And the price is worked out from fixed rates, so sending it from the page would just be inviting someone to send a different one.
-
-**The boat panel** (the fields from `includes/boatInfoCard.jsp`) saves on its own, separately from the reservation form — it never rides along with a booking. Its fields keep the exact names Registration already uses, so nothing has to be renamed or specially handled:
-
-| Field Name | Input Type | Required? | Format / Notes |
-| --- | --- | --- | --- |
-| `boatName` | text | Yes | Up to 50 characters |
-| `boatLength` | number | Yes | Up to 999.9 feet, one decimal place |
-| `hin` | text | No | Up to 12 characters |
-| `regNumber` | text | No | Up to 20 characters; the expected format follows the customer's country, same as on Registration |
-| `boatType` | text | No | Up to 30 characters |
-| `boatBeam` | number | No | Up to 999.9 feet |
-| `boatYear` | text | No | Four digits, 1800 through this year |
-
-**The wait list opt-in** sends one thing:
-
-| Field Name | Input Type | Required? | Format / Notes |
-| --- | --- | --- | --- |
-| `slipSizeFt` | hidden | Yes | `26`, `40`, or `50` — which size they're waiting for |
-
----
-
-## What I Need From The Back End
-
-Not how any of it works — just what has to reach the page, and what the page will hand over.
-
-**On page load, so the page can render at all:**
-
-1. **The customer's current boats**, each with its name, its length, and something to identify it by. Name and length are both shown in the dropdown and the length drives the price, so a list without lengths isn't usable. If they own none, an empty list is fine and expected — that's what triggers the "register a boat first" panel. Please don't send back nothing at all in that case; an empty list and "no answer" need to look different to the page.
-
-2. **How many slips are currently free in each of the three sizes.** All three sizes present every time, with a zero where none are free rather than the size being left out. This is the single thing that makes the instant flagging possible — without it the page can't tell anyone their size is full until after they've pressed Submit, which is the behavior we're specifically trying to avoid.
-
-**When a boat is saved from the panel,** the page needs back: whether it worked; if it did, the new boat's name, length, and identifier so it can be dropped straight into the dropdown and selected; and a refreshed count of free slips for the size that boat needs, since it's already a round trip and that's the one number that may have gone stale. If it didn't work, a message plain enough to show the customer as-is.
-
-**When a booking succeeds,** the page needs the confirmation number, so the customer can be sent to the summary page and see it.
-
-**When a booking fails,** the page needs to know *which* of these it was, because they're displayed in completely different places on screen and worded differently:
-
-- The size filled up in the meantime → the availability panel, with the wait list question attached
-- Something wrong with the boat they picked → underneath the dropdown
-- Something wrong with the date → underneath the date field
-- Something else went wrong → a banner across the top of the form
-
-A single generic failure message can't be placed correctly, so these do need to be distinguishable. The exact names for these are Sara's to pick — I just need them settled before I build the display, and I'll match whatever she chooses.
-
-**A couple of small requests:**
-
-- **Please send the customer back to the form with what they typed still in it** on a failure. Losing a check-in date because a slip filled up is a miserable experience, especially when the next thing we do is ask them to join a wait list.
-- **Please send them somewhere fresh after a successful booking**, rather than leaving them sitting on the submitted form. It's the one place on this site where an accidental refresh would genuinely double-book and take a second slip out of inventory.
-- **Does electric come back as its own figure, or already folded into the monthly total?** This decides whether the summary page can show "Slip $336.00 / Electric $10.50" as two lines or only a single total. I'd prefer two, but I can build either — I just need to know which before I lay out the summary.
-
----
-
-## Back End Parameters
-
-*Left for Sara — see the note at the top of this contract.*
-
-## Database Returns
-
-*Left for Sara — see the note at the top of this contract.*
-
----
-
-## Validation Rules
-
-**Client-side (a courtesy while they're filling it in — never the real check):**
-
-- A boat has to be chosen before Submit switches on.
-- A check-in date is required, and the picker won't offer anything before today.
-- Availability is checked against the on-screen counts every time the boat selection changes, and Submit switches off when the size is full.
-- Inside the boat panel, name and length are required, and HIN and registration number are checked for the right shape when filled in — the same live checks the Registration page already does, since they're the same fields.
-
-**Server-side (the real check):** Sara's to define. What matters from my side is that the page assumes **everything above gets checked again** and doesn't treat any of it as settled. Anyone can bypass a browser entirely, so the on-screen availability count, the disabled Submit button, and the date restriction are all conveniences rather than protections. The page is built to handle being told "no" after the fact — see [Telling Them Straight Away](#telling-them-straight-away-when-their-size-is-full).
-
----
-
-## Error Handling
-
-Everything a customer might see, and where on the page it shows up:
-
-| Condition | Message Shown | Where Displayed |
-| --- | --- | --- |
-| Not signed in | *"Please sign in to reserve a slip."* | The sign-in popup, opened for them, returning them here afterward |
-| They own no boats | *"You'll need a registered boat before you can reserve a slip."* | Above the boat panel, which opens on its own |
-| No boat chosen | *"Select a boat for this reservation."* | Under the dropdown |
-| The chosen boat isn't theirs | *"Select a boat for this reservation."* | Under the dropdown — **deliberately identical to the message above**, so someone poking at boat numbers can't tell a real one from a made-up one |
-| Date missing or in the past | *"Choose a check-in date of today or later."* | Under the date field |
-| **That size is full** — whether caught on selection or at Submit | *"All of our 40 ft slips are currently reserved."* plus the wait list question | The availability panel above Submit; Submit switched off |
-| Boat over 50 feet | *"We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142."* | The availability panel; Submit switched off, **no wait list offered** |
-| That boat already has a reservation | *"Gullwing already has an active reservation (MB-00042)."* | Under the dropdown |
-| Already on the wait list for that size | *"You're already on the wait list for a 40 ft slip."* | The wait list panel, replacing the Join button |
-| Wait list joined | *"You're on the wait list for a 40 ft slip. We'll contact you when one opens up."* | The wait list page, after they're sent there |
-| Boat panel details wrong | Whatever was wrong with it | Inside the panel, which stays open |
-| Boat already registered to someone | *"That HIN or boat registration is already in use."* | Inside the panel |
-| Booking couldn't be saved | *"Your reservation could not be completed. Please try again."* | A banner across the top of the form |
-| Boat couldn't be saved | *"Your boat could not be saved. Please try again."* | Inside the panel |
-
----
-
-## Login State Differences
-
-| Item | Logged In | Logged Out |
-| --- | --- | --- |
-| Book a slip | Opens the reservation page directly | Asks the user to sign in first |
-| Boat dropdown | Lists the boats they currently own | Not shown |
-| Register Your Boat panel | Available | Not shown |
-| Availability counts | Shown on the page | Not shown — the page is just the sign-in prompt |
-| Pricing | Shown, and updates as they choose | Not shown |
-
-The page genuinely can't work signed out — there's no way to know whose boats to list or whose name to put on a reservation. Miguel already pointed the landing page's "Reserve a Slip" button straight here for signed-in visitors, so most people arrive already sorted.
-
----
-
-## Still To Sort Out With The Team
-
-Things that aren't mine to decide alone, listed so they don't get lost:
-
-1. **The existing reservations are priced the old way.** See [Worth Flagging](#worth-flagging-the-existing-reservations-dont-follow-this) above. Leave them as history, or reprice them?
-
-2. **The check-in date doesn't affect what's available.** A reservation is a month-to-month lease with a start date and no end date, so a slip is either being leased right now or it isn't — there's no way to ask "will this be free in December?" So the date is collected and recorded, but it doesn't widen or narrow what the customer can book. Someone can pick a check-in date three months out and the slip is treated as taken from now. That's consistent with a lease that bills from the start date, but it isn't date-range availability, and if anyone on the team is expecting the latter, that's a schema conversation and not something this page can solve. My recommendation is to ship it this way and write the limitation down.
-
-3. **Can one boat hold two reservations at once?** I've assumed no — one hull, one slip — and written the error message for it above. But nothing in the business rules covers it and nothing stops it happening, so it's an assumption, not a fact. If the marina would allow a boat to hold two slips, that check comes out.
-
-4. **Boats that already have a reservation still appear in the dropdown**, marked *(reserved)*, rather than being hidden. Hiding them would make the page look broken to someone whose only boat is already docked — they'd see an empty dropdown and no explanation. Picking one gives the message above.
-
----
+Worth saying plainly because it's easy to assume it's already there. The boats are in the database, Registration writes them at signup, but `BoatDAO` only has `insertBoat` and `insertOwnership` and `CustomerDAO` has nothing about boats. That query is new work, and it's the biggest thing the page is waiting on.
 
 ## Scaffold Include
-
-This page includes the shared header/footer and identifies itself for nav highlighting:
 
 ```jsp
 <jsp:include page="/includes/header.jsp">
@@ -312,32 +143,65 @@ This page includes the shared header/footer and identifies itself for nav highli
 <jsp:include page="/includes/footer.jsp" />
 ```
 
-> The `activePage` value `"reservation"` must match what the header checks. See the scaffold contract for the full reference table.
+> The `activePage` value `"reservation"` must match what the header checks.
 
-`reservation.jsp` is currently just the shared "Coming Soon" placeholder. That comes out when the real form goes in.
+## Front End Variables
 
----
+What the page sends when someone books.
 
-## Testing Notes (Carolina)
-
-**The wait list can't be reached on a freshly built database.** Counting what's actually seeded, every size still has room:
-
-| Size | Total | Already reserved | **Free** |
+| Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| 26 ft | 30 | 22 | 8 |
-| 40 ft | 24 | 23 | **1** |
-| 50 ft | 18 | 15 | 3 |
+| `boatId` | select | Yes | Which of their boats it's for. Name and length ride along with it, so neither is sent separately. Greyed out when they own none. |
+| `dockId` | radio | Yes | Which dock they want. Only the docks with a free slip of their boat's size can be picked. |
+| `checkInDate` | date | Yes | Always `yyyy-MM-dd`. Won't take anything before today. Maps to `Reservation.startDate`. |
+| `wantsElectric` | checkbox | No | Off by default, and only present when ticked, the way checkboxes work. |
 
-(A comment in the setup script claims the 40-foot slips are completely full and only 2 of the 50-foot ones are open. They aren't — the data drifted from the comment at some point. The numbers above are what's really in there.)
+That's all of it. No boat name, no boat length, no slip number, no customer ID, no price. Name and length belong to the boat record, nobody picks a slip, only a dock, we know who they are because they're signed in, and sending a price from the page would just invite somebody to send a different one.
 
-So the cheapest way to reach the headline requirement is to **book that last 40-foot slip** with a boat between 26 and 40 feet, then try to book another one. The 26-foot and 50-foot sizes would need 8 and 3 bookings to empty out.
+There's no slip size field either. An earlier version of the cards had radio buttons and it would have been, but they're display-only now and the boat decides the size.
 
-Also worth covering:
+**The Register a Boat panel** posts on its own and never rides along with a booking. Same fields and same names as the Registration page's boat card, so nothing needs renaming, see that contract's Front End Variables for the full list.
 
-- A customer with no boats at all — the panel opening by itself, the greyed-out dropdown.
-- Adding a boat in the panel and confirming it shows up in the dropdown **without the page reloading**, already selected, with a check-in date typed in beforehand still sitting there.
-- The price updating as boats are switched and the electric box is ticked — and confirming it's based on the **boat's** length, not the slip's size. A 32-foot boat in a 40-foot slip should read $336.00, not $420.00.
-- A boat over 50 feet — confirming the wait list is *not* offered.
-- Pressing "Join the wait list" twice — confirming they only end up on it once.
-- Two browsers booking that last 40-foot slip at the same moment — the second should get the full notice and the wait list question, not a second reservation.
-- Someone else's confirmation number typed into the summary page address — it shouldn't show them anything.
+**Joining the wait list** sends one thing, `slipSizeFt`, which is `26`, `40` or `50`. It needs an answer back rather than just doing it, see the wait list item in [Back End Owns](#back-end-owns).
+
+## Back End Parameters
+
+*Sara's to fill in, see [Back End Owns](#back-end-owns) above for what the page needs.*
+
+## Database Returns
+
+*Sara's to fill in.*
+
+## Validation Rules
+
+- **Client-side (UX only, not trusted):** A boat has to be picked, and then a dock, before the button turns on. The date is required and the picker won't offer anything earlier than today. Availability is checked against the on-screen numbers every time the boat changes, and the button switches off when the size is full or nothing is picked yet. In the boat panel, name and length are required, and HIN, registration number and boat year get format-checked if they're filled in. Those are the same checks Registration does, and literally the same code: `registration.js` can't be loaded on this page (it wires up elements that only exist over there and would throw), but `formValidation.js` is already here via the header, so the rules are shared rather than copied.
+- **Server-side (source of truth):** Sara's to define. What matters from my side is that I've assumed **all of the above gets checked again.** Anyone can go round a browser, so the numbers on screen, the greyed-out button and the date limit are conveniences and none of them are protection. The page is built to be told "no" after the fact and handle it properly.
+
+## Error Handling
+
+| Condition | Message Shown | Where Displayed |
+| --- | --- | --- |
+| Not signed in | "Please sign in to reserve a slip." | The sign-in popup, opened for them, returning them here |
+| They own no boats | "You'll need a registered boat before you can reserve a slip." | Above the boat panel, which opens on its own |
+| No boat picked | "Select a boat for this reservation." | Under the dropdown |
+| The boat isn't theirs | "Select a boat for this reservation." | Under the dropdown. Same message on purpose, so a probed boat id can't be told from an empty one |
+| No dock picked | "Choose which dock you'd like to be on." | Under the dock cards |
+| Date missing or in the past | "Choose a check-in date of today or later." | Under the date field |
+| Size is full, however it's caught | "All of our 40 ft slips are currently reserved." plus the wait list question | The availability panel under the cards, button off |
+| Boat over 50 ft | "We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142." | The availability panel, button off, no wait list offered |
+| Boat already has a reservation | "Gullwing already has an active reservation." | Under the dropdown |
+| Already on the wait list | "You're already on the wait list for a 40 ft slip." | The wait list panel, replacing the Join button |
+| Couldn't be added to the wait list | "You could not be added to the wait list. Please try again." | The wait list panel |
+| Wait list joined | "You're on the wait list for a 40 ft slip." | The wait list page, after they're sent there |
+| Boat panel details wrong | Whatever was wrong with it | Inside the panel, which stays open |
+| Boat already registered | "That HIN or boat registration is already in use." | Inside the panel |
+| Booking couldn't be saved | "Your reservation could not be completed. Please try again." | Banner at the top of the form |
+| Boat couldn't be saved | "Your boat could not be saved. Please try again." | Inside the panel |
+
+Confirmations go through the shared status popup in the header. Errors don't, and shouldn't. An error has to stay put until it's dealt with and sit next to whatever's wrong, and a message that removes itself after five seconds is the wrong shape for that.
+
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| The Page | Comes up normally, pulling a the list of boats the customer owns | pulls the login popup, blocking the page |

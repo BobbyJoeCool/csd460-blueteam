@@ -19,3 +19,6 @@
 
 <link rel="stylesheet"
       href="${pageContext.request.contextPath}/css/loginModal.css">
+
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/css/statusPopup.css">
