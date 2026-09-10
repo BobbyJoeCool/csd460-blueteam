@@ -36,6 +36,28 @@
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
+<%-- The hero is a photo band, so it sits outside <main> and runs the full
+     width of the window - registration.jsp puts its intro band in the same
+     place, and for the same reason. Only the lede changes between signed in
+     and signed out, so that's the only part the branch covers. --%>
+<header class="reservation-hero">
+    <div class="reservation-hero__content">
+        <p class="reservation-eyebrow">Month-to-Month Marina Lease</p>
+        <h1>Reserve Your Slip</h1>
+        <p class="reservation-lede">
+            <c:choose>
+                <c:when test="${empty sessionScope.customerId}">
+                    Please sign in to reserve a slip.
+                </c:when>
+                <c:otherwise>
+                    Choose your vessel and dock, add power if you need it, and pick your start date.
+                </c:otherwise>
+            </c:choose>
+        </p>
+    </div>
+    <p class="reservation-hero__credit">Hero image created with Google Gemini</p>
+</header>
+
 <main>
 
 <c:choose>
@@ -44,11 +66,6 @@
          the sign-in prompt. The login modal works out its own redirectTo
          from the current path, so they land back here. --%>
     <c:when test="${empty sessionScope.customerId}">
-        <header class="reservation-hero">
-            <p class="reservation-eyebrow">Month-to-Month Marina Lease</p>
-            <h1>Reserve Your Slip</h1>
-            <p class="reservation-lede">Please sign in to reserve a slip.</p>
-        </header>
         <div class="reservation-signin">
             <button type="button" class="btn-primary"
                     onclick="MoffatBay.loginModal.open()">Sign in</button>
@@ -65,14 +82,6 @@
     </c:when>
 
     <c:otherwise>
-
-        <header class="reservation-hero">
-            <p class="reservation-eyebrow">Month-to-Month Marina Lease</p>
-            <h1>Reserve Your Slip</h1>
-            <p class="reservation-lede">
-                Choose your vessel and dock, add power if you need it, and pick your start date.
-            </p>
-        </header>
 
         <div class="reservation-wrap">
 
@@ -366,9 +375,21 @@
                 <div class="form-banner" id="boatPanelError" role="alert" hidden></div>
 
                 <form id="boatPanelForm" novalidate>
-                    <jsp:include page="/includes/boatInfoCard.jsp">
-                        <jsp:param name="country" value="${sessionScope.customer.country}" />
-                    </jsp:include>
+                    <%-- The card's wrapper and heading belong to the page
+                         including it, not to the shared fields. Registration
+                         adds an "Optional" note here as well; this panel
+                         doesn't, because a boat isn't optional to the person
+                         who opened it - they can't reserve a slip without
+                         one. --%>
+                    <div class="form-column">
+
+                        <h2 class="column-heading">Boat Information</h2>
+
+                        <jsp:include page="/includes/boatInfoCard.jsp">
+                            <jsp:param name="country" value="${sessionScope.customer.country}" />
+                        </jsp:include>
+
+                    </div>
 
                     <div class="submit-row">
                         <button type="submit" class="btn-primary" id="saveBoat">Save boat</button>

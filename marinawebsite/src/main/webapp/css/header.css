@@ -7,6 +7,11 @@
     background: var(--color-bg-header);
     color: var(--color-text-inverse);
     padding: 0.9rem 1.5rem;
+    /* The header's own contents would settle at this height anyway; pinning
+       it means --header-height in site.css is the truth rather than a guess,
+       for the sticky elements on other pages that have to clear it. It's a
+       minimum, so the wrapped mobile header below can still grow. */
+    min-height: var(--header-height);
     /* sticky header */
     position: sticky;
     top: 0;
