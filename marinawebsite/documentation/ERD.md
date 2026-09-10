@@ -4,8 +4,8 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.5.0
-- Date: 2026-09-07
+- Version: 1.6.0
+- Date: 2026-09-10
 
 ## Overview
 
@@ -200,6 +200,7 @@ erDiagram
         INT slipID FK "References the reserved marina slip"
         DATE startDate "Date the month-to-month lease begins"
         DECIMAL monthlyRate "Monthly rental rate at the time of reservation"
+        BOOLEAN electricalHookup "TRUE if the reservation includes the optional electric hookup"
         VARCHAR reservationStatus "Current status of the reservation"
     }
 
@@ -270,6 +271,8 @@ erDiagram
 - **`Rate` (Table 12) is a standalone lookup, not a column on `SlipSize` or `Slip`.** Slip rent is charged per foot of the **boat's** length ($10.50/ft/month), not per slip size, so the price has nothing to hang off `SlipSize` - a 32 ft boat and a 39 ft boat in identical 40 ft slips pay different rents. Electric is a second row in the same table, a flat $10.50/month regardless of boat size. Added in `MoffatBayMarinaDB_V1-5-0_update.sql`. Keeping these as data rather than constants in application code means a price change is two `UPDATE`s and no redeploy.
 - **`Rate` deliberately has no effective-date range or rate history.** Each `Reservation` already stores its own `monthlyRate` at the moment of booking, so past reservations keep the price they were sold at without any help from this table. Dated rates would solve a problem the snapshot already solves. If the marina ever needs to answer "what did we charge in March", that question is answerable from `Reservation` itself.
 - **Update, V1-5-0: `Boat.regNumber` data repair.** V1-3-0 folded the state prefix into the registration number with `CONCAT(regState, regNumber)`, but every seeded `regNumber` already carried its prefix (`WN1204JT`), so the concat doubled it to `WAWN1204JT`. All 60 seeded boats matched `RegisterServlet.REG_NUMBER_PATTERN` before that migration and none matched it after. V1-5-0 strips the duplicated prefix, guarded on four leading letters so boats registered through the site after V1-3-0 are untouched. The consolidated `V1-4-0` build script seeds the correct values outright.
+- **Update, V1-6-0: `Reservation.electricalHookup`.** The Reservation page has asked whether the customer wants an electric hookup since it was built, and there was nowhere to record the answer. `monthlyRate` is a blended total, so it can't stand in for one: 26 ft of boat with electric and 27 ft without both come to $283.50. The hookup is also a physical thing plugged in at the slip, not only a line on an invoice, so the marina needs to know who has one. `BOOLEAN NOT NULL DEFAULT FALSE`; the 60 seeded reservations all take the default, since their `monthlyRate` values are flat per-slip-size figures that predate `Rate` and carry no evidence either way.
+- **`Reservation.electricalHookup` is a flag, not a second money column.** The amount is `Rate.ELECTRIC_MONTHLY` and the total the customer was quoted is `Reservation.monthlyRate`; the flag only says whether that fee is part of that total. The accepted tradeoff: if the electric rate ever changes, an old reservation still shows *that* it included electric but not *how much* of its total was electric - that has to be inferred from `monthlyRate` and the boat's length. Storing a per-reservation electric amount would remove the inference, at the cost of a second snapshot column that would agree with `Rate` in every row until the day a price changes. Deliberately not done at this scale; noted here so a later term knows it was a decision rather than an oversight.
 - **`passwordHash` (both `Employee` and `Customer`) is a SHA-256 digest**, computed with MySQL's `SHA2(<plaintext>, 256)` to match how the seed data in the database creation script is hashed. This is the project's actual password hashing scheme (unsalted) - not a placeholder to be swapped out later, since no further "real auth" phase follows this submission.
   - The password hashing done in SQL lets us load a password hash into the table using SHA-256. `SHA2('Password1', 256)` enters into the database as `19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd`.
   - This means our program MUST use SHA-256 hashing (unsalted) in order to authenticate correctly.

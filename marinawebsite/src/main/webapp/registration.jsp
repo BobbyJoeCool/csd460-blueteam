@@ -43,8 +43,23 @@
         <!-- Left column: name & mailing info -->
         <jsp:include page="/includes/personalInfoCard.jsp" />
 
-        <!-- Middle column: boat info, entirely optional -->
-        <jsp:include page="/includes/boatInfoCard.jsp" />
+        <!-- Middle column: boat info, entirely optional. The wrapper and
+             the "Optional" note live here rather than in the shared card:
+             a boat is optional on this page, but required over on the
+             Reservation page's Register a Boat panel, which includes the
+             same fields. -->
+        <div class="form-column" id="boatInfoColumn">
+
+            <h2 class="column-heading">Boat Information</h2>
+
+            <div class="column-intro">
+                <p class="optional-mark">Optional</p>
+                <p class="column-note">(you may add a boat later, or do it now)</p>
+            </div>
+
+            <jsp:include page="/includes/boatInfoCard.jsp" />
+
+        </div>
 
         <!-- Right column: email & password -->
         <div class="form-column">

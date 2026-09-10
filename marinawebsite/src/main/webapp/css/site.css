@@ -101,6 +101,25 @@
 	/* Status colors */
 	--color-error: #b3261e;
 	--color-success: var(--color-ocean-blue);
+
+	/* --------------------------------------------------------------------
+     3. Layout metrics — the non-color values that more than one component
+     has to agree on. Same rule as the colors above: reference the variable,
+     don't retype the number.
+     -------------------------------------------------------------------- */
+
+	/* Height of the sticky site header. Anything else that sticks to the top
+     of the window has to come to rest below it rather than under it (the
+     Reservation Summary card is the one that does today), and the header
+     paints over anything that doesn't. header.css pins .site-header to this
+     instead of letting its contents decide the height, so the two sides
+     can't drift apart.
+     72px, a little above what the header's contents come to on their own
+     (the 36px logo, its baseline gap, and 0.9rem of padding top and bottom,
+     ~70px in Chrome). Being the taller of the two is the point: the header
+     is then exactly this tall whatever the browser does with the font, so
+     the number here is the header's height rather than a guess at it. */
+	--header-height: 4.5rem;
 }
 
 /* ==========================================================================

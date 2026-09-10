@@ -17,11 +17,37 @@
 
 /* ------------------------------------------------------------------ hero */
 
+/* A photo band, the same treatment as .intro-band on Registration and the
+   landing page's .hero-section, but shorter than either: people arrive here
+   wanting to fill the form in, so the picture shouldn't be a scroll to get
+   past. Sits outside <main> so it can run the full width of the window -
+   registration.jsp does the same with its intro band.
+
+   The gradient is --color-deep-marine at 48-62%, written as rgba because a
+   custom property can't carry an alpha channel on its own. It's heavier than
+   the landing page's because this photo is a sunset: the horizon is a bright
+   orange band straight across the middle, exactly where the heading sits.
+   Heavier again and the sunset stops being worth having behind the text. */
 .reservation-hero {
-    max-width: 46rem;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 1.5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 17rem;
+    padding: 3.5rem 1.5rem;
+    background:
+        linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
+        url("../images/Slip_Closeup.png");
+    background-color: var(--color-bg-header);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--color-text-inverse);
     text-align: center;
+}
+
+.reservation-hero__content {
+    max-width: 46rem;
 }
 
 .reservation-eyebrow {
@@ -30,7 +56,10 @@
     font-weight: bold;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-ocean-blue);
+    /* Was ocean blue, back when this sat on the sand page background. */
+    color: var(--color-text-inverse);
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .reservation-hero h1 {
@@ -41,14 +70,31 @@
     font-weight: normal;
     font-size: clamp(2rem, 5vw, 3rem);
     line-height: 1.15;
-    color: var(--color-text-heading);
+    color: var(--color-text-inverse);
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 12px rgba(0, 0, 0, 0.6);
 }
 
 .reservation-lede {
     margin: 0;
     font-size: 1.05rem;
-    color: var(--color-text-muted);
-    opacity: 0.8;
+    color: var(--color-text-inverse);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Credit for the hero photo. Small and out of the way in the corner, but on
+   the page rather than buried in a comment. */
+.reservation-hero__credit {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.6rem;
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-inverse);
+    opacity: 0.75;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .reservation-wrap {
@@ -425,8 +471,13 @@
 /* -------------------------------------------------------- summary card */
 
 .summary-card {
+    /* The site header is sticky too and sits at top: 0 with a higher
+       z-index, so stopping at 1rem parked this underneath it. Come to rest
+       below the header instead: its height plus the same 1rem gap.
+       --header-height is set in site.css and pins the header itself, so the
+       two can't drift. */
     position: sticky;
-    top: 1rem;
+    top: calc(var(--header-height) + 1rem);
     border-radius: 10px;
     overflow: hidden;
     background: var(--color-bg-surface);
@@ -556,7 +607,14 @@
 .boat-panel__box {
     position: relative;
     width: min(38rem, 100%);
-    background: var(--color-bg-surface);
+    /* The card inside is --color-bg-card, a light ocean tint, which is all
+       but invisible against white - the two read as one flat box. Standing
+       the panel on the page background instead gives the card the same
+       ground it has on the Registration page, where the tint and the border
+       are enough to read as a card. Inputs keep their own white background
+       either way. */
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 1.5rem;
 }
@@ -596,10 +654,10 @@
 }
 
 /* The boat card is a form column on Registration; in this panel it is the
-   only thing there, so let it fill the width. */
+   only thing there, so let it fill the width. Only the width - the column's
+   own 1.5rem of padding stays, or the fields sit against the card's edge. */
 .boat-panel .form-column {
     width: 100%;
-    padding: 0;
 }
 
 /* .form-banner comes from registration.css; this page toggles it, so it
