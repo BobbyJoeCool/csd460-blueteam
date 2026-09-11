@@ -6,9 +6,7 @@
  * The Reservation page: pricing, the availability flag, the register-a-boat
  * panel, and the wait-list prompt.
  *
- * RUNNING ON A FAKE BACK END. Nothing here talks to a real server yet. See
- * USE_FAKE_BACKEND below, and the block of fake* functions at the bottom.
- * Every point that will depend on Sara's side is marked "BACKEND:".
+ * Reservation data and form actions are supplied by the Java back end.
  *
  * This page holds NO rate. Each boat's monthly figure and the electric fee
  * are worked out server-side from the Rate table and handed over ready-made,
@@ -20,9 +18,7 @@ var MoffatBay = window.MoffatBay || {};
 MoffatBay.reservation = (function () {
     "use strict";
 
-    /* STUB - flip to false when the real endpoints exist, then delete the
-       fake* functions at the bottom of this file and this flag with them. */
-    var USE_FAKE_BACKEND = true;
+ 
 
     var form = document.getElementById("reservationForm");
     if (!form) { return {}; }          // signed out - the page is a sign-in prompt
@@ -87,6 +83,18 @@ MoffatBay.reservation = (function () {
         try { return JSON.parse(el.textContent); }
         catch (e) { return fallback; }
     }
+    /** POSTs form data and returns the JSON object from the servlet. */
+    function postForm(url, body) {
+        return fetch(url, {
+            method: "POST",
+            body: body,
+            headers: { "Accept": "application/json" }
+        }).then(function (response) {
+            return response.json();
+        });
+    }
+
+
 
     function money(cents) {
         return "$" + (cents / 100).toFixed(2);
@@ -344,7 +352,6 @@ MoffatBay.reservation = (function () {
             availPanel.hidden = false;
             availPanel.classList.add("is-full");
             setText(availMessage, "All of our " + size + " ft slips are currently reserved.");
-            showWaitList(size);
             setSubmitEnabled(false);
             return;
         }
@@ -474,6 +481,8 @@ MoffatBay.reservation = (function () {
         return "";
     }
 
+    
+
     function handleBoatSave(event) {
         event.preventDefault();
         setBanner(boatPanelError, "");
@@ -489,15 +498,15 @@ MoffatBay.reservation = (function () {
 
         if (saveBoatBtn) { saveBoatBtn.disabled = true; }
 
-        // BACKEND: replace with a real POST to the boat-save endpoint.
-        // Expects back { ok, boatId, boatName, boatLength, slipSizeFt,
-        // monthlyCents } on success - the same shape as one entry in the
-        // page-load boat list - optionally with a refreshed "docks" array
-        // alongside it. Or { ok: false, error } with a message plain enough
-        // to show as-is.
-        var request = USE_FAKE_BACKEND
-            ? fakeSaveBoat(name.trim(), length.trim())
-            : Promise.reject(new Error("Boat save endpoint not wired up yet."));
+        // Sends the completed boat registration form to the reservation boat servlet.
+        // The servlet saves the boat and returns the new boat data as JSON so it can
+        // be added to the boat dropdown without reloading the page.
+       
+        var request = postForm(
+            boatPanelForm.getAttribute("action"),
+            new FormData(boatPanelForm)
+        );
+
 
         request.then(function (result) {
             if (saveBoatBtn) { saveBoatBtn.disabled = false; }
@@ -521,6 +530,8 @@ MoffatBay.reservation = (function () {
 
     // ---------------------------------------------------------- wait list
 
+    
+
     function handleJoinWaitList() {
         var size = waitPrompt ? waitPrompt.dataset.size : null;
         if (!size) { return; }
@@ -529,14 +540,16 @@ MoffatBay.reservation = (function () {
         var joinBtn = document.getElementById("joinWaitList");
         if (joinBtn) { joinBtn.disabled = true; }
 
-        // BACKEND: replace with a real POST to the wait-list endpoint,
-        // sending slipSizeFt. Expects back { ok } on success, or
-        // { ok: false, alreadyWaiting: true } if they are already on the
-        // list for that size, so the page can say so instead of silently
-        // putting them on it twice.
-        var request = USE_FAKE_BACKEND
-            ? fakeJoinWaitList(size)
-            : Promise.reject(new Error("Wait list endpoint not wired up yet."));
+        // Sends the required slip size to the wait-list servlet.
+        // The servlet determines whether the customer can be added and returns
+        // a JSON response indicating success or whether they are already waiting.
+        var waitData = new URLSearchParams();
+        waitData.set("slipSizeFt", size);
+        var waitUrl = form.getAttribute("action")
+            .replace(/\/reservation$/, "/reservation/waitlist");
+        var request = postForm(waitUrl, waitData);
+
+
 
         request.then(function (result) {
             if (joinBtn) { joinBtn.disabled = false; }
@@ -567,6 +580,7 @@ MoffatBay.reservation = (function () {
     }
 
     // ------------------------------------------------------------- submit
+  
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -598,13 +612,13 @@ MoffatBay.reservation = (function () {
 
         if (submitBtn) { submitBtn.disabled = true; }
 
-        // BACKEND: this is where the form actually posts. Delete the fake
-        // branch and let the form submit normally, or keep a fetch here if
-        // the endpoint returns JSON. Expects a confirmation number on
-        // success, or the "that size filled up" answer.
-        var request = USE_FAKE_BACKEND
-            ? fakeSubmitReservation(opt)
-            : Promise.reject(new Error("Reservation endpoint not wired up yet."));
+        // Sends the reservation form to the reservation servlet for final validation
+        // and database insertion. The servlet returns JSON containing either an error
+        // condition or the confirmation number for a successfully created reservation.
+        var request = postForm(
+            form.getAttribute("action"),
+            new FormData(form)
+        );
 
         request.then(function (result) {
             if (submitBtn) { submitBtn.disabled = false; }
@@ -654,76 +668,6 @@ MoffatBay.reservation = (function () {
         return d.getFullYear() + "-" + m + "-" + day;
     }
 
-    // ================================================================
-    // FAKE BACK END - delete this whole block with USE_FAKE_BACKEND.
-    //
-    // Deterministic on purpose so every outcome can actually be reached
-    // while testing, instead of waiting for a random one:
-    //   boat name contains "dup"  -> duplicate registration
-    //   boat name contains "fail" -> save failed
-    //   otherwise                 -> saved
-    // ================================================================
-
-    function fakeDelay(value, ms) {
-        return new Promise(function (resolve) {
-            window.setTimeout(function () { resolve(value); }, ms || 400);
-        });
-    }
-
-    function fakeSaveBoat(name, lengthText) {
-        var length = parseFloat(lengthText);
-
-        if (!name || !lengthText) {
-            return fakeDelay({ ok: false,
-                error: "Boat Name and Boat Length are required when adding a boat." });
-        }
-        if (isNaN(length) || length <= 0 || length > 999.9) {
-            return fakeDelay({ ok: false,
-                error: "Enter a boat length between 1 and 999.9 feet." });
-        }
-        if (name.toLowerCase().indexOf("dup") !== -1) {
-            return fakeDelay({ ok: false,
-                error: "That HIN or boat registration is already in use." });
-        }
-        if (name.toLowerCase().indexOf("fail") !== -1) {
-            return fakeDelay({ ok: false,
-                error: "Your boat could not be saved. Please try again." });
-        }
-
-        var tenths = Math.round(length * 10);
-        var size = length <= 26 ? 26 : (length <= 40 ? 40 : (length <= 50 ? 50 : 0));
-
-        return fakeDelay({
-            ok: true,
-            boatId: "stub-" + Date.now(),
-            boatName: name,
-            boatLength: length.toFixed(1),
-            slipSizeFt: size,
-            monthlyCents: tenths * 105,     // server's job for real; $10.50/ft
-            /* Handed back unchanged: registering a boat doesn't use up a
-               slip, so nothing about availability actually moves here. It
-               rides along only because it's a free chance to refresh
-               numbers that may have gone stale while the page sat open. */
-            docks: docks
-        });
-    }
-
-    /* Type a size of 50 to see the "already on the list" answer. */
-    function fakeJoinWaitList(size) {
-        if (String(size) === "50") {
-            return fakeDelay({ ok: false, alreadyWaiting: true });
-        }
-        return fakeDelay({ ok: true });
-    }
-
-    function fakeSubmitReservation(opt) {
-        var size = Number(opt.dataset.slipSize);
-
-        if (freeSlips(size) === 0) {
-            return fakeDelay({ ok: false, sizeFull: true, slipSizeFt: size });
-        }
-        return fakeDelay({ ok: true, confirmationNumber: "MB-00061" });
-    }
 
     // ================================================================
     // Wiring

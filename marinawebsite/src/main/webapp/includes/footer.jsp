@@ -36,7 +36,7 @@
                     About Us
                 </a>
 
-                <a href="${pageContext.request.contextPath}/reservation.jsp">
+                <a href="${pageContext.request.contextPath}/reservation">
                     Reservations
                 </a>
 
