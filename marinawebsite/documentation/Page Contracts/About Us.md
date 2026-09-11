@@ -62,15 +62,15 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 
 ### Back End Owns
 
-- [ ] **Does this page need a servlet at all?** Confirm the scope now that it's handling a contact submission, not just static content.
-- [ ] **Servlet mapping:** What URL maps to this page / handles the form POST? (e.g., `/about`, or a separate `/submitInquiry`)
-- [ ] **What does Back End do with the submission (carried over from Contact Us — decide this first, it drives everything else):** Store in a database table, send an email, both, or just return a success message?
+- [x] **Does this page need a servlet at all?** Decided, and built: two servlets. `AboutServlet` (`/about`) just forwards to `aboutUs.jsp` — the page itself needs no server-side data. `ContactServlet` (`/contact`) is the separate one that actually handles the form submission.
+- [x] **Servlet mapping:** Decided — the form POSTs to `/contact` (`ContactServlet`). `ContactServlet` also now answers `GET /contact` (forwards to `/aboutUs.jsp`), so navigating there directly no longer 405s.
+- [x] **What does Back End do with the submission:** Stores it. `ContactServlet` validates, builds a `Contact` object, and calls `ContactDAO.insert()` to write a row to the `Contact` table. No email is sent.
 - [x] **Pre-fill for logged-in users:** Nothing needed from Back End. The page
   reads the `Customer` bean `LoginServlet` already puts in session, so a
   signed-in customer's name and email arrive filled in with no GET handler
   involved. Answered by Front End — one less thing on this list.
-- [ ] **Success response:** After submission, what does Back End return — a forward back to the same JSP with a success attribute, or a redirect?
-- [ ] **Error attributes:** What attribute names and messages does Back End set for validation failures?
+- [x] **Success response:** **Decided, and changed since first built.** Originally forwarded back to `aboutUs.jsp` with a `contactSuccess` request attribute (see the Error Handling table's note below) — that let a page refresh right after submitting resubmit the same contact message. Now `ContactServlet` **redirects** (not forwards) to `/aboutUs.jsp?notice=contactSent` on success, so a refresh just reloads the page instead of resubmitting the form. `aboutUs.jsp` shows the success banner off that query param now, not off `contactSuccess`.
+- [x] **Error attributes:** Decided — `contactError`, a request attribute, set on validation failure. That path still forwards (not redirects), since a forward is what lets the rejected submission redisplay with everything the customer typed still in it (see the note under Error Handling below).
 
 ## Scaffold Include
 
@@ -90,9 +90,7 @@ This page includes the shared header/footer and identifies itself for nav highli
 
 ## Front End Variables
 
-Everything the contact form submits. The form POSTs to whatever URL Back End
-maps (see the open item above) — the page currently points at `/contact`, say
-if it should be something else.
+Everything the contact form submits. The form POSTs to `/contact` (`ContactServlet`) — decided, see [Back End Owns](#back-end-owns) above.
 
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
@@ -151,13 +149,14 @@ proposal, rename them and I'll follow.
 | `boatLength` filled in but not a number | "Enter a length in feet, or leave this blank." | Under the field, client-side |
 | Message over 2000 characters | Counter turns red past 1800; message on submit | Under the message box |
 | Server-side validation rejects the submission | Back End's wording, shown as-is | `contactError` request attribute, as a banner above the form. The form comes back with what was typed still in it |
-| Submission saved | Back End's wording, e.g. "Thanks — we'll be in touch." | `contactSuccess` request attribute, as a banner above the form |
+| Submission saved | "Thanks — we'll be in touch." | **Updated:** shown based on `?notice=contactSent` in the URL after a redirect, not a `contactSuccess` request attribute after a forward (see [Back End Owns](#back-end-owns) above for why this changed) |
 | Database failure | Standard error page | `error.jsp`, per `web.xml` |
 
-**The form redisplays from `param` values**, so a rejected submission comes back
-filled in rather than blank. That works whether Back End forwards or redirects,
-as long as a forward is used for the rejection case — a redirect would lose
-what they typed.
+**The form redisplays from `param` values on a rejection**, so a rejected submission comes back
+filled in rather than blank — this only works because the rejection case forwards
+rather than redirects; a redirect would lose what they typed. The success case is
+the opposite on purpose: it redirects specifically so the request parameters are
+gone and a refresh can't resubmit them.
 
 ## Login State Differences
 

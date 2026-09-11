@@ -48,9 +48,15 @@ Boat details are optional at signup, so a customer can arrive owning nothing. In
 
 That panel reuses the boat fields off the Registration page rather than me building a second copy of the same form. **Saving from it doesn't reload the page**, which is the important part. The boat gets saved in the background, turns up in the dropdown already selected, and anything already filled in is still sitting there. It's the first thing on the site that saves without reloading, and it's why the shared status popup in the header exists at all, since there's no new page for a confirmation to appear on.
 
+**Fixed since first built:** the panel's page-behind-it originally kept scrolling while the panel was open (and the mouse wheel would inconsistently scroll the panel or the page underneath it). The main page's scroll is now locked for as long as the panel is open (`document.body.style.overflow = "hidden"`, cleared on close), and the panel's own header (close button, title) is pinned with `position: sticky` so it stays visible even if the form inside scrolls.
+
 ### Choosing a Dock
 
-The three docks sit in different parts of the marina, which is a real difference worth letting someone choose. Dock A is nearest the Ship Store, C is nearest the Office, Restaurant and Fuel Dock, and B is in between. So step 2 is three cards, one per dock, with that description on each and how many slips are free there.
+The three docks sit in different parts of the marina, which is a real difference worth letting someone choose. So step 2 is three cards, one per dock, with a description on each and how many slips are free there.
+
+**Update, dock naming/landmarks changed (`MoffatBayMarinaDB_V1-7-0_update.sql`):** originally Dock A was described as nearest the Ship Store, C nearest the Office, Restaurant and Fuel Dock, and B in between. That's been replaced with a clearer compass-name-plus-single-landmark scheme, closer to what `marina_a.png` actually shows: **Dock A is the Eastern Dock**, closest to the Ship Store; **Dock B is the Central Dock**, closest to the Office & Restaurant (moved here from Dock C's description — the map places the Office & Restaurant marker measurably closer to B); **Dock C is the Western Dock**, closest to the Fueling Station only. Each dock's description is now three lines (name, compass label, landmark) rather than one sentence, rendered with `white-space: pre-line` in `reservation.css` so the dock cards show it as a short stat block instead of a run-on sentence.
+
+**Also added:** a "Pick a dock for me" button under the dock cards, for anyone with no preference. It checks the real dock radio with the most free slips of the boat's size — no new server endpoint, it's a client-side convenience in `reservation.js` that just selects one of the existing radios, so it submits exactly like a manual pick. Ties are broken with `Math.random()` rather than always favoring the same dock.
 
 **It only ever shows counts for the size the chosen boat needs.** A dock with three 26 ft slips free is no use to a 40 ft boat, so showing its total would be actively misleading. Until a boat is picked the cards can't say anything useful and sit greyed out. A dock with nothing of the right size can't be picked, and says so on the card rather than just fading.
 
@@ -82,18 +88,19 @@ The assignment asks to be able to cancel a reservation, which should exists on t
 
 ### Back End Owns
 
-The page is built and running on stand-in data, so this list is what it's waiting for. Names are just what the stand-in uses, rename anything as long as I know before I swap it out.
+**Update: this whole list was written while the page ran on stand-in data. All of it is now built.** Left the original wording below (with the answer folded in) rather than deleting the checklist, since it still documents exactly what each response needs to look like.
 
 - [x] **Authentication:** Signed in required. `sessionScope.customerId` from `LoginServlet`, never read off the form. Signed out, the page becomes the sign-in prompt.
-- [ ] **The customer's boats, on page load:** For each one an id, the name, the length, which slip size it needs (26/40/50, or 0 if it's over 50 ft), **what it costs a month in whole cents (example: \$10.00 is 1000)**, and whether it already has a reservation. Empty list if they own none, which is what opens the boat panel, so an empty list and no answer have to look different.
-- [ ] **The docks, with how many slips of each size are free on each one:** An id, the letter, the description, and counts for all three sizes with a zero where there are none rather than the size being left out. Per dock is the only availability figure I need, the totals on the size cards get summed from it. This is the one thing that makes the instant warning possible.
-- [ ] **The two rates:** `SLIP_PER_FOOT_MONTHLY` and `ELECTRIC_MONTHLY` from the `Rate` table, in cents. Only for the wording of the note at the top, the boats arrive already priced. Careful, the per-foot one is **1050** for \$10.50, not 105. There's a 105 in the arithmetic because boat lengths carry one decimal, so it's cents per tenth of a foot. I mixed those up and the page advertised slips at \$1.05 a foot until I caught it.
-- [ ] **Saving a boat from the panel:** Whether it worked; if so the new boat, and if not a message plain enough to show as-is.
-- [ ] **A successful booking:** The confirmation number. Please send them somewhere fresh rather than leaving them on the submitted form, it's the one place where a refresh would genuinely book a second slip. 
-- [ ] **A failed booking:** These need telling apart, because they land in five different places on the page and are worded differently: the size filled up marina-wide, just the dock they picked filled up, something wrong with the boat, something wrong with the date, or anything else. If it's the dock, say which one, so I can grey out that one and leave the others alone rather than blanking the whole size. One generic failure can't be put in the right place. Also please send back what they typed, still filled in.
-- [ ] **Joining the wait list:** Takes `slipSizeFt` and **answers back**. Either it worked, or they were already on the list for that size. I need telling which, because the page can't know on its own and the second one has its own message. `WaitList` has nothing stopping duplicate rows, and two "Waiting" rows for one person would throw off the average wait time BR-20 wants, so please don't write a second one either.
+- [x] **The customer's boats, on page load:** Built — `ReservationServlet.doGet()` calls `BoatDAO.findByCustomerId()`, then fills in slip size and monthly cents per boat (`slipSizeFor()` / `toCents()`) before handing the list to the JSP as `ownedBoats`. Matches the shape asked for exactly: id, name, length, slip size (0 if over 50 ft), whole-cents monthly cost, and `hasActiveReservation`. An empty list (`ownedBoats` empty) is what makes `boatSelect.disabled` true, which is what auto-opens the Register a Boat panel.
+- [x] **The docks, with how many slips of each size are free on each one:** Built — `ReservationDAO.findDockAvailability()`, returned as `docks` (id, dock number, description, and a `26`/`40`/`50` count map with explicit zeroes, never a missing key). Rendered into the page as the `dockAvailability` JSON script tag `reservation.js` reads on load.
+- [x] **The two rates:** Built — `Rate` table (`SLIP_PER_FOOT_MONTHLY`, `ELECTRIC_MONTHLY`), read via `ReservationDAO.getRate()`, exposed to the page as `perFootCents`/`electricCents` (confirmed still in whole cents per tenth-of-a-foot, `1050` not `105`, matching the warning here).
+- [x] **Saving a boat from the panel:** Built — `ReservationBoatServlet` (`/reservation/boat`). Success: `{"ok":true,"boatId":...,"boatName":...,"boatLength":...,"slipSizeFt":...,"monthlyCents":...}` — the same shape as one entry in the page-load boat list, as asked for below. Failure: `{"ok":false,"error":"..."}`, plain enough to show as-is. **Also since fixed:** the servlet originally had no `@MultipartConfig`, so `reservation.js` posting this form as `FormData` (always `multipart/form-data`) meant the server never actually saw any of the submitted fields — every save looked like a blank submission and failed with "required" errors no matter what was typed. Fixed by adding `@MultipartConfig` to both this servlet and `ReservationServlet`. Also added: saving now requires at least one of HIN or Registration Number (previously neither was ever required, matching Registration's rule — this page's rule is deliberately stricter, since you can't reserve a slip for a boat nobody can identify).
+- [x] **A successful booking:** Built — `{"ok":true,"confirmationNumber":"MB-00061"}`, and the page redirects (`window.location.href`, not a form submit) to `/reservationSummary?confirmation=MB-00061` — **note: no `.jsp`** (see the correction under [Handing over to the summary page](#handing-over-to-the-summary-page) below, this section originally said `reservationSummary.jsp`, which is wrong).
+- [x] **A failed booking:** Built, and told apart exactly as asked: `{"ok":false,"boatError":"..."}`, `{"ok":false,"dockError":"..."}`, `{"ok":false,"dateError":"..."}`, and for a full size, `{"ok":false,"sizeFull":true,"slipSizeFt":40}` (marina-wide) or the same plus `"dockId":3` (just that one dock, so the page greys out only that dock's card for that size instead of the whole size).
+- [x] **Joining the wait list:** Built (this was the last piece finished) — `ReservationWaitlistServlet` (`/reservation/waitlist`), takes `slipSizeFt`, answers `{"ok":true}`, `{"ok":false,"alreadyWaiting":true}`, or `{"ok":false,"error":"..."}`. `WaitListDAO.isWaiting()` is checked before `WaitListDAO.insert()` specifically so a double-click (or the "already waiting" case) can't write a second `Waiting` row for the same customer/size. **Scope note:** only the "join" side is built. There's no way yet to look the wait list up, see your position in it, or cancel an entry — that's the separate, not-yet-built Wait List Lookup page (see its own contract).
 - [x] **Is electric its own figure or folded into the total?** Its own. The summary shows it on a separate line, only when the box is ticked.
-- [ ] **Servlet URL mappings:** For the booking, the boat save, and the wait list join.
+- [x] **Servlet URL mappings:** Built — `/reservation` (page load + booking), `/reservation/boat` (boat save), `/reservation/waitlist` (wait list join).
+- [x] **Cancelling a reservation:** Built, and landed where this section guessed it would — on the Reservation Summary page (`ReservationSummaryServlet`, `POST` with `action=cancel`), not the Reservation Lookup page.
 
 #### How the boat list updates
 
@@ -116,11 +123,11 @@ You can also send a refreshed `docks` array back with it and I'll use it. Regist
 #### Handing over to the summary page
 
 On success the page sends them to
-`reservationSummary.jsp?confirmation=MB-00061`, so the summary page looks the reservation up fresh from that number. A redirect and not a forward, because a forward would mean a refresh could book a second slip.
+`/reservationSummary?confirmation=MB-00061` (**correction: not `reservationSummary.jsp`** — going straight at the JSP would skip `ReservationSummaryServlet` entirely and render an empty page, same class of bug as hitting `/reservation.jsp` directly instead of `/reservation`), so the summary page looks the reservation up fresh from that number. A redirect and not a forward, because a forward would mean a refresh could book a second slip.
 
-**This needs Carolina and Miguel to agree, it isn't mine to decide.** Their contract still has "how does this page receive the reservation data" open and calls it the most critical handshake, and the page above has effectively answered it by shipping. Happy to change what I send if they'd rather have it another way, I just need telling.
+**Resolved — built as described:** Carolina and Miguel's side did agree to this handshake. `ReservationSummaryServlet.doGet()` reads `confirmation` from the query string and looks it up via `ReservationDAO.findDetailsByConfirmation()`.
 
-One thing to raise with them either way: confirmation numbers run in sequence (MB-00001 up), so anyone can put someone else's in the address bar. The summary page needs to check the reservation actually belongs to whoever is signed in before it shows anything. Their contract has that as an open question too.
+**Also resolved:** confirmation numbers do run in sequence (`MB-00001` up), so the summary page does check ownership — `ReservationSummaryServlet` compares the looked-up reservation's `customerID` against `sessionScope.customerId` and shows the same "reservation not found" message either way (no such confirmation, or one that isn't yours) rather than distinguishing the two, so probing sequential numbers can't be used to tell which confirmation numbers are real.
 
 #### Why cents
 
@@ -128,7 +135,7 @@ Send the price already worked out, and as a whole number of cents rather than do
 
 #### Nothing can read the boats back yet
 
-The boats are in the database, Registration writes them at signup, but `BoatDAO` only has `insertBoat` and `insertOwnership` and `CustomerDAO` has nothing about boats. That query is new work, and it's the biggest thing the page is waiting on.
+**Resolved.** This used to be the biggest open item on the page — `BoatDAO` only had `insertBoat`/`insertOwnership`, nothing that read boats back. `BoatDAO.findByCustomerId(Connection, int customerId)` now exists and is what `ReservationServlet.doGet()` calls for the page-load boat list.
 
 ## Scaffold Include
 
@@ -163,16 +170,36 @@ No boat name, no boat length, no slip number, no customer ID, no price. Name and
 
 ## Back End Parameters
 
-*Sara's to fill in, see [Back End Owns](#back-end-owns) above for what the page needs.*
+**Filled in — built.**
+
+| Parameter Name | Type | Source (form field / session / query string) | Notes |
+| --- | --- | --- | --- |
+| `customerId` | `Integer` | Session (`sessionScope.customerId`) | Never read off the form |
+| `boatId` | `Integer` | Form field | Must be one of the signed-in customer's own boats — checked against a fresh `BoatDAO.findByCustomerId()` lookup, not trusted from the request |
+| `dockId` | `Integer` | Form field | |
+| `checkInDate` | `LocalDate` | Form field | Must parse and not be before today |
+| `wantsElectric` | `boolean` | Form field | `true` only if the parameter is present at all, matching how an unchecked checkbox submits nothing |
+| `slipSizeFt` (wait list only) | `Integer` | Form field | Must be `26`, `40`, or `50` |
 
 ## Database Returns
 
-*Sara's to fill in.*
+**Filled in — built.**
+
+| Method / Query | Parameters In | Returns | Notes |
+| --- | --- | --- | --- |
+| `BoatDAO.findByCustomerId()` | `Connection`, `customerId` | `List<Boat>` | Empty list if the customer owns no boats |
+| `ReservationDAO.findDockAvailability()` | `Connection` | `List<DockAvailability>` | One entry per dock, counts for all three sizes, zero rather than a missing key |
+| `ReservationDAO.getRate()` | `Connection`, `rateCode` | `BigDecimal` | Throws `SQLException` if the rate code isn't found — a missing rate is a configuration bug, not a normal "no data" case |
+| `ReservationDAO.findAvailableSlip()` | `Connection`, `dockId`, `slipSizeFt` | `Integer` slip id, or `null` | `null` means that dock has nothing free of that size right now. Locks the returned row with `FOR UPDATE` so two requests can't both grab the last slip |
+| `ReservationDAO.countAvailableForSize()` | `Connection`, `slipSizeFt` | `int` | Marina-wide count, used to tell "just this dock is full" from "the whole size is gone" |
+| `ReservationDAO.insert()` | `Connection`, `Reservation` | `String` confirmation number | Inserts with a temporary placeholder, then updates to the final `MB-#####` format once the generated `reservationID` is known |
+| `WaitListDAO.isWaiting()` | `Connection`, `customerId`, `slipSizeFt` | `boolean` | Checked before `insert()` so a customer can't end up with two `Waiting` rows for the same size |
+| `WaitListDAO.insert()` | `Connection`, `customerId`, `slipSizeFt` | none (throws on failure) | |
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** A boat has to be picked, and then a dock, before the button turns on. The date is required and the picker won't offer anything earlier than today. Availability is checked against the on-screen numbers every time the boat changes, and the button switches off when the size is full or nothing is picked yet. In the boat panel, name and length are required, and HIN, registration number and boat year get format-checked if they're filled in. Those are the same checks Registration does, and literally the same code: `registration.js` can't be loaded on this page (it wires up elements that only exist over there and would throw), but `formValidation.js` is already here via the header, so the rules are shared rather than copied.
-- **Server-side (source of truth):** Sara's to define. What matters from my side is that I've assumed **all of the above gets checked again.** Anyone can go round a browser, so the numbers on screen, the greyed-out button and the date limit are conveniences and none of them are protection. The page is built to be told "no" after the fact and handle it properly.
+- **Client-side (UX only, not trusted):** A boat has to be picked, then a dock, **then a start date** (**updated** — originally only boat + dock gated the button; the date is now checked too, both on boat/dock change and on the date field's own `change` event, not just at submit time) before the button turns on. The date picker won't offer anything earlier than today. Availability is checked against the on-screen numbers every time the boat changes, and the button switches off when the size is full or nothing is picked yet. **Added:** a status line under the button (`#submitBlockedReason`) now names whichever one of those is still missing ("Choose a dock to continue.", "Choose a start date to continue.", etc.), instead of just a disabled button with no explanation. In the boat panel, name and length are required, and HIN, registration number and boat year get format-checked if they're filled in; **also now required: at least one of HIN or Registration Number** (previously neither was ever required — this page is deliberately stricter than Registration here, since a boat with no identifier at all shouldn't be reservable). Those are the same checks Registration does, and literally the same code: `registration.js` can't be loaded on this page (it wires up elements that only exist over there and would throw), but `formValidation.js` is already here via the header, so the rules are shared rather than copied.
+- **Server-side (source of truth):** Built, in `ReservationServlet.doPost()` and `ReservationBoatServlet.doPost()` — everything the client-side list above checks gets checked again. Boat ownership is re-verified against a fresh DB lookup (never trusts a submitted `boatId` just because it parsed), the slip pick is re-derived from boat length server-side, and `findAvailableSlip()` locks its result with `FOR UPDATE` so two requests racing for the last slip of a size can't both win. None of the client-side conveniences (greyed-out button, date picker's minimum, the boat panel's HIN-or-reg-number nudge) are trusted as protection on their own.
 
 ## Error Handling
 
@@ -191,6 +218,7 @@ No boat name, no boat length, no slip number, no customer ID, no price. Name and
 | Couldn't be added to the wait list | "You could not be added to the wait list. Please try again." | The wait list panel |
 | Wait list joined | "You're on the wait list for a 40 ft slip." | The wait list page, after they're sent there |
 | Boat panel details wrong | Whatever was wrong with it | Inside the panel, which stays open |
+| Boat panel has neither HIN nor Registration Number (**new**) | "Enter either a HIN or a Registration Number." | Inside the panel, both client- and server-side |
 | Boat already registered | "That HIN or boat registration is already in use." | Inside the panel |
 | Booking couldn't be saved | "Your reservation could not be completed. Please try again." | Banner at the top of the form |
 | Boat couldn't be saved | "Your boat could not be saved. Please try again." | Inside the panel |

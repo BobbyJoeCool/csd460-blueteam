@@ -87,9 +87,11 @@ regenerate.
 
 ### Customer Data Passed to the Front End
 
-After login, this is the account info the rest of the site has access to: first name, last name, email, phone, mailing address (street, city, state, zip), and the date they joined. There's also a short "First L." display name (like "Robert B.") built automatically from the first and last name, so no page has to build it on its own.
+After login, this is the account info the rest of the site has access to: first name, last name, email, phone (plus `phoneCountryCode`, added in `MoffatBayMarinaDB_V1-1-0_update.sql`), mailing address (street, `streetAddress2`, city, state, zip), `country` (added in `V1-2-0_update.sql`, one of `US`/`CA`/`OTHER`), and the date they joined. There's also a short "First L." display name (like "Robert B.") built automatically from the first and last name, so no page has to build it on its own.
 
-The password comes along too, in hashed form, since it's part of the same record. It should never actually get shown or referenced on any page though.
+**Update:** the `Customer` object also carries `failedLoginAttempts` and `accountLocked` now (added in `V1-1-0_update.sql`, for the lockout feature this contract itself specifies above), plus `customerId`. Both exist on the object for the servlets that need them, not for display — no page should render either one.
+
+The password does **not** come along, unlike this section originally said — `Customer.java` deliberately excludes `passwordHash` from the bean entirely (see its class-level Javadoc), specifically so it can never end up in the session or get rendered by a JSP. Password verification stays server-side, through `CustomerDAO.verifyPassword()`, which returns only a `boolean`.
 
 ### What the Front End Sees on Failure
 
@@ -99,7 +101,7 @@ Two different failure messages, so the user knows what's going on. Neither one e
 - **Lockout rule notice:** every failed sign-in also sets `lockoutThreshold` (an int, always 3) so the modal can add "Accounts are locked after 3 unsuccessful attempts." under the error. It is the same message on every failure, whether or not the email belongs to a real account.
 
   **Changed 2026-09-04.** This started out as a per-account countdown — `attemptsRemaining`, rendering "2 more failed attempts will lock this account." That was a mistake. A countdown can only appear for an address that actually exists, so watching for it confirmed which emails were registered, which is precisely what the single generic error message exists to prevent. The fixed notice gives the user the same useful warning and tells an attacker nothing.
-- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login?action=reset` and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
+- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login` with `action=reset` as a **form field in the POST body**, not a query string — `LoginServlet` only implements `doPost`, so a GET would 405 either way — and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
 
 ### Where the User Lands After Login
 
