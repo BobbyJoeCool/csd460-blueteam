@@ -24,6 +24,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,19 +90,35 @@
         </div>
     </c:when>
 
-    <c:otherwise>
-        <header class="summary-hero">
-            <div class="summary-success-mark" aria-hidden="true">&#10003;</div>
-            <p class="summary-eyebrow">Reservation Confirmed</p>
-            <h1>Your Slip Is Reserved</h1>
-            <p class="summary-lede">
-                Keep your confirmation number handy for reservation lookup and future changes.
-            </p>
-            <p class="confirmation-number">
-                <span>Confirmation</span>
-                <strong><c:out value="${reservation.confirmationNumber}" /></strong>
-            </p>
-        </header>
+<c:otherwise>
+    <header class="summary-hero">
+
+        <c:choose>
+            <c:when test="${reservation.cancelled}">
+                <div class="summary-cancelled-mark" aria-hidden="true">&#10005;</div>
+                <p class="summary-eyebrow">Reservation Cancelled</p>
+                <h1>Your Reservation Has Been Cancelled</h1>
+                <p class="summary-lede">
+                    This reservation is no longer active.
+                </p>
+            </c:when>
+
+            <c:otherwise>
+                <div class="summary-success-mark" aria-hidden="true">&#10003;</div>
+                <p class="summary-eyebrow">Reservation Confirmed</p>
+                <h1>Your Slip Is Reserved</h1>
+                <p class="summary-lede">
+                    Keep your confirmation number handy for reservation lookup and future changes.
+                </p>
+            </c:otherwise>
+        </c:choose>
+
+        <p class="confirmation-number">
+            <span>Confirmation</span>
+            <strong><c:out value="${reservation.confirmationNumber}" /></strong>
+        </p>
+
+    </header>
 
         <div class="summary-wrap">
             <section class="summary-status-band" aria-label="Reservation status">
@@ -115,87 +132,6 @@
             </section>
 
             <div class="summary-layout">
-                <div class="summary-detail-stack">
-                    <section class="summary-section" aria-labelledby="vesselHeading">
-                        <div class="summary-section__heading">
-                            <span class="summary-section__number" aria-hidden="true">1</span>
-                            <div>
-                                <p class="summary-section__kicker">Vessel</p>
-                                <h2 id="vesselHeading"><c:out value="${reservation.boatName}" /></h2>
-                            </div>
-                        </div>
-
-                        <dl class="detail-grid">
-                            <div>
-                                <dt>Boat Type</dt>
-                                <dd><c:out value="${reservation.boatType}" default="Not provided" /></dd>
-                            </div>
-                            <div>
-                                <dt>Boat Length</dt>
-                                <dd><fmt:formatNumber value="${reservation.boatLength}" minFractionDigits="1" maxFractionDigits="1" /> ft</dd>
-                            </div>
-                            <div>
-                                <dt>Registration</dt>
-                                <dd><c:out value="${reservation.regNumber}" default="Not provided" /></dd>
-                            </div>
-                        </dl>
-                    </section>
-
-                    <section class="summary-section" aria-labelledby="slipHeading">
-                        <div class="summary-section__heading">
-                            <span class="summary-section__number" aria-hidden="true">2</span>
-                            <div>
-                                <p class="summary-section__kicker">Slip Assignment</p>
-                                <h2 id="slipHeading">Dock <c:out value="${reservation.dockNumber}" />, Slip <c:out value="${reservation.slipNumber}" /></h2>
-                            </div>
-                        </div>
-
-                        <dl class="detail-grid">
-                            <div>
-                                <dt>Slip Size</dt>
-                                <dd><c:out value="${reservation.slipSizeFt}" /> ft</dd>
-                            </div>
-                            <div>
-                                <dt>Dock</dt>
-                                <dd>Dock <c:out value="${reservation.dockNumber}" /></dd>
-                            </div>
-                            <div>
-                                <dt>Slip Number</dt>
-                                <dd><c:out value="${reservation.slipNumber}" /></dd>
-                            </div>
-                        </dl>
-                    </section>
-
-                    <section class="summary-section" aria-labelledby="leaseHeading">
-                        <div class="summary-section__heading">
-                            <span class="summary-section__number" aria-hidden="true">3</span>
-                            <div>
-                                <p class="summary-section__kicker">Lease Details</p>
-                                <h2 id="leaseHeading">Starts <fmt:formatDate value="${reservation.startDate}" pattern="MMMM d, yyyy" /></h2>
-                            </div>
-                        </div>
-
-                        <dl class="detail-grid">
-                            <div>
-                                <dt>Start Date</dt>
-                                <dd><fmt:formatDate value="${reservation.startDate}" pattern="MMMM d, yyyy" /></dd>
-                            </div>
-                            <div>
-                                <dt>Electric Hookup</dt>
-                                <dd>
-                                    <c:choose>
-                                        <c:when test="${reservation.electricalHookup}">Yes</c:when>
-                                        <c:otherwise>No</c:otherwise>
-                                    </c:choose>
-                                </dd>
-                            </div>
-                            <div>
-                                <dt>Lease Type</dt>
-                                <dd>Month-to-month</dd>
-                            </div>
-                        </dl>
-                    </section>
-                </div>
 
                 <aside class="receipt-card" aria-labelledby="receiptHeading">
                     <div class="receipt-card__head">
@@ -248,6 +184,7 @@
                         </p>
                     </div>
                 </aside>
+            </div>
             </div>
 
             <section class="summary-actions" aria-labelledby="actionsHeading">

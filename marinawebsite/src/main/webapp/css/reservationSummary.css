@@ -2,7 +2,12 @@
  * Blue Team - CSD 460 Capstone - Moffat Bay Marina
  * css/reservationSummary.css
  * Front End: Carolina Rodriguez
-*/
+ */
+
+
+/* =========================
+   HERO / PAGE STATUS
+   ========================= */
 
 .summary-hero {
     max-width: 50rem;
@@ -15,7 +20,8 @@
     padding-bottom: 1.25rem;
 }
 
-.summary-success-mark {
+.summary-success-mark,
+.summary-cancelled-mark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -23,10 +29,17 @@
     height: 3.4rem;
     margin-bottom: 1rem;
     border-radius: 50%;
-    background: var(--color-ocean-blue);
     color: var(--color-surface-neutral);
     font-size: 1.8rem;
     font-weight: bold;
+}
+
+.summary-success-mark {
+    background: var(--color-ocean-blue);
+}
+
+.summary-cancelled-mark {
+    background: var(--color-error);
 }
 
 .summary-eyebrow,
@@ -57,6 +70,11 @@
     opacity: 0.8;
 }
 
+
+/* =========================
+   CONFIRMATION NUMBER
+   ========================= */
+
 .confirmation-number {
     display: inline-flex;
     flex-wrap: wrap;
@@ -65,9 +83,11 @@
     gap: 0.55rem;
     margin: 1.25rem 0 0;
     padding: 0.65rem 1rem;
-    border: 1px solid color-mix(in srgb, var(--color-ocean-blue) 35%, transparent);
+    border: 1px solid
+        color-mix(in srgb, var(--color-ocean-blue) 35%, transparent);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--color-ocean-blue) 7%, var(--color-bg-surface));
+    background:
+        color-mix(in srgb, var(--color-ocean-blue) 7%, var(--color-bg-surface));
 }
 
 .confirmation-number span {
@@ -83,11 +103,25 @@
     letter-spacing: 0.04em;
 }
 
+
+/* =========================
+   MAIN SUMMARY WRAPPER
+   ========================= */
+
 .summary-wrap {
     max-width: 72rem;
     margin: 0 auto 4rem;
     padding: 0 1.5rem;
 }
+
+.summary-layout {
+    display: block;
+}
+
+
+/* =========================
+   OPTIONAL STATUS BAND
+   ========================= */
 
 .summary-status-band {
     display: flex;
@@ -96,9 +130,11 @@
     gap: 1.5rem;
     margin-bottom: 1.75rem;
     padding: 1rem 1.25rem;
-    border: 1px solid color-mix(in srgb, var(--color-ocean-blue) 25%, transparent);
+    border: 1px solid
+        color-mix(in srgb, var(--color-ocean-blue) 25%, transparent);
     border-radius: 8px;
-    background: color-mix(in srgb, var(--color-ocean-blue) 7%, var(--color-bg-surface));
+    background:
+        color-mix(in srgb, var(--color-ocean-blue) 7%, var(--color-bg-surface));
 }
 
 .summary-status-band > div {
@@ -127,102 +163,19 @@
     opacity: 0.8;
 }
 
-.summary-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 21rem;
-    gap: 1.75rem;
-    align-items: start;
-}
 
-.summary-detail-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    min-width: 0;
-}
-
-.summary-section,
-.summary-actions {
-    padding: 1.5rem;
-    border-radius: 10px;
-    background: var(--color-bg-surface);
-}
-
-.summary-section__heading {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin-bottom: 1.25rem;
-}
-
-.summary-section__number {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.15rem;
-    height: 2.15rem;
-    border-radius: 50%;
-    background: var(--color-ocean-blue);
-    color: var(--color-surface-neutral);
-    font-weight: bold;
-}
-
-.summary-section__heading h2,
-.summary-actions h2 {
-    margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 1.35rem;
-    font-weight: normal;
-    color: var(--color-text-heading);
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    margin: 0;
-    border: 1px solid color-mix(in srgb, var(--color-border) 18%, transparent);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.detail-grid > div {
-    min-width: 0;
-    padding: 1rem;
-    border-right: 1px solid color-mix(in srgb, var(--color-border) 14%, transparent);
-}
-
-.detail-grid > div:last-child {
-    border-right: 0;
-}
-
-.detail-grid dt,
-.receipt-lines dt {
-    margin-bottom: 0.3rem;
-    font-size: 0.74rem;
-    font-weight: bold;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    opacity: 0.68;
-}
-
-.detail-grid dd,
-.receipt-lines dd {
-    margin: 0;
-    overflow-wrap: anywhere;
-    font-weight: 600;
-    color: var(--color-text-body);
-}
+/* =========================
+   RESERVATION RECEIPT
+   ========================= */
 
 .receipt-card {
-    position: sticky;
-    top: 1.25rem;
+    width: 100%;
     overflow: hidden;
     border-radius: 10px;
     background: var(--color-bg-surface);
-    box-shadow: 0 0.5rem 1.4rem color-mix(in srgb, var(--color-charcoal-navy) 12%, transparent);
+    box-shadow:
+        0 0.5rem 1.4rem
+        color-mix(in srgb, var(--color-charcoal-navy) 12%, transparent);
 }
 
 .receipt-card__head {
@@ -260,15 +213,26 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 12%, transparent);
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 12%, transparent);
 }
 
 .receipt-lines dt {
     margin: 0;
+    font-size: 0.74rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    opacity: 0.68;
 }
 
 .receipt-lines dd {
+    margin: 0;
+    overflow-wrap: anywhere;
     text-align: right;
+    font-weight: 600;
+    color: var(--color-text-body);
 }
 
 .receipt-lines .receipt-total {
@@ -292,19 +256,40 @@
 .receipt-note {
     margin: 0.85rem 0 0;
     padding-top: 0.85rem;
-    border-top: 1px solid color-mix(in srgb, var(--color-border) 12%, transparent);
+    border-top: 1px solid
+        color-mix(in srgb, var(--color-border) 12%, transparent);
     font-size: 0.84rem;
     line-height: 1.5;
     color: var(--color-text-muted);
     opacity: 0.72;
 }
 
+
+/* =========================
+   MANAGE RESERVATION
+   ========================= */
+
 .summary-actions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    width: 100%;
+    box-sizing: border-box;
     margin-top: 1.75rem;
+    padding: 1.5rem;
+
+    border-radius: 10px;
+    background: var(--color-bg-surface);
+}
+
+.summary-actions h2 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: var(--color-text-heading);
 }
 
 .summary-actions p:not(.summary-section__kicker) {
@@ -317,18 +302,24 @@
 
 .summary-actions__buttons {
     display: flex;
-    flex: 0 0 auto;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 0.75rem;
 }
 
+
+/* Back to Reservations uses shared .btn-primary from site.css */
 .summary-link-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
 }
+
+
+/* =========================
+   CANCEL BUTTON
+   ========================= */
 
 .summary-cancel-button {
     padding: 0.7rem 1.15rem;
@@ -338,12 +329,19 @@
     color: var(--color-error);
     font: inherit;
     font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.summary-cancel-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
+.summary-cancel-button:hover {
+    background: var(--color-error);
+    color: var(--color-surface-neutral);
 }
+
+
+/* =========================
+   SIGN-IN / ERROR STATE
+   ========================= */
 
 .summary-signin,
 .summary-error-actions {
@@ -353,26 +351,13 @@
     text-align: center;
 }
 
-@media (max-width: 60rem) {
-    .summary-layout {
-        grid-template-columns: 1fr;
-    }
 
-    .receipt-card {
-        position: static;
-    }
-
-    .summary-actions {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .summary-actions__buttons {
-        justify-content: flex-start;
-    }
-}
+/* =========================
+   RESPONSIVE
+   ========================= */
 
 @media (max-width: 42rem) {
+
     .summary-status-band {
         align-items: flex-start;
         flex-direction: column;
@@ -382,22 +367,17 @@
         text-align: left;
     }
 
-    .detail-grid {
-        grid-template-columns: 1fr;
+    .receipt-lines > div {
+        gap: 0.75rem;
     }
 
-    .detail-grid > div {
-        border-right: 0;
-        border-bottom: 1px solid color-mix(in srgb, var(--color-border) 14%, transparent);
+    .summary-actions__buttons {
+        width: 100%;
     }
 
-    .detail-grid > div:last-child {
-        border-bottom: 0;
-    }
-
-    .summary-actions__buttons,
     .summary-link-button,
     .summary-cancel-button {
         width: 100%;
+        box-sizing: border-box;
     }
 }
