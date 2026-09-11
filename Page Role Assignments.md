@@ -130,6 +130,8 @@ Agree on and record field/variable names for this page in its Page Contract doc 
 | --- | --- |
 | Front End | Robert |
 | Back End | Sara |
+| Dev Tester | Robert |
+| Peer Tester | Carolina |
 
 ### Module Seven: Web Development 3
 
@@ -141,6 +143,8 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | --- | --- |
 | Front End | Miguel |
 | Back End | Sara |
+| Dev Tester | Carolina |
+| Peer Tester | Robert |
 
 > **Update (Sep 7):** Professor-directed change to the syllabus — Contact Us is being cut as a standalone page, and its contact info is folding into About Us. That makes this a real Front End/Back End page now, not the back-end-lite page it was scoped as at the top of the week. Miguel keeps Front End since he already owns the wireframe. Sara moves here from Testing.  Reasoning is, Sara did testing last week, so she stays off testing this week and Robert will take on the testing for the About Us page.
 
@@ -150,14 +154,8 @@ Agree on and record field/variable names for both pages below in their Page Cont
 | --- | --- |
 | Front End | Carolina |
 | Back End | Miguel |
-
-**Testing - Modules 6 & 7**
-
-| Page | Tester |
-| --- | --- |
-| Reservation (Book a Slip) | Carolina |
-| About Us | Robert |
-| Reservation Summary | Robert |
+| Dev Tester | Robert |
+| Peer Tester | Carolina |
 
 ## Week Six (Sep 14 - Sep 20, 2026)
 
@@ -171,24 +169,29 @@ Agree on and record field/variable names for both pages below in their Page Cont
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Sara |
+| Back End | Carolina |
 
 **Edit User Info/Register a New Boat**
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Miguel |
+| Back End | Robert |
 
 > **Update (Sep 7):** Moved up from Module 9 into Module 8, since Look Up Reservation was the only page left here once Contact Us was cut — keeps Module 8 and Module 9 workload closer to even instead of leaving Module 9 with two pages and Module 8 with one.
+> This should be done as an "edit user profile" page that reuses the Register a Boat popup modal used for the Reserve a Slip page.
+> Team needs to figure out which fields should be editable.  
 
 **Testing - Module 8**
 
-| Page | Tester |
-| --- | --- |
-| Look Up Reservation | |
-| Edit User Info/Register a New Boat | |
+For each page, we will do at least 2 tests (though 2 per person is probably better, but creating tests just to fill a "number requirement" that test the same things is not a good use of time).  Each tester will take the developer roll on a test for the page they developed.
+
+- The Front end developer will ensure that everything renders and looks correct, and all front end logic works as it is supposed to.
+- The Back End developer will ensure that everything that is supposed to connect to other parts of the website/app (database connections, servlets, DAOs, etc) works as expected.
+- The peer tester will test any tests done by the same-end developer on the other side (Front end developer will look at the front end developers tests for the other page) so as to keep the testing clear.
+
+To prevent issues during uploading/merging during the testing process, each person's tests needs to be seperate word documents, to be consolodated once all testing is done.  
 
 ## Week Seven (Sep 21 - Sep 27, 2026)
 
@@ -217,7 +220,7 @@ This keeps track of who does what task in each week.  `(#)` being the week they 
 
 | Person   | Front End | Back End | Testing |
 | -------- | ----------| -------- | ------- |
-| Robert   | (4)(5)    | (4)      | (5)     |
-| Miguel   | (4)(5)    | (5)      | (4)     |
-| Sara     | (4)       | (5)(5)   | (4)     |
-| Carolina | (4)(5)    | (4)      | (5)     |
+| Robert   | (4)(5)    | (4)(7)   | (5)(7)  |
+| Miguel   | (4)(5)    | (5)(7)   | (4)(7)  |
+| Sara     | (4)(7)    | (5)(5)   | (4)(7)  |
+| Carolina | (4)(5)(7) | (4)      | (5)(7)  |
