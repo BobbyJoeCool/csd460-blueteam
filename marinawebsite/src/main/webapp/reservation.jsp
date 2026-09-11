@@ -12,9 +12,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
-<%-- BACKEND: delete this include. ReservationServlet.doGet sets the same
-     three request attributes. --%>
-<jsp:include page="/includes/_stubReservationData.jsp" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -375,7 +372,9 @@
 
                 <div class="form-banner" id="boatPanelError" role="alert" hidden></div>
 
-                <form id="boatPanelForm" novalidate>
+                <form id="boatPanelForm"
+                      action="${pageContext.request.contextPath}/reservation/boat"
+                      method="post" novalidate>
                     <%-- The card's wrapper and heading belong to the page
                          including it, not to the shared fields. Registration
                          adds an "Optional" note here as well; this panel

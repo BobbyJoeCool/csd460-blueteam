@@ -30,7 +30,7 @@
         class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
         <a href="${pageContext.request.contextPath}/aboutUs.jsp"
         class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-        <a href="${pageContext.request.contextPath}/reservation.jsp"
+        <a href="${pageContext.request.contextPath}/reservation"
         class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
         <a href="${pageContext.request.contextPath}/contact.jsp"
         class="${param.activePage == 'contact' ? 'nav-active' : ''}">Contact</a>

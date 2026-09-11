@@ -5,8 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import com.moffatbaymarina.marinawebsite.model.Boat;
 
@@ -107,6 +109,52 @@ public class BoatDAO {
 		}
 	}
 }
+
+    /**
+     * Returns  all boats currently owned by a customer. Reservation-only
+     * derived values (slip size and monthly cents) are filled by the servlet;
+     * checks active-reservation status for dropdown menu to prevent
+     * duplicate reservations for the same boat
+     */
+    public List<Boat> findByCustomerId(Connection conn, int customerId)
+            throws SQLException {
+        String sql = """
+                SELECT b.boatID, b.boatName, b.boatLength,
+                       EXISTS (SELECT 1 FROM Reservation r 
+                       WHERE r.boatID = b.boatID
+                       AND r.reservationStatus = 'Active') 
+                       AS hasActiveReservation 
+                FROM Boat b
+                JOIN BoatOwnership bo ON bo.boatID = b.boatID
+                WHERE bo.customerID = ? AND bo.endDate IS NULL
+                ORDER BY b.boatName
+                """;
+
+        List<Boat> boats = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    boats.add(mapReservationBoat(rs));
+                }
+            }
+        }
+        return boats;
+    }
+
+
+    private Boat mapReservationBoat(ResultSet rs) throws SQLException {
+        Boat boat = new Boat();
+        boat.setBoatId(rs.getInt("boatID"));
+        boat.setBoatName(rs.getString("boatName"));
+        boat.setBoatLength(rs.getBigDecimal("boatLength"));
+        boat.setHasActiveReservation(rs.getBoolean("hasActiveReservation"));
+        return boat;
+    }
+
+
+
+
 	//Nullable SQL parameter helpers-----------------------------------------------------------------------------------
 
 	private void setNullableString(

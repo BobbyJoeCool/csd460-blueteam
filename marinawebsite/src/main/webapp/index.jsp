@@ -49,7 +49,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 			<c:when test="${sessionScope.loggedIn}">
 				<a
 					class="btn-primary hero-cta"
-					href="${pageContext.request.contextPath}/reservation.jsp">
+					href="${pageContext.request.contextPath}/reservation">
 					Reserve a Slip
 				</a>
 			</c:when>
@@ -57,7 +57,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 				<button
 					class="btn-primary hero-cta"
 					type="button"
-					onclick="MoffatBay.loginModal.open('/reservation.jsp')">
+					onclick="MoffatBay.loginModal.open('/reservation')">
 					Reserve a Slip
 				</button>
 			</c:otherwise>
@@ -140,7 +140,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 						<a
 							class="btn-secondary"
-							href="${pageContext.request.contextPath}/reservation.jsp">
+							href="${pageContext.request.contextPath}/reservation">
 							Book a Slip
 						</a>
 

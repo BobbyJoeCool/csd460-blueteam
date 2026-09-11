@@ -1,11 +1,20 @@
 package com.moffatbaymarina.marinawebsite.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import com.moffatbaymarina.marinawebsite.model.DockAvailability;
+import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 
@@ -19,6 +28,8 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  * there is one place that knows how a reservation is stored.
  *
  * @author Miguel Fernandez
+ * @author Sara White
+ * Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class ReservationDAO {
@@ -117,6 +128,202 @@ public class ReservationDAO {
             stmt.setInt(2, customerId);
             return stmt.executeUpdate() == 1;
         }
+    }
+
+        /**
+         * Uses the rateCode to retrieve the current rate amount
+         * from the Rate table.
+         */
+    public BigDecimal getRate(Connection conn, String rateCode) throws SQLException {
+        String sql = "SELECT rateAmount FROM Rate WHERE rateCode = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, rateCode);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("rateAmount");
+                }
+            }
+        }
+        throw new SQLException("Required rate not found: " + rateCode);
+    }
+ /**
+     * Returns every dock with a 26/40/50 count, including explicit zeroes.
+     */
+    public List<DockAvailability> findDockAvailability(Connection conn)
+            throws SQLException {
+        String sql = """
+                SELECT d.dockID,
+                       d.dockNumber,
+                       d.dockDescription,
+                       sz.sizeFt,
+                       SUM(CASE
+                           WHEN s.slipID IS NOT NULL
+                            AND s.slipStatus = 'operational'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM Reservation r
+                                WHERE r.slipID = s.slipID
+                                  AND r.reservationStatus = 'Active'
+                            )
+                           THEN 1 ELSE 0
+                       END) AS availableCount
+                FROM Dock d
+                CROSS JOIN SlipSize sz
+                LEFT JOIN Slip s
+                       ON s.dockID = d.dockID
+                      AND s.slipSizeID = sz.slipSizeID
+                GROUP BY d.dockID, d.dockNumber, d.dockDescription, sz.sizeFt
+                ORDER BY d.dockNumber, sz.sizeFt
+                """;
+
+        Map<Integer, DockAvailability> docks = new LinkedHashMap<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int dockId = rs.getInt("dockID");
+                DockAvailability dock = docks.get(dockId);
+                if (dock == null) {
+                    dock = new DockAvailability();
+                    dock.setDockId(dockId);
+                    dock.setDockNumber(rs.getString("dockNumber"));
+                    dock.setDockDescription(rs.getString("dockDescription"));
+                    docks.put(dockId, dock);
+                }
+                dock.setAvailableCount(
+                        rs.getInt("sizeFt"),
+                        rs.getInt("availableCount"));
+            }
+        }
+        return new ArrayList<>(docks.values());
+    }
+
+
+
+    public Integer findAvailableSlip(
+        Connection conn, int dockId,
+        int slipSizeFt) throws SQLException {
+
+    String sql = """
+            SELECT s.slipID FROM Slip s
+            JOIN SlipSize sz
+                ON sz.slipSizeID = s.slipSizeID
+            WHERE s.dockID = ?
+              AND sz.sizeFt = ?
+              AND s.slipStatus = 'operational'
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM Reservation r
+                  WHERE r.slipID = s.slipID
+                    AND r.reservationStatus = 'Active'
+              )
+            ORDER BY s.slipNumber
+            LIMIT 1
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, dockId);
+        stmt.setInt(2, slipSizeFt);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("slipID");
+            }
+        }
+    }
+
+    return null;
+}
+
+    /** Counts free operational slips of a specific size across the marina */
+    public int countAvailableForSize(Connection conn, int slipSizeFt)
+            throws SQLException {
+        String sql = """
+                SELECT COUNT(*) AS availableCount
+                FROM Slip s
+                JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
+                WHERE sz.sizeFt = ?
+                  AND s.slipStatus = 'operational'
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM Reservation r
+                      WHERE r.slipID = s.slipID
+                        AND r.reservationStatus = 'Active'
+                  )
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, slipSizeFt);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getInt("availableCount");
+            }
+        }
+    }
+
+    /**
+     * The final confirmation number uses the generated 
+     * reservation ID, but that ID doesn’t exist until after 
+     * the insert. So the row is inserted with a temporary 
+     * unique confirmation value, the generated ID is retrieved 
+     * and then the confirmation number is updated to the final 
+     * MB-xxxxx format.
+     */
+    public String insert(Connection conn, Reservation reservation) throws SQLException {
+        String temporaryConfirmation = "TMP-"
+                + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        String insertSql = """
+                INSERT INTO Reservation (
+                    confirmationNumber,
+                    customerID,
+                    boatID,
+                    slipID,
+                    startDate,
+                    monthlyRate,
+                    electricalHookup,
+                    reservationStatus
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+
+        int reservationId;
+        try (PreparedStatement stmt = conn.prepareStatement(
+                insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, temporaryConfirmation);
+            stmt.setInt(2, reservation.getCustomerId());
+            stmt.setInt(3, reservation.getBoatId());
+            stmt.setInt(4, reservation.getSlipId());
+            stmt.setDate(5, Date.valueOf(reservation.getStartDate()));
+            stmt.setBigDecimal(6, reservation.getMonthlyRate());
+            stmt.setBoolean(7, reservation.isElectricalHookup());
+            stmt.setString(8, reservation.getReservationStatus());
+
+            if (stmt.executeUpdate() != 1) {
+                throw new SQLException("Reservation did not insert one row.");
+            }
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (!keys.next()) {
+                    throw new SQLException("Reservation did not return a reservationID.");
+                }
+                reservationId = keys.getInt(1);
+            }
+        }
+
+        String confirmation = String.format("MB-%05d", reservationId);
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                UPDATE Reservation
+                SET confirmationNumber = ?
+                WHERE reservationID = ?
+                """)) {
+            stmt.setString(1, confirmation);
+            stmt.setInt(2, reservationId);
+            if (stmt.executeUpdate() != 1) {
+                throw new SQLException("Reservation confirmation number was not saved.");
+            }
+        }
+
+        reservation.setReservationId(reservationId);
+        reservation.setConfirmationNumber(confirmation);
+        return confirmation;
     }
 
     /**

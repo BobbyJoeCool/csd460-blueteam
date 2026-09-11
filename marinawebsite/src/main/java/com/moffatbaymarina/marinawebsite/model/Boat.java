@@ -22,6 +22,11 @@ public class Boat {
     private BigDecimal boatBeam;
     private Integer boatYear;
 
+    // Reservation-page derived values; not stored on the Boat table.
+    private int slipSizeFt;
+    private int monthlyCents;
+    private boolean hasActiveReservation;
+
 // Constructor-----------------------------------------------------------------------------------------------------
     public Boat() {
     }
@@ -89,5 +94,31 @@ public class Boat {
 
     public void setBoatYear(Integer boatYear) {
         this.boatYear = boatYear;
+    }
+
+
+     public int getSlipSizeFt() {
+        return slipSizeFt;
+    }
+
+    public void setSlipSizeFt(int slipSizeFt) {
+        this.slipSizeFt = slipSizeFt;
+    }
+
+    public int getMonthlyCents() {
+        return monthlyCents;
+    }
+
+    public void setMonthlyCents(int monthlyCents) {
+        this.monthlyCents = monthlyCents;
+    }
+
+    //
+    public boolean getHasActiveReservation() {
+        return hasActiveReservation;
+    }
+
+    public void setHasActiveReservation(boolean hasActiveReservation) {
+        this.hasActiveReservation = hasActiveReservation;
     }
 }
