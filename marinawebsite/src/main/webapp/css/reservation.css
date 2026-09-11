@@ -281,6 +281,7 @@
     font-size: 0.85rem;
     color: var(--color-text-muted);
     opacity: 0.8;
+    white-space: pre-line;
 }
 
 .dock-card__stock {
@@ -493,6 +494,17 @@
     cursor: not-allowed;
 }
 
+.submit-blocked-reason {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.submit-blocked-reason:empty {
+    display: none;
+}
+
 .summary-notes {
     margin: 1.1rem 0 0;
     padding: 0;
@@ -515,7 +527,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 2rem 1rem;
 }
 
@@ -524,7 +536,7 @@
 }
 
 .boat-panel__backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: var(--color-overlay-backdrop);
 }
@@ -532,16 +544,22 @@
 .boat-panel__box {
     position: relative;
     width: min(38rem, 100%);
-    /* The card inside is --color-bg-card, a light ocean tint, which is all
-       but invisible against white - the two read as one flat box. Standing
-       the panel on the page background instead gives the card the same
-       ground it has on the Registration page, where the tint and the border
-       are enough to read as a card. Inputs keep their own white background
-       either way. */
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
     background: var(--color-bg-page);
     border: 1px solid var(--color-border);
     border-radius: 10px;
     padding: 1.5rem;
+}
+
+.boat-panel__header {
+    position: sticky;
+    top: -1.5rem;
+    margin: -1.5rem -1.5rem 0;
+    padding: 1.5rem 1.5rem 0.75rem;
+    background: var(--color-bg-page);
+    border-radius: 10px 10px 0 0;
+    z-index: 1;
 }
 
 .boat-panel__box h2 {
@@ -552,7 +570,7 @@
 }
 
 .boat-panel__lead {
-    margin: 0 0 1rem;
+    margin: 0;
 }
 
 .boat-panel__lead[hidden] {

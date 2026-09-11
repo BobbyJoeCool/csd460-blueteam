@@ -45,6 +45,13 @@ public class ContactServlet extends HttpServlet {
     private final ContactDAO contactDAO = new ContactDAO();
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.getRequestDispatcher(VIEW).forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -86,10 +93,7 @@ public class ContactServlet extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
             contactDAO.insert(conn, contact);
-            request.setAttribute(
-                    "contactSuccess",
-                    "Thanks — we'll be in touch as soon as we can.");
-            request.getRequestDispatcher(VIEW).forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/aboutUs.jsp?notice=contactSent");
         } catch (SQLException e) {
             throw new ServletException("Contact submission failed.", e);
         }

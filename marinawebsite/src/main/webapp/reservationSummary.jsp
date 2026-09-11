@@ -86,7 +86,7 @@
 
         <div class="summary-error-actions">
             <a class="btn-primary summary-link-button"
-               href="${pageContext.request.contextPath}/reservation.jsp">Return to Reservations</a>
+               href="${pageContext.request.contextPath}/reservation">Return to Reservations</a>
         </div>
     </c:when>
 
@@ -185,7 +185,6 @@
                     </div>
                 </aside>
             </div>
-            </div>
 
             <section class="summary-actions" aria-labelledby="actionsHeading">
                 <div>
@@ -200,7 +199,7 @@
 
                 <div class="summary-actions__buttons">
                     <a class="btn-primary summary-link-button"
-                       href="${pageContext.request.contextPath}/reservation.jsp">Back to Reservations</a>
+                       href="${pageContext.request.contextPath}/reservation">Back to Reservations</a>
                     <%-- Only an Active reservation can be cancelled. The servlet
                          checks this as well - the confirm() below is a courtesy,
                          not a control. --%>

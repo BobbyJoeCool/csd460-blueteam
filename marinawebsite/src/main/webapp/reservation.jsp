@@ -258,15 +258,20 @@
                             </c:forEach>
                         </fieldset>
 
+                        <button type="button" class="btn-clear-section" id="autoPickDock" disabled>
+                            Pick a dock for me
+                        </button>
+
                         <div class="field-error" id="dockError"></div>
 
                         <figure class="marina-map">
                             <img src="${pageContext.request.contextPath}/images/marina_a.png"
-                                 alt="Map of Moffat Bay Marina showing Dock A closest to the Ship
-                                      Store, Dock B in the middle, and Dock C closest to the Office,
-                                      Restaurant and Fuel Dock. Each dock has 24 slips: numbers 8 to
-                                      12 and 20 to 24 are 26 ft, numbers 4 to 7 and 16 to 19 are
-                                      40 ft, and the rest are 50 ft.">
+                                 alt="Map of Moffat Bay Marina showing Dock A (Eastern Dock) closest
+                                      to the Ship Store, Dock B (Central Dock) closest to the Office
+                                      &amp; Restaurant, and Dock C (Western Dock) closest to the
+                                      Fueling Station. Each dock has 24 slips: numbers 8 to 12 and 20
+                                      to 24 are 26 ft, numbers 4 to 7 and 16 to 19 are 40 ft, and the
+                                      rest are 50 ft.">
                             <figcaption>
                                 Slips 8&ndash;12 and 20&ndash;24 on every dock are 26 ft,
                                 4&ndash;7 and 16&ndash;19 are 40 ft, and the rest are 50 ft.
@@ -342,6 +347,7 @@
                                 class="btn-primary summary-cta" id="submitReservation" disabled>
                             Reserve My Slip
                         </button>
+                        <p class="submit-blocked-reason" id="submitBlockedReason"></p>
 
                         <ul class="summary-notes">
                             <li>30-day notice to vacate</li>
@@ -361,14 +367,16 @@
             <div class="boat-panel__backdrop" data-boat-close></div>
 
             <div class="boat-panel__box">
-                <button type="button" class="boat-panel__close" data-boat-close
-                        aria-label="Close">&times;</button>
+                <div class="boat-panel__header">
+                    <button type="button" class="boat-panel__close" data-boat-close
+                            aria-label="Close">&times;</button>
 
-                <h2 id="boatPanelTitle">Register a Boat</h2>
+                    <h2 id="boatPanelTitle">Register a Boat</h2>
 
-                <p class="boat-panel__lead" id="boatPanelLead" hidden>
-                    You'll need a registered boat before you can reserve a slip.
-                </p>
+                    <p class="boat-panel__lead" id="boatPanelLead" hidden>
+                        You'll need a registered boat before you can reserve a slip.
+                    </p>
+                </div>
 
                 <div class="form-banner" id="boatPanelError" role="alert" hidden></div>
 
