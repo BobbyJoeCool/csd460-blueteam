@@ -27,7 +27,7 @@
     <jsp:param name="activePage" value="register" />
 </jsp:include>
 
-<section class="intro-band">
+<section class="hero-band" id="registrationHero">
     <h1>Create Your Moffat Bay Marina Account</h1>
     <p>An account is required to reserve a slip. It only takes a minute.</p>
 </section>

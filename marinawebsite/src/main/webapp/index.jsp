@@ -29,18 +29,9 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 	<main class="landing-main">
 
 <!-- Hero section -->
-<section
-	class="hero-section"
-	style="
-		background-image:
-			linear-gradient(
-				rgba(13, 59, 77, 0.22),
-				rgba(13, 59, 77, 0.32)
-			),
-			url('${pageContext.request.contextPath}/images/Marina.png');
-	">
+<section class="hero-band" id="landingHero">
 
-	<div class="hero-content">
+	<div class="hero-band__content">
 		<h1>Your Harbor Between Horizons</h1>
 
 		<p class="hero-description">

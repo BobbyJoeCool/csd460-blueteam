@@ -25,8 +25,9 @@
     <title>Reserve a Slip - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
-    <%-- registration.css carries the shared form-card styles the boat panel
-         reuses (.form-group, .field-error, .callout-badge, ...). --%>
+    <%-- registration.css carries registration-specific layout (form columns,
+         password fields, etc.). Shared form classes (.form-group, .field-error,
+         .callout-badge, .btn-primary, ...) now live in site.css. --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/registration.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservation.css">
 </head>
@@ -40,11 +41,11 @@
      width of the window - registration.jsp puts its intro band in the same
      place, and for the same reason. Only the lede changes between signed in
      and signed out, so that's the only part the branch covers. --%>
-<header class="reservation-hero">
-    <div class="reservation-hero__content">
-        <p class="reservation-eyebrow">Month-to-Month Marina Lease</p>
+<header class="hero-band" id="reservationHero">
+    <div class="hero-band__content">
+        <p class="hero-band__eyebrow">Month-to-Month Marina Lease</p>
         <h1>Reserve Your Slip</h1>
-        <p class="reservation-lede">
+        <p class="hero-band__lede">
             <c:choose>
                 <c:when test="${empty sessionScope.customerId}">
                     Please sign in to reserve a slip.
@@ -55,7 +56,7 @@
             </c:choose>
         </p>
     </div>
-    <p class="reservation-hero__credit">Hero image created with Google Gemini</p>
+    <p class="hero-band__credit">Hero image created with Google Gemini</p>
 </header>
 
 <main>

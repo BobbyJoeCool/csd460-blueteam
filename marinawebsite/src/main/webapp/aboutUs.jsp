@@ -46,7 +46,7 @@
          Intro band. Same treatment as the Registration page's, so the
          two secondary pages open the same way.
          ================================================================ --%>
-    <section class="intro-band">
+    <section class="hero-band" id="aboutHero">
         <h1>About Moffat Bay Marina</h1>
         <p>Your Harbor Between Horizons</p>
     </section>

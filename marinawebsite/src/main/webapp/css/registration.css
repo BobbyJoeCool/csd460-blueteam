@@ -2,52 +2,12 @@
  * Author: Robert Breutzmann
  * CSD 460 - Capstone Project - Marina Website Project
  * Registration Page styles. Depends on site.css being linked first.
+ *
+ * Shared classes (.hero-band, .form-group, .field-error,
+ * .required-mark, .field-hint, .form-banner, .callout-badge,
+ * .btn-primary, .btn-clear-section) now live in site.css so every
+ * page gets them. Only registration-specific layout remains here.
  */
-
-/* ==========================================================================
-   Intro band
-   ========================================================================== */
-
-.intro-band {
-	/* rgba below is --color-deep-marine at 60% opacity, custom properties
-	   can't carry alpha on their own without color-mix() */
-	background:
-		linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
-		url("../images/Marina.png");
-	background-color: var(--color-bg-header);
-	background-size: cover;
-	background-position: center;
-	color: var(--color-text-inverse);
-	text-align: center;
-	padding: 4rem 1.5rem;
-}
-
-.intro-band h1 {
-	margin: 0 0 0.5rem;
-	font-size: 1.8rem;
-	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-
-.intro-band p {
-	margin: 0;
-	opacity: 0.9;
-	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* ==========================================================================
-   Form-level error banner (server-side: blank required field, DB error)
-   ========================================================================== */
-
-.form-banner {
-	max-width: 960px;
-	margin: 1.5rem auto 0;
-	padding: 0.9rem 1.2rem;
-	border-radius: 6px;
-	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
-	border: 1px solid var(--color-error);
-	color: var(--color-error);
-	font-size: 0.95rem;
-}
 
 /* ==========================================================================
    Registration form layout
@@ -88,12 +48,6 @@ main {
 	border-bottom: 1px solid var(--color-border);
 	font-size: 1.1rem;
 	color: var(--color-text-heading);
-}
-
-.form-group {
-	display: flex;
-	flex-direction: column;
-	gap: 0.35rem;
 }
 
 .form-group.field-narrow input {
@@ -138,101 +92,6 @@ main {
 	font-size: 0.85rem;
 	color: var(--color-text-muted);
 	opacity: 0.8;
-}
-
-.field-hint {
-	font-weight: 400;
-	font-size: 0.8rem;
-	color: var(--color-text-muted);
-	opacity: 0.75;
-	white-space: normal;
-}
-
-/* ==========================================================================
-   Informational callouts - "call the Marina" notes and the foreign-
-   registration badge. Not errors, so they get the golden-hour accent
-   rather than --color-error.
-   ========================================================================== */
-
-.callout-badge {
-	display: block;
-	margin: 0.25rem 0 0.5rem;
-	padding: 0.75rem 1rem;
-	border-radius: 6px;
-	background: color-mix(in srgb, var(--color-golden-hour) 18%, var(--color-surface-neutral));
-	border: 1px solid var(--color-golden-hour);
-	color: var(--color-text-body);
-	font-size: 0.85rem;
-	line-height: 1.4;
-}
-
-.callout-badge[hidden] {
-	display: none;
-}
-
-.callout-badge a {
-	font-weight: 600;
-}
-
-/* Reset buttons on the Personal Info / Boat Info cards - a lesser action
-   than the page's one primary CTA (Create Account), so this stays a
-   quiet outlined button rather than a second filled one. */
-.btn-clear-section {
-	align-self: flex-start;
-	margin-top: 0.25rem;
-	padding: 0.5rem 0.9rem;
-	border: 1px solid var(--color-border);
-	border-radius: 6px;
-	background: transparent;
-	color: var(--color-text-body);
-	font-size: 0.85rem;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.btn-clear-section:hover {
-	border-color: var(--color-cta-secondary-bg);
-	color: var(--color-cta-secondary-bg);
-}
-
-.form-group label {
-	font-size: 0.9rem;
-	font-weight: 600;
-	color: var(--color-text-heading);
-	white-space: nowrap;
-}
-
-.required-mark {
-	color: var(--color-error);
-}
-
-.form-group input,
-.form-group select {
-	padding: 0.7rem 0.8rem;
-	border: 1px solid var(--color-input-border);
-	border-radius: 6px;
-	background: var(--color-input-bg);
-	color: var(--color-input-text);
-	font-size: 0.95rem;
-	width: 100%;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-	outline: none;
-	border-color: var(--color-input-border-focus);
-	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
-}
-
-.form-group input.field-invalid,
-.form-group select.field-invalid {
-	border-color: var(--color-error);
-}
-
-.field-error {
-	color: var(--color-error);
-	font-size: 0.82rem;
-	min-height: 1.1em;
 }
 
 .form-row-split {
@@ -283,27 +142,6 @@ main {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-}
-
-.btn-primary {
-	background: var(--color-cta-primary-bg);
-	color: var(--color-cta-primary-text);
-	border: none;
-	padding: 0.85rem 1.5rem;
-	border-radius: 6px;
-	font-size: 1rem;
-	font-weight: 600;
-	cursor: pointer;
-	align-self: flex-start;
-}
-
-.btn-primary:hover:not(:disabled) {
-	background: var(--color-cta-primary-bg-hover);
-}
-
-.btn-primary:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
 }
 
 .login-link {
