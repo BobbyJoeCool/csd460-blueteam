@@ -28,8 +28,10 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 - [x] **How does this page receive the reservation data?** Decided — a
   **redirect** carrying the confirmation number, and this page looks the
   reservation up fresh from the database. The Reservation page already ships
-  this way (`reservationSummary.jsp?confirmation=MB-00061`, see the Reservation
-  contract's "Handing over to the summary page"), and it is the right call for
+  this way (`/reservationSummary?confirmation=MB-00061` — **not** `reservationSummary.jsp`,
+  see the Reservation contract's "Handing over to the summary page" for that
+  correction — going at the JSP directly would skip this servlet entirely),
+  and it is the right call for
   a reason worth writing down: a forward would mean a browser refresh
   re-submits the booking and makes a second reservation. A redirect makes
   refresh a harmless re-read.
@@ -46,7 +48,7 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
   | `reservationSummaryError` | request attribute | A ready-to-display message, set instead of `reservation` when there is nothing to show |
   | `notice` | query string | `reservationCancelled` / `reservationNotCancelled` after a cancel, read by the shared status popup |
 
-  `reservation` and `reservationError` are never both set. The page shows one
+  `reservation` and `reservationSummaryError` are never both set. The page shows one
   or the other.
 
 - [x] **Is this page accessible directly by URL?** Yes. `GET
@@ -75,7 +77,7 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 
 - [x] **Missing/invalid reservation handling:** Decided — a missing
   confirmation number, one that matches nothing, and one that belongs to
-  someone else all produce **the same** `reservationError` message and an HTTP
+  someone else all produce **the same** `reservationSummaryError` message and an HTTP
   404. Telling them apart would let someone map which confirmation numbers are
   real, which is the same reasoning the Login contract uses for its single
   generic failure message.
@@ -196,10 +198,10 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| No `confirmation` parameter | "We couldn't find that reservation. Check the confirmation number, or contact the marina office at (360) 555-0142." | On the page via `reservationError`; HTTP 404 |
+| No `confirmation` parameter | "We couldn't find that reservation. Check the confirmation number, or contact the marina office at (360) 555-0142." | On the page via `reservationSummaryError`; HTTP 404 |
 | Confirmation number matches nothing | Same message | Same |
 | Reservation belongs to another customer | Same message | Same — deliberately indistinguishable from the two above, so the page can't be used to discover which confirmation numbers exist |
-| Not signed in | No message on this page | Redirected to the landing page with the login modal opened and `redirectTo` set back to this reservation |
+| Not signed in | No message on this page | **Corrected** — this used to say "redirected to the landing page," which doesn't match what's built. `ReservationSummaryServlet` forwards (doesn't redirect) to this same page, HTTP 401, with `signInRedirectTo` set as a request attribute. `reservationSummary.jsp` renders its own "Sign in to view your reservation" panel and hands `signInRedirectTo` to the login modal, so the confirmation number in the URL survives and a successful sign-in lands right back here — a redirect to the landing page would have thrown that away |
 | Cancel succeeded | "Reservation cancelled" | Shared status popup, via `?notice=reservationCancelled` |
 | Cancel did nothing (already cancelled) | Wording via `?notice=reservationNotCancelled` | Shared status popup |
 | Database failure | Standard error page | `error.jsp`, per `web.xml` |
@@ -208,6 +210,6 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Reservation summary | Shown, if the reservation is theirs | Redirected to the landing page with the login modal opened; returns here after signing in |
+| Reservation summary | Shown, if the reservation is theirs | **Corrected** — this page's own sign-in panel is shown (forward, not a redirect to the landing page), with the login modal opened from there; returns here after signing in |
 | Someone else's reservation | Same "couldn't find that reservation" message as one that doesn't exist | n/a |
 | Cancel button | Shown only while the reservation is `Active` | n/a |

@@ -80,6 +80,31 @@ rule above — they now point at `aboutUs.jsp` / `reservation.jsp` /
 but were never nav links to begin with, so nothing to rewire for those
 four.
 
+**Update, current build has moved past the note above:** `About Us` and
+`Reservations` now point at `/about` and `/reservation` (the servlets),
+not the raw JSPs — going straight at `aboutUs.jsp` or `reservation.jsp`
+skips the servlet's `doGet()` and the page loses whatever it was supposed
+to load (owned boats/docks/pricing on Reservation; nothing extra on About
+Us, but the site's convention is now "every nav link goes through a
+servlet"). Both `includes/header.jsp` and `includes/footer.jsp` were
+updated to match.
+
+**Flagging, not yet fixed:** `Contact` in both `header.jsp` and
+`footer.jsp` still links to `contact.jsp` — the original "Coming Soon"
+placeholder — even though `aboutUs.jsp`'s own header comment says the
+Contact Us page was cut as a standalone page (professor-directed change)
+and its contact info/form moved into About Us. `contact.jsp` is now an
+orphaned stub nobody actually needs, and `DevNotes/Contracts/contact-us-contract.md`
+(referenced in `contact.jsp`'s own header) was never created. The site's
+real, working contact form lives at `/about` (via `ContactServlet`,
+mapped to `/contact` for the form's own `POST`/redirect target), so the
+nav's `Contact` link should almost certainly point there instead — this
+wasn't rewired when the professor-directed change happened and nobody's
+caught it since. Worth a team decision: repoint `Contact` to `/about`
+(maybe scrolled to the form's `<section>`), drop it from the nav
+entirely since About Us already covers it, or actually build out
+`contact.jsp` as its own page after all.
+
 ## Signed-In vs Signed-Out Header
 
 **Added 2026-09-06.** The header is on every page, so it is where the site
