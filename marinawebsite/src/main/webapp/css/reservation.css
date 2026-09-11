@@ -9,93 +9,18 @@
  * centred hero, month-to-month notice band, three numbered step cards down
  * the left, sticky Reservation Summary down the right.
  *
- * Loaded after registration.css, which carries the shared form-card styles
- * the boat panel reuses. Colors come from the semantic variables in
+ * Loaded after registration.css (registration-specific layout). Shared
+ * form classes (.form-group, .field-error, .callout-badge, .btn-primary,
+ * etc.) live in site.css. Colors come from the semantic variables in
  * site.css - nothing outside that file's palette section should reference a
  * hex value directly.
  */
 
 /* ------------------------------------------------------------------ hero */
 
-/* A photo band, the same treatment as .intro-band on Registration and the
-   landing page's .hero-section, but shorter than either: people arrive here
-   wanting to fill the form in, so the picture shouldn't be a scroll to get
-   past. Sits outside <main> so it can run the full width of the window -
-   registration.jsp does the same with its intro band.
-
-   The gradient is --color-deep-marine at 48-62%, written as rgba because a
-   custom property can't carry an alpha channel on its own. It's heavier than
-   the landing page's because this photo is a sunset: the horizon is a bright
-   orange band straight across the middle, exactly where the heading sits.
-   Heavier again and the sunset stops being worth having behind the text. */
-.reservation-hero {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 17rem;
-    padding: 3.5rem 1.5rem;
-    background:
-        linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
-        url("../images/Slip_Closeup.png");
-    background-color: var(--color-bg-header);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: var(--color-text-inverse);
-    text-align: center;
-}
-
-.reservation-hero__content {
-    max-width: 46rem;
-}
-
-.reservation-eyebrow {
-    margin: 0 0 0.5rem;
-    font-size: 0.8rem;
-    font-weight: bold;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    /* Was ocean blue, back when this sat on the sand page background. */
-    color: var(--color-text-inverse);
-    opacity: 0.9;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-}
-
-.reservation-hero h1 {
-    margin: 0 0 0.75rem;
-    /* The prototype sets the page title in a serif, against the sans the
-       rest of the site uses. */
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: normal;
-    font-size: clamp(2rem, 5vw, 3rem);
-    line-height: 1.15;
-    color: var(--color-text-inverse);
-    text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 12px rgba(0, 0, 0, 0.6);
-}
-
-.reservation-lede {
-    margin: 0;
-    font-size: 1.05rem;
-    color: var(--color-text-inverse);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-}
-
-/* Credit for the hero photo. Small and out of the way in the corner, but on
-   the page rather than buried in a comment. */
-.reservation-hero__credit {
-    position: absolute;
-    right: 0.9rem;
-    bottom: 0.6rem;
-    margin: 0;
-    font-size: 0.7rem;
-    letter-spacing: 0.04em;
-    color: var(--color-text-inverse);
-    opacity: 0.75;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
+/* The reservation hero uses .hero-band + #reservationHero (site.css) for
+   its photo band, gradient, and heading styles. Only the page-specific
+   layout below the hero remains here. */
 
 .reservation-wrap {
     max-width: 72rem;
@@ -660,8 +585,3 @@
     width: 100%;
 }
 
-/* .form-banner comes from registration.css; this page toggles it, so it
-   needs to honour [hidden]. */
-.form-banner[hidden] {
-    display: none;
-}

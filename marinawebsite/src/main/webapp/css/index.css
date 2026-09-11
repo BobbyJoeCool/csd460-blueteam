@@ -15,36 +15,9 @@
 }
 
 /* ==========================================================================
-   Hero section
+   Hero section — landing-page-specific hero children.
+   Base layout and image come from .hero-band + #landingHero in site.css.
    ========================================================================== */
-
-.hero-section {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 400px;
-	background-color: var(--color-bg-header);
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	color: var(--color-text-inverse);
-	text-align: center;
-	padding: 4rem 1.5rem;
-}
-
-.hero-content {
-	max-width: 780px;
-}
-
-.hero-content h1 {
-	margin: 0 0 1.25rem;
-	font-family: Georgia, "Times New Roman", serif;
-	font-size: clamp(2.4rem, 5vw, 3.8rem);
-	line-height: 1.1;
-	text-shadow:
-		0 2px 4px rgba(0, 0, 0, 0.95),
-		0 0 12px rgba(0, 0, 0, 0.75);
-}
 
 .hero-description,
 .hero-tagline {
@@ -168,48 +141,6 @@
 	opacity: 0.85;
 }
 
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
-
-.btn-primary {
-	display: inline-block;
-	background: var(--color-cta-primary-bg);
-	color: var(--color-cta-primary-text);
-	border: none;
-	padding: 0.85rem 1.5rem;
-	border-radius: 6px;
-	font-family: inherit;
-	font-size: 1rem;
-	font-weight: 600;
-	text-decoration: none;
-	cursor: pointer;
-}
-
-.btn-primary:hover {
-	background: var(--color-cta-primary-bg-hover);
-	color: var(--color-cta-primary-text);
-}
-
-.btn-secondary {
-	display: inline-block;
-	background: transparent;
-	color: var(--color-cta-secondary-text);
-	border: 1px solid var(--color-cta-secondary-text);
-	padding: 0.75rem 1.4rem;
-	border-radius: 6px;
-	font-size: 0.95rem;
-	font-weight: 600;
-	text-decoration: none;
-}
-
-.btn-secondary:hover {
-	background: var(--color-cta-secondary-bg-hover);
-	border-color: var(--color-cta-secondary-bg-hover);
-	color: var(--color-charcoal-navy);
-}
-
-
 
 /* ==========================================================================
    Responsive layout
@@ -226,12 +157,12 @@
 @media (max-width: 600px) {
 	
 
-	.hero-section {
+	#landingHero {
 		min-height: 360px;
 		padding: 3rem 1.25rem;
 	}
 
-	.hero-content h1 {
+	#landingHero h1 {
 		font-size: 2.4rem;
 	}
 

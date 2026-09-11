@@ -159,3 +159,359 @@ a {
 a:hover {
     color: var(--color-link-hover);
 }
+
+/* ==========================================================================
+   Shared component styles
+   Classes used by more than one page, kept here so every page that loads
+   site.css (via includes/styles.jsp) gets them without importing another
+   page's stylesheet.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Hero band — full-width photo header with a dark gradient overlay and
+   centered white text. Every page's banner inherits this base and adds
+   its own image/gradient/height.
+
+   Base class:  .hero-band
+   Used by: registration.jsp  (#registrationHero)
+            aboutUs.jsp       (#aboutHero)
+            index.jsp         (#landingHero)
+            reservation.jsp   (#reservationHero)
+   -------------------------------------------------------------------------- */
+
+.hero-band {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-header);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--color-text-inverse);
+    text-align: center;
+    padding: 4rem 1.5rem;
+}
+
+.hero-band h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.8rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-band p {
+    margin: 0;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Eyebrow text above the h1 (Reservation uses this today; available to
+   any hero that wants a category label above its title). */
+.hero-band__eyebrow {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-inverse);
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Subtitle text below the h1. */
+.hero-band__lede {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--color-text-inverse);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Small-print image credit, pinned to the bottom-right corner. */
+.hero-band__credit {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.6rem;
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-inverse);
+    opacity: 0.75;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Content container inside the hero — caps the text width. */
+.hero-band__content {
+    max-width: 46rem;
+}
+
+/* --------------------------------------------------------------------------
+   Page-specific hero overrides — each page targets its hero by id.
+   The id carries only the properties that differ from the base.
+   -------------------------------------------------------------------------- */
+
+/* Registration + About Us: Marina.png, 60% deep-marine overlay.
+   Used by: registration.jsp (#registrationHero),
+            aboutUs.jsp      (#aboutHero) */
+#registrationHero,
+#aboutHero {
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
+        url("../images/Marina.png");
+}
+
+/* Landing page: Marina.png, light 22-32% overlay so the photo dominates.
+   Taller than other heroes to anchor the first impression.
+   Used by: index.jsp (#landingHero) */
+#landingHero {
+    min-height: 400px;
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.22), rgba(13, 59, 77, 0.32)),
+        url("../images/Marina.png");
+}
+
+#landingHero .hero-band__content {
+    max-width: 780px;
+}
+
+#landingHero h1 {
+    margin: 0 0 1.25rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    line-height: 1.1;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.95),
+        0 0 12px rgba(0, 0, 0, 0.75);
+}
+
+/* Reservation: Slip_Closeup.png, heavier 48-62% gradient (the sunset
+   horizon is bright orange right where the heading sits). Shorter than
+   the landing hero — people arrive here to fill a form, not admire
+   the view.
+   Used by: reservation.jsp (#reservationHero) */
+#reservationHero {
+    min-height: 17rem;
+    padding: 3.5rem 1.5rem;
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
+        url("../images/Slip_Closeup.png");
+}
+
+#reservationHero h1 {
+    margin: 0 0 0.75rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: normal;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.15;
+    color: var(--color-text-inverse);
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   Form groups — label + input/select + error stacks.
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp (boat panel),
+            includes/boatInfoCard.jsp, includes/personalInfoCard.jsp
+   -------------------------------------------------------------------------- */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-heading);
+    white-space: nowrap;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--color-input-border);
+    border-radius: 6px;
+    background: var(--color-input-bg);
+    color: var(--color-input-text);
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-input-border-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
+}
+
+.form-group input.field-invalid,
+.form-group select.field-invalid {
+    border-color: var(--color-error);
+}
+
+/* --------------------------------------------------------------------------
+   Field error — validation message beneath a form field.
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
+            includes/boatInfoCard.jsp
+   -------------------------------------------------------------------------- */
+
+.field-error {
+    color: var(--color-error);
+    font-size: 0.82rem;
+    min-height: 1.1em;
+}
+
+/* --------------------------------------------------------------------------
+   Required mark — the red asterisk after a label.
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
+            includes/boatInfoCard.jsp
+   -------------------------------------------------------------------------- */
+
+.required-mark {
+    color: var(--color-error);
+}
+
+/* --------------------------------------------------------------------------
+   Field hint — secondary label text (e.g. "(optional)", "(recommended)").
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
+            includes/boatInfoCard.jsp
+   -------------------------------------------------------------------------- */
+
+.field-hint {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    opacity: 0.75;
+    white-space: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Form banner — page-level success/error message above a form.
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp
+   -------------------------------------------------------------------------- */
+
+.form-banner {
+    max-width: 960px;
+    margin: 1.5rem auto 0;
+    padding: 0.9rem 1.2rem;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
+    border: 1px solid var(--color-error);
+    color: var(--color-error);
+    font-size: 0.95rem;
+}
+
+.form-banner[hidden] {
+    display: none;
+}
+
+.form-banner--success {
+    background: color-mix(in srgb, var(--color-success) 8%, var(--color-surface-neutral));
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+/* --------------------------------------------------------------------------
+   Callout badge — informational (non-error) notice inside a form card.
+   Used by: registration.jsp (foreign-registration note),
+            reservation.jsp (boat panel), includes/boatInfoCard.jsp
+   -------------------------------------------------------------------------- */
+
+.callout-badge {
+    display: block;
+    margin: 0.25rem 0 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-golden-hour) 18%, var(--color-surface-neutral));
+    border: 1px solid var(--color-golden-hour);
+    color: var(--color-text-body);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.callout-badge[hidden] {
+    display: none;
+}
+
+.callout-badge a {
+    font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Primary button — the one CTA per page (coral background).
+   Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
+            reservationSummary.jsp, index.jsp
+   -------------------------------------------------------------------------- */
+
+.btn-primary {
+    display: inline-block;
+    background: var(--color-cta-primary-bg);
+    color: var(--color-cta-primary-text);
+    border: none;
+    padding: 0.85rem 1.5rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-cta-primary-bg-hover);
+    color: var(--color-cta-primary-text);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Secondary button — every button after the one primary CTA.
+   Used by: index.jsp
+   -------------------------------------------------------------------------- */
+
+.btn-secondary {
+    display: inline-block;
+    background: transparent;
+    color: var(--color-cta-secondary-text);
+    border: 1px solid var(--color-cta-secondary-text);
+    padding: 0.75rem 1.4rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: var(--color-cta-secondary-bg-hover);
+    border-color: var(--color-cta-secondary-bg-hover);
+    color: var(--color-charcoal-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Clear/reset section button — quiet outlined button for lesser actions.
+   Used by: registration.jsp (personal/boat info reset),
+            reservation.jsp (boat panel, decline wait list)
+   -------------------------------------------------------------------------- */
+
+.btn-clear-section {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-clear-section:hover {
+    border-color: var(--color-cta-secondary-bg);
+    color: var(--color-cta-secondary-bg);
+}
