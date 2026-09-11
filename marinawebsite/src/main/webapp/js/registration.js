@@ -1,4 +1,6 @@
 /*
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * src/main/webapp/js/registration.js
  *
  * Client-side validation and form-state wiring for the Registration page.

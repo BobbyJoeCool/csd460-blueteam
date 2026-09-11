@@ -1,6 +1,8 @@
 /*
  * src/main/webapp/js/aboutUs.js
  * Author: Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  * CSD 460 - Capstone Project - Marina Website Project
  *
  * Client-side checks for the About Us contact form, plus the character

@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   "Password must contain" checklist box. Shows/hides a checkmark per
   rule as the user types, via passwordRules.js (which pairs with this
   markup - the actual rule definitions/regexes stay in

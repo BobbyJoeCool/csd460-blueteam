@@ -26,6 +26,8 @@ import jakarta.servlet.http.HttpSession;
  * returning to it logged out would just bounce them again.
  *
  * @author Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  */
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {

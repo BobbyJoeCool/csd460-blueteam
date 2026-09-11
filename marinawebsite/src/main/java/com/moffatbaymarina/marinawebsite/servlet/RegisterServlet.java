@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * Handles customer and optional boat registration.
  * Ai assisted with JavaDoc comments in this file.
  * @author Carolina Rodriguez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina Rodriguez
  */
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {

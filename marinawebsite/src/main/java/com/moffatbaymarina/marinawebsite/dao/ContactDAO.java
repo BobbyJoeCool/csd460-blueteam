@@ -13,7 +13,8 @@ import com.moffatbaymarina.marinawebsite.model.Contact;
  * Data access for contact-form submissions.
  *
  * @author White, S.
- * Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  * 
  * Handles database access for contact form submissions.
  *

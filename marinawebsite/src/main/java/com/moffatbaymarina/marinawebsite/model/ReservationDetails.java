@@ -24,6 +24,8 @@ import java.util.Date;
  * the JSP - the page should never do arithmetic it could get wrong.
  *
  * @author Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class ReservationDetails implements Serializable {

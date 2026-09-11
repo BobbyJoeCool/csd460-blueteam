@@ -1,6 +1,8 @@
 <%--
     Front End:   Robert Breutzmann
     Back End:    Sara White (not built yet - this page runs on stub data)
+    Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+    Primary Author/Owner - Robert Breutzmann
     Course:      CSD 460 - Capstone Project
     Module:      Module 6 / Week 5 - Web Development 2
     Page:        Reservation (Book a Slip) (reservation.jsp)

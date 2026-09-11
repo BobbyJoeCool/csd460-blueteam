@@ -10,6 +10,8 @@ import java.math.BigDecimal;
  *
  * Ai assisted with JavaDoc comments in this file.
  * @author Carolina Rodriguez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina Rodriguez
  */
 public class Boat {
 

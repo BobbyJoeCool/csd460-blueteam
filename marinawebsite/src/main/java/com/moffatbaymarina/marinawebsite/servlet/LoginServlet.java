@@ -43,6 +43,8 @@ import jakarta.servlet.http.HttpSession;
  * whole point of the single generic error message.
  *
  * @author Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 @WebServlet("/login")

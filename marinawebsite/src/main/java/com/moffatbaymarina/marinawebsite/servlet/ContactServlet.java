@@ -19,8 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author White, S. 
- * Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * @author White, S.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  * 
  * Handles contact form submissions from the About Us page.
  *

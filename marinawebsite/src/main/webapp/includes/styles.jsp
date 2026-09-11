@@ -1,4 +1,7 @@
 <%-- 
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Sara White
+
     Shared global stylesheets.
     Include this file in the <head> of each page using:
 

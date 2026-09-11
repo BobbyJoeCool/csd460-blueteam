@@ -1,6 +1,6 @@
 /**  
- *  Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
- * @author White, S. 
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
 */
 
 package com.moffatbaymarina.marinawebsite.servlet;

@@ -1,5 +1,7 @@
 /*
  * Blue Team - CSD 460 Capstone - Moffat Bay Marina
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * Shared client-side form helpers: phone formatting, password rule
  * checking, email format checking. Any page can pull this in with
  *   <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>

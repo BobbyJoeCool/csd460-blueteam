@@ -2,6 +2,8 @@
  * Blue Team - CSD 460 Capstone - Moffat Bay Marina
  * js/reservation.js
  * Author: Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  *
  * The Reservation page: pricing, the availability flag, the register-a-boat
  * panel, and the wait-list prompt.

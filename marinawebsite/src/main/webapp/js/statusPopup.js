@@ -2,6 +2,8 @@
  * Blue Team - CSD 460 Capstone - Moffat Bay Marina
  * js/statusPopup.js
  * Author: Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  *
  * The shared status popup. Loaded by includes/statusPopup.jsp, which is
  * itself pulled in by header.jsp, so this is available on every page.

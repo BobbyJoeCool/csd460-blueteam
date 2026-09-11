@@ -1,5 +1,7 @@
 <!--Blue Team
 Author: Carolina Rodriguez
+Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+Primary Author/Owner - Carolina Rodriguez
 Description: Provides the public landing page for the Moffat Bay Marina website. 
 The page contains the main navigation, marina branding, hero section, slip and amenity highlights, 
 registration call to action, contact information, office hours, and footer navigation. 

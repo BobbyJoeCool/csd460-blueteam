@@ -1,6 +1,8 @@
 <%--
     Front End:   Robert Breutzmann
     Back End:    N/A
+    Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+    Primary Author/Owner - Robert Breutzmann
     Course:      CSD 460 - Capstone Project
     Module:      Module 9 / Week 7 - Web Development 5
     Page:        Wait List Lookup (waitListLookup.jsp)

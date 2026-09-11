@@ -19,6 +19,8 @@ import java.util.Properties;
  * databasescripts/MoffatBayMarinaDB_V1-0-0.sql.
  *
  * @author Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public final class DBConnection {

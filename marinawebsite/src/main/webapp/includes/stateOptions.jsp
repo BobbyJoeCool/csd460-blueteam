@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   Shared <option> list for a US state <select>. Include this inside a
   <select>, passing the form field name to check against via a
   <jsp:param> named "fieldName" so the right option gets marked

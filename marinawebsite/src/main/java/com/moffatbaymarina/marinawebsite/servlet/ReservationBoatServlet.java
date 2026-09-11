@@ -1,5 +1,6 @@
 /** 
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  * 
  * 
  * Handles adding a new boat from the Reservation page.

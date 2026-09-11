@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   Shared <option> list for a Canadian province/territory <select> - the
   mailing address's own State/Province field's option set when Country
   is Canada. Same fieldName/selected pattern as stateOptions.jsp:

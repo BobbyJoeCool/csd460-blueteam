@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   Shared <option> list for the Country <select> - United States, Canada,
   or Other. Include this inside a <select>, passing the form field name to
   check against via a <jsp:param> named "fieldName" so the right option

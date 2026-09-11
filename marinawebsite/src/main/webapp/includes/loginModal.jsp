@@ -24,6 +24,8 @@
                         refills without the servlet having to hand it back.
 
   Author: Miguel Fernandez
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Miguel Fernandez
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>

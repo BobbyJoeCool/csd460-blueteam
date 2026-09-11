@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   Personal Information card (name, phone, mailing address) - the left
   column of the Registration form.
 

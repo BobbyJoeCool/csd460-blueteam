@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
     Generic error page, wired up in WEB-INF/web.xml as the target for a
     404 and for any uncaught exception (java.lang.Throwable). Deliberately
     shows only a generic message - never the exception itself - so a DB

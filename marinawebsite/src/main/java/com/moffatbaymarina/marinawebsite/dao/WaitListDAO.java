@@ -15,6 +15,8 @@ import java.sql.SQLException;
  * work starts.
  *
  * @author Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  */
 public class WaitListDAO {
 
