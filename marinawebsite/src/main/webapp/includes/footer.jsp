@@ -32,7 +32,7 @@
                     Home
                 </a>
 
-                <a href="${pageContext.request.contextPath}/aboutUs.jsp">
+                <a href="${pageContext.request.contextPath}/about">
                     About Us
                 </a>
 

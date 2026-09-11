@@ -17,6 +17,7 @@ import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,10 +27,17 @@ import jakarta.servlet.http.HttpSession;
 /**
  * Loads the Reservation page and creates reservations.
  *
- * @author White, S. 
+ * <p>{@code @MultipartConfig} is required here - {@code reservation.js}
+ * posts the reservation form as a {@code FormData} body, which browsers
+ * always send as {@code multipart/form-data}. Without this annotation,
+ * {@code request.getParameter()} can't see any of that body, so every
+ * submitted field would look blank.
+ *
+ * @author White, S.
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  */
 @WebServlet("/reservation")
+@MultipartConfig
 public class ReservationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -112,115 +120,114 @@ public class ReservationServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-    conn.setAutoCommit(false);
+            conn.setAutoCommit(false);
 
-    try {
-        List<Boat> ownedBoats =
-                boatDAO.findByCustomerId(conn, customerId);
+            try {
+                List<Boat> ownedBoats =
+                        boatDAO.findByCustomerId(conn, customerId);
 
-        Boat boat = null;
+                Boat boat = null;
 
-        for (Boat currentBoat : ownedBoats) {
-            if (currentBoat.getBoatId() == boatId) {
-                boat = currentBoat;
-                break;
-            }
-        }
+                for (Boat currentBoat : ownedBoats) {
+                    if (currentBoat.getBoatId() == boatId) {
+                        boat = currentBoat;
+                        break;
+                    }
+                }
 
-        if (boat == null) {
-            conn.rollback();
-            writeJson(response, "{\"ok\":false,\"boatError\":\"Select a boat for this reservation.\"}");
-            return;
-        }
+                if (boat == null) {
+                    conn.rollback();
+                    writeJson(response, "{\"ok\":false,\"boatError\":\"Select a boat for this reservation.\"}");
+                    return;
+                }
 
-        if (boat.getHasActiveReservation()) {
-            conn.rollback();
-            writeJson(response, "{\"ok\":false,\"boatError\":\""
-                    + jsonEscape(boat.getBoatName())
-                    + " already has an active reservation.\"}");
-            return;
-        }
+                if (boat.getHasActiveReservation()) {
+                    conn.rollback();
+                    writeJson(response, "{\"ok\":false,\"boatError\":\""
+                            + jsonEscape(boat.getBoatName())
+                            + " already has an active reservation.\"}");
+                    return;
+                }
 
-        int slipSizeFt = slipSizeFor(boat.getBoatLength());
+                int slipSizeFt = slipSizeFor(boat.getBoatLength());
 
-        if (slipSizeFt == 0) {
-            conn.rollback();
-            writeJson(response,
-                    "{\"ok\":false,\"boatError\":\"We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142.\"}");
-            return;
-        }
+                if (slipSizeFt == 0) {
+                    conn.rollback();
+                    writeJson(response,
+                            "{\"ok\":false,\"boatError\":\"We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142.\"}");
+                    return;
+                }
 
+                Integer slipId = reservationDAO.findAvailableSlip(
+                        conn, dockId, slipSizeFt);
 
-        Integer slipId = reservationDAO.findAvailableSlip(
-                conn, dockId, slipSizeFt);
+                if (slipId == null) {
+                    int marinaWide =
+                            reservationDAO.countAvailableForSize(conn, slipSizeFt);
 
-        if (slipId == null) {
-            int marinaWide =
-                    reservationDAO.countAvailableForSize(conn, slipSizeFt);
+                    conn.rollback();
 
-            conn.rollback();
+                    if (marinaWide == 0) {
+                        writeJson(response,
+                                "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
+                                        + slipSizeFt + "}");
+                    } else {
+                        writeJson(response,
+                                "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
+                                        + slipSizeFt + ",\"dockId\":" + dockId + "}");
+                    }
 
-            if (marinaWide == 0) {
+                    return;
+                }
+
+                BigDecimal perFootRate =
+                        reservationDAO.getRate(conn, SLIP_RATE);
+
+                BigDecimal electricRate =
+                        reservationDAO.getRate(conn, ELECTRIC_RATE);
+
+                BigDecimal monthlyRate =
+                        boat.getBoatLength().multiply(perFootRate);
+
+                if (electricalHookup) {
+                    monthlyRate = monthlyRate.add(electricRate);
+                }
+
+                monthlyRate =
+                        monthlyRate.setScale(2, RoundingMode.HALF_UP);
+
+                Reservation reservation = new Reservation();
+
+                reservation.setCustomerId(customerId);
+                reservation.setBoatId(boatId);
+                reservation.setSlipId(slipId);
+                reservation.setStartDate(startDate);
+                reservation.setMonthlyRate(monthlyRate);
+                reservation.setReservationStatus("Active");
+                reservation.setElectricalHookup(electricalHookup);
+
+                String confirmation =
+                        reservationDAO.insert(conn, reservation);
+
+                conn.commit();
+
                 writeJson(response,
-                        "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
-                                + slipSizeFt + "}");
-            } else {
-                writeJson(response,
-                        "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
-                                + slipSizeFt + ",\"dockId\":" + dockId + "}");
+                        "{\"ok\":true,\"confirmationNumber\":\""
+                                + jsonEscape(confirmation) + "\"}");
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+
+            } finally {
+                conn.setAutoCommit(true);
             }
 
-            return;
+        } catch (SQLException e) {
+            throw new ServletException(
+                    "Reservation could not be completed.", e);
         }
-
-        BigDecimal perFootRate =
-                reservationDAO.getRate(conn, SLIP_RATE);
-
-        BigDecimal electricRate =
-                reservationDAO.getRate(conn, ELECTRIC_RATE);
-
-        BigDecimal monthlyRate =
-                boat.getBoatLength().multiply(perFootRate);
-
-        if (electricalHookup) {
-            monthlyRate = monthlyRate.add(electricRate);
-        }
-
-        monthlyRate =
-                monthlyRate.setScale(2, RoundingMode.HALF_UP);
-
-        Reservation reservation = new Reservation();
-
-        reservation.setCustomerId(customerId);
-        reservation.setBoatId(boatId);
-        reservation.setSlipId(slipId);
-        reservation.setStartDate(startDate);
-        reservation.setMonthlyRate(monthlyRate);
-        reservation.setReservationStatus("Active");
-        reservation.setElectricalHookup(electricalHookup);
-
-        String confirmation =
-                reservationDAO.insert(conn, reservation);
-
-        conn.commit();
-
-        writeJson(response,
-                "{\"ok\":true,\"confirmationNumber\":\""
-                        + jsonEscape(confirmation) + "\"}");
-
-    } catch (SQLException e) {
-        conn.rollback();
-        throw e;
-
-    } finally {
-        conn.setAutoCommit(true);
     }
-
-} catch (SQLException e) {
-    throw new ServletException(
-            "Reservation could not be completed.", e);
-}
-}
     /**
      * Helper method determines if a login session exists.
      * If yes, checks for customerId and returns that ID.

@@ -105,9 +105,10 @@
                     <span class="about-fact__figure">3</span>
                     <h3>Docks</h3>
                     <p>
-                        Docks A, B and C. A is closest to the Ship Store, C is
-                        closest to the Office, Restaurant and Fuel Dock, and B
-                        sits between them.
+                        Docks A, B and C - the Eastern, Central and Western
+                        docks. A is closest to the Ship Store, B is closest to
+                        the Office &amp; Restaurant, and C is closest to the
+                        Fueling Station.
                     </p>
                 </div>
 
@@ -226,10 +227,10 @@
                 <a href="tel:+13605550142">(360) 555-0142</a>.
             </p>
 
-            <%-- Set by the back end after a successful submission. --%>
-            <c:if test="${not empty contactSuccess}">
+            <%-- Redirected here with ?notice=contactSent after a successful submission. --%>
+            <c:if test="${param.notice == 'contactSent'}">
                 <p class="form-banner form-banner--success" role="status">
-                    <c:out value="${contactSuccess}"/>
+                    Thanks — we'll be in touch as soon as we can.
                 </p>
             </c:if>
 

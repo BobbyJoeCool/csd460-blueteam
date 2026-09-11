@@ -199,6 +199,12 @@ public class ReservationDAO {
 
 
 
+    /**
+     * {@code FOR UPDATE} locks the returned slip row so a second, concurrent
+     * call can't also see it as free before this transaction commits or
+     * rolls back - without it, two requests racing for the same last-open
+     * slip could both pass this check and both book it.
+     */
     public Integer findAvailableSlip(
         Connection conn, int dockId,
         int slipSizeFt) throws SQLException {
@@ -218,6 +224,7 @@ public class ReservationDAO {
               )
             ORDER BY s.slipNumber
             LIMIT 1
+            FOR UPDATE
             """;
 
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {

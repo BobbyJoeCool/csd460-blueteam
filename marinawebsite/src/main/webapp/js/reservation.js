@@ -27,6 +27,7 @@ MoffatBay.reservation = (function () {
     var checkInDate    = document.getElementById("checkInDate");
     var electric       = document.getElementById("wantsElectric");
     var submitBtn      = document.getElementById("submitReservation");
+    var submitBlockedReason = document.getElementById("submitBlockedReason");
 
     var boatError      = document.getElementById("boatError");
     var dateError      = document.getElementById("dateError");
@@ -51,6 +52,7 @@ MoffatBay.reservation = (function () {
     var summaryDock    = document.getElementById("summaryDock");
     var dockRadios     = Array.prototype.slice.call(
                              form.querySelectorAll('input[name="dockId"]'));
+    var autoPickBtn    = document.getElementById("autoPickDock");
     var ratePerFootEl  = document.getElementById("ratePerFoot");
     var rateElectricEl = document.getElementById("rateElectric");
 
@@ -199,6 +201,51 @@ MoffatBay.reservation = (function () {
                                 + "We'll assign you a slip on whichever you pick.");
             }
         }
+
+        if (autoPickBtn) {
+            autoPickBtn.disabled = !size || freeSlips(size) === 0;
+        }
+    }
+
+    /**
+     * "Pick a dock for me" - checks the real dock radio with the most free
+     * slips of the chosen size, so the form still submits a normal dockId
+     * like any other selection. Ties are broken at random rather than
+     * always favouring the same dock (e.g. always Dock A).
+     */
+    function pickDockForMe() {
+        var opt = selectedOption();
+        var size = opt ? Number(opt.dataset.slipSize) : 0;
+        if (!size) { return; }
+
+        var best = [];
+        var bestFree = 0;
+
+        dockRadios.forEach(function (radio) {
+            if (radio.disabled) { return; }
+
+            var dockId = Number(radio.value);
+            var dock = null;
+            for (var i = 0; i < docks.length; i++) {
+                if (Number(docks[i].dockId) === dockId) { dock = docks[i]; }
+            }
+
+            var free = freeOnDock(dock, size);
+            if (free > bestFree) {
+                bestFree = free;
+                best = [radio];
+            } else if (free === bestFree && free > 0) {
+                best.push(radio);
+            }
+        });
+
+        if (!best.length) { return; }
+
+        var chosen = best[Math.floor(Math.random() * best.length)];
+        chosen.checked = true;
+        setText(dockError, "");
+        updateAvailability();
+        updateSummary();
     }
 
     // ------------------------------------------------- slip size cards
@@ -320,6 +367,7 @@ MoffatBay.reservation = (function () {
         if (!opt) {
             if (availPanel) { availPanel.hidden = true; }
             setSubmitEnabled(false);
+            setText(submitBlockedReason, "Select a boat to continue.");
             return;
         }
 
@@ -335,6 +383,7 @@ MoffatBay.reservation = (function () {
                 "We don't have a slip that fits a boat over 50 feet. "
                 + "Please call the marina at (360) 555-0142.");
             setSubmitEnabled(false);
+            setText(submitBlockedReason, "We don't have a slip that fits this boat.");
             return;
         }
 
@@ -343,6 +392,7 @@ MoffatBay.reservation = (function () {
             setText(boatError, (opt.dataset.boatName || "That boat")
                 + " already has an active reservation.");
             setSubmitEnabled(false);
+            setText(submitBlockedReason, "This boat already has an active reservation.");
             return;
         }
 
@@ -353,6 +403,8 @@ MoffatBay.reservation = (function () {
             availPanel.classList.add("is-full");
             setText(availMessage, "All of our " + size + " ft slips are currently reserved.");
             setSubmitEnabled(false);
+            setText(submitBlockedReason, "All " + size + " ft slips are currently reserved.");
+            showWaitList(size);
             return;
         }
 
@@ -360,8 +412,21 @@ MoffatBay.reservation = (function () {
         availPanel.classList.remove("is-full");
         setText(availMessage, "");
 
-        /* There is room somewhere, but they still have to say where. */
-        setSubmitEnabled(!!selectedDock());
+        /* There is room somewhere, but they still have to say where, and
+           when. Dock first, since it's the earlier step on the page. */
+        var dockChosen = !!selectedDock();
+        var dateChosen = !!(checkInDate && checkInDate.value
+                && checkInDate.value >= todayIso());
+
+        setSubmitEnabled(dockChosen && dateChosen);
+
+        if (!dockChosen) {
+            setText(submitBlockedReason, "Choose a dock to continue.");
+        } else if (!dateChosen) {
+            setText(submitBlockedReason, "Choose a start date to continue.");
+        } else {
+            setText(submitBlockedReason, "");
+        }
     }
 
     /** Redraws every part of the page that depends on the chosen boat. */
@@ -396,6 +461,8 @@ MoffatBay.reservation = (function () {
         if (!boatPanel) { return; }
         lastFocused = document.activeElement;
         boatPanel.hidden = false;
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
         setBanner(boatPanelError, "");
         var first = document.getElementById("boatName");
         if (first) { first.focus(); }
@@ -404,6 +471,8 @@ MoffatBay.reservation = (function () {
     function closeBoatPanel() {
         if (!boatPanel) { return; }
         boatPanel.hidden = true;
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
         if (lastFocused) { lastFocused.focus(); }
     }
 
@@ -465,6 +534,9 @@ MoffatBay.reservation = (function () {
 
         var country = boatPanel ? boatPanel.dataset.country : "";
 
+        if (hin.trim() === "" && reg.trim() === "") {
+            return "Enter either a HIN or a Registration Number.";
+        }
         if (!f.isValidHIN(hin.trim().toUpperCase())) {
             return "HIN should be 12 characters: 3 letters, then 9 more "
                  + "letters or numbers.";
@@ -687,8 +759,15 @@ MoffatBay.reservation = (function () {
             updateSummary();
         });
     });
+    if (autoPickBtn)  { autoPickBtn.addEventListener("click", pickDockForMe); }
     if (electric)     { electric.addEventListener("change", updateSummary); }
-    if (checkInDate)  { checkInDate.addEventListener("change", updateSummary); }
+    if (checkInDate)  {
+        checkInDate.addEventListener("change", function () {
+            setText(dateError, "");
+            updateAvailability();
+            updateSummary();
+        });
+    }
     if (openPanelBtn) { openPanelBtn.addEventListener("click", openBoatPanel); }
     if (boatPanelForm){ boatPanelForm.addEventListener("submit", handleBoatSave); }
 

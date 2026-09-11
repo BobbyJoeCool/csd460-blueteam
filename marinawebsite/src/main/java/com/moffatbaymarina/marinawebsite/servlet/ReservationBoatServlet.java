@@ -29,14 +29,24 @@ import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/** Saves a boat from the Reservation page's background panel. */
+/**
+ * Saves a boat from the Reservation page's background panel.
+ *
+ * <p>{@code @MultipartConfig} is required here - {@code reservation.js}
+ * posts this form as a {@code FormData} body, which browsers always send as
+ * {@code multipart/form-data} even though nothing here is a file upload.
+ * Without this annotation, {@code request.getParameter()} can't see any of
+ * that body at all, so every field looks blank no matter what was typed.
+ */
 @WebServlet("/reservation/boat")
+@MultipartConfig
 public class ReservationBoatServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -160,6 +170,9 @@ public class ReservationBoatServlet extends HttpServlet {
         }
         if (boatType.length() > 30) {
             return "Boat Type cannot exceed 30 characters.";
+        }
+        if (hin.isBlank() && regNumber.isBlank()) {
+            return "Enter either a HIN or a Registration Number.";
         }
         if (!hin.isBlank() && !HIN_PATTERN.matcher(hin).matches()) {
             return "HIN should be 12 characters: 3 letters, then 9 more letters or numbers.";
