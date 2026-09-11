@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   "Coming Soon" placeholder body - the <main> content for every planned
   page that doesn't have real content yet (see the Registration contract's
   sibling docs in DevNotes/Contracts/ for what each one will eventually

@@ -1,6 +1,8 @@
 /*
  * src/main/webapp/js/loginModal.js
  * Author: Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  * CSD 460 - Capstone Project - Marina Website Project
  *
  * Open/close behavior for the Login modal, plus the client-side checks

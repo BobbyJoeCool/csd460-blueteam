@@ -1,6 +1,8 @@
 <%--
     Front End:   Robert Breutzmann
     Back End:    Carolina Rodriguez
+    Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+    Primary Author/Owner - Robert Breutzmann
     Course:      CSD 460 - Capstone Project
     Module:      Module 5 / Week 4 - Web Development 1
     Page:        Registration Page (registration.jsp)

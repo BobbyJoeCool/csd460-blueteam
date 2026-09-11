@@ -1,6 +1,8 @@
 <%--
     Front End:   Carolina Rodriguez
     Back End:    Miguel Fernandez
+    Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+    Primary Author/Owner - Carolina Rodriguez
 
     BACK END - now connected
     ------------------------

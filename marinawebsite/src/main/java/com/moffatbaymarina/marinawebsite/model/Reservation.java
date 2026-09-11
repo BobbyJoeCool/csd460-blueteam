@@ -20,6 +20,8 @@ import java.time.LocalDate;
  * and one bean means one idea of what a reservation is.
  *
  * @author Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class Reservation implements Serializable {

@@ -43,6 +43,8 @@ import jakarta.servlet.http.HttpSession;
  * the Login contract uses for its single generic failure message.
  *
  * @author Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 @WebServlet("/reservationSummary")

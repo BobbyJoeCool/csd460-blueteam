@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Sara White
+
   src/main/webapp/includes/header.jsp
 
   Shared site header. Included by every page, which is what lets it show

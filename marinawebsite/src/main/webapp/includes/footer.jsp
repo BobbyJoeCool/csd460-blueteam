@@ -1,3 +1,8 @@
+<%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Sara White
+--%>
+
 <footer class="site-footer">
 
     <div class="footer-columns">

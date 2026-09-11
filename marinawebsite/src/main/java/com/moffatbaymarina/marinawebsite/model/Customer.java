@@ -15,6 +15,8 @@ import java.time.LocalDate;
  * {@code CustomerDAO.verifyPassword()}, which returns only a boolean.
  *
  * @author Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * @implNote JavaDoc comments in this file were added with the assistance of Claude..
  */
 public class Customer implements Serializable {

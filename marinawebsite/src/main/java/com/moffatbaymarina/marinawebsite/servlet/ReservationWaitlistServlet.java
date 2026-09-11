@@ -22,6 +22,8 @@ import jakarta.servlet.http.HttpSession;
  * {@code /reservation/waitlist}, which needs its own {@code @WebServlet}.
  *
  * @author Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  */
 @WebServlet("/reservation/waitlist")
 public class ReservationWaitlistServlet extends HttpServlet {

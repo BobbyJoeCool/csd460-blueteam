@@ -1,4 +1,7 @@
 <%--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Robert Breutzmann
+
   Boat Information fields. The middle column of the Registration form, and
   the body of the Register a Boat panel on the Reservation page.
 

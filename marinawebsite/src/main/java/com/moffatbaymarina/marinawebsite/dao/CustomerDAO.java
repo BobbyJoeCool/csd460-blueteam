@@ -16,6 +16,8 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  * and the login-attempt / lockout bookkeeping used during authentication.
  *
  * @author Robert Breutzmann & Carolina Rodriguez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann & Carolina Rodriguez
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class CustomerDAO {

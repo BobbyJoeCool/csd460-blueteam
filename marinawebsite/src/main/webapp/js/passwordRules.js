@@ -1,4 +1,6 @@
 /*
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Robert Breutzmann
  * src/main/webapp/js/passwordRules.js
  *
  * Behavior for the "password must contain" checklist box

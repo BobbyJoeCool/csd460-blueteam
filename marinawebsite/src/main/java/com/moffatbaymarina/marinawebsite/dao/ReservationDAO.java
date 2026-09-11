@@ -29,7 +29,8 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  *
  * @author Miguel Fernandez
  * @author Sara White
- * Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez & Sara White
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class ReservationDAO {

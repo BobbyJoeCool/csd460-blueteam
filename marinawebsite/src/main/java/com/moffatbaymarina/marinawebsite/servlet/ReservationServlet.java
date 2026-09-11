@@ -35,6 +35,7 @@ import jakarta.servlet.http.HttpSession;
  *
  * @author White, S.
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  */
 @WebServlet("/reservation")
 @MultipartConfig

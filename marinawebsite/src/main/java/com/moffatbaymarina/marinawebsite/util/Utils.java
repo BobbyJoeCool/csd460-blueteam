@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
  * @author White, S. (Blue Team)
  * @author Fernandez, M. (Blue Team)
  * @author Rodriguez, C. (Blue Team)
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Shared (all four)
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
  */
 public class Utils {

@@ -5,8 +5,9 @@ import java.math.BigDecimal;
 /**
  * Contact form submission stored in the Contact table.
  *
- * @author White, S. (Blue Team)
- *  * Blue Team: Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * @author White, S.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  
  * Represents contact form information submitted from the About Us page.
  *

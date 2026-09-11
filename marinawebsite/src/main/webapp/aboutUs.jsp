@@ -1,6 +1,8 @@
 <%--
     Front End:   Miguel Fernandez
     Back End:    Sara White
+    Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+    Primary Author/Owner - Miguel Fernandez
     Course:      CSD 460 - Capstone Project
     Module:      Module 7 / Week 5 - Web Development 3
     Page:        About Us (aboutUs.jsp)

@@ -6,8 +6,9 @@ import java.util.Map;
 /**
  * Reservation page view of one dock and available slips in each slip size
  *
- * @author White, S. 
+ * @author White, S.
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Sara White
  * 
  * This model stores one dock's identifying information and a map of how many slips are available for each slip size. Each slip-size count starts at zero; ReservationDAO will replace those values with counts from the database. 
  */
