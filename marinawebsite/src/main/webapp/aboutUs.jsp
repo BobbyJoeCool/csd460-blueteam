@@ -47,8 +47,13 @@
          two secondary pages open the same way.
          ================================================================ --%>
     <section class="hero-band" id="aboutHero">
-        <h1>About Moffat Bay Marina</h1>
-        <p>Your Harbor Between Horizons</p>
+        <%-- .hero-band is a flex container that centres one child, so the
+             heading and lede go inside .hero-band__content. As direct
+             children they lay out side by side in a row. --%>
+        <div class="hero-band__content">
+            <h1>About Moffat Bay Marina</h1>
+            <p class="hero-band__lede">Your Harbor Between Horizons</p>
+        </div>
     </section>
 
     <div class="about-page">
@@ -257,7 +262,7 @@
                                name="firstName"
                                maxlength="50"
                                autocomplete="given-name"
-                               value="${fn:escapeXml(not empty param.firstName
+                               value="${fn:escapeXml(not empty contactError and not empty param.firstName
                                         ? param.firstName
                                         : sessionScope.customer.firstName)}"
                                required>
@@ -273,7 +278,7 @@
                                name="lastName"
                                maxlength="50"
                                autocomplete="family-name"
-                               value="${fn:escapeXml(not empty param.lastName
+                               value="${fn:escapeXml(not empty contactError and not empty param.lastName
                                         ? param.lastName
                                         : sessionScope.customer.lastName)}"
                                required>
@@ -290,7 +295,7 @@
                            name="email"
                            maxlength="255"
                            autocomplete="email"
-                           value="${fn:escapeXml(not empty param.email
+                           value="${fn:escapeXml(not empty contactError and not empty param.email
                                     ? param.email
                                     : sessionScope.customer.email)}"
                            required>
@@ -306,7 +311,7 @@
                                id="boatName"
                                name="boatName"
                                maxlength="100"
-                               value="${fn:escapeXml(param.boatName)}">
+                               value="${not empty contactError ? fn:escapeXml(param.boatName) : ''}">
                         <p class="field-error" id="boatNameError"></p>
                     </div>
 
@@ -320,7 +325,7 @@
                                min="0"
                                max="9999.99"
                                step="0.1"
-                               value="${fn:escapeXml(param.boatLength)}">
+                               value="${not empty contactError ? fn:escapeXml(param.boatLength) : ''}">
                         <p class="field-error" id="boatLengthError"></p>
                     </div>
                 </div>
@@ -342,7 +347,7 @@
                                              'General Inquiry',
                                              'Other']}">
                             <option value="${fn:escapeXml(reason)}"
-                                    ${param.reasonForContact eq reason ? 'selected' : ''}>
+                                    ${not empty contactError and param.reasonForContact eq reason ? 'selected' : ''}>
                                 ${fn:escapeXml(reason)}
                             </option>
                         </c:forEach>
@@ -358,7 +363,7 @@
                               name="message"
                               rows="7"
                               maxlength="2000"
-                              required>${fn:escapeXml(param.message)}</textarea>
+                              required>${not empty contactError ? fn:escapeXml(param.message) : ''}</textarea>
                     <p class="contact-form__counter">
                         <span id="messageCount">0</span> / 2000
                     </p>
