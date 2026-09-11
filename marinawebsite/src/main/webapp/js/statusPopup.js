@@ -37,6 +37,16 @@ MoffatBay.statusPopup = (function () {
         loggedOut:  function () { return "You've been logged out"; },
         registered: function () { return "Account created — welcome aboard"; },
 
+        reservationCancelled: function () {
+            return "Reservation cancelled";
+        },
+        /* The cancel went through but changed nothing, which in practice
+           means it had already been cancelled - usually a double click or
+           a resubmitted form. Says so rather than claiming success. */
+        reservationNotCancelled: function () {
+            return "That reservation was already cancelled";
+        },
+
         waitListJoined: function (size) {
             return size ? "You're on the wait list for a " + size + " ft slip"
                         : null;

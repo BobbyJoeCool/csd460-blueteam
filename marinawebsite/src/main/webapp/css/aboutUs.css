@@ -1,0 +1,456 @@
+/*
+ * src/main/webapp/css/aboutUs.css
+ * Author: Miguel Fernandez
+ * CSD 460 - Capstone Project - Marina Website Project
+ *
+ * About Us page styles. Depends on site.css being linked first - every
+ * color here comes from a semantic variable, no hex values.
+ *
+ * Note on the form styles below: .intro-band, .form-group, .field-error,
+ * .required-mark, .field-hint, .form-banner and .btn-primary also exist in
+ * registration.css. They are repeated here rather than shared because
+ * registration.css is only loaded by registration.jsp, so a page that
+ * doesn't load it gets unstyled form controls and invisible error text.
+ *
+ * Duplication is the wrong long-term answer - these belong in site.css,
+ * next to the palette every page already shares. Not moving them here
+ * because registration.css is Robert's file and that change would touch
+ * his page. Raised for the team instead.
+ */
+
+.about-page {
+	max-width: 1080px;
+	margin: 0 auto;
+	padding: 3rem 1.5rem 4rem;
+}
+
+.about-page section + section {
+	margin-top: 4rem;
+}
+
+.about-page h2 {
+	margin: 0 0 1.25rem;
+	color: var(--color-text-heading);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.9rem;
+}
+
+/* ==========================================================================
+   The marina's story - text beside a photo, stacking on narrow screens
+   ========================================================================== */
+
+.about-story {
+	display: grid;
+	grid-template-columns: 1.15fr 1fr;
+	gap: 2.5rem;
+	align-items: start;
+}
+
+.about-story__text p {
+	margin: 0 0 1rem;
+	font-size: 1.02rem;
+	line-height: 1.65;
+}
+
+.about-story__text p:last-child {
+	margin-bottom: 0;
+}
+
+.about-story__figure {
+	margin: 0;
+}
+
+.about-story__figure img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 10px;
+	box-shadow: 0 8px 20px color-mix(in srgb, var(--color-charcoal-navy) 22%, transparent);
+}
+
+.about-story__figure figcaption,
+.about-map figcaption {
+	margin-top: 0.6rem;
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	font-size: 0.85rem;
+	text-align: center;
+}
+
+/* ==========================================================================
+   At a glance - three figures
+   ========================================================================== */
+
+.about-facts__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+}
+
+.about-fact {
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 1.5rem;
+	text-align: center;
+}
+
+.about-fact__figure {
+	display: block;
+	color: var(--color-cta-secondary-bg);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 2.6rem;
+	line-height: 1;
+}
+
+.about-fact h3 {
+	margin: 0.5rem 0 0.65rem;
+	color: var(--color-text-heading);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.1rem;
+}
+
+.about-fact p {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 0.88rem;
+	line-height: 1.55;
+}
+
+/* ==========================================================================
+   Find us and reach us
+   ========================================================================== */
+
+.about-contact__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+}
+
+.about-contact__card {
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 1.5rem;
+}
+
+.about-contact__card h3 {
+	margin: 0 0 1rem;
+	padding-bottom: 0.6rem;
+	border-bottom: 1px solid var(--color-border);
+	color: var(--color-text-heading);
+	font-size: 1.05rem;
+}
+
+.about-contact__card address {
+	font-style: normal;
+	line-height: 1.7;
+}
+
+.about-contact__line {
+	display: flex;
+	gap: 0.6rem;
+	margin: 0 0 0.55rem;
+	line-height: 1.5;
+}
+
+.about-contact__label {
+	flex: 0 0 3.6rem;
+	color: var(--color-text-muted);
+	opacity: 0.7;
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding-top: 0.12rem;
+}
+
+.about-hours {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.92rem;
+}
+
+.about-hours th,
+.about-hours td {
+	padding: 0.3rem 0;
+	text-align: left;
+	font-weight: 400;
+}
+
+.about-hours th {
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	padding-right: 1rem;
+	white-space: nowrap;
+}
+
+.about-hours td {
+	text-align: right;
+}
+
+.about-hours__note {
+	margin: 0.9rem 0 0;
+	padding-top: 0.8rem;
+	border-top: 1px solid var(--color-border);
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	font-size: 0.82rem;
+	line-height: 1.45;
+}
+
+/* ==========================================================================
+   Marina map
+   ========================================================================== */
+
+.about-map figure {
+	margin: 0;
+	background: var(--color-surface-neutral);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 1.25rem;
+}
+
+.about-map img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* ==========================================================================
+   Contact form
+   ========================================================================== */
+
+.about-form-section__lead {
+	max-width: 46rem;
+	margin: -0.4rem 0 1.75rem;
+	color: var(--color-text-muted);
+	line-height: 1.6;
+}
+
+.contact-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	max-width: 46rem;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	padding: 1.75rem;
+}
+
+.contact-form__row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.25rem;
+}
+
+.contact-form textarea {
+	padding: 0.7rem 0.8rem;
+	border: 1px solid var(--color-input-border);
+	border-radius: 6px;
+	background: var(--color-input-bg);
+	color: var(--color-input-text);
+	font-family: inherit;
+	font-size: 0.95rem;
+	width: 100%;
+	resize: vertical;
+}
+
+.contact-form textarea:focus {
+	outline: none;
+	border-color: var(--color-input-border-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
+}
+
+.contact-form textarea.field-invalid {
+	border-color: var(--color-error);
+}
+
+/* Sits under the textarea, right-aligned, quiet until it matters. */
+.contact-form__counter {
+	margin: 0.2rem 0 0;
+	color: var(--color-text-muted);
+	opacity: 0.6;
+	font-size: 0.78rem;
+	text-align: right;
+}
+
+.contact-form__counter.is-near-limit {
+	color: var(--color-error);
+	opacity: 1;
+}
+
+.contact-form__actions {
+	margin-top: 0.25rem;
+}
+
+/* Success counterpart to registration.css's .form-banner, which is styled
+   for errors. Same shape, ocean blue rather than error red. */
+.form-banner--success {
+	background: color-mix(in srgb, var(--color-success) 8%, var(--color-surface-neutral));
+	border-color: var(--color-success);
+	color: var(--color-success);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 900px) {
+	.about-story {
+		grid-template-columns: 1fr;
+		gap: 1.75rem;
+	}
+
+	.about-facts__grid,
+	.about-contact__grid {
+		grid-template-columns: 1fr;
+		max-width: 520px;
+		margin: 0 auto;
+	}
+}
+
+@media (max-width: 600px) {
+	.about-page {
+		padding: 2rem 1rem 3rem;
+	}
+
+	.about-page section + section {
+		margin-top: 2.75rem;
+	}
+
+	.about-page h2 {
+		font-size: 1.6rem;
+	}
+
+	.contact-form {
+		padding: 1.25rem;
+	}
+
+	.contact-form__row {
+		grid-template-columns: 1fr;
+	}
+}
+
+
+/* ==========================================================================
+   Shared form styles
+   These match registration.css. See the note at the top of this file about
+   why they are repeated rather than shared.
+   ========================================================================== */
+
+.intro-band {
+	/* rgba below is --color-deep-marine at 60% opacity; custom properties
+	   can't carry alpha on their own without color-mix() */
+	background:
+		linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
+		url("../images/Marina.png");
+	background-color: var(--color-bg-header);
+	background-size: cover;
+	background-position: center;
+	color: var(--color-text-inverse);
+	text-align: center;
+	padding: 4rem 1.5rem;
+}
+
+.intro-band h1 {
+	margin: 0 0 0.5rem;
+	font-size: 1.8rem;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.intro-band p {
+	margin: 0;
+	opacity: 0.9;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.form-group label {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--color-text-heading);
+}
+
+.form-group input,
+.form-group select {
+	padding: 0.7rem 0.8rem;
+	border: 1px solid var(--color-input-border);
+	border-radius: 6px;
+	background: var(--color-input-bg);
+	color: var(--color-input-text);
+	font-family: inherit;
+	font-size: 0.95rem;
+	width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+	outline: none;
+	border-color: var(--color-input-border-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-blue) 15%, transparent);
+}
+
+.form-group input.field-invalid,
+.form-group select.field-invalid {
+	border-color: var(--color-error);
+}
+
+/* The message under a field that failed validation. min-height keeps the
+   space reserved, so showing one doesn't shove the rest of the form down. */
+.field-error {
+	color: var(--color-error);
+	font-size: 0.82rem;
+	min-height: 1.1em;
+}
+
+.required-mark {
+	color: var(--color-error);
+}
+
+.field-hint {
+	font-weight: 400;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	white-space: normal;
+}
+
+.form-banner {
+	max-width: 46rem;
+	margin: 0 0 1.25rem;
+	padding: 0.9rem 1.2rem;
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
+	border: 1px solid var(--color-error);
+	color: var(--color-error);
+	font-size: 0.95rem;
+}
+
+.btn-primary {
+	background: var(--color-cta-primary-bg);
+	color: var(--color-cta-primary-text);
+	border: none;
+	padding: 0.85rem 1.5rem;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	align-self: flex-start;
+}
+
+.btn-primary:hover:not(:disabled) {
+	background: var(--color-cta-primary-bg-hover);
+}
+
+.btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}

@@ -634,7 +634,10 @@ MoffatBay.reservation = (function () {
                 return;
             }
 
-            window.location.href = "reservationSummary.jsp?confirmation="
+            // No ".jsp" - ReservationSummaryServlet is mapped to
+            // /reservationSummary and looks the booking up. Going straight
+            // at the JSP would skip the servlet and render an empty page.
+            window.location.href = "reservationSummary?confirmation="
                 + encodeURIComponent(result.confirmationNumber);
 
         }).catch(function (err) {

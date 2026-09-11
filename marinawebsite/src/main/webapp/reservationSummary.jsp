@@ -1,21 +1,28 @@
 <%--
     Front End:   Carolina Rodriguez
-    Back End:    Miguel Fernandez (pending - backend connection)
+    Back End:    Miguel Fernandez
 
-    BACKEND 
-    -----------------
-    The servlet should look up the reservation using the confirmation number,
-    verify that it belongs to the currently logged-in customer,
-    set one "reservation" request attribute,
-    and then forward the request here.
+    BACK END - now connected
+    ------------------------
+    ReservationSummaryServlet (/reservationSummary) looks the reservation up
+    by confirmation number, checks it belongs to the signed-in customer, and
+    forwards here with one "reservation" attribute - a ReservationDetails.
+
+    It sets instead of that, and this page renders instead of the summary:
+      reservationSummaryError   nothing to show: no confirmation number, none
+                                matching, or one belonging to someone else.
+                                All three are deliberately the same message.
+      signInRedirectTo          where to return after signing in, handed to
+                                the login modal by the Sign in button.
+
+    Cancelling POSTs back here with action=cancel and the confirmation
+    number. See documentation/Page Contracts/Reservation Summary.md.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<%-- JSP connect here. --%>
-<%-- Backend pending --%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,8 +54,12 @@
         </header>
 
         <div class="summary-signin">
+            <%-- signInRedirectTo is set by ReservationSummaryServlet. The modal
+                 builds its own redirectTo from the request URI, which carries no
+                 query string, so without this the confirmation number is lost on
+                 the way back. --%>
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open()">Sign in</button>
+                    onclick="MoffatBay.loginModal.open('${signInRedirectTo}')">Sign in</button>
             <p>
                 No account yet?
                 <a href="${pageContext.request.contextPath}/registration.jsp">Create one</a>.
@@ -173,9 +184,8 @@
                                 <dt>Electric Hookup</dt>
                                 <dd>
                                     <c:choose>
-                                        <c:when test="${reservation.wantsElectric == true}">Yes</c:when>
-                                        <c:when test="${reservation.wantsElectric == false}">No</c:when>
-                                        <c:otherwise>Pending backend</c:otherwise>
+                                        <c:when test="${reservation.electricalHookup}">Yes</c:when>
+                                        <c:otherwise>No</c:otherwise>
                                     </c:choose>
                                 </dd>
                             </div>
@@ -219,7 +229,7 @@
                                 </div>
                             </c:if>
 
-                            <c:if test="${reservation.wantsElectric == true and not empty reservation.electricMonthlyRate}">
+                            <c:if test="${reservation.electricalHookup and not empty reservation.electricMonthlyRate}">
                                 <div>
                                     <dt>Electric</dt>
                                     <dd><fmt:formatNumber value="${reservation.electricMonthlyRate}" type="currency" /></dd>
@@ -245,20 +255,30 @@
                     <p class="summary-section__kicker">Need to make a change?</p>
                     <h2 id="actionsHeading">Manage Your Reservation</h2>
                     <p>
-                        You can return to the reservation page now. Cancellation will be connected
-                        here when the Reservation Summary backend endpoint is ready.
+                        You can return to the reservation page, or cancel this
+                        reservation. Cancelling can't be undone - you would need
+                        to book again.
                     </p>
                 </div>
 
                 <div class="summary-actions__buttons">
                     <a class="btn-primary summary-link-button"
                        href="${pageContext.request.contextPath}/reservation.jsp">Back to Reservations</a>
-                    <%-- BACKEND: wire this button to the cancellation endpoint once the
-                         servlet mapping and server-side validation are finalized. --%>
-                    <button type="button" class="summary-cancel-button" disabled
-                            title="Cancellation backend not connected yet">
-                        Cancel Reservation
-                    </button>
+                    <%-- Only an Active reservation can be cancelled. The servlet
+                         checks this as well - the confirm() below is a courtesy,
+                         not a control. --%>
+                    <c:if test="${reservation.active}">
+                        <form method="post"
+                              action="${pageContext.request.contextPath}/reservationSummary"
+                              onsubmit="return confirm('Cancel this reservation? This cannot be undone.');">
+                            <input type="hidden" name="action" value="cancel">
+                            <input type="hidden" name="confirmation"
+                                   value="${reservation.confirmationNumber}">
+                            <button type="submit" class="summary-cancel-button">
+                                Cancel Reservation
+                            </button>
+                        </form>
+                    </c:if>
                 </div>
             </section>
         </div>
