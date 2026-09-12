@@ -7,14 +7,14 @@ To complete the test case plan, fill out the information for Project, Course, De
 
 ## Table of Contents
 
-- **Test 1:** New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL
-- **Test 2:** Reservation Page Reflects Reduced Availability Immediately After Booking
-- **Test 3:** A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation
-- **Test 4:** Reservation Booking and Cancellation via Reservation Summary
-- **Test 5:** About Us Page Loads and Displays Correctly
-- **Test 6:** About Us Navigation
-- **Test 7:** About Us Page Has Public Access
-- **Test 8:** About Us Content Accuracy
+- [**Test 1:** New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL](#test-1-new-slip-reservation-matches-through-to-the-reservation-summary-page-and-posts-to-mysql)
+- [**Test 2:** Reservation Page Reflects Reduced Availability Immediately After Booking](#test-2-reservation-page-reflects-reduced-availability-immediately-after-booking)
+- [**Test 3:** A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation](#test-3-a-full-slip-size-notifies-the-customer-offers-the-wait-list-and-never-creates-a-reservation)
+- [**Test 4:** Reservation Booking and Cancellation via Reservation Summary](#test-4-reservation-booking-and-cancellation-via-reservation-summary)
+- [**Test 5:** About Us Page Loads and Displays Correctly](#test-5-about-us-page-loads-and-displays-correctly)
+- [**Test 6:** About Us Navigation](#test-6-about-us-navigation)
+- [**Test 7:** About Us Page Has Public Access](#test-7-about-us-page-has-public-access)
+- [**Test 8:** About Us Content Accuracy](#test-8-about-us-content-accuracy)
 
 For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.
 
@@ -247,9 +247,6 @@ WHERE b.boatName = 'QA Cancel Test';
 > [!bug] Peer Tester (Robert)
 > The Hero Banner text should be on two lines but shows on one.
 
-> [!warning] Peer Tester (Robert)
-> When on a Phone (specifically the iPhone 12) Design, the Header expands to 2 lines.  Where as not a bug, this is visually not the way to go.  We may want to revisit the responsive design of the menu and have it be a dropdown for the mobile
-
 **Screenshots**
 
 1. About Us page loaded, full view.
@@ -263,79 +260,119 @@ WHERE b.boatName = 'QA Cancel Test';
     ![Docks](Screenshots/Test_5/T5_S3b.png)
 4. Any section where content overlaps or is cut off.
     ![Cards](Screenshots/Test_5/T5_S4a.png)
-    ![iPad View](Screenshots/Test_5/T5_S4b.png)
-    ![iPad View - Cards](Screenshots/Test_5/T5_S4c.png)
-    ![iPhone View](Screenshots/Test_5/T5_S4d.png)
 
 ## Test 6: About Us Navigation
 
 **Test Objective:** Verify all navigation links on the About Us page work correctly.
 
 **Developer:** Carolina Rodriguez · **Date tested:** \<yyyy.mm.dd>
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Click the logo/home link. | User is returned to the landing page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Click another navigation option like Reservation. | Correct page opens. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Use the browser back button. | Return to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 2 | Click the logo/home link. | User is returned to the landing page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 3 | Click another navigation option like Reservation. | Correct page opens. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 4 | Use the browser back button. | Return to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
 
-**Comments:** Comments should be substantive; this means there should be at least 2-3 well-structured sentences with constructive feedback.
+**Comments:**
+
+> [!note] Peer Tester (Robert)
+> I ran into no issues with this test.  When navigating to a "gated" page like Reservation, I was prompted to sign in rather than being allowed to make a reservation wihout an account, as per the design.
 
 **Screenshots**
 
 1. About Us page reached from the main nav.
-
+    ![Shot 1](Screenshots/Test_6/T6_S1.png)
 2. Landing page after clicking the logo/home link
-
+    ![Shot 2](Screenshots/Test_6/T6_S2.png)
 3. The other page (e.g. Reservation) after navigating to it.
-
+    ![Shot 3](Screenshots/Test_6/T6_S3.png)
 4. About Us page after using the browser back button.
-
+    ![Shot 4](Screenshots/Test_6/T6_S4.png)
 
 ## Test 7: About Us Page Has Public Access
 
 **Test Objective:** Verify the About Us page works for signed out users and displays correctly on different screen sizes.
 
 **Developer:** Carolina Rodriguez · **Date tested:** \<yyyy/mm/dd>
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Sign out of user log in. | Users are signed out successfully. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Open the About Us page. | Able to access About Us page even without login | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Scroll through full page. | All information can be viewed without extending off screen. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Sign out of user log in. | Users are signed out successfully. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 2 | Open the About Us page. | Able to access About Us page even without login | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 4 | Scroll through full page. | All information can be viewed without extending off screen. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
 
-**Comments:** Comments should be substantive; this means there should be at least 2-3 well-structured sentences with constructive feedback.
+**Comments:**
+
+> [!note] Peer Tester (Robert)
+> As a part of the testing, I also used the Developer Tools in Chrome to "Simulate" an iPad Air and iPhone 12 Pro screen for step 4.  My notes are below.
+
+> [!warning] Peer Tester (Robert)
+> When on a Phone (specifically the iPhone 12) Design, the Header expands to 2 lines.  Where as not a bug, this is visually not the way to go.  We may want to revisit the responsive design of the menu and have it be a dropdown for the mobile
+
+> [!warning] Peer Tester (Robert)
+> The form fields are a little bit far apart when the screen narrows.  The responsive design should probably reduce the gap on the form.  Additionally, should probably check additional pages in the site as I believe this is on the shared form-fields `site.css`. 
 
 **Screenshots**
 
-1. Signed-out state (e.g. header showing Login/Register instead of an account name). — **Screenshot #:**
-2. About Us page accessed while signed out. — **Screenshot #:**
-3. About Us page at half browser width, showing no overlap. — **Screenshot #:**
-4. Bottom of the page after scrolling through, showing no content cut off. — **Screenshot #:**
+1. Signed-out state (e.g. header showing Login/Register instead of an account name).
+    ![Shot 1](Screenshots/Test_7/T7_S1.png)
+2. About Us page accessed while signed out.
+    ![Shot 2](Screenshots/Test_7/T7_S2.png)
+3. About Us page at half browser width, showing no overlap.
+    ![Shot 3](Screenshots/Test_7/T7_S3.png)
+4. Multiple shots of the page with a narrow browser and with Dev Tools showing different size screens.
+    ![Shot 4a](Screenshots/Test_7/T7_S4a.png)
+    ![Shot 4b](Screenshots/Test_7/T7_S4b.png)
+    ![Shot 4c](Screenshots/Test_7/T7_S4c.png)
+    ![Shot 4d](Screenshots/Test_7/T7_S4d.png)
+    ![iPad View](Screenshots/Test_5/T5_S4b.png)
+    ![iPad View - Cards](Screenshots/Test_5/T5_S4c.png)
+    ![iPhone View](Screenshots/Test_5/T5_S4d.png)
 
 ## Test 8: About Us Content Accuracy
 
 **Test Objective:** Verify that the information shown on the About Us page is complete and consistent with the rest of the Moffat Bay Marina website.
 
 **Developer:** Carolina Rodriguez · **Date tested:** \<yyyy/mm/dd>
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☑&nbsp;Fail |
 
-**Comments:** Comments should be substantive; this means there should be at least 2-3 well-structured sentences with constructive feedback.
+**Comments:** 
+
+> [!bug] Peer Tester (Robert)
+> Submitting a message through this page does not add it to the database.  This is a fatal bug that needs to be fixed before it can be submitted!
 
 **Screenshots**
 
-1. Full page text (headings and paragraphs) for a spelling/grammar check. — **Screenshot #:**
-2. Side-by-side or sequential shots of matching details on About Us vs. another page. — **Screenshot #:**
-3. Contact information / location details section. — **Screenshot #:**
-4. Any buttons or links tested, plus the destination each one opened. — **Screenshot #:**
+1. Full page text (headings and paragraphs) for a spelling/grammar check.
+    ![Hero heading, "A working harbor in the San Juans"](Screenshots/Test_8/T8_S1a.png)
+    ![Section heading, "The marina at a glance"](Screenshots/Test_8/T8_S1b.png)
+    ![Section heading, "Find us and reach us"](Screenshots/Test_8/T8_S1c.png)
+    ![Section heading, "The docks"](Screenshots/Test_8/T8_S1d.png)
+    ![Section heading, "Send us a message"](Screenshots/Test_8/T8_S1e.png)
+2. Shot of the Definitions Document, showing the "source of truth" and the information on the page.
+    ![Definitions Document - Contact, Hours, and Dock/Slip Size tables](Screenshots/Test_8/T8_S2a.png)
+    ![About Us page - "The marina at a glance" and "Find us and reach us" cards](Screenshots/Test_8/T8_S2b.png)
+3. Contact information / location details section.
+    ![Definitions Document - Contact table, same as Screenshot 2a](Screenshots/Test_8/T8_S2a.png)
+    ![About Us page - "Send us a message" contact section](Screenshots/Test_8/T8_S3b.png)
+    ![Footer - address, phone, and office hours](Screenshots/Test_8/T8_S3c.png)
+4. Any buttons or links tested, plus the destination each one opened.
+    ![Broken Contact link leads to the "Lost At Sea" 404 page](Screenshots/Test_8/T8_S4.png)
+
+## Additional Notes
+
+> [!bug] Peer Tester (Robert)
+> The "Send us a message" contact form has too much empty space between its fields, the same spacing issue already flagged for the mobile/narrow-screen form fields in Test 7. Should be corrected.
+
+![Contact form showing excessive empty space between fields](Screenshots/T9.png)
