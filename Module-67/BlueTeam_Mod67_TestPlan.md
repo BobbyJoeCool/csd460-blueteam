@@ -25,16 +25,16 @@ For each test, the <u>developer</u> should: provide a test description, a test o
 **Test Objective:** Verifies that a new slip reservation submitted from the Reservation page carries the same boat, dock, and pricing details through to the Reservation Summary page, and that the booking (and any newly registered boat) is correctly written to the database.
 
 **Developer:** Robert Breutzmann · **Date tested:** Sept 11, 2026
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Carolina Rodriguez · **Date tested:** Sept 13,2026
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | <ol><li>Go to http://localhost:8080/marinawebsite/ (or http://localhost:8081/marinawebsite/).</li><li>Log in with elena.marsh@example.com / Password1.</li><li>Open the Reservation page (click "Book a Slip" or navigate directly to reservation.jsp).</li></ol> | The header shows "Welcome, Elena M." and the Reservation page loads showing the Choose Your Vessel dropdown (Elena's existing boat listed with a "(reserved)" tag), the 26/40/50 ft slip cards, and the three dock cards. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | <ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Test Skiff</li><li>Boat Type: Skiff</li><li>Boat Length: 22.0</li><li>Boat Beam: 8.0</li><li>HIN: QTB123456789</li><li>Registration Number: WA10001QT</li><li>Boat Year: 2024</li></ul></li><li>Click "Save boat."</li></ol> | The panel closes without reloading the page, "QA Test Skiff — 22.0 ft" appears in the Boat dropdown already selected, the status popup shows "Boat saved," and the page re-prices for a 26 ft boat. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | With "QA Test Skiff" selected, record the number shown on the 26 ft Slip card and the number shown on each of the Dock A, Dock B, and Dock C cards. | The 26 ft Slip card shows a count greater than zero and is highlighted "Fits your boat"; each dock card shows its own open count for 26 ft slips; the Reservation Summary sidebar shows Vessel "QA Test Skiff — 22.0 ft" and Monthly Rate "\$231.00." | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | <ol><li>Select the Dock A radio button.</li><li>Check "Yes, I need an electric hookup."</li><li>Set the Start Date field to today's date.</li></ol> | The Reservation Summary sidebar updates live: Dock shows "Dock A," an Electric hookup line appears showing "\$10.50," Start Date shows today's date, Monthly Rate updates to "\$241.50," and the "Reserve My Slip" button becomes enabled. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 5 | <ol><li>Record the Vessel, Dock, Start Date, Electric hookup, and Monthly Rate values shown in the Reservation Summary sidebar.</li><li>Click "Reserve My Slip."</li></ol> | The browser redirects to reservationSummary.jsp?confirmation=MB-##### with a new confirmation number, and the Reservation Summary page displays the same vessel, dock, start date, electric hookup, and \$241.50 monthly rate recorded just before submitting. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 6 | Confirm the new records in MySQL (see the query below the table). | The Boat query returns one row for "QA Test Skiff" with boatLength 22.0. The BoatOwnership query returns one row linking that boat to customerID 1, with today's date as startDate and a NULL endDate. The Reservation query returns exactly one Active row for customerID 1 on Dock A, sizeFt 26, with a monthlyRate matching the total shown on the Reservation Summary page in Step 5. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | <ol><li>Go to http://localhost:8080/marinawebsite/ (or http://localhost:8081/marinawebsite/).</li><li>Log in with elena.marsh@example.com / Password1.</li><li>Open the Reservation page (click "Book a Slip" or navigate directly to reservation.jsp).</li></ol> | The header shows "Welcome, Elena M." and the Reservation page loads showing the Choose Your Vessel dropdown (Elena's existing boat listed with a "(reserved)" tag), the 26/40/50 ft slip cards, and the three dock cards. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | <ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Test Skiff</li><li>Boat Type: Skiff</li><li>Boat Length: 22.0</li><li>Boat Beam: 8.0</li><li>HIN: QTB123456789</li><li>Registration Number: WA10001QT</li><li>Boat Year: 2024</li></ul></li><li>Click "Save boat."</li></ol> | The panel closes without reloading the page, "QA Test Skiff — 22.0 ft" appears in the Boat dropdown already selected, the status popup shows "Boat saved," and the page re-prices for a 26 ft boat. | ☑&nbsp;Pass<br>☐&nbsp;Fail |**Pass**|
+| 3 | With "QA Test Skiff" selected, record the number shown on the 26 ft Slip card and the number shown on each of the Dock A, Dock B, and Dock C cards. | The 26 ft Slip card shows a count greater than zero and is highlighted "Fits your boat"; each dock card shows its own open count for 26 ft slips; the Reservation Summary sidebar shows Vessel "QA Test Skiff — 22.0 ft" and Monthly Rate "\$231.00." | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | <ol><li>Select the Dock A radio button.</li><li>Check "Yes, I need an electric hookup."</li><li>Set the Start Date field to today's date.</li></ol> | The Reservation Summary sidebar updates live: Dock shows "Dock A," an Electric hookup line appears showing "\$10.50," Start Date shows today's date, Monthly Rate updates to "\$241.50," and the "Reserve My Slip" button becomes enabled. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 5 | <ol><li>Record the Vessel, Dock, Start Date, Electric hookup, and Monthly Rate values shown in the Reservation Summary sidebar.</li><li>Click "Reserve My Slip."</li></ol> | The browser redirects to reservationSummary.jsp?confirmation=MB-##### with a new confirmation number, and the Reservation Summary page displays the same vessel, dock, start date, electric hookup, and \$241.50 monthly rate recorded just before submitting. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 6 | Confirm the new records in MySQL (see the query below the table). | The Boat query returns one row for "QA Test Skiff" with boatLength 22.0. The BoatOwnership query returns one row linking that boat to customerID 1, with today's date as startDate and a NULL endDate. The Reservation query returns exactly one Active row for customerID 1 on Dock A, sizeFt 26, with a monthlyRate matching the total shown on the Reservation Summary page in Step 5. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 For step 6, use these queries:
 
@@ -63,31 +63,38 @@ WHERE r.confirmationNumber = '<confirmation number from Step 5>';
 > Test passes. Minor visual bug with creating a new boat, the register a new boat popup modal scrolls weird, leaving the background "greying" exposing some of the page behind it and allowing for scrolling on the main page. Tester Fixed this before handing off to peer testing.
 
 > [!note] Peer Tester (Carolina)
->
+> Everything runs smoothly, only possible note is to make “Boat already reserved” in a bolder text for better visibility. SQL loads data entered and reservation shows how many docks available.
 
 **Screenshots**
 
-1. Header showing "Welcome, Elena M." with the Reservation page loaded: vessel dropdown, slip cards, and dock cards visible. — **Screenshot #:**
-2. Boat panel closed, "QA Test Skiff — 22.0 ft" selected in the dropdown, and the "Boat saved" status popup. — **Screenshot #:**
-3. 26 ft Slip card and Dock A/B/C cards with their availability counts, plus the Reservation Summary sidebar showing Vessel and Monthly Rate. — **Screenshot #:**
-4. Reservation Summary sidebar after selecting Dock A and electric hookup, showing the updated Monthly Rate and the enabled "Reserve My Slip" button. — **Screenshot #:**
-5. Reservation Summary page after submitting, showing the new confirmation number and matching vessel/dock/date/rate details. — **Screenshot #:**
-6. MySQL client output for the three verification queries (Boat, BoatOwnership, Reservation). — **Screenshot #:**
+1. Header showing "Welcome, Elena M." with the Reservation page loaded: vessel dropdown, slip cards, and dock cards visible. 
+    ![Shot 1](Screenshots/Test_1/T1-S1.png)
+    ![Shot 1a](Screenshots/Test_1/T1-S1a.png)
+2. Boat panel closed, "QA Test Skiff — 22.0 ft" selected in the dropdown, and the "Boat saved" status popup.
+    ![Shot 2](Screenshots/Test_1/T1-S2.png)
+3. 26 ft Slip card and Dock A/B/C cards with their availability counts, plus the Reservation Summary sidebar showing Vessel and Monthly Rate. 
+    ![Shot 3](Screenshots/Test_1/T1-S3.png)
+4. Reservation Summary sidebar after selecting Dock A and electric hookup, showing the updated Monthly Rate and the enabled "Reserve My Slip" button.
+    ![Shot 4](Screenshots/Test_1/T1-S4.png)
+5. Reservation Summary page after submitting, showing the new confirmation number and matching vessel/dock/date/rate details.
+    ![Shot 5](Screenshots/Test_1/T1-S5.png)
+6. MySQL client output for the three verification queries (Boat, BoatOwnership, Reservation).
+    ![Shot 6](Screenshots/Test_1/T1-S6.png)
 
 ## Test 2: Reservation Page Reflects Reduced Availability Immediately After Booking
 
 **Test Objective:** Verifies that after a slip is booked, the Reservation page marks that boat as already reserved and drops the affected slip-size and dock availability counts by exactly one, matching the database.
 
 **Developer:** Robert Breutzmann · **Date tested:** Sept 11, 2026
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Carolina Rodriguez· **Date tested:** Sept 13, 2026
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Immediately after Test 1, use the header navigation to return to http://localhost:8080/marinawebsite/reservation.jsp. | The Reservation page performs a fresh page load (not the cached in-page state from before submitting) and shows the Choose Your Vessel dropdown again. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Open the Boat dropdown. | "QA Test Skiff — 22.0 ft (reserved)" is listed with the "(reserved)" tag, reflecting the booking just made in Test 1. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Select "QA Test Skiff — 22.0 ft (reserved)" from the dropdown. | An inline message appears under the dropdown reading "QA Test Skiff already has an active reservation." and the "Reserve My Slip" button stays disabled: the boat cannot be booked into a second slip. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | <ol><li>With that boat still selected, compare the number now shown on the 26 ft Slip card to the number recorded in Test 1, Step 3.</li><li>Compare the Dock A count to the number recorded for Dock A in that same step.</li></ol> | The 26 ft Slip card reads exactly one less than the count recorded in Test 1; the Dock A card reads exactly one less than the count recorded for Dock A in Test 1; the Dock B and Dock C counts are unchanged, since only a Dock A slip was booked. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 5 | Confirm the same drop directly in MySQL (see the query below the table). | Dock A's openSlips is exactly one less than it was before Test 1's booking. Dock B and Dock C are unchanged. The sum of openSlips across all three docks matches the total shown on the 26 ft Slip card in Step 4. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Immediately after Test 1, use the header navigation to return to http://localhost:8080/marinawebsite/reservation.jsp. | The Reservation page performs a fresh page load (not the cached in-page state from before submitting) and shows the Choose Your Vessel dropdown again. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | Open the Boat dropdown. | "QA Test Skiff — 22.0 ft (reserved)" is listed with the "(reserved)" tag, reflecting the booking just made in Test 1. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | Select "QA Test Skiff — 22.0 ft (reserved)" from the dropdown. | An inline message appears under the dropdown reading "QA Test Skiff already has an active reservation." and the "Reserve My Slip" button stays disabled: the boat cannot be booked into a second slip. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | <ol><li>With that boat still selected, compare the number now shown on the 26 ft Slip card to the number recorded in Test 1, Step 3.</li><li>Compare the Dock A count to the number recorded for Dock A in that same step.</li></ol> | The 26 ft Slip card reads exactly one less than the count recorded in Test 1; the Dock A card reads exactly one less than the count recorded for Dock A in Test 1; the Dock B and Dock C counts are unchanged, since only a Dock A slip was booked. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 5 | Confirm the same drop directly in MySQL (see the query below the table). | Dock A's openSlips is exactly one less than it was before Test 1's booking. Dock B and Dock C are unchanged. The sum of openSlips across all three docks matches the total shown on the 26 ft Slip card in Step 4. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 For step 5, use this query:
 
@@ -111,30 +118,35 @@ ORDER BY d.dockNumber;
 > This test fully passes. Before handing off to Peer tester, I added a summary of why the reservation cannot be booked below the disabled "RESERVE" button as a helper, so the "This boat already has a reservation" line now appears there as well.
 
 > [!note] Peer Tester (Carolina)
->
+> All steps passed. The reserved boat showed correctly, the system blocked a second reservation, and the slip/dock availability updated by one. The database results matched what was shown on the Reservation page.
 
 **Screenshots**
 
-1. Fresh page load of the Reservation page showing the Choose Your Vessel dropdown. — **Screenshot #:**
-2. Boat dropdown open, showing "QA Test Skiff — 22.0 ft (reserved)." — **Screenshot #:**
-3. Inline "already has an active reservation" message with the disabled "Reserve My Slip" button. — **Screenshot #:**
-4. 26 ft Slip card and Dock A/B/C cards showing the reduced counts. — **Screenshot #:**
-5. MySQL query output showing openSlips per dock after the booking. — **Screenshot #:**
+1. Fresh page load of the Reservation page showing the Choose Your Vessel dropdown.
+    ![Shot 1](Screenshots/Test_2/T2-S1.png)
+2. Boat dropdown open, showing "QA Test Skiff — 22.0 ft (reserved).
+    ![Shot 2](Screenshots/Test_2/T2-S2.png)
+3. Inline "already has an active reservation" message with the disabled "Reserve My Slip" button. 
+    ![Shot 3](Screenshots/Test_2/T2-S3.png)
+4. 26 ft Slip card and Dock A/B/C cards showing the reduced counts.
+    ![Shot 4](Screenshots/Test_2/T2-S4.png)
+5. MySQL query output showing openSlips per dock after the booking.
+    ![Shot 5](Screenshots/Test_2/T2-S5.png)
 
 ## Test 3: A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation
 
 **Test Objective:** Verifies that selecting a boat whose matched slip size has no open slots shows the full-size notice instead of a dock/reservation flow, that joining the wait list writes a WaitList row and redirects to the Wait List Lookup page stub, and that no Reservation row is ever created for that boat.
 
 **Developer:** Robert Breutzmann · **Date tested:** Sept 11, 2026
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Carolina Rodriguez · **Date tested:** Sept 13, 2026
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Confirm the current 40 ft availability in MySQL before starting (see the query below the table). | Per the seeded data, there are no open 40 ft slips. This query should return 0 \| 0 \| 0 | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | <ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Open the Reservation page.</li><li>Register a new boat with:<ul><li>Boat Name: QA Overflow Boat</li><li>Boat Type: Sailboat</li><li>Boat Length: 35.0</li><li>Boat Beam: 11.0</li><li>HIN: QOB123456789</li><li>Registration Number: WA10003QT</li><li>Boat Year: 2023</li></ul></li><li>Select it from the dropdown.</li></ol> | The moment the boat is selected — before any dock is chosen — the availability panel shows "All of our 40 ft slips are currently reserved." All three dock radio buttons read "No 40 ft slips free here" and are disabled, and "Reserve My Slip" is disabled. No reservation can be submitted. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | <ol><li>Under the notice, confirm the wait-list question "Would you like to be added to the wait list for a 40 ft slip? We'll contact you when one opens up." appears with "Join the wait list" and "No thanks" buttons.</li><li>Click "Join the wait list."</li></ol> | The browser redirects to waitListLookup.jsp?notice=waitListJoined&size=40. Because the Wait List Lookup page has not been built yet, this lands on the shared "Coming Soon" placeholder for "The Wait List Lookup page" — the expected behavior until that page ships. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Confirm the result in MySQL (see the query below the table). | The WaitList query returns one new row for customerID 1 at sizeFt 40 with status "Waiting." The Reservation query returns zero rows — "QA Overflow Boat" was never assigned a slip or booked. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 5 | <ol><li>Go back to the Reservation page.</li><li>Select "QA Overflow Boat" again.</li><li>Click "Join the wait list" a second time.</li></ol> | Instead of a second entry, the wait-list panel shows "You're already on the wait list for a 40 ft slip," the Join button is hidden, and re-running the WaitList query from Step 5 still returns exactly one row for customerID 1 at size 40. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Confirm the current 40 ft availability in MySQL before starting (see the query below the table). | Per the seeded data, there are no open 40 ft slips. This query should return 0 \| 0 \| 0 | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | <ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Open the Reservation page.</li><li>Register a new boat with:<ul><li>Boat Name: QA Overflow Boat</li><li>Boat Type: Sailboat</li><li>Boat Length: 35.0</li><li>Boat Beam: 11.0</li><li>HIN: QOB123456789</li><li>Registration Number: WA10003QT</li><li>Boat Year: 2023</li></ul></li><li>Select it from the dropdown.</li></ol> | The moment the boat is selected — before any dock is chosen — the availability panel shows "All of our 40 ft slips are currently reserved." All three dock radio buttons read "No 40 ft slips free here" and are disabled, and "Reserve My Slip" is disabled. No reservation can be submitted. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | <ol><li>Under the notice, confirm the wait-list question "Would you like to be added to the wait list for a 40 ft slip? We'll contact you when one opens up." appears with "Join the wait list" and "No thanks" buttons.</li><li>Click "Join the wait list."</li></ol> | The browser redirects to waitListLookup.jsp?notice=waitListJoined&size=40. Because the Wait List Lookup page has not been built yet, this lands on the shared "Coming Soon" placeholder for "The Wait List Lookup page" — the expected behavior until that page ships. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Confirm the result in MySQL (see the query below the table). | The WaitList query returns one new row for customerID 1 at sizeFt 40 with status "Waiting." The Reservation query returns zero rows — "QA Overflow Boat" was never assigned a slip or booked. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 5 | <ol><li>Go back to the Reservation page.</li><li>Select "QA Overflow Boat" again.</li><li>Click "Join the wait list" a second time.</li></ol> | Instead of a second entry, the wait-list panel shows "You're already on the wait list for a 40 ft slip," the Join button is hidden, and re-running the WaitList query from Step 5 still returns exactly one row for customerID 1 at size 40. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 For step 1, use this query:
 
@@ -174,32 +186,37 @@ WHERE b.boatName = 'QA Overflow Boat';
 > This test also passed. No notes to add as everything functioned exactly as it should. The test landed at a stub page, rather than the actual waitlist. The waitlist entry was created as the waitlistDAO stub was made to allow an entry to go into the database.
 
 > [!note] Peer Tester (Carolina)
->
+> All steps passed. The 40 ft slips showed no availability in both the page and MySQL, the overflow boat could not be reserved, and the wait-list option appeared as expected. Joining the wait list created one Waiting entry for customerID 1 at size 40, with no reservation created. A second attempt correctly showed that the customer was already on the wait list and did not create a duplicate entry.
 
 **Screenshots**
 
-1. MySQL query output confirming zero open 40 ft slips. — **Screenshot #:**
-2. Reservation page with "QA Overflow Boat" selected, showing the "All of our 40 ft slips are currently reserved" notice and disabled dock options. — **Screenshot #:**
-3. Wait-list prompt and the resulting redirect to the Wait List Lookup "Coming Soon" placeholder. — **Screenshot #:**
-4. MySQL query output showing the new WaitList row and zero Reservation rows for the boat. — **Screenshot #:**
-5. Wait-list panel on the second attempt, showing "You're already on the wait list." — **Screenshot #:**
+1. MySQL query output confirming zero open 40 ft slips.
+    ![Shot 1](Screenshots/Test_3/T3-S1.png)
+2. Reservation page with "QA Overflow Boat" selected, showing the "All of our 40 ft slips are currently reserved" notice and disabled dock options.
+    ![Shot 2](Screenshots/Test_3/T3-S2.png)
+3. Wait-list prompt and the resulting redirect to the Wait List Lookup "Coming Soon" placeholder.
+    ![Shot 3](Screenshots/Test_3/T3-S3.png)
+4. MySQL query output showing the new WaitList row and zero Reservation rows for the boat. 
+    ![Shot 4](Screenshots/Test_3/T3-S4.png)
+5. Wait-list panel on the second attempt, showing "You're already on the wait list.
+    ![Shot 5](Screenshots/Test_3/T3-S5.png)
 
 ## Test 4: Reservation Booking and Cancellation via Reservation Summary
 
 **Test Objective:** Verifies the full reservation lifecycle: booking a slip from the Reservation page, confirming the details on the Reservation Summary page, cancelling the reservation, and verifying the cancellation is reflected on both the Summary page and in the database.
 
 **Developer:** Robert Breutzmann · **Date tested:** Sept 11, 2026
-**Peer tester:** · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Carolina Rodriguez · **Date tested:** Sept 13,2026
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | <ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Navigate to the Reservation page.</li></ol> | The header shows "Welcome, Elena M." and the Reservation page loads. The boat dropdown lists "Salt Whisper — 24.5 ft (reserved)" since her existing boat already has an active reservation. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | <ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Cancel Test</li><li>Boat Type: Skiff</li><li>Boat Length: 20.0</li></ul></li><li>Leave Boat Beam, HIN, Registration Number, and Boat Year blank.</li><li>Click "Save boat."</li></ol> | The panel closes, "QA Cancel Test — 20.0 ft" appears in the dropdown already selected, and the page re-prices for a 26 ft slip. The Reservation Summary sidebar shows Vessel "QA Cancel Test — 20.0 ft" and Monthly Rate "\$210.00." | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | <ol><li>Select the Dock B radio button.</li><li>Set the Start Date field to today's date.</li></ol> | The Reservation Summary sidebar updates: Dock shows "Dock B," Start Date shows today's date, and the "Reserve My Slip" button becomes enabled. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Click "Reserve My Slip." | The browser redirects to reservationSummary?confirmation=MB-##### with a new confirmation number. The Reservation Summary page shows status "Active," vessel "QA Cancel Test," location "Dock B, Slip #," start date matching today, and Monthly Rate "\$210.00/mo." | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 5 | <ol><li>In the "Manage Your Reservation" section, click "Cancel Reservation."</li><li>When the browser confirmation dialog appears, click OK.</li></ol> | The page reloads. The hero area now shows a red ✗ mark with heading "Your Reservation Has Been Cancelled" and the text "This reservation is no longer active." The status band shows "Cancelled." The Cancel button is gone; only "Back to Reservations" remains. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 6 | Confirm the cancellation in MySQL (see the query below the table). | The query returns one row with reservationStatus = "Cancelled" for customerID 1 and boatName "QA Cancel Test." | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 7 | <ol><li>Navigate back to the Reservation page.</li><li>Open the boat dropdown.</li></ol> | "QA Cancel Test — 20.0 ft" no longer shows the "(reserved)" tag, confirming the cancellation freed the boat for re-booking. | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | <ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Navigate to the Reservation page.</li></ol> | The header shows "Welcome, Elena M." and the Reservation page loads. The boat dropdown lists "Salt Whisper — 24.5 ft (reserved)" since her existing boat already has an active reservation. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | <ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Cancel Test</li><li>Boat Type: Skiff</li><li>Boat Length: 20.0</li></ul></li><li>Registration: WA10004QT </li><li> Leave Boat Beam, HIN, and Boat Year blank.</li><li>Click "Save boat."</li></ol> | The panel closes, "QA Cancel Test — 20.0 ft" appears in the dropdown already selected, and the page re-prices for a 26 ft slip. The Reservation Summary sidebar shows Vessel "QA Cancel Test — 20.0 ft" and Monthly Rate "\$210.00." | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | <ol><li>Select the Dock B radio button.</li><li>Set the Start Date field to today's date.</li></ol> | The Reservation Summary sidebar updates: Dock shows "Dock B," Start Date shows today's date, and the "Reserve My Slip" button becomes enabled. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Click "Reserve My Slip." | The browser redirects to reservationSummary?confirmation=MB-##### with a new confirmation number. The Reservation Summary page shows status "Active," vessel "QA Cancel Test," location "Dock B, Slip #," start date matching today, and Monthly Rate "\$210.00/mo." | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 5 | <ol><li>In the "Manage Your Reservation" section, click "Cancel Reservation."</li><li>When the browser confirmation dialog appears, click OK.</li></ol> | The page reloads. The hero area now shows a red ✗ mark with heading "Your Reservation Has Been Cancelled" and the text "This reservation is no longer active." The status band shows "Cancelled." The Cancel button is gone; only "Back to Reservations" remains. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 6 | Confirm the cancellation in MySQL (see the query below the table). | The query returns one row with reservationStatus = "Cancelled" for customerID 1 and boatName "QA Cancel Test." | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 7 | <ol><li>Navigate back to the Reservation page.</li><li>Open the boat dropdown.</li></ol> | "QA Cancel Test — 20.0 ft" no longer shows the "(reserved)" tag, confirming the cancellation freed the boat for re-booking. | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 For step 6, use this query:
 
@@ -218,33 +235,45 @@ WHERE b.boatName = 'QA Cancel Test';
 > This test performed just fine. I added some back end to this to ensure that this doesn't accidently submit twice.
 
 > [!note] Peer Tester (Carolina)
->
+> All steps passed. The new test boat was added and priced correctly, the reservation was created for Dock B with the expected rate, and the cancellation flow worked as expected. The Reservation Summary changed to Cancelled, the cancel button was removed, MySQL showed the reservation status as Cancelled, and the boat no longer appeared as reserved when returning to the Reservation page.
 
 **Screenshots**
 
-1. Header showing "Welcome, Elena M." with "Salt Whisper — 24.5 ft (reserved)" in the boat dropdown. — **Screenshot #:**
-2. Boat panel closed with "QA Cancel Test — 20.0 ft" selected and the Reservation Summary sidebar pricing. — **Screenshot #:**
-3. Reservation Summary sidebar after selecting Dock B and today's date, with "Reserve My Slip" enabled. — **Screenshot #:**
-4. Reservation Summary page after booking, showing status "Active" and the confirmation details. — **Screenshot #:**
-5. Reservation Summary page after cancellation, showing the red ✗ mark and "Cancelled" status band. — **Screenshot #:**
-6. MySQL query output confirming reservationStatus = "Cancelled." — **Screenshot #:**
-7. Boat dropdown showing "QA Cancel Test — 20.0 ft" without the "(reserved)" tag. — **Screenshot #:**
+1. Header showing "Welcome, Elena M." with "Salt Whisper — 24.5 ft (reserved)" in the boat dropdown.
+    ![Shot 1](Screenshots/Test_4/T4-S1.png)
+2. Boat panel closed with "QA Cancel Test — 20.0 ft" selected and the Reservation Summary sidebar pricing.
+    ![Shot 2](Screenshots/Test_4/T4-S2.png)
+    ![Shot 2a](Screenshots/Test_4/T4-S2a.png)
+3. Reservation Summary sidebar after selecting Dock B and today's date, with "Reserve My Slip" enabled.
+    ![Shot 3](Screenshots/Test_4/T4-S3.png)
+4. Reservation Summary page after booking, showing status "Active" and the confirmation details.
+    ![Shot 4](Screenshots/Test_4/T4-S4.png)
+5. Reservation Summary page after cancellation, showing the red ✗ mark and "Cancelled" status band.
+    ![Shot 5](Screenshots/Test_4/T4-S5.png)
+    ![Shot 5a](Screenshots/Test_4/T4-S5a.png)
+6. MySQL query output confirming reservationStatus = "Cancelled."
+    ![Shot 6](Screenshots/Test_4/T4-S6.png)
+7. Boat dropdown showing "QA Cancel Test — 20.0 ft" without the "(reserved)" tag. 
+    ![Shot 7](Screenshots/Test_4/T4-S7.png)
 
 ## Test 5: About Us Page Loads and Displays Correctly
 
 **Test Objective:** Verify the About Us page loads correctly and displays all expected content
 
-**Developer:** Carolina Rodriguez · **Date tested:** 09/10/26
+**Developer:** Carolina Rodriguez · **Date tested:** Sept 10,2026
 **Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Open the About Us page from the website navigation. | The About Us page loads without errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 2 | Verify the header and footer are visible. | All text and headings are readable and properly formatted. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Fail** |
-| 3 | Verify all images load. | Images display without broken links or distortion. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 4 | Check the page for overlapping or cut-off content. | All sections display correctly with no layout issues. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 1 | Open the About Us page from the website navigation. | The About Us page loads without errors. | **Pass** | **Pass** |
+| 2 | Verify the header and footer are visible. | All text and headings are readable and properly formatted. | **Pass** | **Fail** |
+| 3 | Verify all images load. | Images display without broken links or distortion. | **Pass** | **Pass** |
+| 4 | Check the page for overlapping or cut-off content. | All sections display correctly with no layout issues. | **Pass** | **Pass** |
 
 **Comments:**
+
+> [!note] Developer (Carolina)
+> About Us page loaded correctly and all images and page sections displayed as expected during developer testing.
 
 > [!bug] Peer Tester (Robert)
 > The Hero Banner text should be on two lines but shows on one.
@@ -267,20 +296,23 @@ WHERE b.boatName = 'QA Cancel Test';
 
 **Test Objective:** Verify all navigation links on the About Us page work correctly.
 
-**Developer:** Carolina Rodriguez · **Date tested:** \<yyyy.mm.dd>
+**Developer:** Carolina Rodriguez · **Date tested:** Sept 11,2026
 **Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 2 | Click the logo/home link. | User is returned to the landing page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 3 | Click another navigation option like Reservation. | Correct page opens. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 4 | Use the browser back button. | Return to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | **Pass** | **Pass** |
+| 2 | Click the logo/home link. | User is returned to the landing page. | **Pass** | **Pass** |
+| 3 | Click another navigation option like Reservation. | Correct page opens. | **Pass** | **Pass** |
+| 4 | Use the browser back button. | Return to the About Us page. | **Pass** | **Pass** |
 
 **Comments:**
 
+> [!note] Developer (Carolina)
+> All steps passed. The About Us page opened correctly, the logo returned to the landing page, the Reservation navigation opens if signed in, if signed out, asks to sign in, and the browser Back button returned to About Us as expected.
+
 > [!note] Peer Tester (Robert)
-> I ran into no issues with this test.  When navigating to a "gated" page like Reservation, I was prompted to sign in rather than being allowed to make a reservation wihout an account, as per the design.
+> I ran into no issues with this test.  When navigating to a "gated" page like Reservation, I was prompted to sign in rather than being allowed to make a reservation without an account, as per the design.
 
 **Screenshots**
 
@@ -297,17 +329,19 @@ WHERE b.boatName = 'QA Cancel Test';
 
 **Test Objective:** Verify the About Us page works for signed out users and displays correctly on different screen sizes.
 
-**Developer:** Carolina Rodriguez · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Carolina Rodriguez · **Date tested:** Sept 11,2026
 **Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Sign out of user log in. | Users are signed out successfully. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 1 | Sign out of user log in. | Users are signed out successfully. | **Pass** | **Pass** |
 | 2 | Open the About Us page. | Able to access About Us page even without login | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 4 | Scroll through full page. | All information can be viewed without extending off screen. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | **Pass** | **Pass** |
+| 4 | Scroll through full page. | All information can be viewed without extending off screen. | **Pass** | **Pass** |
 
 **Comments:**
+> [!note] Developer (Carolina)
+>All steps passed. I was able to sign out successfully, access the About Us page without being logged in, resize the browser without overlapping content, and scroll through the full page without information extending off screen.
 
 > [!note] Peer Tester (Robert)
 > As a part of the testing, I also used the Developer Tools in Chrome to "Simulate" an iPad Air and iPhone 12 Pro screen for step 4.  My notes are below.
@@ -339,17 +373,19 @@ WHERE b.boatName = 'QA Cancel Test';
 
 **Test Objective:** Verify that the information shown on the About Us page is complete and consistent with the rest of the Moffat Bay Marina website.
 
-**Developer:** Carolina Rodriguez · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Carolina Rodriguez · **Date tested:** Sept 11,2026
 **Peer tester:** Robert Breutzmann · **Date tested:** 09/12/26
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
-| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | **Pass** | **Pass** |
+| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | **Pass** | **Pass** |
+| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | **Pass** | **Pass** |
+| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | **Pass** | **Pass** |
 
 **Comments:** 
+> [!note] Developer (Carolina) 
+>All steps passed. The About Us page content was readable,connects to database, the marina information was consistent with the rest of the website, contact and location details matched, and all buttons and links directed to the correct pages.
 
 > [!info] Peer Tester (Robert)
 > Submitting a message through this page does not add it to the database.  This is a fatal bug that needs to be fixed before it can be submitted!
