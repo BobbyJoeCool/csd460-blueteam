@@ -45,7 +45,7 @@
                     Reservations
                 </a>
 
-                <a href="${pageContext.request.contextPath}/contact.jsp">
+                <a href="${pageContext.request.contextPath}/about#formHeading">
                     Contact
                 </a>
             </nav>

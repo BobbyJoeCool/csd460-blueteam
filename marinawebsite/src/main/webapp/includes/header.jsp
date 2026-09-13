@@ -29,14 +29,30 @@
 </div>
 
     <nav class="header-nav" aria-label="Main navigation">
-        <a href="${pageContext.request.contextPath}/index.jsp"
-        class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
-        <a href="${pageContext.request.contextPath}/about"
-        class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-        <a href="${pageContext.request.contextPath}/reservation"
-        class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
-        <a href="${pageContext.request.contextPath}/contact.jsp"
-        class="${param.activePage == 'contact' ? 'nav-active' : ''}">Contact</a>
+
+        <%-- Hamburger toggle - only visible at mobile widths (see
+             header.css). Toggles the .is-open class on .header-nav via
+             js/header.js, which is what reveals #headerNavLinks (and the
+             Log Out form, when signed in) as a dropdown. --%>
+        <button type="button"
+                class="nav-toggle"
+                aria-label="Menu"
+                aria-expanded="false"
+                aria-controls="headerNavLinks"
+                data-nav-toggle>
+            <span class="nav-toggle__bar"></span>
+            <span class="nav-toggle__bar"></span>
+            <span class="nav-toggle__bar"></span>
+        </button>
+
+        <div class="header-nav__links" id="headerNavLinks">
+            <a href="${pageContext.request.contextPath}/index.jsp"
+            class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
+            <a href="${pageContext.request.contextPath}/about"
+            class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
+            <a href="${pageContext.request.contextPath}/reservation"
+            class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
+        </div>
 
         <%-- Signed-in state. loggedIn and displayName are both set by
              LoginServlet (see the Login contract's "What the Session
@@ -74,6 +90,8 @@
         </c:choose>
     </nav>
 </header>
+
+<script src="${pageContext.request.contextPath}/js/header.js" defer></script>
 
 	<!-- Reusable login modal (pulls in its own scripts) -->
 	<jsp:include page="/includes/loginModal.jsp" />

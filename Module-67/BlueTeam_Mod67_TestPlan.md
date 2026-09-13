@@ -7,14 +7,16 @@ To complete the test case plan, fill out the information for Project, Course, De
 
 ## Table of Contents
 
-- [**Test 1:** New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL](#test-1-new-slip-reservation-matches-through-to-the-reservation-summary-page-and-posts-to-mysql)
-- [**Test 2:** Reservation Page Reflects Reduced Availability Immediately After Booking](#test-2-reservation-page-reflects-reduced-availability-immediately-after-booking)
-- [**Test 3:** A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation](#test-3-a-full-slip-size-notifies-the-customer-offers-the-wait-list-and-never-creates-a-reservation)
-- [**Test 4:** Reservation Booking and Cancellation via Reservation Summary](#test-4-reservation-booking-and-cancellation-via-reservation-summary)
-- [**Test 5:** About Us Page Loads and Displays Correctly](#test-5-about-us-page-loads-and-displays-correctly)
-- [**Test 6:** About Us Navigation](#test-6-about-us-navigation)
-- [**Test 7:** About Us Page Has Public Access](#test-7-about-us-page-has-public-access)
-- [**Test 8:** About Us Content Accuracy](#test-8-about-us-content-accuracy)
+- [Table of Contents](#table-of-contents)
+- [Test 1: New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL](#test-1-new-slip-reservation-matches-through-to-the-reservation-summary-page-and-posts-to-mysql)
+- [Test 2: Reservation Page Reflects Reduced Availability Immediately After Booking](#test-2-reservation-page-reflects-reduced-availability-immediately-after-booking)
+- [Test 3: A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation](#test-3-a-full-slip-size-notifies-the-customer-offers-the-wait-list-and-never-creates-a-reservation)
+- [Test 4: Reservation Booking and Cancellation via Reservation Summary](#test-4-reservation-booking-and-cancellation-via-reservation-summary)
+- [Test 5: About Us Page Loads and Displays Correctly](#test-5-about-us-page-loads-and-displays-correctly)
+- [Test 6: About Us Navigation](#test-6-about-us-navigation)
+- [Test 7: About Us Page Has Public Access](#test-7-about-us-page-has-public-access)
+- [Test 8: About Us Content Accuracy](#test-8-about-us-content-accuracy)
+- [Additional Notes](#additional-notes)
 
 For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.
 
@@ -237,10 +239,10 @@ WHERE b.boatName = 'QA Cancel Test';
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Open the About Us page from the website navigation. | The About Us page loads without errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Verify the header and footer are visible. | All text and headings are readable and properly formatted. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☑&nbsp;Fail |
-| 3 | Verify all images load. | Images display without broken links or distortion. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Check the page for overlapping or cut-off content. | All sections display correctly with no layout issues. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Open the About Us page from the website navigation. | The About Us page loads without errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | Verify the header and footer are visible. | All text and headings are readable and properly formatted. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Fail** |
+| 3 | Verify all images load. | Images display without broken links or distortion. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Check the page for overlapping or cut-off content. | All sections display correctly with no layout issues. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 **Comments:**
 
@@ -270,10 +272,10 @@ WHERE b.boatName = 'QA Cancel Test';
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Click the logo/home link. | User is returned to the landing page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Click another navigation option like Reservation. | Correct page opens. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Use the browser back button. | Return to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Click About Us from the main navigation. | User is taken to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | Click the logo/home link. | User is returned to the landing page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | Click another navigation option like Reservation. | Correct page opens. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Use the browser back button. | Return to the About Us page. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 **Comments:**
 
@@ -300,10 +302,10 @@ WHERE b.boatName = 'QA Cancel Test';
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Sign out of user log in. | Users are signed out successfully. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Open the About Us page. | Able to access About Us page even without login | ☑&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Scroll through full page. | All information can be viewed without extending off screen. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
+| 1 | Sign out of user log in. | Users are signed out successfully. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | Open the About Us page. | Able to access About Us page even without login | ☑&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | Resize the browser page to half the size of your screen. | Page adjusts without overlapping. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Scroll through full page. | All information can be viewed without extending off screen. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 **Comments:**
 
@@ -342,15 +344,21 @@ WHERE b.boatName = 'QA Cancel Test';
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☑&nbsp;Pass<br>☐&nbsp;Fail |
-| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | ☐&nbsp;Pass<br>☐&nbsp;Fail | ☐&nbsp;Pass<br>☑&nbsp;Fail |
+| 1 | Review all headings and paragraph text on the About Us page. | Text is complete, readable, and free of obvious spelling or grammar errors. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 2 | Compare marina details with information shown elsewhere on the website. | Names, descriptions, and other shared information are consistent across pages. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 3 | Check any contact information, location details, or marina specific facts shown on the page. | Information matches everywhere. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
+| 4 | Verify any buttons or links included in the page content. | Each button or link points to the correct destination. | ☐&nbsp;Pass<br>☐&nbsp;Fail | **Pass** |
 
 **Comments:** 
 
-> [!bug] Peer Tester (Robert)
+> [!info] Peer Tester (Robert)
 > Submitting a message through this page does not add it to the database.  This is a fatal bug that needs to be fixed before it can be submitted!
+>
+> **Update**
+> This was a database error on the testers part.  I had lost the connection to the Database and this was not working.
+
+> [!warning] Peer Tester (Robert)
+> While trying to fix the submittion issue, the success popup comes up directly above the submit form and should use the Message Popup Modal instead.
 
 **Screenshots**
 
@@ -369,6 +377,7 @@ WHERE b.boatName = 'QA Cancel Test';
     ![Footer - address, phone, and office hours](Screenshots/Test_8/T8_S3c.png)
 4. Any buttons or links tested, plus the destination each one opened.
     ![Broken Contact link leads to the "Lost At Sea" 404 page](Screenshots/Test_8/T8_S4.png)
+    ![Popup done incorrectly](Screenshots/Test_8/T8_S4b.png)
 
 ## Additional Notes
 

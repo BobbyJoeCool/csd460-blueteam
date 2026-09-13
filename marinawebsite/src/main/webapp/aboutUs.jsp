@@ -234,13 +234,6 @@
                 <a href="tel:+13605550142">(360) 555-0142</a>.
             </p>
 
-            <%-- Redirected here with ?notice=contactSent after a successful submission. --%>
-            <c:if test="${param.notice == 'contactSent'}">
-                <p class="form-banner form-banner--success" role="status">
-                    Thanks — we'll be in touch as soon as we can.
-                </p>
-            </c:if>
-
             <%-- Set by the back end when the submission is rejected. --%>
             <c:if test="${not empty contactError}">
                 <p class="form-banner" role="alert">
