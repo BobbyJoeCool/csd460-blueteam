@@ -52,6 +52,10 @@ MoffatBay.statusPopup = (function () {
         waitListJoined: function (size) {
             return size ? "You're on the wait list for a " + size + " ft slip"
                         : null;
+        },
+
+        contactSent: function () {
+            return "Thanks — we'll be in touch as soon as we can.";
         }
     };
 

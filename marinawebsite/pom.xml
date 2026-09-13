@@ -50,6 +50,26 @@
 
   <build>
     <finalName>marinawebsite</finalName>
+    <resources>
+      <!-- Default resources directory - kept explicit since declaring
+           <resources> at all overrides Maven's implicit default. -->
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!-- Copies .env (module root) onto the classpath as WEB-INF/classes/.env,
+           so DBConnection can find it via the classloader instead of the
+           process's working directory. That directory varies by how Tomcat
+           gets launched (Maven vs. deployed vs. the VS Code extension), and
+           has been observed as "/" under the extension, which breaks the
+           old CWD-relative file lookup entirely - see DBConnection.loadEnv(). -->
+      <resource>
+        <directory>${project.basedir}</directory>
+        <includes>
+          <include>.env</include>
+        </includes>
+        <targetPath>.</targetPath>
+      </resource>
+    </resources>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>

@@ -54,6 +54,50 @@
     flex-wrap: wrap;
 }
 
+/* Hamburger toggle - hidden until the mobile breakpoint below turns it on. */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle__bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-nav-text);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Morphs the three bars into an X while the dropdown is open. */
+.header-nav.is-open .nav-toggle__bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.header-nav.is-open .nav-toggle__bar:nth-child(2) {
+    opacity: 0;
+}
+
+.header-nav.is-open .nav-toggle__bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.header-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
 .header-nav a {
     color: var(--color-nav-text);
     text-decoration: none;
@@ -118,13 +162,62 @@
 }
 
 @media (max-width: 600px) {
+    /* The compact row (icon, hamburger, welcome/login) stays vertically
+       centered, undoing the flex-start set at the 768px step above -
+       that was for the old layout, which wrapped onto multiple lines. */
     .site-header {
-        flex-direction: column;
         align-items: center;
     }
 
+    /* Brand text goes away on mobile - just the icon stays, next to the
+       hamburger and the auth control. */
+    .header-brand span {
+        display: none;
+    }
+
     .header-nav {
-        justify-content: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .nav-toggle {
+        display: flex;
+        /* First in the DOM, but sits at the left of the row. */
+        order: -1;
+        margin-right: auto;
+    }
+
+    /* Closed by default: the links (and, when signed in, the Log Out
+       form below) are hidden until .is-open is toggled on .header-nav. */
+    .header-nav__links {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        width: 100%;
+        order: 5;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-nav.is-open .header-nav__links {
+        display: flex;
+    }
+
+    /* Log Out stays out of the compact row on mobile - it only shows up
+       inside the open dropdown, under the links. */
+    .nav-logout-form {
+        display: none;
+        width: 100%;
+        order: 5;
+    }
+
+    .header-nav.is-open .nav-logout-form {
+        display: flex;
+    }
+
+    .nav-logout-form .nav-cta {
         width: 100%;
     }
 }
