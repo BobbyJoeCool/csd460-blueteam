@@ -4,14 +4,17 @@ These five files are how the database schema was actually built, one step at a
 time, during Module 5 / Week 4. **They are kept as the record of how the schema
 got to where it is. Don't run them to stand up a database.**
 
-To build the database, run the consolidated script one directory up:
+To build the database, run the current consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../MoffatBayMarinaDB_V1-4-0.sql
+mysql -u root -p < ../../../MoffatBayMarinaDB_V1-7-0.sql
 ```
 
-That single file produces the same schema these five produce in sequence, and it
-is the one that gets maintained going forward.
+That single file produces the same schema these five produce in sequence, plus
+everything added since - see [`../Week5/README.md`](../Week5/README.md) for
+what came after V1-4-0. The five files here stopped being the maintained path
+once V1-4-0.sql (itself later superseded - see Week5) was written; they are
+kept only as history.
 
 ## What's here
 

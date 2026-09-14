@@ -8,8 +8,6 @@
 
 - Front End:
 - Back End:
-- Database:
-- Testing:
 
 ## Open Questions / Decisions Needed
 

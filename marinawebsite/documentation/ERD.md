@@ -4,8 +4,8 @@
 - Roster: Breutzmann, R. | White, S. | Fernandez, M. | Rodriguez, C.
 - CSD 460 - Moffat Bay Marina
 - Comment citation: The formatting and some of the prose of this document (such as the header) was drafted with the assistance of Claude (Anthropic) and reviewed by the database lead, Breutzmann, R. All decisions and ERD design is 100% made by the developers. Design Decisions notes maintained by Claude as well, verified by Database Lead, Breutzmann, R.
-- Version: 1.6.0
-- Date: 2026-09-10
+- Version: 1.7.0
+- Date: 2026-09-11
 
 ## Overview
 
@@ -185,7 +185,21 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 10: Reservation | Owner: Rodriguez, C. |
+    %% Table 10: Rate | Owner: Breutzmann, R. (Database Lead) |
+    %% Inward FKs (none)
+    %% Outward FKs (none)
+    %% Standalone lookup of the marina's current prices. Read when pricing a
+    %% booking; the resulting figure is stored on Reservation.monthlyRate.
+    %% =============================================================================
+    Rate {
+        INT rateID PK "Unique identifier for the rate record"
+        VARCHAR rateCode UK "Stable code the application looks a rate up by, e.g. SLIP_PER_FOOT_MONTHLY"
+        DECIMAL rateAmount "Current amount in US dollars"
+        VARCHAR rateDescription "What this rate is, in plain terms"
+    }
+
+    %% =============================================================================
+    %% Table 11: Reservation | Owner: Rodriguez, C. |
     %% Inward FKs Reservation.reservationID <- TerminationNotice.reservationID
     %% Outward FKs Reservation.customerID FK -> Customer.customerID,
     %%             Reservation.boatID FK -> Boat.boatID,
@@ -205,7 +219,7 @@ erDiagram
     }
 
     %% =============================================================================
-    %% Table 11: Termination Notice (TerminationNotice) | Owner: Rodriguez, C. |
+    %% Table 12: Termination Notice (TerminationNotice) | Owner: Rodriguez, C. |
     %% Inward FKs (none)
     %% Outward FKs TerminationNotice.reservationID FK -> Reservation.reservationID
     %% 30-day notice a customer files to end a Reservation's lease.
@@ -216,20 +230,6 @@ erDiagram
         DATE noticeDate "Date the customer submitted the 30-day notice"
         DATE terminationDate "Date the lease is scheduled to end"
         VARCHAR noticeStatus "Current status of the termination notice"
-    }
-
-    %% =============================================================================
-    %% Table 12: Rate | Owner: Breutzmann, R. (Database Lead) |
-    %% Inward FKs (none)
-    %% Outward FKs (none)
-    %% Standalone lookup of the marina's current prices. Read when pricing a
-    %% booking; the resulting figure is stored on Reservation.monthlyRate.
-    %% =============================================================================
-    Rate {
-        INT rateID PK "Unique identifier for the rate record"
-        VARCHAR rateCode UK "Stable code the application looks a rate up by, e.g. SLIP_PER_FOOT_MONTHLY"
-        DECIMAL rateAmount "Current amount in US dollars"
-        VARCHAR rateDescription "What this rate is, in plain terms"
     }
 
     %% --- Relationships ---
@@ -248,10 +248,10 @@ erDiagram
 
 ## Design Decisions
 
-- **`DatabaseVersion` (Table 0)** is a standalone metadata table, no FKs in or out, holding one row that records which version of the build script last created the database (`version`, `appliedDate`, `description`). MySQL has no built-in concept of a "database version" the way some other systems do, so this is hand-rolled: it makes a running instance self-describing - anyone connected to it can query `DatabaseVersion` to confirm which schema/seed-data version they're looking at, instead of needing to track down the `.sql` file that built it. **Updated 2026-09-07:** this was originally described as holding a single current-version row, since the whole database is dropped and recreated on every run of the build script (see `DROP DATABASE IF EXISTS` in `MoffatBayMarinaDB_V1-4-0.sql`). That stopped being true once update scripts started appending their own rows. It now holds one row per version applied, and `currentVersion.sql` reads the most recent. The consolidated `V1-4-0` build script seeds all five historical rows deliberately, so a database built from that one file is indistinguishable from one built by running `V1-0-0` and the four updates in sequence.
+- **`DatabaseVersion` (Table 0)** is a standalone metadata table, no FKs in or out, holding one row that records which version of the build script last created the database (`version`, `appliedDate`, `description`). MySQL has no built-in concept of a "database version" the way some other systems do, so this is hand-rolled: it makes a running instance self-describing - anyone connected to it can query `DatabaseVersion` to confirm which schema/seed-data version they're looking at, instead of needing to track down the `.sql` file that built it. **Updated 2026-09-07:** this was originally described as holding a single current-version row, since the whole database is dropped and recreated on every run of the build script (see `DROP DATABASE IF EXISTS`, still true of the current consolidated script). That stopped being true once update scripts started appending their own rows. It now holds one row per version applied, and `currentVersion.sql` reads the most recent. **Updated 2026-09-14:** the consolidated build script is now `MoffatBayMarinaDB_V1-7-0.sql`, which supersedes `V1-4-0.sql` the same way `V1-4-0.sql` once superseded `V1-0-0.sql` plus its four updates - both retired scripts live on under `databasescripts/Legacy/` (`Week4/`, `Week5/`) as history. `V1-7-0.sql` seeds all eight historical rows (`1.0.0` through `1.7.0`) deliberately, so a database built from that one file is indistinguishable from one built by running every version script in sequence.
 - **`PascalCase` and `camelCase`** Table names are `PascalCase` and column names are `camelCase` following standard conventions.
 - **`ID` is capitalized in table names** As an example `slipID` or `customerID` rather than `slipId` or `customerId`.
-- **3 docks, all on one shoreline.** Per the client's marina map (`Source_Information/marina_a.png`), the marina has 3 linear docks (A, B, C) along a single harbor-side shoreline - dock descriptions reflect relative position along that one shoreline, not a compass side.
+- **3 docks, all on one shoreline.** Per the client's marina map (`Source_Information/marina_a.png`), the marina has 3 linear docks (A, B, C) along a single harbor-side shoreline.
 - **Seed data: 24 slips per dock, sourced from the client's marina map** Each dock is two mirrored columns of 12 slips; within each column slips 1-3/13-15 = 50 ft, 4-7/16-19 = 40 ft, and 8-12/20-24 = 26 ft, giving 6 x 50 ft, 8 x 40 ft, and 10 x 26 ft per dock (72 slips total). See `definitions_decisions.md` for the full breakdown.
 - **No waitlist queue position stored in database** even though this means Marina personnel cannot manually "bump" people up the list. An intentional design decision, made to keep within the scope of the design specs, to simplify the database.  Position in queue can be determined by calculating the time joined and seeing how many people joined before that person did.
 - **`Customer.email` has a `UNIQUE` constraint at the database level.** Email doubles as the login username, so app-level checks alone aren't enough - two signups submitted at the same time could both pass an app-level "is this email taken" check before either is saved. The DB constraint is the actual guarantee against duplicate logins.
@@ -268,10 +268,11 @@ erDiagram
 - **`Contact.reasonForContact` is a `VARCHAR` holding an enum-style value (common reasons plus "Other"), not a dedicated lookup table**, matching how `Slip.slipStatus` already represents its enum in this diagram - the exact reason list is an implementation detail for the `CREATE TABLE` script, not the ERD.
 - **`Contact.respondedEmployeeID` is a nullable FK to `Employee.employeeID`** (`Employee ||--o{ Contact : "responds to"`), null until a submission is answered - mirroring how `responded`/`respondedDate`/`respondedMessage` are already null until responded.
 - **`Employee` table mirrors `Customer`'s account fields** (`email` as a `UNIQUE` login username, `passwordHash`, `phone`) plus `jobTitle` and `hireDate`, since staff need to log in and respond to `Contact` submissions the same way customers log in to make reservations.
-- **`Rate` (Table 12) is a standalone lookup, not a column on `SlipSize` or `Slip`.** Slip rent is charged per foot of the **boat's** length ($10.50/ft/month), not per slip size, so the price has nothing to hang off `SlipSize` - a 32 ft boat and a 39 ft boat in identical 40 ft slips pay different rents. Electric is a second row in the same table, a flat $10.50/month regardless of boat size. Added in `MoffatBayMarinaDB_V1-5-0_update.sql`. Keeping these as data rather than constants in application code means a price change is two `UPDATE`s and no redeploy.
+- **`Rate` (Table 10) is a standalone lookup, not a column on `SlipSize` or `Slip`.** Slip rent is charged per foot of the **boat's** length ($10.50/ft/month), not per slip size, so the price has nothing to hang off `SlipSize` - a 32 ft boat and a 39 ft boat in identical 40 ft slips pay different rents. Electric is a second row in the same table, a flat $10.50/month regardless of boat size. Added in `MoffatBayMarinaDB_V1-5-0_update.sql`. Keeping these as data rather than constants in application code means a price change is two `UPDATE`s and no redeploy.
 - **`Rate` deliberately has no effective-date range or rate history.** Each `Reservation` already stores its own `monthlyRate` at the moment of booking, so past reservations keep the price they were sold at without any help from this table. Dated rates would solve a problem the snapshot already solves. If the marina ever needs to answer "what did we charge in March", that question is answerable from `Reservation` itself.
-- **Update, V1-5-0: `Boat.regNumber` data repair.** V1-3-0 folded the state prefix into the registration number with `CONCAT(regState, regNumber)`, but every seeded `regNumber` already carried its prefix (`WN1204JT`), so the concat doubled it to `WAWN1204JT`. All 60 seeded boats matched `RegisterServlet.REG_NUMBER_PATTERN` before that migration and none matched it after. V1-5-0 strips the duplicated prefix, guarded on four leading letters so boats registered through the site after V1-3-0 are untouched. The consolidated `V1-4-0` build script seeds the correct values outright.
+- **Update, V1-5-0: `Boat.regNumber` data repair.** V1-3-0 folded the state prefix into the registration number with `CONCAT(regState, regNumber)`, but every seeded `regNumber` already carried its prefix (`WN1204JT`), so the concat doubled it to `WAWN1204JT`. All 60 seeded boats matched `RegisterServlet.REG_NUMBER_PATTERN` before that migration and none matched it after. V1-5-0 strips the duplicated prefix, guarded on four leading letters so boats registered through the site after V1-3-0 are untouched. The consolidated build script (`V1-4-0.sql` at the time, `V1-7-0.sql` now) seeds the correct values outright.
 - **Update, V1-6-0: `Reservation.electricalHookup`.** The Reservation page has asked whether the customer wants an electric hookup since it was built, and there was nowhere to record the answer. `monthlyRate` is a blended total, so it can't stand in for one: 26 ft of boat with electric and 27 ft without both come to $283.50. The hookup is also a physical thing plugged in at the slip, not only a line on an invoice, so the marina needs to know who has one. `BOOLEAN NOT NULL DEFAULT FALSE`; the 60 seeded reservations all take the default, since their `monthlyRate` values are flat per-slip-size figures that predate `Rate` and carry no evidence either way.
+- **Update, V1-7-0: `Dock.dockDescription` rewrite.** Data-only, no schema change. Each dock's description is now three `CHAR(10)`-separated lines - name, a compass label (A = Eastern, B = Central, C = Western), and nearest landmark - rather than one sentence, so the Reservation page's dock cards can render it as a short stat list (`reservation.css` needs `white-space: pre-line` on `.dock-card__desc` for the line breaks to show). Also reassigns which landmark each dock is described as closest to: Dock B now claims the Office & Restaurant (previously lumped in with Dock C), and Dock C is closest to the Fueling Station only. This matches `marina_a.png` more closely than the original text did - the Office & Restaurant marker sits measurably closer to Dock B than Dock C, and the Fuel Dock marker sits past Dock C's end. The compass labels are a customer-facing orientation aid only; they don't change the "3 docks, all on one shoreline" layout above.
 - **`Reservation.electricalHookup` is a flag, not a second money column.** The amount is `Rate.ELECTRIC_MONTHLY` and the total the customer was quoted is `Reservation.monthlyRate`; the flag only says whether that fee is part of that total. The accepted tradeoff: if the electric rate ever changes, an old reservation still shows *that* it included electric but not *how much* of its total was electric - that has to be inferred from `monthlyRate` and the boat's length. Storing a per-reservation electric amount would remove the inference, at the cost of a second snapshot column that would agree with `Rate` in every row until the day a price changes. Deliberately not done at this scale; noted here so a later term knows it was a decision rather than an oversight.
 - **`passwordHash` (both `Employee` and `Customer`) is a SHA-256 digest**, computed with MySQL's `SHA2(<plaintext>, 256)` to match how the seed data in the database creation script is hashed. This is the project's actual password hashing scheme (unsalted) - not a placeholder to be swapped out later, since no further "real auth" phase follows this submission.
   - The password hashing done in SQL lets us load a password hash into the table using SHA-256. `SHA2('Password1', 256)` enters into the database as `19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd`.
