@@ -14,8 +14,8 @@
 
 <p align="center">
   <img alt="Status" src="https://img.shields.io/badge/status-in%20development-f4a261?style=flat-square">
-  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.3.0-0a6e8c?style=flat-square">
-  <img alt="Module" src="https://img.shields.io/badge/module-5-ff6f59?style=flat-square">
+  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.7.0-0a6e8c?style=flat-square">
+  <img alt="Module" src="https://img.shields.io/badge/module-8-ff6f59?style=flat-square">
   <img alt="Team" src="https://img.shields.io/badge/team-Blue-16262e?style=flat-square">
 </p>
 
@@ -26,7 +26,9 @@
 Moffat Bay Marina is a fictional marina on Joviedsa Island in Washington's San
 Juan Islands. This repository is the team's build of its customer-facing
 website: visitors can read about the marina, register an account, sign in, and
-(in a later module) reserve one of the marina's 72 slips.
+reserve one of the marina's 72 slips. Looking up an existing reservation,
+editing a profile, and joining the wait list are still being built — see
+[What's Built](#whats-built).
 
 It's a full-stack Jakarta EE application — JSP and JSTL on the front end, Java
 servlets and DAOs on the back end, MySQL underneath, packaged with Maven and
@@ -36,12 +38,16 @@ Built for **CSD 460 — Capstone Project**.
 
 ## The Team
 
-| | Role this module |
+| | Role this module (Module 8 — Look Up Reservation, Edit User Info) |
 | --- | --- |
-| **Robert Breutzmann** — *Team Lead* | Registration front end, login back end, database and ERD, placeholder and error pages |
-| **Miguel Fernandez** | Login modal front end, logged-in session state, Customer and Boat tables, login testing |
-| **Carolina Rodriguez** | Landing page, registration back end |
-| **Sara White** | Shared header and footer, site styles, landing page and registration testing |
+| **Robert Breutzmann** — *Team Lead* | Back End: Edit User Info / Register a New Boat |
+| **Miguel Fernandez** | Front End: Edit User Info / Register a New Boat |
+| **Carolina Rodriguez** | Back End: Look Up Reservation |
+| **Sara White** | Front End: Look Up Reservation |
+
+Role rotates every module — see
+[`Page Role Assignments.md`](Page%20Role%20Assignments.md) for the full
+history and how assignments are decided.
 
 ## The Marina
 
@@ -54,8 +60,9 @@ so every page tells the same story:
 | **Docks** | Three — A, B and C |
 | **Slips** | 72 total, 24 per dock |
 | **Slip sizes** | 26 ft, 40 ft and 50 ft |
+| **Slip pricing** | $10.50/ft of boat length, monthly, plus an optional flat $10.50/month for electric hookup |
 | **Address** | 1400 Harbor Loop Road, Joviedsa Island, WA 98250 |
-| **Hours** | 6:00 am – 7:00 pm weekdays, 7:00 am – 5:00 pm Sunday |
+| **Hours** | 6:00 am – 7:00 pm Monday – Saturday, 7:00 am – 5:00 pm Sunday |
 
 ## What's Built
 
@@ -65,7 +72,18 @@ so every page tells the same story:
 | Login (modal, available site-wide) | Complete |
 | Registration | Complete |
 | Shared header, footer and navigation | Complete |
-| About Us · Contact · Reservations · Reservation Summary · Look Up Reservation · Wait List · Edit User Info | Placeholder pages |
+| About Us (includes contact info and the contact form) | Complete |
+| Reservation (Book a Slip) | Complete |
+| Reservation Summary | Complete |
+| Look Up Reservation | Placeholder — in progress, Module 8 |
+| Edit User Info / Register a New Boat | Placeholder — in progress, Module 8 |
+| Wait List Lookup | Placeholder — not started, Module 9 |
+
+Contact Us was cut as its own page by a professor-directed syllabus change
+(Sep 7, 2026) and folded into About Us. `contact.jsp` still exists as an
+unlinked placeholder route left over from before that change; the real
+contact info and form live on About Us now, posting to the same `/contact`
+servlet.
 
 ## Tech Stack
 
@@ -82,7 +100,7 @@ so every page tells the same story:
 
 ### Prerequisites
 
-- **JDK 21 or newer**
+- **JDK 25 or newer** (the build targets Java release 25 — see `maven.compiler.release` in `pom.xml`)
 - **Apache Maven 3.9+**
 - **Apache Tomcat 11** (or 10.1+)
 - **MySQL 8.0**
@@ -121,27 +139,22 @@ so build the database first if the site can't connect.
 
 ### 2. Build the database
 
-Two scripts, in this order. The first builds everything from scratch; the
-second brings it to the current version.
+One script builds everything from scratch:
 
 ```bash
-mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-4-0.sql
-mysql -u root -p MoffatBayMarinaDB < databasescripts/MoffatBayMarinaDB_V1-5-0_update.sql
+mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-7-0.sql
 ```
 
-> **The first script is destructive** — it drops `MoffatBayMarinaDB` if it
-> already exists and rebuilds it empty. That's the intent for a fresh setup,
-> but don't run it against a database holding work you want to keep.
+> **This script is destructive** — it drops `MoffatBayMarinaDB` if it already
+> exists and rebuilds it empty. That's the intent for a fresh setup, but don't
+> run it against a database holding work you want to keep.
 
-`MoffatBayMarinaDB_V1-4-0.sql` replaces the old five-step sequence (`V1-0-0`
-plus four `_update` scripts). Those still exist under
-`databasescripts/Legacy/Week4/` as the record of how the schema was built, but
-they're history now — running them is not the way to stand a database up.
-
-**If you already have a database from the old five-script sequence**, don't
-rebuild: just run the `V1-5-0` update on top of it. It's written to land on the
-same end state either way, and it also repairs a data bug V1-3-0 introduced in
-`Boat.regNumber`. See `databasescripts/Legacy/Week4/README.md`.
+`MoffatBayMarinaDB_V1-7-0.sql` builds all twelve tables (including `Rate`,
+added in 1.5.0) and their seed data in one pass, at the schema's current
+version. It replaces the step-by-step path that actually built it —
+`V1-0-0` plus every update through `V1-7-0` — which lives under
+`databasescripts/Legacy/` (`Week4/`, then `Week5/`) purely as history; running
+those individually is not the way to stand a database up.
 
 Check where you landed at any time:
 
@@ -183,6 +196,16 @@ halves of the same page without waiting on each other.
 Every schema change is a **numbered migration** rather than an edit to the
 original script, and it's recorded in the `DatabaseVersion` table, so everyone
 can confirm they're running the same schema.
+
+The [ERD](marinawebsite/documentation/ERD.md) and
+[Business Rules](marinawebsite/documentation/BusinessRules.md) docs are the
+source of truth for the data model and the logic built on top of it (slip-fit
+checks, login lockout, etc.); `definitions_decisions.md` above is the source
+of truth for the marina's "fake facts" — hours, pricing, contact info — that
+every page needs to agree on.
+
+Each page gets one Front End and one Back End developer, with testing tracked
+separately per module — see [The Team](#the-team) for who's on what right now.
 
 Work happens on branches and lands on `main` through pull requests.
 
