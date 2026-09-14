@@ -64,7 +64,7 @@ Every page must use its assigned string exactly. Update this table as pages are 
 | About Us | `about` |
 | Reservation (Book a Slip) | `reservation` |
 | Reservation Summary | *(none — not a nav link)* |
-| Contact Us | `contact` |
+| Contact Us | *(retired — `contact.jsp` deleted 2026-09-14, see the update note below)* |
 | Look Up Reservation | *(none — not a nav link)* |
 | Wait List Lookup | *(none — not a nav link)* |
 | Edit User Info | *(none — not a nav link)* |
@@ -89,21 +89,19 @@ Us, but the site's convention is now "every nav link goes through a
 servlet"). Both `includes/header.jsp` and `includes/footer.jsp` were
 updated to match.
 
-**Flagging, not yet fixed:** `Contact` in both `header.jsp` and
-`footer.jsp` still links to `contact.jsp` — the original "Coming Soon"
-placeholder — even though `aboutUs.jsp`'s own header comment says the
-Contact Us page was cut as a standalone page (professor-directed change)
-and its contact info/form moved into About Us. `contact.jsp` is now an
-orphaned stub nobody actually needs, and `DevNotes/Contracts/contact-us-contract.md`
-(referenced in `contact.jsp`'s own header) was never created. The site's
-real, working contact form lives at `/about` (via `ContactServlet`,
-mapped to `/contact` for the form's own `POST`/redirect target), so the
-nav's `Contact` link should almost certainly point there instead — this
-wasn't rewired when the professor-directed change happened and nobody's
-caught it since. Worth a team decision: repoint `Contact` to `/about`
-(maybe scrolled to the form's `<section>`), drop it from the nav
-entirely since About Us already covers it, or actually build out
-`contact.jsp` as its own page after all.
+**Resolved, 2026-09-14:** the above turned out to be based on a stale
+assumption — by the time it was checked, neither `header.jsp` nor
+`footer.jsp` actually had a `Contact` nav link pointing at `contact.jsp`
+(or anywhere else); that must have been dropped at some earlier point
+without this note being updated to say so. Since there was no live link
+to repoint, and `contact.jsp` itself was still the original "Coming Soon"
+placeholder with `DevNotes/Contracts/contact-us-contract.md` (referenced
+in its own header) never created, `contact.jsp` has now been deleted
+outright rather than kept as an orphaned stub. The site's real, working
+contact form lives at `/about` (via `ContactServlet`, mapped to
+`/contact` for the form's own `POST`/redirect target) — nothing else on
+the site references the old `contact.jsp` path, confirmed by a repo-wide
+grep before deleting it.
 
 ## Signed-In vs Signed-Out Header
 

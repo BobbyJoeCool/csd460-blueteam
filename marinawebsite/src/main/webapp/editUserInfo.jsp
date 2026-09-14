@@ -6,12 +6,13 @@
     Course:      CSD 460 - Capstone Project
     Module:      (not yet scheduled)
     Page:        Edit User Info (editUserInfo.jsp)
-    Contract:    DevNotes/Contracts/edit-user-info-contract.md
+    Contract:    marinawebsite/documentation/Page Contracts/Edit User Profile.md
 
     Placeholder page - real content not built yet, see the contract above.
     Body is the shared "Coming Soon" include (includes/comingSoon.jsp).
-    No activePage value in DevNotes/Contracts/Shared HeaderFooter.md's
-    table yet, so no nav item highlights for this one.
+    No activePage value passed below - Shared HeaderFooter.md's table
+    lists Edit User Info as "(none - not a nav link)", and header.jsp has
+    no case for it anyway, so there's nothing to highlight.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>

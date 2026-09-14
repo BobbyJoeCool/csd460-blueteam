@@ -6,7 +6,7 @@
     Course:      CSD 460 - Capstone Project
     Module:      Module 5 / Week 4 - Web Development 1
     Page:        Registration Page (registration.jsp)
-    Contract:    DevNotes/Contracts/registration-page-contract.md
+    Contract:    marinawebsite/documentation/Page Contracts/Registration.md
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>

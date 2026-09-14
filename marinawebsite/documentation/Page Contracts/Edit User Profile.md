@@ -6,7 +6,9 @@ Edit User Info
 
 ## Module / Week
 
-Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
+Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
+
+> Corrected from a stale "Module 9 / Week 7" — see `Page Role Assignments.md`.
 
 ## Assigned
 
@@ -20,7 +22,7 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 - [ ] **Form field `name` attributes:** Are these the same `name` values as the Registration form, or different? Reusing keeps things consistent. List every editable field's `name`.
 - [x] **Which fields are editable?** See [Which Fields Are Editable](#which-fields-are-editable) below for the full column-by-column list — still needs the team's sign-off, not yet final.
 - [x] **Password change fields:** Password change is a popup modal, not inline fields on the main form — see [Password Change (Popup Modal)](#password-change-popup-modal) below. Fields are `currentPassword`, `newPassword`, `confirmNewPassword`.
-- [ ] **Forgot-password / lockout-recovery modal:** See [Password Change and the Lockout Model](#password-change-and-the-lockout-model) below. If adopted, this is a second popup modal, similar in shape to the Change Password modal but without a `currentPassword` field (replaced by the fake verification code), and it updates the Login page's existing lockout model as it stands today — not just an addition to this page. Needs Miguel + Robert sign-off before building.
+- [x] **Forgot-password / lockout-recovery modal:** **Decided — Miguel + Robert signed off (Sep 2026); building this module.** Second popup modal, same shape as the Change Password modal but without `currentPassword` (replaced by the fake verification code `12345`). See [Password Change and the Lockout Model](#password-change-and-the-lockout-model) below.
 - [ ] **How to show the customer's current information:** Three options on the table, team needs to pick one (or mix, per field type):
   1. **Placeholder text** inside each empty input (e.g. `placeholder="${customer.firstName}"`) that disappears the moment the user starts typing a replacement. Cheapest to build, but the moment you click into the field you lose sight of what it used to say, and a placeholder can't hold a value that's more than a few words (an address, for instance) without truncating.
   2. **Text next to the field showing the current value** (e.g. "Currently: Jane"), staying visible the whole time the user edits the field next to it. Doesn't disappear on focus, doesn't fight for space with placeholder styling, and reads clearly for longer values.
@@ -30,41 +32,49 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 
 ### Back End Owns
 
-- [ ] **Pre-populated data source:** Does Back End forward the current Customer Bean as a request attribute on GET, or does Front End read it from the session? What attribute name?
+- [x] **Pre-populated data source:** Front End reads `sessionScope.customer` directly via EL — no request attribute, no extra DB read. `LoginServlet` already puts `Customer` in the session, and it's kept current by the session refresh rule below. The GET handler's only job is the redirect-if-not-logged-in guard.
 - [x] **Password change verification:** Yes — `CustomerDAO.verifyPassword()` (already exists, used by `LoginServlet`) checks `currentPassword` before anything is changed. If it doesn't match, the modal shows an inline error and nothing is written to the database — not even a `newPassword` that happens to be valid.
 - [x] **Partial vs. full update:** Partial. Only fields the customer actually changed get written — see [Partial Update](#partial-update-only-changed-fields-get-written) below.
-- [ ] **Email uniqueness on change:** If the user changes their email, does Back End check for duplicates? What error attribute and message does it set? (Same shape as Registration's duplicate-email check — see `Registration.md`'s Duplicate Email section — but needs its own decision here since this is an UPDATE against the customer's own existing row, not an INSERT.)
-- [ ] **DAO method signature:** What does the update method look like? Needs to support "only these fields changed" — a full `Customer` object alone doesn't distinguish "left blank on purpose" from "not touched." Candidates: `updateCustomer(Connection, int customerId, Map<String,String> changedFields)`, or a partial-update Bean with nullable wrapper types, or one method per field. Team decides.
+- [x] **Email uniqueness on change:** Yes. New `CustomerDAO.emailInUseByAnotherCustomer(String email, int customerId)` — `SELECT customerID FROM Customer WHERE email = ? AND customerID != ?` — deliberately not a reuse of `findByEmail()`, since that check has no way to exempt the customer's own current row.
+- [x] **DAO method signature:** `CustomerDAO.updateCustomer(Connection conn, int customerId, Map<String, String> changedFields)`. A key absent from the map means untouched. A key present with an empty/null value means "clear it" — legal only for nullable/optional columns (`streetAddress2`; check the current schema for any others) — and the DAO binds SQL `NULL`, not an empty string. A **required** field arriving as a key with an empty/null value never reaches the DAO — the servlet rejects the request outright before validation runs, since a well-behaved Front End should never produce that state (see Partial Update below).
 - [x] **All-or-nothing on validation:** If even one changed field fails validation, the **entire update is aborted** — no partial write. See [Validate Everything First](#validate-everything-first-then-write-nothing-or-write-everything) below.
-- [ ] **Forgot-password / lockout-recovery flow:** See [Password Change and the Lockout Model](#password-change-and-the-lockout-model) below. This would replace or supplement the Login page's existing "Unlock Account" button (`CustomerDAO.unlockAccount()`, plain reset, no password involved) with a verification-code-based password reset — a real change to the Login model as it exists, not just new work on this page. Needs Miguel + Robert sign-off before building.
+- [x] **Forgot-password / lockout-recovery flow:** **Decided — replaces the Login page's "Unlock Account" button entirely.** A locked-out customer unlocks their account by successfully completing the forgot-password reset through this modal; there is no separate unlock action anymore. New `CustomerDAO.resetPasswordAndUnlock(Connection conn, int customerId, String newPasswordHash)` clears both `accountLocked` and `failedLoginAttempts` in the same transaction as the password update — kept distinct from the plain Change Password modal's `updatePassword()`, since that caller already proved they know the current password and should never touch lockout state. `Login.md` gets updated once this code ships (follow-up, not a blocker).
 - [x] **Session refresh after update:** After a successful update, Back End must replace the Customer Bean in the session with the new values — otherwise the header greeting, and any other page reading `sessionScope.customer`, shows stale data until the next login.
-- [ ] **Success/error response:** After saving, does Back End forward back to the same JSP with a success/error attribute, or redirect? What attribute names carry the messages?
-- [ ] **Servlet URL mapping:** What URL does the profile-fields form POST to? What URL does the password-change modal POST to (same servlet with an `action` param, or its own servlet)? What URL is the GET for loading the page?
+- [x] **Success/error response:** Sticky forward back to `editUserInfo.jsp` with named request attributes (`formError`, per-field errors), matching Registration's already-built pattern rather than the popup this contract originally specified. On success: a simple `MoffatBay.statusPopup.show("Profile updated")` confirmation, plus a field-by-field before/after diff rendered as page content (a summary box on the redisplayed form) — not inside the popup, since `statusPopup` is a 5-second auto-dismissing toast built for short confirmations, not something meant to be read and processed. The servlet captures each changed field's old value before applying the update, so both old and new values are available to the JSP.
+- [x] **Servlet URL mapping:** `/editProfile` (GET + POST, main profile form) and `/editProfile/password` (POST, password-change modal) as two separate servlet classes — `EditProfileServlet` and `EditProfilePasswordServlet` — mirroring the `/reservation` + `/reservation/boat` split (`ReservationServlet`/`ReservationBoatServlet`), not an `action` parameter on one servlet.
 
 ---
 
 ### Which Fields Are Editable
 
-Every column on the `Customer` table (`databasescripts/MoffatBayMarinaDB_V1-4-0.sql`), whether the customer should be able to change it here, and why. Proposed defaults below — **the team still needs to check these off**, not treat them as decided.
+Every column on the `Customer` table (`databasescripts/MoffatBayMarinaDB_V1-7-0.sql` — the schema was consolidated after this contract cited the now-relocated `V1-4-0.sql`, see `databasescripts/Legacy/Week5/`), whether the customer should be able to change it here, and why. Confirmed below.
 
 | Column | Editable? | Notes |
 | --- | --- | --- |
 | `customerID` | No | Primary key. Never Not Rendered on this table, Not editable. |
 | `firstName` | Yes | Same field as Registration. |
 | `lastName` | Yes | Same field as Registration. |
-| `email` | Needs discussion | It's both the contact address and the login username, and it's `UNIQUE` on the table. Editable is reasonable, but changing it needs the same duplicate-email check Registration has, and arguably a "type it twice" confirmation like the password fields get, since a typo here can lock someone out of their own account. Team should explicitly decide yes/no rather than default it in. |
-| `passwordHash` | [ ] No, not directly | Never rendered, never taken from this form's fields. Only changes through the [Password Change (Popup Modal)](#password-change-popup-modal) flow, which is a separate `currentPassword`/`newPassword`/`confirmNewPassword` exchange, not a value typed into a "new password" box sitting on the main form.|
-| `phone` | [ ] Yes | Same formatting/validation as Registration's Phone field. |
-| `phoneCountryCode` | [ ] Yes | Travels with `phone`, same as Registration. |
-| `streetAddress` | [ ] Yes | |
-| `streetAddress2` | [ ] Yes | Optional, same as Registration. |
-| `city` | [ ] Yes | |
-| `state` | [ ] Yes | Follows `country`'s option list/label, same as Registration. |
-| `zipCode` | [ ] Yes | |
-| `country` | [ ] Yes | Changing this should also re-drive the State/Province field's option list and label client-side, same swap `registration.js` already does. |
-| `dateJoined` | [ ] No | Historical fact about the account, not something a customer should be able to backdate or change. NotRendered |
-| `failedLoginAttempts` | [ ] No | System-managed bookkeeping (`LoginServlet`/`CustomerDAO.recordFailedAttempt` / `resetFailedAttempts`), never customer-facing. |
-| `accountLocked` | [ ] No | System-managed (`CustomerDAO.lockAccount` / `unlockAccount`), handled by the Login lockout flow, not this page — pending the [Password Change and the Lockout Model](#password-change-and-the-lockout-model) decision below, which could tie a forgot-password reset into unlocking the account. |
+| `email` | Yes | Both the contact address and login username, `UNIQUE` on the table. Duplicate-check on change via `CustomerDAO.emailInUseByAnotherCustomer()`, excluding the customer's own row. No "type it twice" confirmation added — not requested. |
+| `passwordHash` | No, not directly | Never rendered, never taken from this form's fields. Only changes through the [Password Change (Popup Modal)](#password-change-popup-modal) flow, or through the forgot-password reset flow via `resetPasswordAndUnlock()`. |
+| `phone` | Yes | Same formatting/validation as Registration's Phone field. |
+| `phoneCountryCode` | Yes | Travels with `phone`, same as Registration. |
+| `streetAddress` | Yes | Required — a blank submission is rejected, not treated as "clear." |
+| `streetAddress2` | Yes | Optional and nullable — an explicitly blank submission clears it to `NULL`. |
+| `city` | Yes | Required — a blank submission is rejected. |
+| `state` | Yes | Required. Follows `country`'s option list/label, same as Registration. |
+| `zipCode` | Yes | Required — a blank submission is rejected. |
+| `country` | Yes | Required. Changing this should also re-drive the State/Province field's option list and label client-side, same swap `registration.js` already does. |
+| `dateJoined` | No | Historical fact about the account, not something a customer should be able to backdate or change. Not rendered. |
+| `failedLoginAttempts` | No | System-managed bookkeeping. Cleared as a side effect of `resetPasswordAndUnlock()`, never set directly by this page. |
+| `accountLocked` | No, not directly | System-managed. `CustomerDAO.unlockAccount()` is retired — cleared only as a side effect of a successful `resetPasswordAndUnlock()` via the [forgot-password flow](#password-change-and-the-lockout-model). |
+
+---
+
+### Boats — Deferred to Next Module
+
+`Page Role Assignments.md`'s Module 8 note called for this page to reuse the Register a Boat popup modal, but that work is **deferred to a later module** — this page ships without boat-editing. Back End would need a new `BoatDAO.findById()`, a new `BoatDAO.updateBoat()`, an ownership-check guard (`BoatOwnership`, `endDate IS NULL`) that doesn't exist anywhere in the codebase today, and either a new servlet or a new branch on an existing one — real scope, not a quick add, and not fair to load onto this module alongside the forgot-password work already committed above.
+
+Instead, this page gets a **"Manage Boats" button** linking to a new stub page (e.g. `manageBoats.jsp`) showing a Coming Soon placeholder — the same pattern `editUserInfo.jsp` itself used before this module. Boat editing is picked up as its own page contract next module.
 
 ---
 
@@ -90,9 +100,11 @@ The standard way of doing this is sending an email with a verification code to a
 
 This exact modal could be used with a "forgot password" option on the login screen as well to update the password if the user "forgets" it.
 
-This takes extra work, and therefore Miguel and Robert need to agree on it before implimenting it, and it would requires seperate tests, with Miguel testing that the front end looks right and properly shows that the password model shows that a correct password is enetered and the second box matches, and Robert needs to show that the password testing on the back end actually changed by logging in with the new password and showing that the old password is invalid.
+This takes extra work, so it requires separate tests: Miguel testing that the front end looks right and properly shows that the password modal shows a correct password entered and the second box matching, and Robert showing that the back end actually changed the password by logging in with the new password and showing that the old password is now invalid.
 
-Worth being explicit about the scope of "yes" here: adopting this changes the Login page's lockout model as it exists today, not just this page. Login currently has a demo "Unlock Account" button (plain reset, no password involved, no verification step — see `marinawebsite/documentation/Page Contracts/Login.md`) that this would presumably replace or sit alongside. It also means building **two** similar-but-not-identical popup modals: the Change Password modal above (`currentPassword` + `newPassword` + `confirmNewPassword`) and this forgot-password modal (fake verification code + `newPassword` + `confirmNewPassword`, no `currentPassword` since the whole point is the user doesn't have it). Not updating `Login.md` yet — that's follow-up work if/when the team actually signs off on this.
+**Decided (Sep 2026): Miguel and Robert signed off. Building this module.**
+
+Scope of the "yes": this changes the Login page's lockout model, not just this page. Login's existing "Unlock Account" button (plain reset, no password, no verification — see `Login.md`) is **retired and replaced** by this flow — unlocking now happens by successfully completing a password reset through the forgot-password modal, not through a separate button. This means building **two** similar-but-not-identical popup modals: the Change Password modal above (`currentPassword` + `newPassword` + `confirmNewPassword`) and this forgot-password modal (fake verification code `12345` + `newPassword` + `confirmNewPassword`, no `currentPassword`). `Login.md` gets updated once this code ships — follow-up work, not a blocker to starting.
 
 ---
 
@@ -102,6 +114,8 @@ The customer might only be changing their phone number — the UPDATE statement 
 
 1. **Diff against the loaded Customer.** Front End always submits every field (simplest form), and the servlet compares each submitted value against the Customer Bean it loaded for the GET, building the SET clause only from fields that actually differ. Simple to build, but doesn't distinguish "customer retyped their existing phone number unchanged" from "customer never touched the phone field" — both look identical to a diff. Probably fine, since the end result is the same value either way, but worth naming as a limitation.
 2. **Front End only submits touched fields.** JavaScript tracks which inputs the customer actually interacted with (a `change` listener setting a `data-touched` flag, or simply: fields that differ from their pre-filled value at submit time) and the form only includes those in the POST body. The servlet then only has parameters for what's changing at all — nothing to diff, `request.getParameter("x") == null` already means "not changing x." Slightly more JS, but the server-side logic gets simpler and the two "unwitting no-op" cases above are no longer conflated.
+
+**Decided: Option 2, with one refinement.** A touched field is submitted with its new value normally. A touched **optional** field the customer clears (e.g. blanking `streetAddress2`) is submitted as an explicit empty value — the servlet treats "key present, value empty" as "set this column to NULL," not as "not changing it." A touched **required** field must never arrive empty — if it does, the servlet rejects the whole request outright (a distinct, structural error, not a normal per-field validation message), since that state means something upstream is broken, not that the customer made a typo.
 
 Either way, the UPDATE statement itself needs to be built dynamically (which columns are in the `SET` clause depends on what changed), not a single fixed `UPDATE Customer SET firstName=?, lastName=?, ... WHERE customerID=?` that always touches every column.
 
@@ -152,6 +166,9 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `currentPassword` | password | Yes, in the password modal only | Never pre-filled; see [Password Change (Popup Modal)](#password-change-popup-modal) |
 | `newPassword` | password | Yes, in the password modal only | Same five rules as Registration's Password field |
 | `confirmNewPassword` | password | Yes, client-side only, in the password modal only | Never submitted, checked live against `newPassword` |
+| `verificationCode` | text | Yes, in the forgot-password modal only | Fake verification code; must equal `12345` |
+| `newPassword` (forgot-password modal) | password | Yes, in the forgot-password modal only | Same five rules as the Change Password modal's `newPassword` |
+| `confirmNewPassword` (forgot-password modal) | password | Yes, client-side only, in the forgot-password modal only | Never submitted, checked live against the forgot-password modal's `newPassword` |
 
 ## Back End Parameters
 
@@ -173,6 +190,8 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | `country` | `String` | Form field, present only if changed | Must be `US`, `CA`, or `OTHER` |
 | `currentPassword` | `String` | Form field (password modal) | Verified via `CustomerDAO.verifyPassword()` before anything else |
 | `newPassword` | `String` | Form field (password modal) | Validated against the five password rules, then hashed |
+| `verificationCode` | `String` | Form field (forgot-password modal) | Must equal `12345` (simulated email verification) |
+| `newPassword` (forgot-password) | `String` | Form field (forgot-password modal) | Same five rules, then hashed via `resetPasswordAndUnlock()` |
 
 ## Database Returns
 
@@ -181,9 +200,12 @@ Every query or DAO method the Back End calls for this page, and its exact return
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
 | `CustomerDAO.verifyPassword()` | `String email`, `String submittedHash` | `boolean` | Already exists, reused from Login, for the "current password" check in the password modal |
-| `CustomerDAO.findByEmail()` | `String email` | `Customer` or `null` | Already exists; reusable for a duplicate-email check if `email` ends up editable |
-| *(new)* `CustomerDAO.updateCustomer()` | `Connection`, `int customerId`, changed fields only | Not yet decided — `boolean` success, updated `Customer`, or `void` with exception on failure | See [DAO method signature](#back-end-owns) open question above |
-| *(new)* `CustomerDAO.updatePassword()` | `Connection` (or none), `int customerId`, `String newHash` | Not yet decided | Separate from `updateCustomer()` since it's a completely separate submission, see [Password Change (Popup Modal)](#password-change-popup-modal) |
+| `CustomerDAO.findByEmail()` | `String email` | `Customer` or `null` | Already exists; used for lookups that only have an email to start from (login, registration) |
+| *(new)* `CustomerDAO.findById()` | `Connection`, `int customerId` | `Customer` or `null` | Added so session refresh after a profile update never depends on an email that may have just changed |
+| *(new)* `CustomerDAO.emailInUseByAnotherCustomer()` | `Connection`, `String email`, `int customerId` | `boolean` | Excludes the customer's own row; used only when `email` is a changed field |
+| *(new)* `CustomerDAO.resetPasswordAndUnlock()` | `Connection`, `int customerId`, `String newPasswordHash` | `void`, throws on failure | Clears `accountLocked` and `failedLoginAttempts` in the same transaction as the password update; used only by the forgot-password flow, never the plain Change Password modal |
+| *(new)* `CustomerDAO.updateCustomer()` | `Connection`, `int customerId`, `Map<String, String> changedFields` | `void`, throws `SQLException` on failure (caller rolls back the transaction) | See [DAO method signature](#back-end-owns) above |
+| *(new)* `CustomerDAO.updatePassword()` | `Connection`, `int customerId`, `String newHash` | `void`, throws `SQLException` on failure | Separate from `updateCustomer()` and from `resetPasswordAndUnlock()` — this one is only reached after `verifyPassword()` succeeds, see [Password Change (Popup Modal)](#password-change-popup-modal) |
 
 ## Validation Rules
 
@@ -200,8 +222,10 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | Current password doesn't match, in the password modal | "Current password is incorrect." | Inline in the password modal, under `currentPassword` |
 | New password doesn't meet the rules | Same live rule-checklist behavior as Registration | Under `newPassword`, via `includes/passwordRules.jsp` |
 | Confirm New Password doesn't match New Password | "Passwords do not match." | Under `confirmNewPassword`, live as the user types |
-| Email changed to one already in use (if email ends up editable) | TBD — same open question as Registration's duplicate-email handling | TBD |
-| Update succeeds | TBD — success banner, popup (`MoffatBay.statusPopup.show(...)`), or something else | TBD |
+| Email changed to a value already in use by another customer | Same message shape as Registration's duplicate-email error | Inline, under the `email` field |
+| Update succeeds | Simple `MoffatBay.statusPopup.show("Profile updated")` confirmation, plus a field-by-field before/after diff ("Email: old → new", etc.) | Popup for the confirmation; the diff renders as page content on the redisplayed form, not in the popup |
+| Forgot-password verification code is wrong | "That code doesn't match — check your email and try again." (simulated; the only valid code is `12345`) | Inline in the forgot-password modal, under the code field |
+| A required field is submitted blank | Not a user-facing message — this indicates a Front End or tampering bug. Request is rejected outright. | N/A |
 
 ## Login State Differences
 
