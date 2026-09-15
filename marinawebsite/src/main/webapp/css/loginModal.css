@@ -200,3 +200,19 @@
 		padding: 1.75rem 1.25rem 1.5rem;
 	}
 }
+
+/* Tall modals - the reset form is four fields plus the password checklist,
+   which overruns a laptop viewport where the two-field sign-in never did.
+   Same shape as the Reservation page's boat panel: start at the top rather
+   than centred, and let the panel scroll inside itself instead of pushing
+   its own submit button off the screen. */
+.login-modal.is-open {
+	align-items: flex-start;
+	overflow-y: auto;
+}
+
+.login-modal__panel {
+	max-height: calc(100vh - 3rem);
+	overflow-y: auto;
+	margin: 1.5rem 0;
+}
