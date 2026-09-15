@@ -54,6 +54,7 @@
         <input type="text" id="firstName" name="firstName" required
                placeholder="Jack"
                value="${fn:escapeXml(firstNameValue)}">
+        <div class="field-error" id="firstNameError"></div>
     </div>
 
     <div class="form-group" id="lastNameGroup">
@@ -61,6 +62,7 @@
         <input type="text" id="lastName" name="lastName" required
                placeholder="Sparrow"
                value="${fn:escapeXml(lastNameValue)}">
+        <div class="field-error" id="lastNameError"></div>
     </div>
 
     <div class="form-row-split form-row-split-phone">
@@ -90,6 +92,7 @@
                 <jsp:param name="country" value="${countryValue}" />
             </jsp:include>
         </select>
+        <div class="field-error" id="countryError"></div>
     </div>
 
     <div class="form-group" id="streetAddressGroup">
@@ -97,6 +100,7 @@
         <input type="text" id="streetAddress" name="streetAddress" required
                placeholder="1 Shipwreck Cove"
                value="${fn:escapeXml(streetAddressValue)}">
+        <div class="field-error" id="streetAddressError"></div>
     </div>
 
     <div class="form-group" id="streetAddress2Group">
@@ -104,6 +108,7 @@
         <input type="text" id="streetAddress2" name="streetAddress2"
                placeholder="Apt, suite, PO box, etc. (e.g. Cabin 13)"
                value="${fn:escapeXml(streetAddress2Value)}">
+        <div class="field-error" id="streetAddress2Error"></div>
     </div>
 
     <div class="form-row-split">
@@ -112,6 +117,7 @@
             <input type="text" id="city" name="city" required
                    placeholder="Tortuga"
                    value="${fn:escapeXml(cityValue)}">
+            <div class="field-error" id="cityError"></div>
         </div>
         <%--
           State/Province follows the Country field above: CA swaps in
@@ -141,6 +147,7 @@
                     </c:otherwise>
                 </c:choose>
             </select>
+            <div class="field-error" id="stateError"></div>
         </div>
     </div>
 

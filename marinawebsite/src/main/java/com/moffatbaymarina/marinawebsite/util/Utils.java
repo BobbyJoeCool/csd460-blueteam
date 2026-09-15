@@ -18,10 +18,32 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
-    // Requires local-part chars, "@", domain chars, a dot, then 2+ letter TLD.
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-        "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    /*
+     * Requires local-part chars, "@", domain chars, a dot, then 2+ letter
+     * TLD. Canonical copy - this used to also be duplicated (slightly
+     * differently - missing "%") as RegisterServlet.EMAIL_PATTERN. Consolidated
+     * here as part of the Edit User Info build, per that page's plan
+     * (DevNotes/Plans/edit-user-info-implementation-plan.md, Gap #6/#8):
+     * two near-identical copies could in principle accept/reject a
+     * different set of addresses from each other, which is exactly the
+     * kind of drift this class exists to prevent.
+     */
+    public static final Pattern EMAIL_PATTERN = Pattern.compile(
+        "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
     );
+
+    /** Exactly 10 digits - the shared notion of "a phone number" once the country code is split off. */
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^\\d{10}$");
+
+    /** 1 to 3 digits, no leading zero - matches Customer.phoneCountryCode's VARCHAR(3). */
+    public static final Pattern COUNTRY_CODE_PATTERN = Pattern.compile("^[1-9]\\d{0,2}$");
+
+    /** A 5-digit ZIP, optionally followed by a hyphen and the ZIP+4 suffix. */
+    public static final Pattern ZIP_PATTERN = Pattern.compile("^\\d{5}(-\\d{4})?$");
+
+    /** 10+ characters, at least one uppercase, one lowercase, one digit, one of {@code ! $ % * #}. */
+    public static final Pattern PASSWORD_PATTERN = Pattern.compile(
+        "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!$%*#]).{10,}$");
 
     private Utils() {
     }

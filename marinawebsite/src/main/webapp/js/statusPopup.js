@@ -39,6 +39,21 @@ MoffatBay.statusPopup = (function () {
         loggedOut:  function () { return "You've been logged out"; },
         registered: function () { return "Account created — welcome aboard"; },
 
+        /* ForgotPasswordServlet redirects here on a successful reset -
+           see the Edit User Profile contract's "Password Change and the
+           Lockout Model". No auto-login happens, so this just confirms
+           the reset landed before the customer signs in with it. */
+        passwordReset: function () {
+            return "Password reset — sign in with your new password";
+        },
+
+        /* EditProfileServlet redirects here after a successful profile
+           save (redirect, not forward, so a page refresh doesn't re-submit
+           the same update). */
+        profileUpdated: function () {
+            return "Profile updated";
+        },
+
         reservationCancelled: function () {
             return "Reservation cancelled";
         },

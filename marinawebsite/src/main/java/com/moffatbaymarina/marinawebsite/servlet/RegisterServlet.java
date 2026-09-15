@@ -34,20 +34,13 @@ public class RegisterServlet extends HttpServlet {
 
     //Validation patterns for form fields
 
-	private static final Pattern EMAIL_PATTERN = Pattern.compile(
-			"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-
-	private static final Pattern PHONE_PATTERN =
-			Pattern.compile("^\\d{10}$");
-
-	private static final Pattern COUNTRY_CODE_PATTERN =
-			Pattern.compile("^[1-9]\\d{0,2}$");
-
-	private static final Pattern ZIP_PATTERN =
-			Pattern.compile("^\\d{5}(-\\d{4})?$");
-
-	private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-			"^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!$%*#]).{10,}$");
+	/*
+	 * Email/phone/country-code/zip/password patterns used to be defined
+	 * here too - consolidated onto the single copy in Utils (used by
+	 * every page that now touches Customer fields, not just Registration)
+	 * as part of the Edit User Info build. See Utils' own comment on
+	 * EMAIL_PATTERN for why.
+	 */
 
 	private static final Pattern HIN_PATTERN =
 			Pattern.compile("^[A-Za-z]{3}[A-Za-z0-9]{9}$");
@@ -372,15 +365,15 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		if (email.length() > 100
-				|| !EMAIL_PATTERN.matcher(email).matches()) {
+				|| !Utils.EMAIL_PATTERN.matcher(email).matches()) {
 			return "Enter a valid email address.";
 		}
 
-		if (!COUNTRY_CODE_PATTERN.matcher(phoneCountryCode).matches()) {
+		if (!Utils.COUNTRY_CODE_PATTERN.matcher(phoneCountryCode).matches()) {
 			return "Enter a valid country code.";
 		}
 
-		if (!PHONE_PATTERN.matcher(phone).matches()) {
+		if (!Utils.PHONE_PATTERN.matcher(phone).matches()) {
 			return "Phone number must contain exactly 10 digits.";
 		}
 
@@ -390,11 +383,11 @@ public class RegisterServlet extends HttpServlet {
 			return "Enter valid address information.";
 		}
 
-		if (!ZIP_PATTERN.matcher(zipCode).matches()) {
+		if (!Utils.ZIP_PATTERN.matcher(zipCode).matches()) {
 			return "Enter a valid ZIP code.";
 		}
 
-		if (!PASSWORD_PATTERN.matcher(password).matches()) {
+		if (!Utils.PASSWORD_PATTERN.matcher(password).matches()) {
 			return "Password does not meet the required rules.";
 		}
 
