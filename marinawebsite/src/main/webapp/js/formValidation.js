@@ -13,8 +13,17 @@ var MoffatBay = window.MoffatBay || {};
 
 MoffatBay.form = (function () {
     "use strict";
-    // Requires local-part chars, "@", domain chars, a dot, then 2+ letter TLD.
-    var EMAIL_PATTERN = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    /*
+     * Requires local-part chars, "@", domain chars, a dot, then 2+ letter
+     * TLD. Must stay character-for-character identical to
+     * Utils.EMAIL_PATTERN on the server - the Login contract's
+     * "Client-side email format validation" says these two share a
+     * pattern so they can never disagree about what counts as an
+     * address. The "%" was added here when the server's two copies were
+     * consolidated onto Utils during the Edit User Info build; without
+     * it, an address the server accepts would be refused by the browser.
+     */
+    var EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     /**
      * Checks whether value is a well-formed email address.

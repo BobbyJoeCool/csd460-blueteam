@@ -40,7 +40,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * message ({@link #showError}), the same anti-enumeration handling
  * {@code LoginServlet} already uses for its own generic "username or
  * password is incorrect" message - a submission here can never be used to
- * check which emails are registered.
+ * check which emails are registered. That guarantee depends on the order
+ * the checks run in as much as on the wording; see {@link #doPost}.
  *
  * <p>This endpoint is complete and independently testable (POST
  * {@code email}, {@code verificationCode}, {@code newPassword}, and
@@ -101,17 +102,31 @@ public class ForgotPasswordServlet extends HttpServlet {
             return;
         }
 
+        /*
+         * Checked before the account lookup on purpose. This is the only
+         * message this endpoint can return that differs from the generic
+         * one below, so running it after the lookup would mean it could
+         * only ever appear for an email that actually exists: submitting
+         * the (public) code 12345 with a deliberately weak password would
+         * then answer "password does not meet the required rules" for a
+         * registered address and "that code doesn't match" for an
+         * unregistered one, which is exactly the account-enumeration the
+         * shared generic message exists to prevent - the same mistake the
+         * Login contract records for its old per-account attempts
+         * countdown. Answering the format question first gives nothing
+         * away, since the password rules are printed next to the field.
+         */
+        if (!Utils.PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            showError(request, response, "New password does not meet the required rules.");
+            return;
+        }
+
         try {
             Customer customer = customerDAO.findByEmail(email);
 
             // Same message either way - see the class-level anti-enumeration note.
             if (customer == null || !FAKE_VERIFICATION_CODE.equals(code)) {
                 showError(request, response, "That code doesn't match - check your email and try again.");
-                return;
-            }
-
-            if (!Utils.PASSWORD_PATTERN.matcher(newPassword).matches()) {
-                showError(request, response, "New password does not meet the required rules.");
                 return;
             }
 
