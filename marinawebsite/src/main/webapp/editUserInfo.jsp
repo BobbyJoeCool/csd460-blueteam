@@ -254,8 +254,32 @@
 
 <jsp:include page="/includes/footer.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
+<%-- Signed-in only, so it lives on this page rather than with the login
+     modal. formValidation.js isn't loaded here - includes/loginModal.jsp
+     already pulls it in through the header, on every page. --%>
+<jsp:include page="/includes/changePasswordModal.jsp" />
+
 <script src="${pageContext.request.contextPath}/js/editUserInfo.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var change = document.getElementById("openChangePassword");
+        var forgot = document.getElementById("openForgotPassword");
+
+        if (change) {
+            change.addEventListener("click", MoffatBay.accountModals.openChange);
+        }
+
+        if (forgot) {
+            forgot.addEventListener("click", function (event) {
+                event.preventDefault();
+                /* Pre-filled from the form's own email box, which holds
+                   what's on file unless it's just been edited. */
+                var email = document.getElementById("email");
+                MoffatBay.accountModals.openForgot(email ? email.value : "");
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
