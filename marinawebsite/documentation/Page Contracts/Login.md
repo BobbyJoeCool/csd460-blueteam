@@ -49,7 +49,13 @@ A successful login always resets the failed count back to zero, so a few scatter
 
 That means each customer's record needs to track two things it doesn't right now: how many failed attempts have happened since the last successful login, and whether the account is currently locked. That's a small database change the team needs to plan for alongside building this page.
 
-**Demo shortcut:** since we don't have a real email-based reset flow for this project, the locked-out message just includes a plain "Reset" button. Clicking it clears the lock and the failed count for that account. It's standing in for "the user got a reset email and picked a new password."
+**Demo shortcut, superseded:** an earlier version of this page had the locked-out message include a plain "Reset" button that cleared the lock and the failed count with no verification at all - a placeholder standing in for "the user got a reset email and picked a new password."
+
+That placeholder is retired, along with `CustomerDAO.unlockAccount()`. Per the Edit User Profile contract's "Password Change and the Lockout Model," a locked account is meant to unlock itself only by successfully completing a simulated forgot-password reset: the account's email, a fake verification code (`12345`, standing in for the email-a-code step this project can't actually do), and a new password. `ForgotPasswordServlet` (`/forgotPassword`) is built and working - it looks the account up by email, verifies the code, then calls `CustomerDAO.resetPasswordAndUnlock()`, which changes the password *and* clears both `accountLocked` and `failedLoginAttempts` in one transaction. No auto-login happens - the customer signs back in with the new password same as after any other password change.
+
+The actual front-end trigger and modal (a "Reset Password" button here opening some UI that collects those three fields and posts them to `/forgotPassword`) are **not built yet** - that's Front End's to design and build, not something Back End should be putting together as a stand-in. Until it exists, the locked-out state here just shows the lockout message with no recovery action in the UI.
+
+Identifying the account by email, not a session, is deliberate: a locked-out visitor has no logged-in session to identify them any other way, and this flow has to work regardless of whether it's used right after the lockout or from a different device entirely later on. An unrecognized email and a correct-email-wrong-code submission produce the identical message - the same anti-enumeration handling this page already uses for its own generic "username or password is incorrect" error - so a submission here can never be used to check which emails are registered.
 
 ### What the Session Remembers
 
@@ -93,6 +99,8 @@ After login, this is the account info the rest of the site has access to: first 
 
 The password does **not** come along, unlike this section originally said — `Customer.java` deliberately excludes `passwordHash` from the bean entirely (see its class-level Javadoc), specifically so it can never end up in the session or get rendered by a JSP. Password verification stays server-side, through `CustomerDAO.verifyPassword()`, which returns only a `boolean`.
 
+**Update, 2026-09-14.** `verifyPassword()` now has two overloads: by email (what this page uses, since email is the only thing a not-yet-authenticated visitor has typed in) and by `customerId` (added for the Edit User Info build, used once an ID is already trusted and in hand - e.g. the Change Password modal, or this page's own second call once `findByEmail` has already resolved which account it is). Email became a mutable field once Edit User Info shipped, so preferring the ID-based overload anywhere an ID is already available is the safer default going forward.
+
 ### What the Front End Sees on Failure
 
 Two different failure messages, so the user knows what's going on. Neither one ever says which of username or password was wrong though, only whether the account is now locked:
@@ -101,7 +109,7 @@ Two different failure messages, so the user knows what's going on. Neither one e
 - **Lockout rule notice:** every failed sign-in also sets `lockoutThreshold` (an int, always 3) so the modal can add "Accounts are locked after 3 unsuccessful attempts." under the error. It is the same message on every failure, whether or not the email belongs to a real account.
 
   **Changed 2026-09-04.** This started out as a per-account countdown — `attemptsRemaining`, rendering "2 more failed attempts will lock this account." That was a mistake. A countdown can only appear for an address that actually exists, so watching for it confirmed which emails were registered, which is precisely what the single generic error message exists to prevent. The fixed notice gives the user the same useful warning and tells an attacker nothing.
-- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with the demo "Unlock Account" button added so the user can clear the lock right there. That button is its own POST to `/login` with `action=reset` as a **form field in the POST body**, not a query string — `LoginServlet` only implements `doPost`, so a GET would 405 either way — and needs to resubmit `email` (whose account to unlock) and `redirectTo` (so the user lands back on the same page) as hidden fields.
+- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal. **Updated 2026-09-14:** the demo "Unlock Account" button described here originally is retired and not yet replaced with a real one in the UI - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures) above. `ForgotPasswordServlet` (`/forgotPassword`) is ready for Front End to build a trigger against.
 
 ### Where the User Lands After Login
 
@@ -127,11 +135,13 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`. Trimmed before submit and checked with `MoffatBay.form.isValidEmail` |
 | `password` | password | Yes | No `maxlength` — the stored value is a hash, and Registration's rule is a *minimum* of 10 characters, not a maximum |
 | `redirectTo` | hidden | Yes | Context-relative path (`/index.jsp`, never `/marinawebsite/index.jsp`), since the servlet prepends `getContextPath()`. Defaults to the current page; reuses the submitted value on a retry so a failed attempt doesn't reset the target to `/login` |
-| `action` | hidden | Only on the Unlock Account form | Fixed value `reset`. Sent as a POST field, not a query string — the servlet only implements `doPost`, so a GET would 405 |
 
-The Unlock Account form resubmits `email` and `redirectTo` as hidden fields
-alongside `action`, so the servlet knows whose account to unlock and where to
-send them afterward.
+**Retired 2026-09-14:** the `action=reset` hidden field and the Unlock Account
+form that sent it no longer exist - see [Locking an Account After Repeated
+Failures](#locking-an-account-after-repeated-failures). The locked-out state's
+button now opens the forgot-password modal instead, which is a separate form
+posting to `/forgotPassword` (documented in the Edit User Profile contract,
+not here) rather than another submission of this page's own login form.
 
 ## Back End Parameters
 
@@ -142,7 +152,8 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | `email` | text | Form field | The login identifier; treated as the email no matter what the field is labeled |
 | `password` | text | Form field | Compared as a hash, never as plain text |
 | `redirectTo` | text | Form field (hidden) | Fixed name, required for [Where the User Lands After Login](#where-the-user-lands-after-login) to work. Front End sets its value, not its name |
-| `action` | text | Form field (hidden), only on the Unlock Account submit | Value `reset`; tells the servlet this is the "unlock account" click and not a normal login submit. Sent as a POST field rather than the query string in the original spec, since the servlet only implements `doPost` |
+
+**Retired 2026-09-14:** `action` (the Unlock Account submit's marker) is gone along with that button - see the Front End Variables table above.
 
 ## Validation Rules
 
@@ -161,7 +172,7 @@ Every user-facing error condition this page can hit, and exactly what the user s
 | --- | --- | --- |
 | Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Inline in the login modal, on the page it was submitted from. No separate error page — Back End forwards back to that same page with `loginError` set as a request attribute. |
 | Any failed sign-in that hasn't locked the account | "Accounts are locked after 3 unsuccessful attempts." | Directly under the error message in the modal, driven by the `lockoutThreshold` request attribute. Shown on every failure, including for emails that aren't registered — a notice that only appeared for real accounts would identify them |
-| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the demo "Unlock Account" button |
+| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the "Reset Password" button (opens the forgot-password modal - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures)) |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |
 
 ## Login State Differences

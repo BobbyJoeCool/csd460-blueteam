@@ -65,9 +65,13 @@
         <c:choose>
             <c:when test="${sessionScope.loggedIn}">
 
-                <span class="nav-welcome">
+                <%-- Added alongside the Edit User Info build - previously
+                     plain text, with no way to actually reach the page
+                     from anywhere on the site. See the implementation
+                     plan's Gap #1. --%>
+                <a class="nav-welcome" href="${pageContext.request.contextPath}/editProfile">
                     Welcome, <c:out value="${sessionScope.displayName}"/>
-                </span>
+                </a>
 
                 <%-- POST, not a link: logging out changes state, so it
                      shouldn't sit on something a browser could follow on

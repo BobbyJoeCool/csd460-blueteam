@@ -115,7 +115,9 @@ modal. Signed in, that is replaced by:
 ```jsp
 <c:choose>
     <c:when test="${sessionScope.loggedIn}">
-        <span class="nav-welcome">Welcome, ${sessionScope.displayName}</span>
+        <a class="nav-welcome" href="${pageContext.request.contextPath}/editProfile">
+            Welcome, ${sessionScope.displayName}
+        </a>
         <form class="nav-logout-form" action="${pageContext.request.contextPath}/logout" method="post">
             <button type="submit" class="nav-cta">Log Out</button>
         </form>
@@ -125,6 +127,13 @@ modal. Signed in, that is replaced by:
     </c:otherwise>
 </c:choose>
 ```
+
+**Updated 2026-09-14 (Edit User Info build).** The greeting used to be plain
+text (`<span>`) with no way to actually reach an account page from anywhere
+on the site - there was no Edit User Info page built yet to link to. It's
+now a link to `/editProfile`, since that page exists. This was a Back End
+fix to a real reachability gap, not a reviewed Front End placement
+decision - see `DevNotes/Plans/edit-user-info-front-end-blockers.md`, item 9.
 
 Both attributes come from `LoginServlet` (see the Login contract's "What the
 Session Remembers"). `displayName` already arrives formatted as `"Elena M."`,
@@ -148,7 +157,7 @@ Pages with their own signed-in/signed-out controls handle those themselves —
 The header checks `sessionScope.loggedIn` (set by `LoginServlet`) to swap between two states:
 
 - **Logged out:** a "Log In" button that opens the login modal.
-- **Logged in:** a "Welcome, {displayName}" greeting (plain text, not a link) plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
+- **Logged in:** a "Welcome, {displayName}" greeting, now a link to `/editProfile` (see the 2026-09-14 update above), plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
 
 The footer has no login-state behavior.
 

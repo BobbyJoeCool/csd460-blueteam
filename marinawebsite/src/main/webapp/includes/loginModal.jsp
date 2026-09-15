@@ -15,7 +15,7 @@
   Reads from the request (all set by LoginServlet):
     loginError        - the message to show. Its presence is what opens the modal.
     accountLocked     - TRUE only on the lockout case; swaps the Sign in form
-                        for the Unlock Account button.
+                        for a locked-out message.
     lockoutThreshold  - how many failed attempts lock an account. Set on every
                         failed sign-in, the same value regardless of whether
                         the email is registered, so the message can't be used
@@ -85,25 +85,20 @@
         <c:choose>
 
             <%-- Locked out: no point offering the form, the servlet rejects
-                 it before checking the password. Demo unlock instead. --%>
+                 it before checking the password. The old demo "Unlock
+                 Account" button (plain reset, no verification) is retired -
+                 a locked account now unlocks itself only by completing a
+                 password reset through ForgotPasswordServlet (/forgotPassword,
+                 already built and working - see its class comment and the
+                 Edit User Profile contract's "Password Change and the
+                 Lockout Model"). The actual reset UI (a modal, a link to
+                 somewhere else, whatever it ends up being) is Front End's
+                 to build and wire up here - not built yet. --%>
             <c:when test="${accountLocked}">
 
                 <p class="login-modal__note">
-                    Unlock the account to try again.
+                    Password reset isn't available from here yet.
                 </p>
-
-                <%-- POST, not a link. LoginServlet only implements doPost,
-                     so a GET to /login?action=reset would 405.
-                     redirectTo rides along so the unlock lands the user back
-                     on the page they were on, not the homepage. --%>
-                <form class="login-modal__form"
-                      action="${pageContext.request.contextPath}/login"
-                      method="post">
-                    <input type="hidden" name="action" value="reset">
-                    <input type="hidden" name="email" value="${fn:escapeXml(param.email)}">
-                    <input type="hidden" name="redirectTo" value="${fn:escapeXml(loginRedirectTo)}">
-                    <button type="submit" class="login-modal__submit">Unlock Account</button>
-                </form>
 
             </c:when>
 

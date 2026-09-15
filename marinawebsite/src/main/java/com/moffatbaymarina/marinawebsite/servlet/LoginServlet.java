@@ -56,22 +56,23 @@ public class LoginServlet extends HttpServlet {
     /* Fixed by the Login contract's "Where the User Lands After Login" - Front End sets this hidden field's value, not its name. */
     private static final String PARAM_REDIRECT_TO = "redirectTo";
 
-    /* Fixed by the Login contract's demo reset flow: /login?action=reset. */
-    private static final String PARAM_ACTION = "action";
-    private static final String ACTION_RESET = "reset";
-
     private static final String DEFAULT_REDIRECT = "/";
     private static final int MAX_FAILED_ATTEMPTS = 3;
 
     private final CustomerDAO customerDAO = new CustomerDAO();
 
     /**
-     * Entry point for every POST to /login. Routes a demo reset click
-     * to {@link #handleDemoReset(HttpServletRequest, HttpServletResponse)},
-     * otherwise runs the full login check (lookup, lockout, password
-     * compare, attempt counting) and either logs the user in or shows one
-     * of the two failure pages. Every outcome ends in a redirect or a
-     * forward to the response.
+     * Entry point for every POST to /login. Runs the full login check
+     * (lookup, lockout, password compare, attempt counting) and either
+     * logs the user in or shows one of the two failure pages. Every
+     * outcome ends in a redirect or a forward to the response.
+     *
+     * <p>Used to also route a demo "Unlock Account" reset click
+     * ({@code action=reset}) - retired as part of the Edit User Info
+     * build. A locked account now unlocks itself only by completing the
+     * forgot-password reset ({@code ForgotPasswordServlet}), which
+     * verifies a (simulated) code and requires choosing a new password,
+     * rather than a plain no-verification reset.
      *
      * @param request the incoming login request
      * @param response the response to redirect or forward
@@ -81,11 +82,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        if (ACTION_RESET.equals(request.getParameter(PARAM_ACTION))) {
-            handleDemoReset(request, response);
-            return;
-        }
 
         String identifier = request.getParameter(PARAM_IDENTIFIER);
         String password = request.getParameter(PARAM_PASSWORD);
@@ -111,7 +107,12 @@ public class LoginServlet extends HttpServlet {
             }
 
             String submittedHash = Utils.hashPassword(password);
-            if (customerDAO.verifyPassword(identifier, submittedHash)) {
+            // By customerId, not identifier (email): findByEmail above
+            // already resolved which account this is, so there's no
+            // reason to go back to the mutable email string for the
+            // actual credential check when the stable ID is already in
+            // hand - see CustomerDAO.verifyPassword(int, String).
+            if (customerDAO.verifyPassword(customer.getCustomerId(), submittedHash)) {
                 customerDAO.resetFailedAttempts(customer.getCustomerId());
                 logInAndRedirect(request, response, customer);
                 return;
@@ -127,32 +128,6 @@ public class LoginServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Login lookup/update failed", e);
         }
-    }
-
-    /**
-     * Clears the lockout for the submitted email via
-     * {@link CustomerDAO#unlockAccount(String)}, then redirects the browser
-     * back to {@link #safeRedirectTarget(HttpServletRequest)} - the same
-     * page the modal was opened on, same as a successful login. A
-     * blank/missing email is silently ignored rather than treated as an
-     * error.
-     *
-     * @param request the demo-reset request
-     * @param response the response to redirect
-     * @throws ServletException if the account reset fails
-     * @throws IOException if the redirect fails
-     */
-    private void handleDemoReset(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String identifier = request.getParameter(PARAM_IDENTIFIER);
-        try {
-            if (identifier != null && !identifier.isBlank()) {
-                customerDAO.unlockAccount(identifier);
-            }
-        } catch (SQLException e) {
-            throw new ServletException("Account reset failed", e);
-        }
-        response.sendRedirect(request.getContextPath() + safeRedirectTarget(request));
     }
 
     /**
@@ -193,9 +168,8 @@ public class LoginServlet extends HttpServlet {
          * Appended defensively in case safeRedirectTarget ever returns a
          * path that already carries a query string of its own.
          *
-         * Deliberately only on this path. safeRedirectTarget is also used
-         * by the unlock-account flow, and unlocking an account is not
-         * signing in.
+         * Deliberately only on this path - a successful login, and only
+         * a successful login.
          */
         String target = safeRedirectTarget(request);
         target += (target.contains("?") ? "&" : "?") + "notice=loggedIn";
@@ -243,8 +217,8 @@ public class LoginServlet extends HttpServlet {
 
     /**
      * Sets the account-locked loginError message plus the
-     * accountLocked flag the modal checks to show the demo Unlock
-     * Account button, then forwards back to the page the modal was
+     * accountLocked flag the modal checks to show the forgot-password
+     * reset entry point, then forwards back to the page the modal was
      * opened on.
      *
      * @param request the request to attach the error message and flag to
