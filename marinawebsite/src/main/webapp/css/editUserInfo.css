@@ -1,0 +1,218 @@
+/*
+ * src/main/webapp/css/editUserInfo.css
+ * Author: Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
+ * CSD 460 - Capstone Project - Marina Website Project
+ *
+ * Edit User Info page styles. Depends on site.css (palette, .form-group,
+ * .field-error, .form-banner, .btn-primary, .btn-secondary, .hero-band)
+ * and on registration.css, which owns .form-column, .column-heading and
+ * the split rows personalInfoCard.jsp's markup is built on. Every color
+ * comes from a semantic variable - no hex values.
+ */
+
+/* ==========================================================================
+   Layout - two columns rather than Registration's three
+   ========================================================================== */
+
+.account-form {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr;
+	gap: 2rem;
+	align-items: start;
+}
+
+@media (max-width: 900px) {
+	.account-form {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+}
+
+/* The submit row sits under both columns, not inside one. */
+.account-form .submit-row {
+	grid-column: 1 / -1;
+	align-items: flex-start;
+}
+
+/* ==========================================================================
+   Account column
+   ========================================================================== */
+
+.account-subheading {
+	margin: 0 0 0.35rem;
+	color: var(--color-text-heading);
+	font-size: 1rem;
+}
+
+.account-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	align-items: flex-start;
+	margin-top: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.account-actions .field-hint {
+	margin: 0;
+}
+
+.account-fleet-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+}
+
+/* A disabled read-only field should look like a fact, not like an input
+   someone is being stopped from using. */
+#memberSince:disabled {
+	background: var(--color-surface-neutral);
+	color: var(--color-text-muted);
+	cursor: default;
+}
+
+/* ==========================================================================
+   "What changed" summary
+   ========================================================================== */
+
+.change-summary__title {
+	margin: 0 0 0.6rem;
+	font-weight: 600;
+}
+
+.change-summary__list {
+	margin: 0;
+}
+
+.change-summary__row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	padding: 0.3rem 0;
+}
+
+.change-summary__row + .change-summary__row {
+	border-top: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+}
+
+.change-summary__row dt {
+	flex: 0 0 9rem;
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.change-summary__row dd {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin: 0;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+/* The old value is struck through as well as faded - the arrow and the
+   colour shouldn't be the only things saying which one is gone. */
+.change-summary__old {
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	text-decoration: line-through;
+}
+
+.change-summary__arrow {
+	color: var(--color-text-muted);
+	opacity: 0.6;
+}
+
+.change-summary__new {
+	font-weight: 600;
+}
+
+@media (max-width: 600px) {
+	.change-summary__row dt {
+		flex-basis: 100%;
+	}
+}
+
+/* ==========================================================================
+   Save row
+   ========================================================================== */
+
+/* Sits under the button and only says anything while there is something to
+   say - an empty one collapses rather than leaving a gap. */
+#saveHint {
+	text-align: left;
+}
+
+#saveHint:empty {
+	display: none;
+}
+
+/* Marks a field the customer has actually edited, so "changed but not yet
+   saved" is visible before they press anything. Border only - the value
+   itself stays the normal colour so it's still easy to read. */
+.form-group input.is-changed,
+.form-group select.is-changed {
+	border-color: var(--color-ocean-blue);
+	box-shadow: inset 0 0 0 1px var(--color-ocean-blue);
+}
+
+/* ==========================================================================
+   Account column buttons
+
+   .btn-secondary is built for a dark background - its text color is
+   --color-cta-secondary-text, the light one meant to sit on top of
+   --color-cta-secondary-bg (see site.css, "Used by: index.jsp", where it
+   sits over the hero). On this page it sits on a pale .form-column, so the
+   text all but disappears. Rather than change the shared class and repaint
+   the landing page, it's inverted here: the dark color draws the outline
+   and the label, and the hover fills it in.
+   ========================================================================== */
+
+#accountColumn .btn-secondary {
+	background: transparent;
+	color: var(--color-cta-secondary-bg);
+	border: 1px solid var(--color-cta-secondary-bg);
+	cursor: pointer;
+}
+
+#accountColumn .btn-secondary:hover {
+	background: var(--color-cta-secondary-bg);
+	border-color: var(--color-cta-secondary-bg);
+	color: var(--color-cta-secondary-text);
+}
+
+#accountColumn .btn-secondary:focus-visible {
+	outline: 2px solid var(--color-input-border-focus);
+	outline-offset: 2px;
+}
+
+/* The forgot-password link sits inside a .field-hint, which is muted and
+   part-transparent - fine for hint text, wrong for the only control in
+   that block. Given back full contrast and an underline, so it reads as a
+   link rather than as more hint. */
+#accountColumn .field-hint a {
+	color: var(--color-link);
+	opacity: 1;
+	text-decoration: underline;
+}
+
+#accountColumn .field-hint a:hover {
+	color: var(--color-link-hover);
+}
+
+/* site.css ships .form-banner and .form-banner--success but no error
+   variant, so a rejected save would otherwise render its banner in the
+   same neutral styling as a successful one. */
+.form-banner--error {
+	border-color: var(--color-error);
+	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
+	color: var(--color-error);
+}
