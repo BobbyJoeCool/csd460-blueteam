@@ -61,14 +61,18 @@ For each test, the <u>developer</u> should: provide a test description, a test o
 
 **Screenshots**
 
-1. Header greeting reading "Welcome, QA E." after Step 2's login.
+1. The registration success notice / redirect after Step 1's account creation.
     ![\<caption>](Screenshots/Test_1/T1_S1.png)
-2. The "Saved. Here's what changed" summary showing the Email row after Step 3.
+2. Header greeting reading "Welcome, QA E." after Step 2's login.
     ![\<caption>](Screenshots/Test_1/T1_S2.png)
-3. The login modal's generic incorrect-credentials error after Step 5's old-email attempt.
+3. The "Saved. Here's what changed" summary showing the Email row after Step 3.
     ![\<caption>](Screenshots/Test_1/T1_S3.png)
-4. Header greeting reading "Welcome, QA E." again after Step 6's new-email login.
+4. The landing page header showing Sign In again after Step 4's logout.
     ![\<caption>](Screenshots/Test_1/T1_S4.png)
+5. The login modal's generic incorrect-credentials error after Step 5's old-email attempt.
+    ![\<caption>](Screenshots/Test_1/T1_S5.png)
+6. Header greeting reading "Welcome, QA E." again after Step 6's new-email login.
+    ![\<caption>](Screenshots/Test_1/T1_S6.png)
 
 ## Test 2: Partial Save Writes Only the Changed Columns
 
@@ -109,10 +113,14 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Screenshots**
 
-1. The confirmation panel from Step 2 listing exactly the three changed fields.
+1. The database client showing the "Before" row returned by Step 1's query.
     ![\<caption>](Screenshots/Test_2/T2_S1.png)
-2. The "Saved. Here's what changed" summary after saving, showing the same three fields.
+2. The "Saved. Here's what changed" summary after Step 2, showing exactly Last name, City, and ZIP code.
     ![\<caption>](Screenshots/Test_2/T2_S2.png)
+3. The database client showing the "After" row returned by Step 3's query.
+    ![\<caption>](Screenshots/Test_2/T2_S3.png)
+4. The Before and After rows shown together (side-by-side or stacked), with Step 4's confirmed matches/differences visible.
+    ![\<caption>](Screenshots/Test_2/T2_S4.png)
 
 ## Test 3: Change Password Retires the Old One Immediately
 
@@ -142,12 +150,16 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Screenshots**
 
-1. The Change Password modal open, mid-fill, with the rules checklist visible.
+1. The Change Password modal open, mid-fill, with the rules checklist visible (Step 1).
     ![\<caption>](Screenshots/Test_3/T3_S1.png)
 2. The "Password updated" toast after Step 2.
     ![\<caption>](Screenshots/Test_3/T3_S2.png)
-3. The login modal's incorrect-credentials error after Step 4's old-password attempt.
+3. The landing page header showing Sign In again after Step 3's logout.
     ![\<caption>](Screenshots/Test_3/T3_S3.png)
+4. The login modal's incorrect-credentials error after Step 4's old-password attempt.
+    ![\<caption>](Screenshots/Test_3/T3_S4.png)
+5. Header greeting reading "Welcome, QA E." after Step 5's new-password login.
+    ![\<caption>](Screenshots/Test_3/T3_S5.png)
 
 ## Test 4: Lockout Reset Clears the Lock and Replaces the Password
 
@@ -183,8 +195,10 @@ WHERE email = 'qa.edittest.updated@example.com';
     ![\<caption>](Screenshots/Test_4/T4_S2.png)
 3. The "Password reset" confirmation toast after Step 3.
     ![\<caption>](Screenshots/Test_4/T4_S3.png)
-4. Header greeting reading "Welcome, QA E." after Step 5's successful login with the new password.
+4. The login modal's plain incorrect-credentials error (not a lockout message) after Step 4's old-password attempt — confirming the reset cleared the lockout rather than stacking a new password on top of it.
     ![\<caption>](Screenshots/Test_4/T4_S4.png)
+5. Header greeting reading "Welcome, QA E." after Step 5's successful login with the new password.
+    ![\<caption>](Screenshots/Test_4/T4_S5.png)
 
 ## Test 5: \<Test Title>
 
