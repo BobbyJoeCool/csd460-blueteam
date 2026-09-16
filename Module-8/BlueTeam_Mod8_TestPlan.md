@@ -173,7 +173,7 @@ WHERE email = 'qa.edittest.updated@example.com';
 > I ran into no issues with this test. Everything functioned as expected and no unexpected issues came up. Same note from above about the password error and username error presenting the same results.
 > [!note] Peer Tester (Carolina)
 > \<filled in by the peer tester>
-
+]
 **Screenshots**
 
 1. The login modal's locked-out state after Step 1's third failed attempt, showing the **Reset your password** button.
