@@ -22,9 +22,9 @@
  *
  * Neither is a security boundary - both servlets re-check everything.
  *
- * Requires formValidation.js (MoffatBay.form.PASSWORD_RULES) and
- * passwordRules.js (MoffatBay.passwordRules.check), both loaded by
- * includes/loginModal.jsp.
+ * Requires formValidation.js (MoffatBay.form.*), loaded by
+ * includes/loginModal.jsp. Deliberately does NOT use passwordRules.js -
+ * see checkRules below for why.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -64,35 +64,59 @@ MoffatBay.accountModals = (function () {
     }
 
     /**
-     * Moves the one password checklist on the page into the modal that's
-     * open.
+     * Ticks off the password rules inside one modal.
      *
-     * There is deliberately only one. passwordRules.js looks its rule
-     * elements up by id once, on load, and holds on to them - so a second
-     * copy of the markup would give two boxes sharing one set of ids, and
-     * only the first would ever tick. Moving the node keeps those element
-     * references valid, since they're the same elements either way.
+     * Deliberately not the shared passwordRules.js helper. That one looks
+     * its rule elements up by id once, when the page loads, and holds on to
+     * them - and these modals travel with the login modal to every page,
+     * including Registration, which has a checklist of its own using those
+     * same ids. Two boxes sharing one set of ids means only whichever comes
+     * first in the document ever ticks, and since the header renders before
+     * the page body, that would be the hidden modal rather than the form
+     * the customer is actually filling in.
      *
-     * @param {string} slotId - id of the container to move it into
+     * So each modal carries its own checklist keyed on data-rule, and this
+     * walks that copy. The rules themselves still come from the single
+     * place they are defined, MoffatBay.form.PASSWORD_RULES, so there is
+     * still one answer to what a valid password is.
+     *
+     * @param {Element} modal - the modal whose checklist to update
+     * @param {string} value - the password to test
+     * @returns {boolean} true only if every rule passed
      */
-    function moveRulesTo(slotId) {
-        var rules = document.getElementById("passwordRules");
-        var slot = document.getElementById(slotId);
-        if (rules && slot && rules.parentElement !== slot) {
-            slot.appendChild(rules);
-        }
+    function checkRules(modal, value) {
+        var allMet = true;
+        Object.keys(MoffatBay.form.PASSWORD_RULES).forEach(function (key) {
+            var met = MoffatBay.form.PASSWORD_RULES[key].test(value);
+            if (!met) { allMet = false; }
+            if (!modal) { return; }
+            var item = modal.querySelector('[data-rule="' + key + '"]');
+            if (item) { item.classList.toggle("met", met); }
+        });
+        return allMet;
+    }
+
+    /**
+     * Clears every tick in a modal's checklist, so a reopened modal doesn't
+     * still show the last attempt's progress.
+     * @param {Element} modal - the modal to reset
+     */
+    function clearRules(modal) {
+        if (!modal) { return; }
+        modal.querySelectorAll("[data-rule]").forEach(function (item) {
+            item.classList.remove("met");
+        });
     }
 
     /**
      * Shows a modal and moves focus into it.
      * @param {Element} modal - the modal to open
      * @param {string} firstFieldId - id of the field to focus
-     * @param {string} slotId - where the password checklist should sit
      */
-    function open(modal, firstFieldId, slotId) {
+    function open(modal, firstFieldId) {
         if (!modal) { return; }
         lastFocused = document.activeElement;
-        moveRulesTo(slotId);
+        clearRules(modal);
         modal.classList.add("is-open");
         var first = document.getElementById(firstFieldId);
         if (first) { first.focus(); }
@@ -106,9 +130,7 @@ MoffatBay.accountModals = (function () {
         if (!modal) { return; }
         modal.classList.remove("is-open");
         clearErrors(modal);
-        /* The checklist goes home, so it's where the other modal expects to
-           find it next time and never ends up inside a closed one. */
-        moveRulesTo("forgotRulesSlot");
+        clearRules(modal);
         if (lastFocused) { lastFocused.focus(); }
     }
 
@@ -120,25 +142,26 @@ MoffatBay.accountModals = (function () {
     function openForgot(email) {
         var field = document.getElementById("forgotEmail");
         if (email && field && field.value === "") { field.value = email; }
-        open(forgotModal, "forgotEmail", "forgotRulesSlot");
+        open(forgotModal, "forgotEmail");
     }
 
     /**
      * Opens the change-password modal.
      */
     function openChange() {
-        open(changeModal, "currentPassword", "changeRulesSlot");
+        open(changeModal, "currentPassword");
     }
 
     /**
      * Shared checks for a new password and its confirmation.
+     * @param {Element} modal - the modal these fields live in
      * @param {string} newId - id of the new password input
      * @param {string} newErrorId - id of its message element
      * @param {string} confirmId - id of the confirmation input
      * @param {string} confirmErrorId - id of its message element
      * @returns {string|null} the id of the first bad field, or null
      */
-    function checkNewPassword(newId, newErrorId, confirmId, confirmErrorId) {
+    function checkNewPassword(modal, newId, newErrorId, confirmId, confirmErrorId) {
         var newValue = document.getElementById(newId).value;
         var confirmValue = document.getElementById(confirmId).value;
 
@@ -146,7 +169,7 @@ MoffatBay.accountModals = (function () {
             setFieldError(newId, newErrorId, "Enter a new password.");
             return newId;
         }
-        if (!MoffatBay.passwordRules.check(newValue)) {
+        if (!checkRules(modal, newValue)) {
             setFieldError(newId, newErrorId, "Your password doesn't meet the rules below yet.");
             return newId;
         }
@@ -170,7 +193,7 @@ MoffatBay.accountModals = (function () {
         var forgotNew = document.getElementById("forgotNewPassword");
         if (forgotNew) {
             forgotNew.addEventListener("input", function () {
-                MoffatBay.passwordRules.check(forgotNew.value);
+                checkRules(forgotModal, forgotNew.value);
             });
         }
 
@@ -204,7 +227,7 @@ MoffatBay.accountModals = (function () {
                    format first precisely so that difference can't be used to
                    find out which emails exist. Catching format problems
                    before the request goes keeps that out of play entirely. */
-                var badPassword = checkNewPassword(
+                var badPassword = checkNewPassword(forgotModal,
                     "forgotNewPassword", "forgotNewPasswordError",
                     "forgotConfirmPassword", "forgotConfirmPasswordError");
                 if (badPassword && !firstBad) { firstBad = badPassword; }
@@ -230,7 +253,7 @@ MoffatBay.accountModals = (function () {
         var changeNew = document.getElementById("newPassword");
         if (changeNew) {
             changeNew.addEventListener("input", function () {
-                MoffatBay.passwordRules.check(changeNew.value);
+                checkRules(changeModal, changeNew.value);
             });
         }
 
@@ -257,7 +280,7 @@ MoffatBay.accountModals = (function () {
                     return;
                 }
 
-                var badPassword = checkNewPassword(
+                var badPassword = checkNewPassword(changeModal,
                     "newPassword", "newPasswordError",
                     "confirmNewPassword", "confirmNewPasswordError");
                 if (badPassword) {

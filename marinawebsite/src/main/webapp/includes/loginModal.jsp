@@ -163,7 +163,6 @@
 
 <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
 <script src="${pageContext.request.contextPath}/js/loginModal.js" defer></script>
-<script src="${pageContext.request.contextPath}/js/passwordRules.js" defer></script>
 <script src="${pageContext.request.contextPath}/js/accountModals.js" defer></script>
 <script>
     /* The locked-out state's only control. Wired here rather than in
