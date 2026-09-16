@@ -62,6 +62,16 @@ MoffatBay.editUserInfo = (function () {
        actually on file. Everything else is measured against this. */
     var initialValues = {};
 
+    /*
+     * And how each of those values READ at that moment - "Washington", not
+     * "WA". Captured rather than looked up later, because a select can't
+     * always be asked afterwards: switching country rebuilds the
+     * state/province list, and Washington stops being one of the options at
+     * all. Without this the confirmation panel has no way to name the value
+     * it is about to overwrite.
+     */
+    var initialLabels = {};
+
     /**
      * The control carrying a field's submitted value. Phone is the odd one:
      * the visible box is #phoneDisplay (formatted, unnamed) and the value
@@ -139,6 +149,123 @@ MoffatBay.editUserInfo = (function () {
      */
     function changedFields() {
         return FIELDS.filter(hasChanged);
+    }
+
+    /*
+     * What each field is called in the confirmation panel. Field names are
+     * the Customer column names, which is right for the wire and wrong for
+     * a person reading "streetAddress2" back to themselves.
+     */
+    var FIELD_LABELS = {
+        firstName: "First name",
+        lastName: "Last name",
+        email: "Email",
+        phoneCountryCode: "Country code",
+        phone: "Phone",
+        streetAddress: "Street address",
+        streetAddress2: "Address line 2",
+        city: "City",
+        state: "State/Province",
+        zipCode: "ZIP code",
+        country: "Country"
+    };
+
+    /**
+     * How a field's CURRENT value reads - "Washington" rather than "WA",
+     * the formatted phone rather than ten bare digits. What gets submitted
+     * is still the raw value; this is only for showing a person what they
+     * are about to change.
+     * @param {string} field - a name from FIELDS
+     * @returns {string} the current value as the customer would recognise it
+     */
+    function currentLabel(field) {
+        var el = control(field);
+        if (!el || el.value === "") { return ""; }
+        if (el.tagName === "SELECT") {
+            return el.selectedOptions.length
+                ? el.selectedOptions[0].textContent.trim()
+                : el.value;
+        }
+        if (field === "phone") {
+            return MoffatBay.form.formatPhoneDisplay(el.value);
+        }
+        return el.value.trim();
+    }
+
+    /**
+     * Fills the confirmation panel with one row per changed field, old on
+     * the left and new on the right, and shows it in place of the Save
+     * button.
+     *
+     * Built from the form as it stands at this moment rather than from
+     * anything captured earlier, so what is listed here and what gets
+     * submitted cannot drift apart.
+     *
+     * @param {string[]} changed - the fields about to be saved
+     */
+    function showConfirmation(changed) {
+        var panel = document.getElementById("confirmChanges");
+        var list = document.getElementById("confirmChangesList");
+        var row = document.getElementById("accountSubmitRow");
+        if (!panel || !list) { return; }
+
+        list.textContent = "";
+
+        changed.forEach(function (field) {
+            var wrapper = document.createElement("div");
+            wrapper.className = "change-summary__row";
+
+            var term = document.createElement("dt");
+            term.textContent = FIELD_LABELS[field] || field;
+
+            var detail = document.createElement("dd");
+
+            var before = document.createElement("span");
+            before.className = "change-summary__old";
+            var beforeText = initialLabels[field] || "";
+            if (beforeText === "") {
+                before.innerHTML = "<em>empty</em>";
+            } else {
+                before.textContent = beforeText;
+            }
+
+            var arrow = document.createElement("span");
+            arrow.className = "change-summary__arrow";
+            arrow.textContent = "\u2192";
+            arrow.setAttribute("aria-label", "changing to");
+
+            var after = document.createElement("span");
+            after.className = "change-summary__new";
+            var afterText = currentLabel(field);
+            if (afterText === "") {
+                after.innerHTML = "<em>empty</em>";
+            } else {
+                after.textContent = afterText;
+            }
+
+            detail.appendChild(before);
+            detail.appendChild(arrow);
+            detail.appendChild(after);
+            wrapper.appendChild(term);
+            wrapper.appendChild(detail);
+            list.appendChild(wrapper);
+        });
+
+        if (row) { row.hidden = true; }
+        panel.hidden = false;
+        document.getElementById("confirmSave").focus();
+    }
+
+    /**
+     * Puts the Save button back and hides the confirmation panel, leaving
+     * every field exactly as it was - "Go back" is a return to editing, not
+     * an undo.
+     */
+    function hideConfirmation() {
+        var panel = document.getElementById("confirmChanges");
+        var row = document.getElementById("accountSubmitRow");
+        if (panel) { panel.hidden = true; }
+        if (row) { row.hidden = false; }
     }
 
     /**
@@ -250,6 +377,7 @@ MoffatBay.editUserInfo = (function () {
     function captureInitialValues() {
         FIELDS.forEach(function (field) {
             initialValues[field] = currentValue(field);
+            initialLabels[field] = currentLabel(field);
         });
     }
 
@@ -402,12 +530,32 @@ MoffatBay.editUserInfo = (function () {
             return;
         }
 
-        /* The real form never navigates - submitOnlyChanged posts a form it
-           builds itself, so that the body carries the changed fields and
-           nothing else. */
+        /* The real form never navigates. Saving happens from the
+           confirmation panel below, which posts a form built for the
+           purpose - see submitOnlyChanged. */
         event.preventDefault();
-        submitOnlyChanged(changed);
+        showConfirmation(changed);
     });
+
+    var confirmButton = document.getElementById("confirmSave");
+    if (confirmButton) {
+        confirmButton.addEventListener("click", function () {
+            /* Re-read rather than trusting the list that was drawn: nothing
+               can change behind the panel, but the submitted set should
+               come from the form either way. */
+            submitOnlyChanged(changedFields());
+        });
+    }
+
+    var cancelButton = document.getElementById("cancelSave");
+    if (cancelButton) {
+        cancelButton.addEventListener("click", hideConfirmation);
+    }
+
+    /* Editing anything while the panel is up means the list behind it is
+       already out of date, so it steps aside and the customer confirms
+       again. */
+    form.addEventListener("input", hideConfirmation);
 
     return {
         changedFields: changedFields,

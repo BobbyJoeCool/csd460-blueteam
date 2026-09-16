@@ -216,3 +216,43 @@
 	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
 	color: var(--color-error);
 }
+
+/* ==========================================================================
+   Confirmation step
+
+   Takes the Save button's place rather than covering the form, so the
+   fields it is asking about stay visible behind it - the whole point of
+   doing this inline instead of as a third modal.
+   ========================================================================== */
+
+.confirm-changes {
+	max-width: 46rem;
+	margin: 0.5rem 0 0;
+	padding: 1.25rem 1.5rem;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-ocean-blue);
+	border-radius: 10px;
+}
+
+.confirm-changes[hidden] {
+	display: none;
+}
+
+.confirm-changes__title {
+	margin: 0 0 0.75rem;
+	color: var(--color-text-heading);
+	font-size: 1.1rem;
+}
+
+.confirm-changes__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+}
+
+/* The submit row is hidden outright while the panel is up, so the page
+   never offers two ways to save at once. */
+#accountSubmitRow[hidden] {
+	display: none;
+}

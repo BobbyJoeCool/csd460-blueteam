@@ -248,6 +248,34 @@
             </p>
         </div>
 
+        <%--
+          The confirmation step from the contract's "Partial Update" section:
+          the exact old -> new for every field about to be written, shown
+          before anything is.
+
+          Inline rather than a modal, deliberately. The page already has two
+          modals, the changed fields are marked in place, and a dialog would
+          cover the very fields it's asking about - this reads as the same
+          thing continuing rather than an interruption. Built by
+          editUserInfo.js from the live form values, so it can never show a
+          different set of changes than the ones that get submitted.
+
+          Distinct from the summary at the top of the page: that one reports
+          what was saved, after the fact, from the session. This one asks.
+        --%>
+        <div class="confirm-changes" id="confirmChanges" hidden>
+            <h2 class="confirm-changes__title">Save these changes?</h2>
+            <dl class="change-summary__list" id="confirmChangesList"></dl>
+            <div class="confirm-changes__actions">
+                <button type="button" class="btn-primary" id="confirmSave">
+                    Yes, save
+                </button>
+                <button type="button" class="btn-clear-section" id="cancelSave">
+                    Go back
+                </button>
+            </div>
+        </div>
+
     </form>
 
 </main>
