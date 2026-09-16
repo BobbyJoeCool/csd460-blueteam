@@ -7,9 +7,9 @@
 
   Each field reads its own request parameter first (a resubmitted value
   after a failed validation on the page that includes this), and falls
-  back to an optional "default*" param if that's empty. That's how a
-  future Edit Account page can pre-populate the card from an existing
-  Customer record instead of a blank form:
+  back to an optional "default*" param only when that parameter was never
+  submitted at all. That's how a page like Edit Account can pre-populate
+  the card from an existing Customer record instead of a blank form:
 
     <jsp:include page="/includes/personalInfoCard.jsp">
         <jsp:param name="defaultFirstName" value="${customer.firstName}" />
@@ -29,21 +29,35 @@
   falls back to empty on first load, same as before this was pulled out.
 
   Expects to render inside a <form>; doesn't declare its own <form> tag.
+
+  "Touched" is checked with paramValues, not param. param.X collapses a
+  submitted-but-blank field and a field that was never in the request at
+  all down to the same empty string, so testing "not empty param.X" can't
+  tell the two apart. On Edit User Info that mattered: a required field
+  resubmitted blank was falling back to defaultX (the value already on
+  file) instead of staying blank, so a rejected save redisplayed the
+  customer's old value right next to a "this is required" error - looking
+  like nothing was wrong, or like their blank was silently discarded.
+  paramValues.X is null only when the key is genuinely absent from the
+  request, so it's null on a first GET (fall back to the default) and a
+  non-null (possibly single-empty-string) array on any resubmission (use
+  what was actually submitted, blank or not) - the same touched/untouched
+  distinction EditProfileServlet.touched() already makes server-side.
 --%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 
-<c:set var="firstNameValue" value="${not empty param.firstName ? param.firstName : param.defaultFirstName}" />
-<c:set var="lastNameValue" value="${not empty param.lastName ? param.lastName : param.defaultLastName}" />
-<c:set var="phoneCountryCodeValue" value="${not empty param.phoneCountryCode ? param.phoneCountryCode : (not empty param.defaultPhoneCountryCode ? param.defaultPhoneCountryCode : '1')}" />
-<c:set var="phoneValue" value="${not empty param.phone ? param.phone : param.defaultPhone}" />
-<c:set var="streetAddressValue" value="${not empty param.streetAddress ? param.streetAddress : param.defaultStreetAddress}" />
-<c:set var="streetAddress2Value" value="${not empty param.streetAddress2 ? param.streetAddress2 : param.defaultStreetAddress2}" />
-<c:set var="cityValue" value="${not empty param.city ? param.city : param.defaultCity}" />
-<c:set var="stateValue" value="${not empty param.state ? param.state : param.defaultState}" />
-<c:set var="zipCodeValue" value="${not empty param.zipCode ? param.zipCode : param.defaultZipCode}" />
-<c:set var="countryValue" value="${not empty param.country ? param.country : (not empty param.defaultCountry ? param.defaultCountry : 'US')}" />
+<c:set var="firstNameValue" value="${not empty paramValues.firstName ? param.firstName : param.defaultFirstName}" />
+<c:set var="lastNameValue" value="${not empty paramValues.lastName ? param.lastName : param.defaultLastName}" />
+<c:set var="phoneCountryCodeValue" value="${not empty paramValues.phoneCountryCode ? param.phoneCountryCode : (not empty param.defaultPhoneCountryCode ? param.defaultPhoneCountryCode : '1')}" />
+<c:set var="phoneValue" value="${not empty paramValues.phone ? param.phone : param.defaultPhone}" />
+<c:set var="streetAddressValue" value="${not empty paramValues.streetAddress ? param.streetAddress : param.defaultStreetAddress}" />
+<c:set var="streetAddress2Value" value="${not empty paramValues.streetAddress2 ? param.streetAddress2 : param.defaultStreetAddress2}" />
+<c:set var="cityValue" value="${not empty paramValues.city ? param.city : param.defaultCity}" />
+<c:set var="stateValue" value="${not empty paramValues.state ? param.state : param.defaultState}" />
+<c:set var="zipCodeValue" value="${not empty paramValues.zipCode ? param.zipCode : param.defaultZipCode}" />
+<c:set var="countryValue" value="${not empty paramValues.country ? param.country : (not empty param.defaultCountry ? param.defaultCountry : 'US')}" />
 
 <div class="form-column" id="personalInfoColumn">
 
