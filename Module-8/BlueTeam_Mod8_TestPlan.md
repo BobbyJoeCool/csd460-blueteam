@@ -9,17 +9,17 @@ To complete the test case plan, fill out the information for Project, Course, De
 
 <!-- Each link's anchor is the heading text lowercased, punctuation removed, and spaces turned into hyphens — e.g. "## Test 1: About Us Navigation" becomes "#test-1-about-us-navigation". Update the anchor here any time you change a test's title. -->
 
-- [**Test 1:** Email Change Invalidates the Old Login](#test-1-email-change-invalidates-the-old-login)
-- [**Test 2:** Partial Save Writes Only the Changed Columns](#test-2-partial-save-writes-only-the-changed-columns)
-- [**Test 3:** Change Password Retires the Old One Immediately](#test-3-change-password-retires-the-old-one-immediately)
-- [**Test 4:** Lockout Reset Clears the Lock and Replaces the Password](#test-4-lockout-reset-clears-the-lock-and-replaces-the-password)
-- [**Test 5:** \<short test title>](#test-5-short-test-title)
-- [**Test 6:** \<short test title>](#test-6-short-test-title)
-- [**Test 7:** \<short test title>](#test-7-short-test-title)
-- [**Test 8:** \<short test title>](#test-8-short-test-title)
-- [**Test 9:** \<short test title>](#test-9-short-test-title)
-- [**Test 10:** \<short test title>](#test-10-short-test-title)
-- \<add or remove rows to match the number of tests below, updating each anchor to match its final heading text>
+- [Table of Contents](#table-of-contents)
+- [Test 1: Email Change Invalidates the Old Login](#test-1-email-change-invalidates-the-old-login)
+- [Test 2: Partial Save Writes Only the Changed Columns](#test-2-partial-save-writes-only-the-changed-columns)
+- [Test 3: Change Password Retires the Old One Immediately](#test-3-change-password-retires-the-old-one-immediately)
+- [Test 4: Lockout Reset Clears the Lock and Replaces the Password](#test-4-lockout-reset-clears-the-lock-and-replaces-the-password)
+- [Test 5: \<Test Title\>](#test-5-test-title)
+- [Test 6: \<Test Title\>](#test-6-test-title)
+- [Test 7: \<Test Title\>](#test-7-test-title)
+- [Test 8: \<Test Title\>](#test-8-test-title)
+- [Test 9: \<Test Title\>](#test-9-test-title)
+- [Test 10: \<Test Title\>](#test-10-test-title)
 
 For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter **Pass** or **Fail**. The <u>peer tester</u> should provide their name, date tested, enter **Pass** or **Fail** for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.
 
@@ -36,26 +36,24 @@ For each test, the <u>developer</u> should: provide a test description, a test o
 
 **Test Objective:** Verify that changing a customer's email address on Edit User Info takes effect for authentication immediately — the old email can no longer sign in, and only the new one can.
 
-**Developer:** Robert · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Robert · **Date tested:** 2026/09/16
 **Peer tester:** Carolina · **Date tested:** \<yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Register a new customer at `/register` using the test data above (email `qa.edittest@example.com`, password `TestPass1!`). | Account is created and the page confirms success (registered notice / redirect to sign in). | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | Sign in with `qa.edittest@example.com` / `TestPass1!`. | Login succeeds; header greeting reads "Welcome, QA E." | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | Click the header greeting to open Edit User Info. Change only the Email field to `qa.edittest.updated@example.com`, leave every other field as-is, click **Save changes**, confirm on the inline "Save these changes?" panel, then click **Yes, save**. | Page redirects to `/editProfile?notice=profileUpdated`; a "Profile updated" toast appears; the "Saved. Here's what changed" summary lists exactly one row: Email, `qa.edittest@example.com` → `qa.edittest.updated@example.com`. | \<Pass/Fail> | \<Pass/Fail> |
-| 4 | Log out via the header's Log Out button. | Redirected to the landing page; header shows Sign In again. | \<Pass/Fail> | \<Pass/Fail> |
-| 5 | Attempt to sign in with the **old** email `qa.edittest@example.com` and password `TestPass1!`. | Login fails with the generic "email or password is incorrect" message (the same anti-enumeration message used for any bad credential, not an account-not-found message). | \<Pass/Fail> | \<Pass/Fail> |
-| 6 | Sign in with the **new** email `qa.edittest.updated@example.com` and password `TestPass1!`. | Login succeeds; header greeting reads "Welcome, QA E." again. | \<Pass/Fail> | \<Pass/Fail> |
-
-> [!note] Note for Robert
-> Fill in the date you tested as Developer. Leave the Peer tester date blank for Carolina to fill in when she tests. Leave the test account signed in as `qa.edittest.updated@example.com` when this test ends — Test 2 continues from here.
+| 1 | Register a new customer at `/register` using the test data above (email `qa.edittest@example.com`, password `TestPass1!`). | Account is created and the page confirms success (registered notice / redirect to sign in). | **Pass** | \<Pass/Fail> |
+| 2 | Sign in with `qa.edittest@example.com` / `TestPass1!`. | Login succeeds; header greeting reads "Welcome, QA E." | **Pass** | \<Pass/Fail> |
+| 3 | Click the header greeting to open Edit User Info. Change only the Email field to `qa.edittest.updated@example.com`, leave every other field as-is, click **Save changes**, confirm on the inline "Save these changes?" panel, then click **Yes, save**. | Page redirects to `/editProfile?notice=profileUpdated`; a "Profile updated" toast appears; the "Saved. Here's what changed" summary lists exactly one row: Email, `qa.edittest@example.com` → `qa.edittest.updated@example.com`. | **Pass** | \<Pass/Fail> |
+| 4 | Log out via the header's Log Out button. | Redirected to the landing page; header shows Sign In again. | **Pass** | \<Pass/Fail> |
+| 5 | Attempt to sign in with the **old** email `qa.edittest@example.com` and password `TestPass1!`. | Login fails with the generic "email or password is incorrect" message (the same anti-enumeration message used for any bad credential, not an account-not-found message). | **Pass** | \<Pass/Fail> |
+| 6 | Sign in with the **new** email `qa.edittest.updated@example.com` and password `TestPass1!`. | Login succeeds; header greeting reads "Welcome, QA E." again. | **Pass** | \<Pass/Fail> |
 
 **Comments:**
 
 > [!note] Developer (Robert)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing>
-
+> I had no issues with this test, though it is worth noting that there is no way of telling if the password was typed incorrectly on step 5 because a failed username or a failed password check returns the same result.
+> [!note] Developer (Robert)
+> Something I noticed that is unrelated to this test is that when you create an account, you are not automatically logged in. Some sites do this where when you create an account you are logged in and directed to where you had attempted to reach. In the case of this test, that's back on the landing page. Worth looking at the registration contract to see if creating an account should log you in as that account automatically.
 > [!note] Peer Tester (Carolina)
 > \<filled in by the peer tester>
 
@@ -78,15 +76,15 @@ For each test, the <u>developer</u> should: provide a test description, a test o
 
 **Test Objective:** Verify that saving a partial profile update writes exactly the fields the customer changed to the `Customer` table, and leaves every other column — including `passwordHash`, `dateJoined`, and the lockout columns — byte-for-byte unchanged.
 
-**Developer:** Robert · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Robert · **Date tested:** 2026/09/16
 **Peer tester:** Carolina · **Date tested:** \<yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Signed in as `qa.edittest.updated@example.com` (continuing from Test 1), run the "Before" query below against the database. | Query returns exactly one row for this customer; record every column's value. | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | On Edit User Info, change exactly three fields — Last name to `EditTestVerified`, City to `Mount Vernon`, ZIP code to `98273` — and leave every other field untouched. Click **Save changes**, review the confirmation panel, then click **Yes, save**. | The confirmation panel (and, after saving, the "Saved. Here's what changed" summary) lists exactly three rows: Last name, City, ZIP code — no others. | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | Run the "After" query below against the database. | Query returns exactly one row for this customer. | \<Pass/Fail> | \<Pass/Fail> |
-| 4 | Diff the "Before" and "After" rows column by column. | `lastName` = `EditTestVerified`, `city` = `Mount Vernon`, `zipCode` = `98273`. Every other column — `firstName`, `email`, `phone`, `phoneCountryCode`, `streetAddress`, `streetAddress2`, `state`, `country`, `passwordHash`, `dateJoined`, `failedLoginAttempts`, `accountLocked` — is identical to the "Before" row. | \<Pass/Fail> | \<Pass/Fail> |
+| 1 | Signed in as `qa.edittest.updated@example.com` (continuing from Test 1), run the "Before" query below against the database. | Query returns exactly one row for this customer; record every column's value. | **Pass** | \<Pass/Fail> |
+| 2 | On Edit User Info, change exactly three fields — Last name to `EditTestVerified`, City to `Mount Vernon`, ZIP code to `98273` — and leave every other field untouched. Click **Save changes**, review the confirmation panel, then click **Yes, save**. | The confirmation panel (and, after saving, the "Saved. Here's what changed" summary) lists exactly three rows: Last name, City, ZIP code — no others. | **Pass** | \<Pass/Fail> |
+| 3 | Run the "After" query below against the database. | Query returns exactly one row for this customer. | **Pass**| \<Pass/Fail> |
+| 4 | Diff the "Before" and "After" rows column by column. | `lastName` = `EditTestVerified`, `city` = `Mount Vernon`, `zipCode` = `98273`. Every other column — `firstName`, `email`, `phone`, `phoneCountryCode`, `streetAddress`, `streetAddress2`, `state`, `country`, `passwordHash`, `dateJoined`, `failedLoginAttempts`, `accountLocked` — is identical to the "Before" row. | **Pass** | \<Pass/Fail> |
 
 **SQL query (run before Step 2 and again after, same query both times):**
 
@@ -100,14 +98,10 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Expected row count:** 1, both times. Expected diff: only `lastName`, `city`, `zipCode` change; all twelve other columns match between the two runs.
 
-> [!note] Note for Robert
-> Fill in the date you tested as Developer. Leave the Peer tester date blank for Carolina to fill in when she tests. Paste the actual Before/After column values you captured into the Comments section below so Carolina can check the diff without re-running the query herself.
-
 **Comments:**
 
 > [!note] Developer (Robert)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing — include the Before/After row values here>
-
+> The test successfully updated as expected. I ran into no issues with the process.
 > [!note] Peer Tester (Carolina)
 > \<filled in by the peer tester>
 
@@ -126,25 +120,22 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Test Objective:** Verify that the Change Password modal on Edit User Info updates the stored password hash correctly, and that only the new password authenticates afterward.
 
-**Developer:** Robert · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Robert · **Date tested:** 2026/9/16
 **Peer tester:** Carolina · **Date tested:** \<yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Signed in as `qa.edittest.updated@example.com` / `TestPass1!` (continuing from Test 2), open Edit User Info and click **Change password**. | The Change Password modal opens with Current password, New password, and Confirm new password fields, plus the live password rules checklist. | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | Enter Current password `TestPass1!`, New password `NewPass2!`, Confirm new password `NewPass2!`, and click **Update password**. | The modal closes with no page navigation; a "Password updated" toast appears. | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | Log out via the header's Log Out button. | Redirected to the landing page; header shows Sign In again. | \<Pass/Fail> | \<Pass/Fail> |
-| 4 | Attempt to sign in with `qa.edittest.updated@example.com` and the **old** password `TestPass1!`. | Login fails with the generic incorrect-credentials message. | \<Pass/Fail> | \<Pass/Fail> |
-| 5 | Sign in with `qa.edittest.updated@example.com` and the **new** password `NewPass2!`. | Login succeeds; header greeting reads "Welcome, QA E." | \<Pass/Fail> | \<Pass/Fail> |
-
-> [!note] Note for Robert
-> Fill in the date you tested as Developer. Leave the Peer tester date blank for Carolina to fill in when she tests. Only attempt the old password once in Step 4 — Test 4 needs the failed-attempt counter to still be at zero going in, and a second wrong-password attempt here would eat into the three attempts Test 4 needs.
+| 1 | Signed in as `qa.edittest.updated@example.com` / `TestPass1!` (continuing from Test 2), open Edit User Info and click **Change password**. | The Change Password modal opens with Current password, New password, and Confirm new password fields, plus the live password rules checklist. | **Pass** | \<Pass/Fail> |
+| 2 | Enter Current password `TestPass1!`, New password `TestPass2!`, Confirm new password `TestPass2!`, and click **Update password**. | The modal closes with no page navigation; a "Password updated" toast appears. | **Pass** | \<Pass/Fail> |
+| 3 | Log out via the header's Log Out button. | Redirected to the landing page; header shows Sign In again. | **Pass** | \<Pass/Fail> |
+| 4 | Attempt to sign in with `qa.edittest.updated@example.com` and the **old** password `TestPass1!`. | Login fails with the generic incorrect-credentials message. | **Pass** | \<Pass/Fail> |
+| 5 | Sign in with `qa.edittest.updated@example.com` and the **new** password `TestPass2!`. | Login succeeds; header greeting reads "Welcome, QA E." | **Pass** | \<Pass/Fail> |
 
 **Comments:**
 
 > [!note] Developer (Robert)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing>
-
+> I ran into no issues with this test. Everything functioned as expected and no unexpected issues came up. Same note from above about the password error and username error presenting the same results.
+ 
 > [!note] Peer Tester (Carolina)
 > \<filled in by the peer tester>
 
@@ -165,25 +156,21 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Test Objective:** Verify that three failed sign-in attempts lock the account, that the forgot-password reset (reached from the login modal's locked-out state) both clears the lockout and sets a new password, and that only the new password works afterward.
 
-**Developer:** Robert · **Date tested:** \<yyyy/mm/dd>
+**Developer:** Robert · **Date tested:** 2026/9/16
 **Peer tester:** Carolina · **Date tested:** \<yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | Attempt to sign in as `qa.edittest.updated@example.com` with an incorrect password three times in a row (e.g. `wrong1`, `wrong2`, `wrong3`). | The first two attempts show the generic incorrect-credentials message. After the third, the login modal switches to its locked-out state: the sign-in form is replaced with a message and a **Reset your password** button. | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | Click **Reset your password**. | The Forgot Password modal opens, with the Email field pre-filled with `qa.edittest.updated@example.com`. | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | Enter Verification code `12345` (the site's fixed demo code), New password `NewPass3!`, Confirm new password `NewPass3!`, and submit. | Redirected with a "Password reset — sign in with your new password" confirmation; no auto-login occurs (still signed out). | \<Pass/Fail> | \<Pass/Fail> |
-| 4 | Attempt to sign in with `qa.edittest.updated@example.com` and the password from Test 3, `NewPass2!`. | Login fails with the generic incorrect-credentials message — it does **not** report the account as locked, confirming the reset cleared the lockout rather than merely changing the password on top of it. | \<Pass/Fail> | \<Pass/Fail> |
-| 5 | Sign in with `qa.edittest.updated@example.com` and the new password `NewPass3!`. | Login succeeds; header greeting reads "Welcome, QA E." | \<Pass/Fail> | \<Pass/Fail> |
-
-> [!note] Note for Robert
-> Fill in the date you tested as Developer. Leave the Peer tester date blank for Carolina to fill in when she tests. This is the last test in the sequence, so it's fine to leave the account in its post-Test-4 state (email `qa.edittest.updated@example.com`, password `NewPass3!`) rather than restoring it — this is a disposable QA account, not the shared Elena Marsh demo login.
+| 1 | Attempt to sign in as `qa.edittest.updated@example.com` with an incorrect password three times in a row (e.g. `wrong1`, `wrong2`, `wrong3`). | The first two attempts show the generic incorrect-credentials message. After the third, the login modal switches to its locked-out state: the sign-in form is replaced with a message and a **Reset your password** button. | **Pass** | \<Pass/Fail> |
+| 2 | Click **Reset your password**. | The Forgot Password modal opens, with the Email field pre-filled with `qa.edittest.updated@example.com`. | **Pass** | \<Pass/Fail> |
+| 3 | Enter Verification code `12345` (the site's fixed demo code), New password `TestPass3!`, Confirm new password `TestPass3!`, and submit. | Redirected with a "Password reset — sign in with your new password" confirmation; no auto-login occurs (still signed out). | **Pass** | \<Pass/Fail> |
+| 4 | Attempt to sign in with `qa.edittest.updated@example.com` and the password from Test 3, `TestPass2!`. | Login fails with the generic incorrect-credentials message — it does **not** report the account as locked, confirming the reset cleared the lockout rather than merely changing the password on top of it. | **Pass** | \<Pass/Fail> |
+| 5 | Sign in with `qa.edittest.updated@example.com` and the new password `TestPass3!`. | Login succeeds; header greeting reads "Welcome, QA E." | **Pass** | \<Pass/Fail> |
 
 **Comments:**
 
 > [!note] Developer (Robert)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing>
-
+> I ran into no issues with this test. Everything functioned as expected and no unexpected issues came up. Same note from above about the password error and username error presenting the same results.
 > [!note] Peer Tester (Carolina)
 > \<filled in by the peer tester>
 
@@ -209,7 +196,6 @@ WHERE email = 'qa.edittest.updated@example.com';
 
 **Developer:** Sara · **Date tested:** \<yyyy/mm/dd>
 **Peer tester:** Miguel · **Date tested:** \<yyyy/mm/dd>
-
 > [!note] Note for Sara
 > Fill in the date you tested as Developer. Leave the Peer tester date blank for Miguel to fill in when he tests.
 
