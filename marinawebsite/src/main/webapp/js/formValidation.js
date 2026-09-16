@@ -162,6 +162,103 @@ MoffatBay.form = (function () {
         return value === "" || HIN_PATTERN.test(value);
     }
 
+    /*
+     * The mailing address's State/Province list, and the rule for which
+     * one applies. Lived in registration.js until the Edit User Info build
+     * needed the identical behaviour - that file is scoped to the
+     * Registration page (it reaches for #registrationForm, #submitBtn and
+     * the boat fields on load), so including it elsewhere was never an
+     * option and copying it would have left two lists to keep in step.
+     * See the Registration contract's "Country" section.
+     */
+    var US_STATES = [
+        ["AL", "Alabama"], ["AK", "Alaska"], ["AZ", "Arizona"], ["AR", "Arkansas"],
+        ["CA", "California"], ["CO", "Colorado"], ["CT", "Connecticut"], ["DE", "Delaware"],
+        ["DC", "District of Columbia"], ["FL", "Florida"], ["GA", "Georgia"], ["HI", "Hawaii"],
+        ["ID", "Idaho"], ["IL", "Illinois"], ["IN", "Indiana"], ["IA", "Iowa"],
+        ["KS", "Kansas"], ["KY", "Kentucky"], ["LA", "Louisiana"], ["ME", "Maine"],
+        ["MD", "Maryland"], ["MA", "Massachusetts"], ["MI", "Michigan"], ["MN", "Minnesota"],
+        ["MS", "Mississippi"], ["MO", "Missouri"], ["MT", "Montana"], ["NE", "Nebraska"],
+        ["NV", "Nevada"], ["NH", "New Hampshire"], ["NJ", "New Jersey"], ["NM", "New Mexico"],
+        ["NY", "New York"], ["NC", "North Carolina"], ["ND", "North Dakota"], ["OH", "Ohio"],
+        ["OK", "Oklahoma"], ["OR", "Oregon"], ["PA", "Pennsylvania"], ["RI", "Rhode Island"],
+        ["SC", "South Carolina"], ["SD", "South Dakota"], ["TN", "Tennessee"], ["TX", "Texas"],
+        ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"], ["WA", "Washington"],
+        ["WV", "West Virginia"], ["WI", "Wisconsin"], ["WY", "Wyoming"]
+    ];
+
+    var CA_PROVINCES = [
+        ["AB", "Alberta"], ["BC", "British Columbia"], ["MB", "Manitoba"],
+        ["NB", "New Brunswick"], ["NL", "Newfoundland and Labrador"], ["NS", "Nova Scotia"],
+        ["NT", "Northwest Territories"], ["NU", "Nunavut"], ["ON", "Ontario"],
+        ["PE", "Prince Edward Island"], ["QC", "Quebec"], ["SK", "Saskatchewan"], ["YT", "Yukon"]
+    ];
+
+    /**
+     * Replaces select's <option> children with the given [value, label]
+     * pairs (plus a disabled placeholder), keeping previousValue selected
+     * if it's still one of the options.
+     * @param {HTMLSelectElement} select - the select to rebuild
+     * @param {Array.<Array.<string>>} regions - [value, label] pairs; an empty array means "nothing applies"
+     * @param {string} previousValue - the code to keep selected if it survives the swap
+     */
+    function rebuildRegionOptions(select, regions, previousValue) {
+        select.innerHTML = "";
+
+        var stillValid = regions.some(function (region) { return region[0] === previousValue; });
+
+        var placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.disabled = true;
+        placeholder.textContent = regions.length === 0 ? "Not applicable" : "Select\u2026";
+        placeholder.selected = !stillValid;
+        select.appendChild(placeholder);
+
+        regions.forEach(function (region) {
+            var option = document.createElement("option");
+            option.value = region[0];
+            option.textContent = region[1];
+            option.selected = region[0] === previousValue;
+            select.appendChild(option);
+        });
+    }
+
+    /**
+     * Points a State/Province select at whichever list the chosen country
+     * calls for: US states, Canadian provinces, or nothing at all for
+     * OTHER, where the control is disabled because no state or province
+     * applies. Also renames the label, since "State" is wrong for Canada.
+     *
+     * The initial render is already correct without this - the card's own
+     * JSP picks the right list server-side. This is what keeps it correct
+     * when someone changes country on the page, which is why any page with
+     * both controls has to call it on the country's change event.
+     *
+     * @param {HTMLSelectElement} countrySelect - the country control
+     * @param {HTMLSelectElement} stateSelect - the state/province control
+     * @param {Element} [stateLabel] - its label, renamed when present
+     */
+    function applyCountryToRegion(countrySelect, stateSelect, stateLabel) {
+        if (!countrySelect || !stateSelect) { return; }
+
+        var value = countrySelect.value;
+        var previousValue = stateSelect.value;
+
+        if (value === "CA") {
+            if (stateLabel) { stateLabel.textContent = "Province"; }
+            stateSelect.disabled = false;
+            rebuildRegionOptions(stateSelect, CA_PROVINCES, previousValue);
+        } else if (value === "OTHER") {
+            if (stateLabel) { stateLabel.textContent = "State"; }
+            stateSelect.disabled = true;
+            rebuildRegionOptions(stateSelect, [], previousValue);
+        } else {
+            if (stateLabel) { stateLabel.textContent = "State"; }
+            stateSelect.disabled = false;
+            rebuildRegionOptions(stateSelect, US_STATES, previousValue);
+        }
+    }
+
     var PASSWORD_RULES = {
         length: { label: "At least 10 characters", test: function (v) { return v.length >= 10; } },
         upper: { label: "One uppercase letter", test: function (v) { return /[A-Z]/.test(v); } },
@@ -196,6 +293,10 @@ MoffatBay.form = (function () {
         isValidHIN: isValidHIN,
         extractPhoneDigits: extractPhoneDigits,
         formatPhoneDisplay: formatPhoneDisplay,
+        US_STATES: US_STATES,
+        CA_PROVINCES: CA_PROVINCES,
+        rebuildRegionOptions: rebuildRegionOptions,
+        applyCountryToRegion: applyCountryToRegion,
         PASSWORD_RULES: PASSWORD_RULES,
         checkPasswordRules: checkPasswordRules
     };

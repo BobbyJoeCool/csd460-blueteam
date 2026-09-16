@@ -91,14 +91,25 @@
                  password reset through ForgotPasswordServlet (/forgotPassword,
                  already built and working - see its class comment and the
                  Edit User Profile contract's "Password Change and the
-                 Lockout Model"). The actual reset UI (a modal, a link to
-                 somewhere else, whatever it ends up being) is Front End's
-                 to build and wire up here - not built yet. --%>
+                 Lockout Model"). The reset UI is
+                 includes/forgotPasswordModal.jsp, included at the foot of
+                 this file so it travels with the login modal to every page -
+                 a locked-out visitor has no session, so a reset reachable
+                 only from an account page would be behind the very sign-in
+                 they can't complete. --%>
             <c:when test="${accountLocked}">
 
                 <p class="login-modal__note">
-                    Password reset isn't available from here yet.
+                    Unlocking an account means setting a new password. We'll
+                    send a verification code to the email on the account.
                 </p>
+
+                <button type="button"
+                        class="login-modal__submit"
+                        id="lockedResetTrigger"
+                        data-email="${fn:escapeXml(param.email)}">
+                    Reset your password
+                </button>
 
             </c:when>
 
@@ -148,5 +159,22 @@
     </div>
 </div>
 
+<jsp:include page="/includes/forgotPasswordModal.jsp" />
+
 <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
 <script src="${pageContext.request.contextPath}/js/loginModal.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/accountModals.js" defer></script>
+<script>
+    /* The locked-out state's only control. Wired here rather than in
+       accountModals.js because the button only exists on the render where
+       LoginServlet set accountLocked, and the email it carries is the one
+       just typed - so the reset opens with the address already in it. */
+    document.addEventListener("DOMContentLoaded", function () {
+        var trigger = document.getElementById("lockedResetTrigger");
+        if (!trigger) { return; }
+        trigger.addEventListener("click", function () {
+            MoffatBay.loginModal.close();
+            MoffatBay.accountModals.openForgot(trigger.dataset.email);
+        });
+    });
+</script>
