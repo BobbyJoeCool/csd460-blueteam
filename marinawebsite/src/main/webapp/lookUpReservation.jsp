@@ -1,21 +1,19 @@
 <%--
-    Front End:   Robert Breutzmann
-    Back End:    N/A
+    Front End:   Sara White
+    Back End:    Carolina Rodriguez
     Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
-    Primary Author/Owner - Robert Breutzmann
+    Primary Author/Owner - Sara White
     Course:      CSD 460 - Capstone Project
     Module:      Module 8 / Week 6 - Web Development 4
     Page:        Look Up Reservation (lookUpReservation.jsp)
     Contract:    marinawebsite/documentation/Page Contracts/Look Up Reservation.md
 
-    Placeholder page - real content not built yet, see the contract above.
-    Body is the shared "Coming Soon" include (includes/comingSoon.jsp).
-    No activePage value passed below - Shared HeaderFooter.md's table
-    lists Look Up Reservation as "(none - not a nav link)", and header.jsp
-    has no case for it anyway, so there's nothing to highlight.
+
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,17 +23,196 @@
     <title>Look Up Reservation - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/comingSoon.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lookUpReservation.css">
 </head>
+
 <body>
 
-<jsp:include page="/includes/header.jsp" />
+    <jsp:include page="/includes/header.jsp" />
 
-<main>
-    <jsp:include page="/includes/comingSoon.jsp">
-        <jsp:param name="pageName" value="The Look Up Reservation page" />
-    </jsp:include>
-</main>
+    <section class="hero-band" id="lookUpReservationHero">
+        <div class="hero-band__content">
+            <h1>Look Up Your Reservation</h1>
+
+            <p class="hero-band__lede">
+                View your upcoming and past reservations.
+            </p>
+        </div>
+    </section>
+
+    <main class="lookup-page">
+
+        <section class="reservation-lookup">
+
+            <h2>Find Your Reservation</h2>
+
+            <form method="get"
+                  action="${pageContext.request.contextPath}/reservations"
+                  class="lookup-form">
+
+                <div class="form-group">
+
+                    <!-- Optional input for reservation number -->
+                    <label for="reservationNumber">
+                        Reservation Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="reservationNumber"
+                        name="reservationNumber">
+
+                </div>
+
+                <div class="form-group">
+
+                    <!-- Optional input for year -->
+                    <label for="year">Year</label>
+
+                    <select id="year" name="year">
+                        <option value="">All Years</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <!-- Optional input for month -->
+                    <label for="month">Month</label>
+
+                    <select id="month" name="month">
+                        <option value="">All Months</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Look Up Reservation
+                </button>
+
+            </form>
+
+        </section>
+
+
+    <c:if test="${not empty reservations}">   
+        <section class="reservation-results">
+
+            <div class="results-header">
+
+                <h2>Your Reservations</h2>
+
+                <form method="get"
+                    action="${pageContext.request.contextPath}/reservations"
+                    class="sort-form">
+
+                    <!-- Preserve current search filters when sorting -->
+                    <input type="hidden"
+                        name="reservationNumber"
+                        value="${param.reservationNumber}">
+
+                    <input type="hidden"
+                        name="year"
+                        value="${param.year}">
+
+                    <input type="hidden"
+                        name="month"
+                        value="${param.month}">
+
+                    <label for="sort">Sort By</label>
+
+                    <select id="sort" name="sort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+
+                    <button type="submit" class="btn-secondary">
+                        Sort
+                    </button>
+
+                </form>
+
+            </div>
+
+                <c:forEach var="reservation" items="${reservations}">
+
+                    <article class="reservation-card">
+
+                        <h3>
+                            Reservation #${reservation.confirmationNumber}
+                        </h3>
+
+                        <div class="reservation-details">
+
+                            <div class="reservation-details__column">
+                                <p>
+                                    <!--ToDo: add when guestName is available from backend-->
+                                    <strong>Guest Name</strong><br>
+                                    <!--${reservation.guestName}-->
+                                </p>
+
+                                <p>
+                                    <strong>Slip</strong><br>
+                                    ${reservation.slipNumber}
+                                </p>
+
+                                <p>
+                                    <strong>Start Date</strong><br>
+                                    ${reservation.startDate}
+                                </p>
+
+                                <p>
+                                    <strong>Monthly Rate</strong><br>
+                                    ${reservation.monthlyRate}
+                                </p>
+                            </div>
+
+                            <div class="reservation-details__column">
+                                <p>
+                                    <strong>Lease Status</strong><br>
+                                    ${reservation.reservationStatus}
+                                </p>
+
+                                <p>
+                                    <strong>Boat</strong><br>
+                                    ${reservation.boatName}
+                                </p>
+
+                                <p>
+                                    <!--ToDo: add when paymentStatus is available from backend-->
+                                    <strong>Payment Status</strong><br>
+                                    <!--${reservation.paymentStatus}-->
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </c:forEach>
+
+        </section>
+
+    </c:if> 
+    
+    </main>
 
 <jsp:include page="/includes/footer.jsp" />
 
