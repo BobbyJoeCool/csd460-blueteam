@@ -97,6 +97,10 @@
 
 <script src="${pageContext.request.contextPath}/js/header.js" defer></script>
 
+<!-- Show/hide eye on every password field on the page, the modals below
+     included. Deferred, so it runs after the whole page has been parsed. -->
+<script src="${pageContext.request.contextPath}/js/passwordToggle.js" defer></script>
+
 	<!-- Reusable login modal (pulls in its own scripts) -->
 	<jsp:include page="/includes/loginModal.jsp" />
 
