@@ -51,7 +51,7 @@ For each test, the <u>developer</u> should: provide a test description, a test o
 **Comments:**
 
 > [!note] Developer (Robert)
-> I had no issues with this test, though it is worth noting that there is no way of telling if the password was typed incorrectly on step 5 because a failed username or a failed password check returns the same result.
+> I added a toggle for password visibility so you can see what you are typing.
 > [!note] Developer (Robert)
 > Something I noticed that is unrelated to this test is that when you create an account, you are not automatically logged in. Some sites do this where when you create an account you are logged in and directed to where you had attempted to reach. In the case of this test, that's back on the landing page. Worth looking at the registration contract to see if creating an account should log you in as that account automatically.
 > [!note] Peer Tester (Carolina)
