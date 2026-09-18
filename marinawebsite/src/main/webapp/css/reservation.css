@@ -516,6 +516,12 @@
     opacity: 0.75;
 }
 
+.summary-notes li {
+    padding-left: 1.4rem;
+    background: url("../images/SalishSalmon.png") no-repeat left center;
+    background-size: 0.9rem auto;
+}
+
 .summary-notes li + li {
     margin-top: 0.35rem;
 }
