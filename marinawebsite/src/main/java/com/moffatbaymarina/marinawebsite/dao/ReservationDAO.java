@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.DockAvailability;
 import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
@@ -29,6 +30,7 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  *
  * @author Miguel Fernandez
  * @author Sara White
+ * @author Carolina Rodriguez
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Miguel Fernandez & Sara White
  * @implNote JavaDoc comments in this file were added with the assistance of Claude.
@@ -46,6 +48,7 @@ public class ReservationDAO {
             SELECT  r.reservationID,
                     r.confirmationNumber,
                     r.customerID,
+                    CONCAT(c.firstName, ' ', c.lastName) AS guestName,
                     r.startDate,
                     r.monthlyRate,
                     r.reservationStatus,
@@ -60,6 +63,7 @@ public class ReservationDAO {
                     sz.sizeFt,
                     e.rateAmount AS electricMonthlyRate
             FROM Reservation r
+            JOIN Customer c ON c.customerID = r.customerID
             JOIN Boat     b  ON b.boatID     = r.boatID
             JOIN Slip     s  ON s.slipID     = r.slipID
             JOIN Dock     d  ON d.dockID     = s.dockID
@@ -95,6 +99,105 @@ public class ReservationDAO {
             }
         }
     }
+
+    /*
+    * Finds reservations belonging to one customer and 
+    * filters by confirmation number, year, month, and sort order.
+    */
+    public List<ReservationDetails> findReservationsByCustomer(
+        int customerId,
+        String reservationNumber,
+        String year,
+        String month,
+        String order)
+        throws SQLException {
+
+    StringBuilder sql = new StringBuilder("""
+            SELECT  r.reservationID,
+                    r.confirmationNumber,
+                    r.customerID,
+                    CONCAT(c.firstName, ' ', c.lastName) AS guestName,
+                    r.startDate,
+                    r.monthlyRate,
+                    r.reservationStatus,
+                    r.electricalHookup,
+                    b.boatName,
+                    b.boatType,
+                    b.boatLength,
+                    b.regNumber,
+                    d.dockNumber,
+                    d.dockDescription,
+                    s.slipNumber,
+                    sz.sizeFt,
+                    e.rateAmount AS electricMonthlyRate
+            FROM Reservation r
+            JOIN Customer c
+                ON c.customerID = r.customerID
+            JOIN Boat b
+                ON b.boatID = r.boatID
+            JOIN Slip s
+                ON s.slipID = r.slipID
+            JOIN Dock d
+                ON d.dockID = s.dockID
+            JOIN SlipSize sz
+                ON sz.slipSizeID = s.slipSizeID
+            LEFT JOIN Rate e
+                ON e.rateCode = 'ELECTRIC_MONTHLY'
+            WHERE r.customerID = ?
+            """);
+    List<Object> parameters = new ArrayList<>();
+    parameters.add(customerId);
+
+    if (reservationNumber != null
+            && !reservationNumber.isBlank()) {
+
+        sql.append(" AND r.confirmationNumber = ?");
+        parameters.add(reservationNumber.trim());
+    }
+
+    if (year != null && !year.isBlank()) {
+        sql.append(" AND YEAR(r.startDate) = ?");
+        parameters.add(Integer.parseInt(year));
+    }
+
+    if (month != null && !month.isBlank()) {
+        sql.append(" AND MONTH(r.startDate) = ?");
+        parameters.add(Integer.parseInt(month));
+    }
+
+    // order has already been restricted to ASC or DESC by the servlet.
+    sql.append(" ORDER BY r.startDate ")
+       .append("ASC".equals(order) ? "ASC" : "DESC");
+
+    List<ReservationDetails> reservations =
+            new ArrayList<>();
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt =
+                 conn.prepareStatement(sql.toString())) {
+
+        for (int i = 0; i < parameters.size(); i++) {
+
+            Object value = parameters.get(i);
+
+            if (value instanceof Integer integer) {
+                stmt.setInt(i + 1, integer);
+            } else {
+                stmt.setString(i + 1, value.toString());
+            }
+        }
+
+        try (ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                reservations.add(mapDetails(rs));
+            }
+        }
+    }
+
+    return reservations;
+}
+
 
     /**
      * Cancels a reservation, setting its status rather than deleting the row -
@@ -347,6 +450,7 @@ public class ReservationDAO {
         details.setReservationId(rs.getInt("reservationID"));
         details.setConfirmationNumber(rs.getString("confirmationNumber"));
         details.setCustomerId(rs.getInt("customerID"));
+        details.setGuestName(rs.getString("guestName"));
 
         // java.sql.Date is a java.util.Date, which is what JSTL's
         // <fmt:formatDate> on the page needs. No conversion either way.
