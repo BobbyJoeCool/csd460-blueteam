@@ -1,0 +1,402 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Sara White (developer), Miguel Fernandez (peer tester)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — Landing Page (Module 5)
+
+  Re-formatted by Claude from Module-5/BlueTeam_Mod5_TestPlan.docx (Tests 1, 2) into the TestPlan_Template.html layout.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team — Module 5 Test Plan: Landing Page</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 34%; }
+th:nth-child(3), td:nth-child(3) { width: 42%; }
+th:nth-child(4), td:nth-child(4) { width: 9%; }
+th:nth-child(5), td:nth-child(5) { width: 9%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Repeated header */
+tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
+tr.repeated-header + tr td { border-top: none; }
+tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
+
+/* Screenshot rows */
+tr.screenshot-row td {
+  background: #eef1f5;
+  padding: 10px 12px;
+  border-top: none;
+}
+.screenshot-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.screenshot-flex img {
+  flex: 1 1 auto;
+  max-width: 48%;
+  min-width: 200px;
+  margin: 0;
+}
+.screenshot-caption {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #444;
+  text-align: center;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each header+data+screenshot stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="cover-page">
+<h1>Functional Test - Module 5: Landing Page</h1>
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> Test plan for the landing page (index), covering the sticky site header and responsive layout.</p>
+<p><strong>Date:</strong> 2026/09/05</p>
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> Carolina Rodriguez (Landing Page), Sara White (Shared Header/Footer)</p>
+<p><strong>Back End Developer:</strong> Carolina Rodriguez</p>
+</div>
+<div class="page-roles">
+<p><strong>Developer Tester:</strong> Sara White</p>
+<p><strong>Peer Tester:</strong> Miguel Fernandez</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+<div class="callout callout-note"><strong>About this document</strong><br>These tests were originally written and performed by Sara White (developer) and Miguel Fernandez (peer tester) for the Module 5 test plan (<code>Module-5/BlueTeam_Mod5_TestPlan.docx</code>, Tests 1, 2). They were re-formatted into this layout by Claude. The steps, results, dates, comments, and screenshots are carried over from the original unchanged; the original recorded each result as Yes or No, shown here as Pass or Fail. The tests were not re-run.</div>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<li><a href="#test-1-landing-page">Test 1: Landing Page</a></li>
+<li><a href="#test-2-landing-page">Test 2: Landing Page</a></li>
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+</div>
+
+</section>
+
+<section id="test-1-landing-page">
+<h2>Test 1: Landing Page</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies site header is visible at all times (sticky header)</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>In a browser, navigate to http://localhost:8080/marinawebsite/index.jsp<br>Or<br>http://localhost:8081/marinawebsite/index.jsp</td>
+<td>The Moffat Bay Marina landing page should load.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S1_1.png" alt="Step 1"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 1 - The landing page loaded at index.jsp, header visible at the top.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S1_2.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Scroll halfway down the page.</td>
+<td>The header should remain at the top of the page as you scroll.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 2 - Scrolled halfway down. The header is still pinned to the top of the window.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S2_2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Scroll to the bottom of the page.</td>
+<td>The header should remain at the top of the page as you scroll.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 3 - Scrolled to the bottom of the page. The header has not moved.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S3_2.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Scroll back to the top of the page.</td>
+<td>The header should remain at the top of the page as you scroll.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 4 - Scrolled back to the top. The header and navigation are unchanged throughout.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S4_2.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>no issues here. The header was sticky, it stayed in place and none of the navigation elements became distorted as I scrolled up and down the page.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>Confirmed. The header stayed fixed at the top through all four scroll positions, and none of the navigation elements shifted or overlapped on the way down or back up. Tested on port 8081 rather than 8080, since XAMPP holds 8080 on my machine - same build either way.</div>
+
+</section>
+<section id="test-2-landing-page">
+<h2>Test 2: Landing Page</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies landing page content is responsive and stacks when browser minimized past &lt;a certain point&gt;</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>In a browser, navigate to http://localhost:8080/marinawebsite/index.jsp<br>Or<br>http://localhost:8081/marinawebsite/index.jsp</td>
+<td>The Moffat Bay Marina landing page should load.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S1_1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Expand the browser to full size and make sure zoom is set to 100%.</td>
+<td>The landing page should show the header with navigation links at the top of the page. The hero section shows an image of the marina behind branding text. Below the text in the hero section is a button to reserve a slip. The main content below the hero section will have three content cards displayed horizontally. The footer contains information distributed evenly in three columns.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 2 - Browser at full size, zoom at 100%. Header, hero section and Reserve a Slip button all display as expected.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_2.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 2 - Full screen, showing the three content cards laid out horizontally below the hero.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_3.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Resize the browser window to about 2/3 full size.</td>
+<td>The contents of the page should display more compactly, but still be horizontal.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S3_1.png" alt="Step 3"><img src="Screenshots/LandingPage/Test_2/T2_S3_2.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 3 - Window resized to roughly two thirds width. Content is more compact but still horizontal.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S3_3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Resize the browser to about 1/4 of full size.</td>
+<td>As the browser gets smaller, the contents should start to stack vertically. The header should still remain at top and the navigation elements should become more compact.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S4_1.png" alt="Step 4"><img src="Screenshots/LandingPage/Test_2/T2_S4_2.png" alt="Step 4"><img src="Screenshots/LandingPage/Test_2/T2_S4_3.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 4 - Window resized to roughly one quarter width. Content has stacked vertically and the navigation has compacted.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S4_4.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>Everything stacked nicely as the browser was resized. I didn’t see any awkward spacing between any of the elements.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>Confirmed. The content stayed horizontal down to about two thirds width and stacked cleanly below that. The header compacted as expected and I did not see any text overflow, overlap or awkward gaps at any width I tried, including full screen.</div>
+
+</section>
+
+</body>
+</html>
