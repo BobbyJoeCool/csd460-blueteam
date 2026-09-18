@@ -99,47 +99,52 @@ th, td {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+/* Default column widths: screenshots in the Peer Test cell */
 th:nth-child(1), td:nth-child(1) { width: 6%; }
-th:nth-child(2), td:nth-child(2) { width: 34%; }
-th:nth-child(3), td:nth-child(3) { width: 42%; }
-th:nth-child(4), td:nth-child(4) { width: 9%; }
-th:nth-child(5), td:nth-child(5) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
 th { background: #0d3b4d; color: #fff; }
 /* Tint Developer and Tester data columns */
 td:nth-child(4) { background: #ffe4df; }
 td:nth-child(5) { background: #fdebd0; }
 ol, ul { margin: 4px 0; padding-left: 22px; }
 
-/* Repeated header */
-tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
-tr.repeated-header + tr td { border-top: none; }
-tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
-
-/* Screenshot rows */
-tr.screenshot-row td {
-  background: #eef1f5;
-  padding: 10px 12px;
-  border-top: none;
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
 }
-.screenshot-flex {
+.cell-shots {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-.screenshot-flex img {
-  flex: 1 1 auto;
-  max-width: 48%;
-  min-width: 200px;
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-}
-.screenshot-caption {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-style: italic;
-  color: #444;
-  text-align: center;
+  background: #fff;
 }
 
 /* Code blocks */
@@ -223,7 +228,7 @@ section:first-of-type {
   margin: 0.5in 0.4in;
 }
 
-/* Step groups — each header+data+screenshot stays together */
+/* Step groups — each step row stays together */
 tbody.step-group {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -280,7 +285,7 @@ tbody.step-group {
 <li><a href="#test-1-landing-page">Test 1: Landing Page</a></li>
 <li><a href="#test-2-landing-page">Test 2: Landing Page</a></li>
 </ul>
-<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 </div>
 
 </section>
@@ -290,50 +295,43 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies site header is visible at all times (sticky header)</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>In a browser, navigate to http://localhost:8080/marinawebsite/index.jsp<br>Or<br>http://localhost:8081/marinawebsite/index.jsp</td>
 <td>The Moffat Bay Marina landing page should load.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S1_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S1_1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The landing page loaded at index.jsp, header visible at the top.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S1_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S1_2.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S1_1.png" alt="Step 1"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 1 - The landing page loaded at index.jsp, header visible at the top.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S1_2.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Scroll halfway down the page.</td>
 <td>The header should remain at the top of the page as you scroll.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S2_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S2_1.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Scrolled halfway down. The header is still pinned to the top of the window.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S2_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S2_2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 2 - Scrolled halfway down. The header is still pinned to the top of the window.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S2_2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Scroll to the bottom of the page.</td>
 <td>The header should remain at the top of the page as you scroll.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S3_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S3_1.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Scrolled to the bottom of the page. The header has not moved.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S3_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S3_2.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 3 - Scrolled to the bottom of the page. The header has not moved.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S3_2.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Scroll back to the top of the page.</td>
 <td>The header should remain at the top of the page as you scroll.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S4_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S4_1.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Scrolled back to the top. The header and navigation are unchanged throughout.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_1/T1_S4_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_1/T1_S4_2.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 1, Step 4 - Scrolled back to the top. The header and navigation are unchanged throughout.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_1/T1_S4_2.png" alt="Step 4"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -346,50 +344,43 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies landing page content is responsive and stacks when browser minimized past &lt;a certain point&gt;</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>In a browser, navigate to http://localhost:8080/marinawebsite/index.jsp<br>Or<br>http://localhost:8081/marinawebsite/index.jsp</td>
 <td>The Moffat Bay Marina landing page should load.</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S1_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S1_1.png" alt="Step 1"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S1_1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Expand the browser to full size and make sure zoom is set to 100%.</td>
 <td>The landing page should show the header with navigation links at the top of the page. The hero section shows an image of the marina behind branding text. Below the text in the hero section is a button to reserve a slip. The main content below the hero section will have three content cards displayed horizontally. The footer contains information distributed evenly in three columns.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S2_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S2_1.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Browser at full size, zoom at 100%. Header, hero section and Reserve a Slip button all display as expected.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S2_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S2_2.png" alt="Step 2"></a></div><p class="cell-caption">Full screen, showing the three content cards laid out horizontally below the hero.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S2_3.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S2_3.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 2 - Browser at full size, zoom at 100%. Header, hero section and Reserve a Slip button all display as expected.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_2.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 2 - Full screen, showing the three content cards laid out horizontally below the hero.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S2_3.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Resize the browser window to about 2/3 full size.</td>
 <td>The contents of the page should display more compactly, but still be horizontal.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S3_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S3_1.png" alt="Step 3"></a><a href="Screenshots/LandingPage/Test_2/T2_S3_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S3_2.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Window resized to roughly two thirds width. Content is more compact but still horizontal.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S3_3.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S3_3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S3_1.png" alt="Step 3"><img src="Screenshots/LandingPage/Test_2/T2_S3_2.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 3 - Window resized to roughly two thirds width. Content is more compact but still horizontal.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S3_3.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Resize the browser to about 1/4 of full size.</td>
 <td>As the browser gets smaller, the contents should start to stack vertically. The header should still remain at top and the navigation elements should become more compact.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S4_1.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S4_1.png" alt="Step 4"></a><a href="Screenshots/LandingPage/Test_2/T2_S4_2.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S4_2.png" alt="Step 4"></a><a href="Screenshots/LandingPage/Test_2/T2_S4_3.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S4_3.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Window resized to roughly one quarter width. Content has stacked vertically and the navigation has compacted.</p><div class="cell-shots"><a href="Screenshots/LandingPage/Test_2/T2_S4_4.png" target="_blank"><img src="Screenshots/LandingPage/Test_2/T2_S4_4.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S4_1.png" alt="Step 4"><img src="Screenshots/LandingPage/Test_2/T2_S4_2.png" alt="Step 4"><img src="Screenshots/LandingPage/Test_2/T2_S4_3.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 2, Step 4 - Window resized to roughly one quarter width. Content has stacked vertically and the navigation has compacted.</p><div class="screenshot-flex"><img src="Screenshots/LandingPage/Test_2/T2_S4_4.png" alt="Step 4"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>

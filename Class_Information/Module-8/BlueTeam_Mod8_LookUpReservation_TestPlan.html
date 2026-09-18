@@ -101,47 +101,52 @@ th, td {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+/* Default column widths: screenshots in the Peer Test cell */
 th:nth-child(1), td:nth-child(1) { width: 6%; }
-th:nth-child(2), td:nth-child(2) { width: 34%; }
-th:nth-child(3), td:nth-child(3) { width: 42%; }
-th:nth-child(4), td:nth-child(4) { width: 9%; }
-th:nth-child(5), td:nth-child(5) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
 th { background: #0d3b4d; color: #fff; }
 /* Tint Developer and Tester data columns */
 td:nth-child(4) { background: #ffe4df; }
 td:nth-child(5) { background: #fdebd0; }
 ol, ul { margin: 4px 0; padding-left: 22px; }
 
-/* Repeated header */
-tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
-tr.repeated-header + tr td { border-top: none; }
-tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
-
-/* Screenshot rows */
-tr.screenshot-row td {
-  background: #eef1f5;
-  padding: 10px 12px;
-  border-top: none;
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
 }
-.screenshot-flex {
+.cell-shots {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-.screenshot-flex img {
-  flex: 1 1 auto;
-  max-width: 48%;
-  min-width: 200px;
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-}
-.screenshot-caption {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-style: italic;
-  color: #444;
-  text-align: center;
+  background: #fff;
 }
 
 /* Code blocks */
@@ -225,7 +230,7 @@ section:first-of-type {
   margin: 0.5in 0.4in;
 }
 
-/* Step groups — each header+data+screenshot stays together */
+/* Step groups — each step row stays together */
 tbody.step-group {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -285,7 +290,7 @@ tbody.step-group {
 <li><a href="#test-1-signedin-customer-can-retrieve-own-reservation">Test 1: Signed-In Customer Can Retrieve Own Reservation</a></li>
 <li><a href="#test-2-customer-cannot-retrieve-another-customers-reservation">Test 2: Customer Cannot Retrieve Another Customer's Reservation</a></li>
 </ul>
-<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter <strong>Pass</strong> or <strong>Fail</strong>. The <u>peer tester</u> should provide their name, date tested, enter <strong>Pass</strong> or <strong>Fail</strong> for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter <strong>Pass</strong> or <strong>Fail</strong>. The <u>peer tester</u> should provide their name, date tested, enter <strong>Pass</strong> or <strong>Fail</strong> for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 
 
 </div>
@@ -298,38 +303,33 @@ tbody.step-group {
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 18, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 18, 2026</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Sign in using <code>elena.marsh@example.com</code> and password <code>MoffatMarsh01!</code>.</td>
 <td>Login succeeds and the Look Up Reservation link is available.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The header after Step 1's login, showing the Look Up Reservation link.</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The header after Step 1's login, showing the Look Up Reservation link.</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_1/T1_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Open Look Up Reservation and search for reservation number <code>MB-00001</code>, year <code>2026</code>, and month <code>June</code>.</td>
 <td>The request is sent to <code>/reservations</code> and the reservation is returned for the signed-in customer.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The address bar after Step 2, showing the search sent to /reservations with the reservation number, year, and month.</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The address bar after Step 2, showing the search sent to /reservations with the reservation number, year, and month.</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_1/T1_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Review the returned reservation details.</td>
 <td>Elena's reservation is displayed with the confirmation number, guest name, slip number, start date, monthly rate, lease status, and boat name.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Elena's reservation card from Step 3, with every listed detail visible.</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Elena's reservation card from Step 3, with every listed detail visible.</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_1/T1_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -345,38 +345,33 @@ tbody.step-group {
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 18, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 18, 2026</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Sign in using <code>elena.marsh@example.com</code> and password <code>MoffatMarsh01!</code>.</td>
 <td>Login succeeds and Elena's customer session is active.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The header after Step 1's login, reading "Welcome, Elena M."</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The header after Step 1's login, reading "Welcome, Elena M."</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_2/T2_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Open Look Up Reservation and search for reservation number <code>MB-00004</code>. Leave Year as All Years and Month as All Months.</td>
 <td>The backend searches using Elena's session customer ID along with the reservation number.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The lookup form filled in with MB-00004, All Years, and All Months before submitting in Step 2.</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The lookup form filled in with MB-00004, All Years, and All Months before submitting in Step 2.</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_2/T2_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Review the result.</td>
 <td>The reservation is not displayed and the page shows <code>No reservation found.</code></td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The "No reservation found." message from Step 3, with no reservation card shown.</p><div class="cell-shots"><a href="Screenshots/LookUpReservation/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/LookUpReservation/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The "No reservation found." message from Step 3, with no reservation card shown.</p><div class="screenshot-flex"><img src="Screenshots/LookUpReservation/Test_2/T2_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>

@@ -99,47 +99,52 @@ th, td {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+/* Default column widths: screenshots in the Peer Test cell */
 th:nth-child(1), td:nth-child(1) { width: 6%; }
-th:nth-child(2), td:nth-child(2) { width: 34%; }
-th:nth-child(3), td:nth-child(3) { width: 42%; }
-th:nth-child(4), td:nth-child(4) { width: 9%; }
-th:nth-child(5), td:nth-child(5) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
 th { background: #0d3b4d; color: #fff; }
 /* Tint Developer and Tester data columns */
 td:nth-child(4) { background: #ffe4df; }
 td:nth-child(5) { background: #fdebd0; }
 ol, ul { margin: 4px 0; padding-left: 22px; }
 
-/* Repeated header */
-tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
-tr.repeated-header + tr td { border-top: none; }
-tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
-
-/* Screenshot rows */
-tr.screenshot-row td {
-  background: #eef1f5;
-  padding: 10px 12px;
-  border-top: none;
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
 }
-.screenshot-flex {
+.cell-shots {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-.screenshot-flex img {
-  flex: 1 1 auto;
-  max-width: 48%;
-  min-width: 200px;
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-}
-.screenshot-caption {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-style: italic;
-  color: #444;
-  text-align: center;
+  background: #fff;
 }
 
 /* Code blocks */
@@ -223,7 +228,7 @@ section:first-of-type {
   margin: 0.5in 0.4in;
 }
 
-/* Step groups — each header+data+screenshot stays together */
+/* Step groups — each step row stays together */
 tbody.step-group {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -280,7 +285,7 @@ tbody.step-group {
 <li><a href="#test-1-registration">Test 1: Registration</a></li>
 <li><a href="#test-2-registration">Test 2: Registration</a></li>
 </ul>
-<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 </div>
 
 </section>
@@ -290,61 +295,52 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies password criteria is checked off as user creates password</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Open a browser and navigate to http://localhost:8080/marinawebsite/registration.jsp</td>
 <td>The account registration page should load with three cards (personal information, boat information, and user information) containing input fields</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S1_1.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S1_1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The registration page loaded with all three cards: personal, boat and user information.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S1_2.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S1_2.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S1_1.png" alt="Step 1"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 1 - The registration page loaded with all three cards: personal, boat and user information.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S1_2.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Under the user information section, enter “abc” into the password field. Do not delete “abc” after completing this step.</td>
 <td>Below the password fields, a checkmark should appear to the left of the password criteria list item “One lower case letter”</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S2_1.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S2_1.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Password 'abc' entered. Only 'One lowercase letter' is checked.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S2_2.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S2_2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 2 - Password 'abc' entered. Only 'One lowercase letter' is checked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S2_2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>In the password field, type “123” next to “abc”</td>
 <td>A checkmark should appear to the left of the password criteria list item “</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S3_1.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S3_1.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">'123' added. 'One number' now checked as well.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S3_2.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S3_2.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 3 - '123' added. 'One number' now checked as well.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S3_2.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>In the password field, type “DEF” next to “abc123”</td>
 <td>A checkmark should appear to the left of the password criteria list item “</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S4_1.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S4_1.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">'DEF' added. 'One uppercase letter' now checked.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S4_2.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S4_2.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 4 - 'DEF' added. 'One uppercase letter' now checked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S4_2.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>In the password field, type an exclamation point (“!”) after “abc123DEF”</td>
 <td>A checkmark should appear to the left of the password criteria list items “One special character (! $ % * #)” and “At least 10 characters”</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S5_1.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S5_1.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">'!' added. The special character rule and the ten character rule both check off together.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_1/T1_S5_2.png" target="_blank"><img src="Screenshots/Registration/Test_1/T1_S5_2.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S5_1.png" alt="Step 5"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 5 - '!' added. The special character rule and the ten character rule both check off together.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S5_2.png" alt="Step 5"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -357,138 +353,115 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies account creation on registration page successfully creates database records</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Open a browser and navigate to http://localhost:8080/marinawebsite/registration.jsp<br>Or<br>http://localhost:8081/marinawebsite/registration.jsp</td>
 <td>The account registration page should load with three cards (personal information, boat information, and user information) containing input fields</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S1_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S1_1.png" alt="Step 1"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S1_1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>In the personal information section, enter your first and last name (or a name of your choosing)</td>
 <td>Input fields should hold information typed in by user</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S2_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S2_1.png" alt="Step 2"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S2_1.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>In the phone field, 555-555-5555</td>
 <td>“Phone number needs all 10 digits” message should disappear after entering full phone number. The field should contain the typed information.</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S3_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S3_1.png" alt="Step 3"></a><a href="Screenshots/Registration/Test_2/T2_S3_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S3_2.png" alt="Step 3"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S3_1.png" alt="Step 3"><img src="Screenshots/Registration/Test_2/T2_S3_2.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Select “United States” from the country drop down</td>
 <td>Drop down should display “Canada”, “United States” and “Other” as three options. After selecting “United States”, that selection should remain in the country field</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S4_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S4_1.png" alt="Step 4"></a><a href="Screenshots/Registration/Test_2/T2_S4_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S4_2.png" alt="Step 4"></a></div></td>
 <td>Not recorded</td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S4_1.png" alt="Step 4"><img src="Screenshots/Registration/Test_2/T2_S4_2.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>In the Streed Address Line field, enter:<br>123 ABC Drive<br>And for the city, enter: Bellevue</td>
 <td></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S5_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S5_1.png" alt="Step 5"></a><a href="Screenshots/Registration/Test_2/T2_S5_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S5_2.png" alt="Step 5"></a></div></td>
 <td>Not recorded</td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S5_1.png" alt="Step 5"><img src="Screenshots/Registration/Test_2/T2_S5_2.png" alt="Step 5"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>6</td>
 <td>Select Nebraska from the state dropdown menu</td>
 <td>Dropdown menu should display 50 states. After selecting “Nebraska”, that selection should remain in the state field</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S6_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S6_1.png" alt="Step 6"></a><a href="Screenshots/Registration/Test_2/T2_S6_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S6_2.png" alt="Step 6"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S6_1.png" alt="Step 6"><img src="Screenshots/Registration/Test_2/T2_S6_2.png" alt="Step 6"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>7</td>
 <td>Enter 55555 for the zip code field</td>
 <td>Zip code field should contain the entered zip code and message below stating “Enter a 5-digit ZIP, or ZIP +4 like 12345-6789” should disappear</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S7_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S7_1.png" alt="Step 7"></a><a href="Screenshots/Registration/Test_2/T2_S7_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S7_2.png" alt="Step 7"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S7_1.png" alt="Step 7"><img src="Screenshots/Registration/Test_2/T2_S7_2.png" alt="Step 7"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>8</td>
 <td>For the boat information section, enter the following:<br>boat name: “Boatzilla”<br>boat length: 30<br>HIN: ABC1234DEF67<br>Enter “NE 1234 AB” for the registration number</td>
 <td>Message below the field stating “Registration Number should be a 2-letter state code, 4 to 7 digits, then AB” should disappear</td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S8_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S8_1.png" alt="Step 8"></a><a href="Screenshots/Registration/Test_2/T2_S8_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S8_2.png" alt="Step 8"></a><a href="Screenshots/Registration/Test_2/T2_S8_3.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S8_3.png" alt="Step 8"></a><a href="Screenshots/Registration/Test_2/T2_S8_4.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S8_4.png" alt="Step 8"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S8_1.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_2.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_3.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_4.png" alt="Step 8"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>9</td>
 <td>In the user information section use the following:<br>Email: emailuser@email.email<br>Password: abc123DEF456!</td>
 <td>After entering information, the “create account” button should appear bolder and now be clickable</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S9_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S9_1.png" alt="Step 9"></a><a href="Screenshots/Registration/Test_2/T2_S9_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S9_2.png" alt="Step 9"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The completed registration form. All password rules are met and Create Account is active.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S9_3.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S9_3.png" alt="Step 9"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S9_1.png" alt="Step 9"><img src="Screenshots/Registration/Test_2/T2_S9_2.png" alt="Step 9"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Steps 2 to 9 - The completed registration form. All password rules are met and Create Account is active.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S9_3.png" alt="Step 9"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>10</td>
 <td>Click the “create account” button</td>
 <td></td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">After clicking create account, here is the redirect:</p><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S10_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S10_1.png" alt="Step 10"></a><a href="Screenshots/Registration/Test_2/T2_S10_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S10_2.png" alt="Step 10"></a><a href="Screenshots/Registration/Test_2/T2_S10_3.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S10_3.png" alt="Step 10"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">After clicking Create Account, the browser redirects to /?registered=true. Note there is no on-page confirmation message.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S10_4.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S10_4.png" alt="Step 10"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara) - After clicking create account, here is the redirect:</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S10_1.png" alt="Step 10"><img src="Screenshots/Registration/Test_2/T2_S10_2.png" alt="Step 10"><img src="Screenshots/Registration/Test_2/T2_S10_3.png" alt="Step 10"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Step 10 - After clicking Create Account, the browser redirects to /?registered=true. Note there is no on-page confirmation message.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S10_4.png" alt="Step 10"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>11</td>
 <td>Confirm creation of a customer record with the following MySQL statements:<br><code>USE MoffatBayMarinaDB;</code><br><code>SELECT * FROM Customer WHERE email = “emailuser@email.email”;</code></td>
 <td></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S11_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S11_1.png" alt="Step 11"></a></div></td>
 <td><strong>Pass</strong></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S11_1.png" alt="Step 11"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>12</td>
 <td>Confirm creation of a boat record with the following MySQL statements:<br><code>USE MoffatBayMarinaDB;</code><br><code>SELECT * FROM Boat WHERE boatName = "Boatzilla";</code></td>
 <td></td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S12_1.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S12_1.png" alt="Step 12"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Database verification. The Customer and Boat rows were both created, and the extra BoatOwnership query confirms the two are linked.</p><div class="cell-shots"><a href="Screenshots/Registration/Test_2/T2_S12_2.png" target="_blank"><img src="Screenshots/Registration/Test_2/T2_S12_2.png" alt="Step 12"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S12_1.png" alt="Step 12"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Steps 11 and 12 - Database verification. The Customer and Boat rows were both created, and the extra BoatOwnership query confirms the two are linked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S12_2.png" alt="Step 12"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
