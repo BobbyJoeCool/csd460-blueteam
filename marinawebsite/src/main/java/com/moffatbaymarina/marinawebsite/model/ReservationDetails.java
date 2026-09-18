@@ -34,6 +34,7 @@ public class ReservationDetails implements Serializable {
     private int reservationId;
     private String confirmationNumber;
     private int customerId;
+    private String guestName;
     /*
      * java.util.Date, not LocalDate. This bean exists only to be read by a
      * JSP, and JSTL's <fmt:formatDate> - which is what formats every date on
@@ -138,6 +139,19 @@ public class ReservationDetails implements Serializable {
      */
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+    /**
+     * @return the name of the customer who owns the reservation
+     */
+    public String getGuestName() {
+        return guestName;
+    }
+
+    /**
+     * @param guestName the customer's display name for the reservation
+     */
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
     }
 
     /**

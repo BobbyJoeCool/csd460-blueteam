@@ -193,3 +193,14 @@
         gap: 1rem;
     }
 }
+
+.lookup-message {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+.lookup-message--error {
+    color: #b42318;
+
+
+}
