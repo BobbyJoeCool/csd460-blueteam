@@ -2,7 +2,7 @@
     Front End:   Sara White 
     Back End:    Carolina Rodriguez
     Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
-    Primary Author/Owner - Robert Breutzmann
+    Primary Author/Owner - Sara White
     Course:      CSD 460 - Capstone Project
     Module:      Module 8 / Week 6 - Web Development 4
     Page:        Look Up Reservation (lookUpReservation.jsp)
@@ -17,6 +17,7 @@
 
     If a lookup is performed and no matching reservation is found,
     the page displays a "No reservation found." message.
+
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
@@ -32,6 +33,7 @@
     <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lookUpReservation.css">
 </head>
+
 <body>
 
     <jsp:include page="/includes/header.jsp">
@@ -119,10 +121,10 @@
 
         </section>
 
-
 <c:choose>
 
     <c:when test="${not empty reservations}">   
+
         <section class="reservation-results">
 
             <div class="results-header">
@@ -171,11 +173,10 @@
 
                         <div class="reservation-details">
 
-                            <div class="reservation-details__column">
-
                                 <p>
                                     <strong>Guest Name</strong><br>
                                     ${reservation.guestName}
+
                                 </p>
 
                                 <p>
@@ -204,7 +205,6 @@
                                     <strong>Boat</strong><br>
                                     ${reservation.boatName}
                                 </p>
-
 
                             </div>
 
