@@ -101,47 +101,52 @@ th, td {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+/* Default column widths: screenshots in the Peer Test cell */
 th:nth-child(1), td:nth-child(1) { width: 6%; }
-th:nth-child(2), td:nth-child(2) { width: 34%; }
-th:nth-child(3), td:nth-child(3) { width: 42%; }
-th:nth-child(4), td:nth-child(4) { width: 9%; }
-th:nth-child(5), td:nth-child(5) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
 th { background: #0d3b4d; color: #fff; }
 /* Tint Developer and Tester data columns */
 td:nth-child(4) { background: #ffe4df; }
 td:nth-child(5) { background: #fdebd0; }
 ol, ul { margin: 4px 0; padding-left: 22px; }
 
-/* Repeated header */
-tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
-tr.repeated-header + tr td { border-top: none; }
-tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
-
-/* Screenshot rows */
-tr.screenshot-row td {
-  background: #eef1f5;
-  padding: 10px 12px;
-  border-top: none;
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
 }
-.screenshot-flex {
+.cell-shots {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-.screenshot-flex img {
-  flex: 1 1 auto;
-  max-width: 48%;
-  min-width: 200px;
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-}
-.screenshot-caption {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-style: italic;
-  color: #444;
-  text-align: center;
+  background: #fff;
 }
 
 /* Code blocks */
@@ -225,7 +230,7 @@ section:first-of-type {
   margin: 0.5in 0.4in;
 }
 
-/* Step groups — each header+data+screenshot stays together */
+/* Step groups — each step row stays together */
 tbody.step-group {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -287,7 +292,7 @@ tbody.step-group {
 <li><a href="#test-3-change-password-retires-the-old-one-immediately">Test 3: Change Password Retires the Old One Immediately</a></li>
 <li><a href="#test-4-lockout-reset-clears-the-lock-and-replaces-the-password">Test 4: Lockout Reset Clears the Lock and Replaces the Password</a></li>
 </ul>
-<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter <strong>Pass</strong> or <strong>Fail</strong>. The <u>peer tester</u> should provide their name, date tested, enter <strong>Pass</strong> or <strong>Fail</strong> for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter <strong>Pass</strong> or <strong>Fail</strong>. The <u>peer tester</u> should provide their name, date tested, enter <strong>Pass</strong> or <strong>Fail</strong> for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 
 <div class="callout callout-note"><strong>Shared test account across Tests 1-4</strong><br>All four of Robert's tests below run against one continuous test customer rather than the shared Elena Marsh demo account, so nothing here disturbs the account other testers rely on. Run them in order — 1, then 2, then 3, then 4 — since each one starts from the state the previous one left behind (the email changes in Test 1, three fields change in Test 2, the password changes in Test 3, and it changes again in Test 4). Starting test data, before Test 1's first step:
 <ul>
@@ -309,71 +314,60 @@ tbody.step-group {
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 16, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Register a new customer at <code>/register</code> using the test data above (email <code>qa.edittest@example.com</code>, password <code>TestPass1!</code>).</td>
 <td>Account is created and the page confirms success (registered notice / redirect to sign in).</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The registration success notice / redirect after Step 1's account creation.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The registration success notice / redirect after Step 1's account creation.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Sign in with <code>qa.edittest@example.com</code> / <code>TestPass1!</code>.</td>
 <td>Login succeeds; header greeting reads "Welcome, QA E."</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Header greeting reading "Welcome, QA E." after Step 2's login.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Header greeting reading "Welcome, QA E." after Step 2's login.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Click the header greeting to open Edit User Info. Change only the Email field to <code>qa.edittest.updated@example.com</code>, leave every other field as-is, click <strong>Save changes</strong>, confirm on the inline "Save these changes?" panel, then click <strong>Yes, save</strong>.</td>
 <td>Page redirects to <code>/editProfile?notice=profileUpdated</code>; a "Profile updated" toast appears; the "Saved. Here's what changed" summary lists exactly one row: Email, <code>qa.edittest@example.com</code> → <code>qa.edittest.updated@example.com</code>.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Saved. Here's what changed" summary showing the Email row after Step 3.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The "Saved. Here's what changed" summary showing the Email row after Step 3.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Log out via the header's Log Out button.</td>
 <td>Redirected to the landing page; header shows Sign In again.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The landing page header showing Sign In again after Step 4's logout.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The landing page header showing Sign In again after Step 4's logout.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S4.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>Attempt to sign in with the <strong>old</strong> email <code>qa.edittest@example.com</code> and password <code>TestPass1!</code>.</td>
 <td>Login fails with the generic "email or password is incorrect" message (the same anti-enumeration message used for any bad credential, not an account-not-found message).</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The login modal's generic incorrect-credentials error after Step 5's old-email attempt.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S5.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S5.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The login modal's generic incorrect-credentials error after Step 5's old-email attempt.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S5.png" alt="Step 5"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>6</td>
 <td>Sign in with the <strong>new</strong> email <code>qa.edittest.updated@example.com</code> and password <code>TestPass1!</code>.</td>
 <td>Login succeeds; header greeting reads "Welcome, QA E." again.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Header greeting reading "Welcome, QA E." again after Step 6's new-email login.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_1/T1_S6.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_1/T1_S6.png" alt="Step 6"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Header greeting reading "Welcome, QA E." again after Step 6's new-email login.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_1/T1_S6.png" alt="Step 6"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -389,49 +383,42 @@ tbody.step-group {
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 16, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Signed in as <code>qa.edittest.updated@example.com</code> (continuing from Test 1), run the "Before" query below against the database.</td>
 <td>Query returns exactly one row for this customer; record every column's value.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The database client showing the "Before" row returned by Step 1's query.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The database client showing the "Before" row returned by Step 1's query.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_2/T2_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>On Edit User Info, change exactly three fields — Last name to <code>EditTestVerified</code>, City to <code>Mount Vernon</code>, ZIP code to <code>98273</code> — and leave every other field untouched. Click <strong>Save changes</strong>, review the confirmation panel, then click <strong>Yes, save</strong>.</td>
 <td>The confirmation panel (and, after saving, the "Saved. Here's what changed" summary) lists exactly three rows: Last name, City, ZIP code — no others.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Saved. Here's what changed" summary after Step 2, showing exactly Last name, City, and ZIP code.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The "Saved. Here's what changed" summary after Step 2, showing exactly Last name, City, and ZIP code.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_2/T2_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Run the "After" query below against the database.</td>
 <td>Query returns exactly one row for this customer.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The database client showing the "After" row returned by Step 3's query.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The database client showing the "After" row returned by Step 3's query.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_2/T2_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Diff the "Before" and "After" rows column by column.</td>
 <td><code>lastName</code> = <code>EditTestVerified</code>, <code>city</code> = <code>Mount Vernon</code>, <code>zipCode</code> = <code>98273</code>. Every other column — <code>firstName</code>, <code>email</code>, <code>phone</code>, <code>phoneCountryCode</code>, <code>streetAddress</code>, <code>streetAddress2</code>, <code>state</code>, <code>country</code>, <code>passwordHash</code>, <code>dateJoined</code>, <code>failedLoginAttempts</code>, <code>accountLocked</code> — is identical to the "Before" row.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Before and After rows shown together (side-by-side or stacked), with Step 4's confirmed matches/differences visible.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The Before and After rows shown together (side-by-side or stacked), with Step 4's confirmed matches/differences visible.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_2/T2_S4.png" alt="Step 4"></div></td></tr>
 </tbody>
 </table>
 <p class="query-note">Run this query before Step 2 and again after, same query both times:</p>
@@ -453,60 +440,51 @@ WHERE email = 'qa.edittest.updated@example.com';</code></pre>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 16, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Signed in as <code>qa.edittest.updated@example.com</code> / <code>TestPass1!</code> (continuing from Test 2), open Edit User Info and click <strong>Change password</strong>.</td>
 <td>The Change Password modal opens with Current password, New password, and Confirm new password fields, plus the live password rules checklist.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Change Password modal open, mid-fill, with the rules checklist visible (Step 1).</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_3/T3_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_3/T3_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The Change Password modal open, mid-fill, with the rules checklist visible (Step 1).</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_3/T3_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Enter Current password <code>TestPass1!</code>, New password <code>TestPass2!</code>, Confirm new password <code>TestPass2!</code>, and click <strong>Update password</strong>.</td>
 <td>The modal closes with no page navigation; a "Password updated" toast appears.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Password updated" toast after Step 2.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_3/T3_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_3/T3_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The "Password updated" toast after Step 2.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_3/T3_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Log out via the header's Log Out button.</td>
 <td>Redirected to the landing page; header shows Sign In again.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The landing page header showing Sign In again after Step 3's logout.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_3/T3_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_3/T3_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The landing page header showing Sign In again after Step 3's logout.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_3/T3_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Attempt to sign in with <code>qa.edittest.updated@example.com</code> and the <strong>old</strong> password <code>TestPass1!</code>.</td>
 <td>Login fails with the generic incorrect-credentials message.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The login modal's incorrect-credentials error after Step 4's old-password attempt.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_3/T3_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_3/T3_S4.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The login modal's incorrect-credentials error after Step 4's old-password attempt.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_3/T3_S4.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>Sign in with <code>qa.edittest.updated@example.com</code> and the <strong>new</strong> password <code>TestPass2!</code>.</td>
 <td>Login succeeds; header greeting reads "Welcome, QA E."</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Header greeting reading "Welcome, QA E." after Step 5's new-password login.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_3/T3_S5.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_3/T3_S5.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Header greeting reading "Welcome, QA E." after Step 5's new-password login.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_3/T3_S5.png" alt="Step 5"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -521,60 +499,51 @@ WHERE email = 'qa.edittest.updated@example.com';</code></pre>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 16, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
 <table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Attempt to sign in as <code>qa.edittest.updated@example.com</code> with an incorrect password three times in a row (e.g. <code>wrong1</code>, <code>wrong2</code>, <code>wrong3</code>).</td>
 <td>The first two attempts show the generic incorrect-credentials message. After the third, the login modal switches to its locked-out state: the sign-in form is replaced with a message and a <strong>Reset your password</strong> button.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The login modal's locked-out state after Step 1's third failed attempt, showing the Reset your password button.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_4/T4_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_4/T4_S1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The login modal's locked-out state after Step 1's third failed attempt, showing the Reset your password button.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_4/T4_S1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Click <strong>Reset your password</strong>.</td>
 <td>The Forgot Password modal opens, with the Email field pre-filled with <code>qa.edittest.updated@example.com</code>.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Forgot Password modal from Step 2, with the email pre-filled.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_4/T4_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_4/T4_S2.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The Forgot Password modal from Step 2, with the email pre-filled.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_4/T4_S2.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Enter Verification code <code>12345</code> (the site's fixed demo code), New password <code>TestPass3!</code>, Confirm new password <code>TestPass3!</code>, and submit.</td>
 <td>Redirected with a "Password reset — sign in with your new password" confirmation; no auto-login occurs (still signed out).</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Password reset" confirmation toast after Step 3.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_4/T4_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_4/T4_S3.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The "Password reset" confirmation toast after Step 3.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_4/T4_S3.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Attempt to sign in with <code>qa.edittest.updated@example.com</code> and the password from Test 3, <code>TestPass2!</code>.</td>
 <td>Login fails with the generic incorrect-credentials message — it does <strong>not</strong> report the account as locked, confirming the reset cleared the lockout rather than merely changing the password on top of it.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The login modal's plain incorrect-credentials error (not a lockout message) after Step 4's old-password attempt — confirming the reset cleared the lockout rather than stacking a new password on top of it.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_4/T4_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_4/T4_S4.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">The login modal's plain incorrect-credentials error (not a lockout message) after Step 4's old-password attempt — confirming the reset cleared the lockout rather than stacking a new password on top of it.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_4/T4_S4.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>Sign in with <code>qa.edittest.updated@example.com</code> and the new password <code>TestPass3!</code>.</td>
 <td>Login succeeds; header greeting reads "Welcome, QA E."</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Header greeting reading "Welcome, QA E." after Step 5's successful login with the new password.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_4/T4_S5.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_4/T4_S5.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Header greeting reading "Welcome, QA E." after Step 5's successful login with the new password.</p><div class="screenshot-flex"><img src="Screenshots/EditUserProfile/Test_4/T4_S5.png" alt="Step 5"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>

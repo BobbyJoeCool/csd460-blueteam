@@ -99,47 +99,52 @@ th, td {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+/* Default column widths: screenshots in the Peer Test cell */
 th:nth-child(1), td:nth-child(1) { width: 6%; }
-th:nth-child(2), td:nth-child(2) { width: 34%; }
-th:nth-child(3), td:nth-child(3) { width: 42%; }
-th:nth-child(4), td:nth-child(4) { width: 9%; }
-th:nth-child(5), td:nth-child(5) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
 th { background: #0d3b4d; color: #fff; }
 /* Tint Developer and Tester data columns */
 td:nth-child(4) { background: #ffe4df; }
 td:nth-child(5) { background: #fdebd0; }
 ol, ul { margin: 4px 0; padding-left: 22px; }
 
-/* Repeated header */
-tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
-tr.repeated-header + tr td { border-top: none; }
-tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
-
-/* Screenshot rows */
-tr.screenshot-row td {
-  background: #eef1f5;
-  padding: 10px 12px;
-  border-top: none;
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
 }
-.screenshot-flex {
+.cell-shots {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-.screenshot-flex img {
-  flex: 1 1 auto;
-  max-width: 48%;
-  min-width: 200px;
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-}
-.screenshot-caption {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-style: italic;
-  color: #444;
-  text-align: center;
+  background: #fff;
 }
 
 /* Code blocks */
@@ -223,7 +228,7 @@ section:first-of-type {
   margin: 0.5in 0.4in;
 }
 
-/* Step groups — each header+data+screenshot stays together */
+/* Step groups — each step row stays together */
 tbody.step-group {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -280,7 +285,7 @@ tbody.step-group {
 <li><a href="#test-1-login">Test 1: Login</a></li>
 <li><a href="#test-2-login">Test 2: Login</a></li>
 </ul>
-<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 </div>
 
 </section>
@@ -290,94 +295,79 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies that the site shows the signed-in state in the shared header on every page, that landing page controls change once a customer is signed in, and that logging out ends the session.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>In a browser, navigate to http://localhost:8081/marinawebsite/ or<br>http://localhost:8080/marinawebsite/</td>
 <td>The Moffat Bay Marina landing page should load. The button at the far right of the header should read "Log In" and there should be no welcome text next to it.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Landing page while signed out. The header shows Log In.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S1_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S1_2.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S1_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S1_1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S1_1.png" alt="Step 1"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 1 - Landing page while signed out. The header shows Log In.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S1_2.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Click the "Log In" button in the header.</td>
 <td>A sign in popup should open over the page with an "Email address" field, a "Password" field, a "Sign in" button, and a "Register here" link. The page behind it should dim.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S2_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S2_1.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S2_1.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Enter elena.marsh@example.com in the email field and the matching seeded password in the password field, then click "Sign in".</td>
 <td>The popup should close and the browser should return to the landing page. The header should now read "Welcome, Elena M." with a "Log Out" button in place of "Log In".</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">After signing in. The header now shows Welcome, Elena M. and Log Out.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S3_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S3_2.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S3_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S3_1.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 3 - After signing in. The header now shows Welcome, Elena M. and Log Out.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S3_2.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Scroll down to the "Ready to Reserve Your Slip?" section near the bottom of the landing page.</td>
 <td>The section should read "Check availability and book your spot today" with a "Book a Slip" button. It should no longer offer to create an account, because the visitor already has one.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The reservation section now reads Book a Slip instead of Create an Account.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S4_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S4_2.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S4_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S4_1.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 4 - The reservation section now reads Book a Slip instead of Create an Account.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S4_2.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>Click "About Us" in the header navigation.</td>
 <td>The About Us page should load and its header should also show "Welcome, Elena M." and "Log Out". The signed-in state is shown by the shared header, so it appears on every page without each page checking the session itself.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The About Us page shows the same signed-in header, without any page-specific code.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S5_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S5_2.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S5_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S5_1.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S5_1.png" alt="Step 5"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 5 - The About Us page shows the same signed-in header, without any page-specific code.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S5_2.png" alt="Step 5"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>6</td>
 <td>Click the "Log Out" button in the header.</td>
 <td>The browser should land on the landing page at http://localhost:8081/marinawebsite/ and the header should read "Log In" again. Logout deliberately returns to the landing page rather than the previous page, since that page may itself require a signed-in session.</td>
-<td><strong>Pass</strong></td>
-<td>Not recorded</td>
+<td><strong>Pass</strong><p class="cell-caption">After logging out. Back on the landing page with the header showing Log In.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S6_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S6_2.png" alt="Step 6"></a></div></td>
+<td>Not recorded<div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S6_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S6_1.png" alt="Step 6"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S6_1.png" alt="Step 6"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 6 - After logging out. Back on the landing page with the header showing Log In.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S6_2.png" alt="Step 6"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>7</td>
 <td>Press the browser's Back button.</td>
 <td>The previous page may briefly appear with the signed-in header still showing. This is the browser's cached copy of the page, not a live session.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The browser Back button shows a cached copy of the signed-in page.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S7_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S7_2.png" alt="Step 7"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S7_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S7_1.png" alt="Step 7"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S7_1.png" alt="Step 7"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 7 - The browser Back button shows a cached copy of the signed-in page.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S7_2.png" alt="Step 7"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>8</td>
 <td>Press F5 to reload that same page.</td>
 <td>The header should now read "Log In", confirming the session was actually invalidated on the server and the previous view was only a cached page.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">After pressing F5 the same page shows Log In, confirming the session ended.</p><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S8_2.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S8_2.png" alt="Step 8"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_1/T1_S8_1.png" target="_blank"><img src="Screenshots/Login/Test_1/T1_S8_1.png" alt="Step 8"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S8_1.png" alt="Step 8"></div><p class="screenshot-caption">Developer (Miguel) - Test 5, Step 8 - After pressing F5 the same page shows Log In, confirming the session ended.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_1/T1_S8_2.png" alt="Step 8"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
@@ -390,116 +380,97 @@ tbody.step-group {
 <p class="test-objective"><strong>Test Objective:</strong> Verifies that a failed sign in shows the same generic message whether or not the email belongs to a real account, and that three consecutive failures lock the account until it is unlocked.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
-<table>
+<table class="shots-both">
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>1</td>
 <td>Reset the test account so the failure count starts at zero, using this MySQL statement:<br><code>USE MoffatBayMarinaDB;</code><br><code>UPDATE Customer SET failedLoginAttempts = 0, accountLocked = 0 WHERE email = 'elena.marsh@example.com';</code></td>
 <td>The statement should report one row affected. The account is now unlocked with no recorded failures.</td>
 <td><strong>Pass</strong></td>
-<td>N/A* (see comments)</td>
+<td>N/A* (see comments)<div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S1_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S1_1.png" alt="Step 1"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S1_1.png" alt="Step 1"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>2</td>
 <td>Navigate to http://localhost:8081/marinawebsite/ or<br>http://localhost:8080/marinawebsite/ and click "Log In".</td>
 <td>The sign in popup should open with empty email and password fields.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S2_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S2_1.png" alt="Step 2"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S2_1.png" alt="Step 2"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>3</td>
 <td>Enter elena.marsh@example.com with a deliberately incorrect password and click "Sign in".</td>
 <td>The popup should reopen showing two messages: "The username or password you entered is incorrect." in red, and "Accounts are locked after 3 unsuccessful attempts." in amber below it. The email address should still be filled in and the password field should be empty.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Failed sign in for a registered account.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S3_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S3_2.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S3_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S3_1.png" alt="Step 3"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 3 - Failed sign in for a registered account.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S3_2.png" alt="Step 3"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>4</td>
 <td>Clear the email field, enter nobody@example.com, which has no account in the database, with any password, and click "Sign in".</td>
 <td>The result should be identical to the previous step in every respect: the same two messages, the same wording and styling, and no additional or missing elements. Nothing in the response should reveal that this email has no account.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Failed sign in for an email with no account. Compare with the image above: the two are identical.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S4_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S4_2.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S4_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S4_1.png" alt="Step 4"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 4 - Failed sign in for an email with no account. Compare with the image above: the two are identical.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S4_2.png" alt="Step 4"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>5</td>
 <td>Enter elena.marsh@example.com with an incorrect password again. This is the second consecutive failure for that account.</td>
 <td>The same two messages should appear again, unchanged. The message does not count down, so it looks the same on every failed attempt.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Second consecutive failure. The message does not change.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S5_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S5_2.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S5_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S5_1.png" alt="Step 5"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S5_1.png" alt="Step 5"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 5 - Second consecutive failure. The message does not change.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S5_2.png" alt="Step 5"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>6</td>
 <td>Enter elena.marsh@example.com with an incorrect password a third time.</td>
 <td>The popup should now show "This account has been locked after multiple failed login attempts." The email and password fields and the "Sign in" button should be replaced by an "Unlock Account" button. The lockout rule message should no longer appear, since the account is already locked.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Third failure. The account is locked and the form is replaced by Unlock Account.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S6_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S6_2.png" alt="Step 6"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S6_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S6_1.png" alt="Step 6"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S6_1.png" alt="Step 6"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 6 - Third failure. The account is locked and the form is replaced by Unlock Account.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S6_2.png" alt="Step 6"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>7</td>
 <td>Confirm the lock was recorded, using this MySQL statement:<br><code>SELECT email, failedLoginAttempts, accountLocked FROM Customer WHERE email = 'elena.marsh@example.com';</code></td>
 <td>The query should return one row with failedLoginAttempts of 3 and accountLocked of 1.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S7_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S7_1.png" alt="Step 7"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S7_1.png" alt="Step 7"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>8</td>
 <td>Click the "Unlock Account" button.</td>
 <td>The browser should return to whichever page the popup was opened from, not the site root, and the popup should close. The unlock clears both the lock and the failure count.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">After unlocking, the browser returns to the page the popup was opened from.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S8_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S8_2.png" alt="Step 8"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S8_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S8_1.png" alt="Step 8"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S8_1.png" alt="Step 8"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 8 - After unlocking, the browser returns to the page the popup was opened from.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S8_2.png" alt="Step 8"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>9</td>
 <td>Click "Log In" again and sign in with elena.marsh@example.com and the correct password.</td>
 <td>The sign in should succeed and the header should show "Welcome, Elena M." with a "Log Out" button, proving the unlock cleared the lock.</td>
-<td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Signing in after the unlock succeeds.</p><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S9_2.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S9_2.png" alt="Step 9"></a></div></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S9_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S9_1.png" alt="Step 9"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S9_1.png" alt="Step 9"></div><p class="screenshot-caption">Developer (Miguel) - Test 6, Step 9 - Signing in after the unlock succeeds.</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S9_2.png" alt="Step 9"></div></td></tr>
 </tbody>
 <tbody class="step-group">
-<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
 <tr>
 <td>10</td>
 <td>Confirm the counter was reset, using this MySQL statement:<br><code>SELECT email, failedLoginAttempts, accountLocked FROM Customer WHERE email = 'elena.marsh@example.com';</code></td>
 <td>The query should return failedLoginAttempts of 0 and accountLocked of 0. A successful sign in always clears the running count, so scattered typos over time never add up to a lockout.</td>
 <td><strong>Pass</strong></td>
-<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><div class="cell-shots"><a href="Screenshots/Login/Test_2/T2_S10_1.png" target="_blank"><img src="Screenshots/Login/Test_2/T2_S10_1.png" alt="Step 10"></a></div></td>
 </tr>
-<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Peer tester (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Login/Test_2/T2_S10_1.png" alt="Step 10"></div></td></tr>
 </tbody>
 </table>
 <h4>Comments</h4>
