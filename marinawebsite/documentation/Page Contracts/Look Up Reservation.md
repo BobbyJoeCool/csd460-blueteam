@@ -13,36 +13,38 @@ Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
 - Front End: Sara
 - Back End: Carolina
 
-## Open Questions / Decisions Needed
+## Decisions Made
 
-### Front End Owns
+### Front End
 
-- [ ] **Search field `name` attributes:** What does the user search by — confirmation number, email, or both? Agree on the exact form field `name` values.
-- [ ] **Result Bean properties displayed:** What EL expressions does Front End use to render results? (e.g., `${reservation.confirmationId}`, `${reservation.startDate}`) Front End needs the full list from Back End.
-- [ ] **Same-page or separate results:** Does the form and results display on the same JSP (toggling sections via request attributes), or does Front End build a separate results JSP?
-- [ ] **Search form visibility by login state:** See [Guest Lookup vs. Logged-In Lookup](#guest-lookup-vs-logged-in-lookup) below. If logged-in users get an auto-populated list/dropdown instead of a search form, Front End needs two different views — "here are your reservations" with no form, and "enter your confirmation number and last name" with one — not a single form for everybody.
+- [x] Search fields use `reservationNumber`, `year`, `month`, and `sort`.
+- [x] Results display on the same `lookUpReservation.jsp` page.
+- [x] Results use the `reservations` request attribute.
+- [x] Look Up Reservation only appears in the navigation when the customer is signed in.
+- [x] Results can be sorted newest or oldest.
 
-### Back End Owns
+### Back End
 
-- [ ] **Authentication requirement:** Must the user be logged in? See [Guest Lookup vs. Logged-In Lookup](#guest-lookup-vs-logged-in-lookup) below — Sara and Carolina need to agree on whether logged-out lookup is allowed at all, and if so, what it requires that a logged-in lookup doesn't.
-- [ ] **DAO method signature:** What's the lookup method? (e.g., `findReservationByConfirmation(String id)` returning a single Reservation, or `findReservationsByCustomer(int customerId)` returning a `List<Reservation>`?) Define parameters and return shape, including what "no match" returns (null, empty list). Likely two separate methods, one per login state — see below.
-- [ ] **Single vs. multiple results:** Can the query return more than one reservation? If so, Back End returns a list; Front End needs to know the Bean properties for each row.
-- [ ] **No-match attribute:** What request attribute name and message does Back End set when nothing is found?
-- [ ] **Cancel/modify actions:** Is this page read-only, or can the user cancel a reservation? If actionable, that's an additional POST endpoint and DAO method to define.
-- [ ] **Security:** If lookup is by confirmation number without login, can anyone view the reservation? Does Back End also require a matching email? See [Guest Lookup vs. Logged-In Lookup](#guest-lookup-vs-logged-in-lookup) below for the standard confirmation-number-plus-last-name pattern this would follow.
-- [ ] **Servlet URL mapping:** What URL does the form POST to? What URL is the GET for the page itself?
+- [x] Customer must be signed in.
+- [x] The servlet uses the session `customerId`.
+- [x] Customers can only retrieve their own reservations.
+- [x] The DAO returns a `List<ReservationDetails>`.
+- [x] No match returns an empty list.
+- [x] The page is read-only.
+- [x] Servlet mapping is `/reservations`.
+- [x] Lookup uses `GET`.
 
 ---
 
-### Guest Lookup vs. Logged-In Lookup
+## Login Requirement
 
-Should a reservation be reachable without being logged in at all, and if a logged-out lookup is allowed, should it ask for more than a logged-in lookup does? Sara and Carolina need to agree on this before the search form or the DAO method get built, since it changes both the Front End form fields and the Back End query signature.
+Look Up Reservation is only available to signed-in customers.
 
-The standard pattern across reservation/booking systems (airlines, cruise lines, hotel booking platforms) is a two-tier lookup. A logged-in user sees their own reservations automatically, no search form at all — typically a list or dropdown, since an account can have more than one active reservation. A logged-out user has to prove they own the reservation by supplying something only the booking party would know: the confirmation/reservation number is the primary identifier, but it's never accepted alone, since a bare confirmation number is too easy to guess or enumerate. It's paired with a second piece of identifying information the guest would also know — most commonly last name, sometimes email instead of or in addition to it — and the lookup returns exactly that one reservation, nothing else.
+The servlet uses the `customerId` stored in the session to make sure customers can only retrieve reservations that belong to their own account.
 
-Applied here: a logged-in customer would get a list (or dropdown) of their own current reservations pulled by session `customerId`, no form needed — the same shape as how [Edit User Info](edit-user-info-contract.md) pre-populates from the session rather than asking the customer to look anything up. A logged-out visitor would get a search form asking for the confirmation number **and** last name (both required, not either/or — a bare confirmation number shouldn't be enough by itself), and the query would return only that single matching reservation, with no way to browse or list any others tied to the same name.
+Logged-out users are not allowed to search for reservations by confirmation number alone.
 
-This is two different DAO methods, not one: `findReservationsByCustomer(int customerId)` for the logged-in case, and something like `findReservationByConfirmationAndLastName(String confirmationId, String lastName)` for the logged-out case — they don't share a signature, since one trusts the session and the other has to verify two pieces of submitted data.
+The navigation link for Look Up Reservation is only displayed when a customer is signed in.
 
 ## Scaffold Include
 
@@ -62,43 +64,72 @@ This page includes the shared header/footer and identifies itself for nav highli
 
 ## Front End Variables
 
-Every field or control the page's UI sends to the Back End (form fields, query-string params on a lookup page, etc.).
-
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `reservationNumber` | Text | No | Reservation confirmation number such as `MB-00001` |
+| `year` | Select | No | Can be left as All Years |
+| `month` | Select | No | Can be left as All Months |
+| `sort` | Select | No | `newest` or `oldest` |
 
 ## Back End Parameters
 
-What the Back End reads for each Front End field, plus anything it pulls from elsewhere (session, query string) rather than the form itself.
-
-| Parameter Name | Type | Source (form field / session / query string) | Notes |
+| Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `customerId` | Integer | Session | Identifies the signed-in customer and limits results to that customer |
+| `reservationNumber` | String | Query string | Optional reservation number filter |
+| `year` | String | Query string | Optional year filter |
+| `month` | String | Query string | Optional month filter |
+| `sort` | String | Query string | Controls newest or oldest ordering |
 
 ## Database Returns
 
-Every query or DAO method the Back End calls for this page, and its exact return shape — including what it returns on "no match" (null vs. empty object vs. exception).
-
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `findReservationsByCustomer(...)` | `customerId`, `reservationNumber`, `year`, `month`, `order` | `List<ReservationDetails>` | Returns only reservations belonging to the signed-in customer. Returns an empty list if no match is found. |
+
+### ReservationDetails Fields Used by the JSP
+
+The JSP displays the following values from each `ReservationDetails` object:
+
+- `confirmationNumber`
+- `guestName`
+- `slipNumber`
+- `startDate`
+- `monthlyRate`
+- `reservationStatus`
+- `boatName`
 
 ## Validation Rules
 
 - **Client-side (UX only, not trusted):**
+  - Reservation number, year, and month are optional.
+  - Year and month are selected from dropdown lists.
+
 - **Server-side (source of truth):**
+  - A valid signed-in session with a `customerId` is required.
+  - The `customerId` from the session is always included in the reservation query.
+  - Customers cannot retrieve another customer's reservation.
+  - Sort defaults to newest first unless `oldest` is selected.
 
 ## Error Handling
 
-Every user-facing error condition this page can hit, and exactly what the user sees.
+## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| | | |
+| No matching reservation | `No reservation found.` | Results area on `lookUpReservation.jsp` |
+| Customer is not signed in | Sign-in is required before reservation lookup | Look Up Reservation page / login flow |
+| Database lookup fails | Request fails with a servlet error | Server-side error handling |
 
 ## Login State Differences
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Reservation lookup | Available to the signed-in user; standard pattern would be an auto-populated list/dropdown of their own reservations, no search form needed | Pending team decision — see [Guest Lookup vs. Logged-In Lookup](#guest-lookup-vs-logged-in-lookup) above. If allowed, standard pattern is a confirmation number + last name search form, one matching reservation returned, no browsing |
+## Login State Differences
+
+| Item | Logged In | Logged Out |
+| --- | --- | --- |
+| Look Up Reservation nav link | Displayed | Hidden |
+| Reservation lookup | Available | Not available |
+| Customer identification | Uses session `customerId` | No lookup allowed |
+| Reservation results | Only reservations belonging to the signed-in customer | None |

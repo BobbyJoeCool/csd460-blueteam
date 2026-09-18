@@ -16,8 +16,8 @@ To complete the test case plan, fill out the information for Project, Course, De
 - [Test 4: Lockout Reset Clears the Lock and Replaces the Password](#test-4-lockout-reset-clears-the-lock-and-replaces-the-password)
 - [Test 5: \<Test Title\>](#test-5-test-title)
 - [Test 6: \<Test Title\>](#test-6-test-title)
-- [Test 7: \<Test Title\>](#test-7-test-title)
-- [Test 8: \<Test Title\>](#test-8-test-title)
+- [Test 7: Signed-In Customer Can Retrieve Own Reservation](#test-7-signed-in-customer-can-retrieve-own-reservation)
+- [Test 8: Customer Cannot Retrieve Another Customer's Reservation](#test-8-customer-cannot-retrieve-another-customers-reservation)
 - [Test 9: \<Test Title\>](#test-9-test-title)
 - [Test 10: \<Test Title\>](#test-10-test-title)
 
@@ -261,32 +261,28 @@ WHERE email = 'qa.edittest.updated@example.com';
 3. \<what the screenshot should show, tied to Step 3's expected result>
     ![\<caption>](Screenshots/Test_6/T6_S3.png)
 
-## Test 7: \<Test Title>
+### Test 7: Signed-In Customer Can Retrieve Own Reservation
 
-**Test Objective:** \<what this test verifies for Carolina's Back-End portion of the Look Up Reservation page, in one to two sentences>
+**Test Objective:** Verify that the Look Up Reservation backend returns a reservation that belongs to the signed-in customer.
 
-> [!note] Note for Carolina
-> Replace "\<Test Title>" in the heading above with a short, specific title, fill in the Test Objective, and update this test's link in the Table of Contents to match (see the anchor-format comment up there).
+**Developer:** Carolina · **Date tested:** 2026/09/18
 
-**Developer:** Carolina · **Date tested:** \<yyyy/mm/dd>
-**Peer tester:** Robert · **Date tested:** \<yyyy/mm/dd>
-
-> [!note] Note for Carolina
-> Fill in the date you tested as Developer. Leave the Peer tester date blank for Robert to fill in when he tests. If a step is a database check, include the full SQL query below the table and the exact expected row count/values.
+**Peer tester:** Robert · **Date tested:** <yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
+| 1 | Sign in using `elena.marsh@example.com` and password `MoffatMarsh01!`. | Login succeeds and the Look Up Reservation link is available. | **Pass** | <Pass/Fail> |
+| 2 | Open Look Up Reservation and search for reservation number `MB-00001`, year `2026`, and month `June`. | The request is sent to `/reservations` and the reservation is returned for the signed-in customer. | **Pass** | <Pass/Fail> |
+| 3 | Review the returned reservation details. | Elena's reservation is displayed with the confirmation number, guest name, slip number, start date, monthly rate, lease status, and boat name. | **Pass** | <Pass/Fail> |
 
 **Comments:**
 
 > [!note] Developer (Carolina)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing>
+> The reservation lookup worked as expected and returned Elena’s reservation when I searched for MB-00001 while signed in as her. The correct reservation details were displayed, including the guest name, slip, start date, monthly rate, lease status, and boat name. I did not run into any backend issues during this test, but front-end does need cosmetic touches for buttons.
 
 > [!note] Peer Tester (Robert)
-> \<filled in by the peer tester>
+>
+> <filled in by the peer tester>
 
 **Screenshots**
 
@@ -297,29 +293,28 @@ WHERE email = 'qa.edittest.updated@example.com';
 3. \<what the screenshot should show, tied to Step 3's expected result>
     ![\<caption>](Screenshots/Test_7/T7_S3.png)
 
-## Test 8: \<Test Title>
+## Test 8: Customer Cannot Retrieve Another Customer's Reservation
 
-**Test Objective:** \<what this test verifies for Carolina's Back-End portion of the Look Up Reservation page, in one to two sentences>
+**Test Objective:** Verify that the Look Up Reservation backend only returns reservations that belong to the signed-in customer.
 
-> [!note] Note for Carolina
-> Same as Test 7 above: replace the title, fill in the objective, and update the Table of Contents anchor.
+**Developer:** Carolina · **Date tested:** 2026/09/18
 
-**Developer:** Carolina · **Date tested:** \<yyyy/mm/dd>
-**Peer tester:** Robert · **Date tested:** \<yyyy/mm/dd>
+**Peer tester:** Robert · **Date tested:** <yyyy/mm/dd>
 
 | Step | Action | Expected Results | Developer | Tester |
 |---|---|---|---|---|
-| 1 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
-| 2 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
-| 3 | \<action to take> | \<what should happen> | \<Pass/Fail> | \<Pass/Fail> |
+| 1 | Sign in using `elena.marsh@example.com` and password `MoffatMarsh01!`. | Login succeeds and Elena's customer session is active. | **Pass** | <Pass/Fail> |
+| 2 | Open Look Up Reservation and search for reservation number `MB-00004`. Leave Year as All Years and Month as All Months. | The backend searches using Elena's session customer ID along with the reservation number. | **Pass** | <Pass/Fail> |
+| 3 | Review the result. | The reservation is not displayed and the page shows `No reservation found.` | **Pass** | <Pass/Fail> |
 
 **Comments:**
 
 > [!note] Developer (Carolina)
-> \<2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing>
+> The lookup correctly did not return a reservation that did not belong to the signed-in customer. Instead, the page showed “No reservation found.” The backend is using the customer ID from the session to limit reservation results. I did have to adjust the error message because at first the page was not displaying any response when no reservation was found. After that fix, no additional backend issues came up.
 
 > [!note] Peer Tester (Robert)
-> \<filled in by the peer tester>
+>
+> <filled in by the peer tester>
 
 **Screenshots**
 
