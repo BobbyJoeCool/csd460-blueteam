@@ -1,0 +1,519 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Shared (Functional Test Plan, Modules 6-7)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — About Us
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team — Module 6-7 Test Plan: About Us</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 34%; }
+th:nth-child(3), td:nth-child(3) { width: 42%; }
+th:nth-child(4), td:nth-child(4) { width: 9%; }
+th:nth-child(5), td:nth-child(5) { width: 9%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Repeated header */
+tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
+tr.repeated-header + tr td { border-top: none; }
+tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
+
+/* Screenshot rows */
+tr.screenshot-row td {
+  background: #eef1f5;
+  padding: 10px 12px;
+  border-top: none;
+}
+.screenshot-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.screenshot-flex img {
+  flex: 1 1 auto;
+  max-width: 48%;
+  min-width: 200px;
+  margin: 0;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each header+data+screenshot stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="cover-page">
+<h1>Functional Test - Module 6-7: About Us</h1>
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> Functional test plan for the About Us page, including page content, navigation, responsiveness, and public access.</p>
+<p><strong>Date:</strong> 2026/09/09</p>
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> Miguel Fernandez</p>
+<p><strong>Back End Developer:</strong> Sara White</p>
+</div>
+<div class="page-roles">
+<p><strong>Developer Tester:</strong> Carolina Rodriguez</p>
+<p><strong>Peer Tester:</strong> Robert Breutzmann</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<li><a href="#test-1-about-us-page-loads-and-displays-correctly">Test 1: About Us Page Loads and Displays Correctly</a></li>
+<li><a href="#test-2-about-us-navigation">Test 2: About Us Navigation</a></li>
+<li><a href="#test-3-about-us-page-has-public-access">Test 3: About Us Page Has Public Access</a></li>
+<li><a href="#test-4-about-us-content-accuracy">Test 4: About Us Content Accuracy</a></li>
+<li><a href="#additional-notes">Additional Notes</a></li>
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+</div>
+
+</section>
+
+<section id="test-1-about-us-page-loads-and-displays-correctly">
+<h2>Test 1: About Us Page Loads and Displays Correctly</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify the About Us page loads correctly and displays all expected content</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 10,2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">09/12/26</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Open the About Us page from the website navigation.</td>
+<td>The About Us page loads without errors.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_5/T5_S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Verify the header and footer are visible.</td>
+<td>All text and headings are readable and properly formatted.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Fail</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_5/T5_S2a.png" alt="Step 2"><img src="Screenshots/Test_5/T5_S2b.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Verify all images load.</td>
+<td>Images display without broken links or distortion.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_5/T5_S2a.png" alt="Step 3"><img src="Screenshots/Test_5/T5_S3a.png" alt="Step 3"><img src="Screenshots/Test_5/T5_S3b.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Check the page for overlapping or cut-off content.</td>
+<td>All sections display correctly with no layout issues.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_5/T5_S4a.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Carolina)</strong><br>About Us page loaded correctly and all images and page sections displayed as expected during developer testing.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>The Hero Banner text should be on two lines but shows on one.</div>
+
+</section>
+
+<section id="test-2-about-us-navigation">
+<h2>Test 2: About Us Navigation</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify all navigation links on the About Us page work correctly.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11,2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">09/12/26</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Click About Us from the main navigation.</td>
+<td>User is taken to the About Us page.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_6/T6_S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Click the logo/home link.</td>
+<td>User is returned to the landing page.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_6/T6_S2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Click another navigation option like Reservation.</td>
+<td>Correct page opens.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_6/T6_S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Use the browser back button.</td>
+<td>Return to the About Us page.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_6/T6_S4.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Carolina)</strong><br>All steps passed. The About Us page opened correctly, the logo returned to the landing page, the Reservation navigation opens if signed in, if signed out, asks to sign in, and the browser Back button returned to About Us as expected.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>I ran into no issues with this test.  When navigating to a "gated" page like Reservation, I was prompted to sign in rather than being allowed to make a reservation without an account, as per the design.</div>
+
+</section>
+
+<section id="test-3-about-us-page-has-public-access">
+<h2>Test 3: About Us Page Has Public Access</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify the About Us page works for signed out users and displays correctly on different screen sizes.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11,2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">09/12/26</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Sign out of user log in.</td>
+<td>Users are signed out successfully.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_7/T7_S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Open the About Us page.</td>
+<td>Able to access About Us page even without login</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_7/T7_S2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Resize the browser page to half the size of your screen.</td>
+<td>Page adjusts without overlapping.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_7/T7_S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Scroll through full page.</td>
+<td>All information can be viewed without extending off screen.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_7/T7_S4a.png" alt="Step 4"><img src="Screenshots/Test_7/T7_S4b.png" alt="Step 4"><img src="Screenshots/Test_7/T7_S4c.png" alt="Step 4"><img src="Screenshots/Test_7/T7_S4d.png" alt="Step 4"><img src="Screenshots/Test_5/T5_S4b.png" alt="Step 4"><img src="Screenshots/Test_5/T5_S4c.png" alt="Step 4"><img src="Screenshots/Test_5/T5_S4d.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Carolina)</strong><br>All steps passed. I was able to sign out successfully, access the About Us page without being logged in, resize the browser without overlapping content, and scroll through the full page without information extending off screen.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>As a part of the testing, I also used the Developer Tools in Chrome to "Simulate" an iPad Air and iPhone 12 Pro screen for step 4.  My notes are below.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>When on a Phone (specifically the iPhone 12) Design, the Header expands to 2 lines.  Where as not a bug, this is visually not the way to go.  We may want to revisit the responsive design of the menu and have it be a dropdown for the mobile</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>The form fields are a little bit far apart when the screen narrows.  The responsive design should probably reduce the gap on the form.  Additionally, should probably check additional pages in the site as I believe this is on the shared form-fields <code>site.css</code>.</div>
+
+</section>
+
+<section id="test-4-about-us-content-accuracy">
+<h2>Test 4: About Us Content Accuracy</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the information shown on the About Us page is complete and consistent with the rest of the Moffat Bay Marina website.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11,2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">09/12/26</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Review all headings and paragraph text on the About Us page.</td>
+<td>Text is complete, readable, and free of obvious spelling or grammar errors.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_8/T8_S1a.png" alt="Step 1"><img src="Screenshots/Test_8/T8_S1b.png" alt="Step 1"><img src="Screenshots/Test_8/T8_S1c.png" alt="Step 1"><img src="Screenshots/Test_8/T8_S1d.png" alt="Step 1"><img src="Screenshots/Test_8/T8_S1e.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Compare marina details with information shown elsewhere on the website.</td>
+<td>Names, descriptions, and other shared information are consistent across pages.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_8/T8_S2a.png" alt="Step 2"><img src="Screenshots/Test_8/T8_S2b.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Check any contact information, location details, or marina specific facts shown on the page.</td>
+<td>Information matches everywhere.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_8/T8_S2a.png" alt="Step 3"><img src="Screenshots/Test_8/T8_S3b.png" alt="Step 3"><img src="Screenshots/Test_8/T8_S3c.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Verify any buttons or links included in the page content.</td>
+<td>Each button or link points to the correct destination.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_8/T8_S4.png" alt="Step 4"><img src="Screenshots/Test_8/T8_S4b.png" alt="Step 4"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Carolina)</strong><br>All steps passed. The About Us page content was readable,connects to database, the marina information was consistent with the rest of the website, contact and location details matched, and all buttons and links directed to the correct pages.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>Submitting a message through this page does not add it to the database.  This is a fatal bug that needs to be fixed before it can be submitted!<br><br><br><strong>Update</strong><br>This was a database error on the testers part.  I had lost the connection to the Database and this was not working.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>While trying to fix the submittion issue, the success popup comes up directly above the submit form and should use the Message Popup Modal instead.</div>
+
+</section>
+
+<section id="additional-notes">
+<h2>Additional Notes</h2>
+<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>The "Send us a message" contact form has too much empty space between its fields, the same spacing issue already flagged for the mobile/narrow-screen form fields in Test 3. Should be corrected.</div>
+<p><img src="Screenshots/T9.png" alt="Contact form showing excessive empty space between fields"></p>
+</section>
+
+</body>
+</html>

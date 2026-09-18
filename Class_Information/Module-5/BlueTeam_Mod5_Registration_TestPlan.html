@@ -1,0 +1,501 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Sara White (developer), Miguel Fernandez (peer tester)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — Registration (Module 5)
+
+  Re-formatted by Claude from Module-5/BlueTeam_Mod5_TestPlan.docx (Tests 3, 4) into the TestPlan_Template.html layout.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team — Module 5 Test Plan: Registration</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 34%; }
+th:nth-child(3), td:nth-child(3) { width: 42%; }
+th:nth-child(4), td:nth-child(4) { width: 9%; }
+th:nth-child(5), td:nth-child(5) { width: 9%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Repeated header */
+tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
+tr.repeated-header + tr td { border-top: none; }
+tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
+
+/* Screenshot rows */
+tr.screenshot-row td {
+  background: #eef1f5;
+  padding: 10px 12px;
+  border-top: none;
+}
+.screenshot-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.screenshot-flex img {
+  flex: 1 1 auto;
+  max-width: 48%;
+  min-width: 200px;
+  margin: 0;
+}
+.screenshot-caption {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #444;
+  text-align: center;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each header+data+screenshot stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="cover-page">
+<h1>Functional Test - Module 5: Registration</h1>
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> Test plan for the registration page, covering the live password criteria checklist and account creation in the database.</p>
+<p><strong>Date:</strong> 2026/09/05</p>
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> Robert Breutzmann</p>
+<p><strong>Back End Developer:</strong> Carolina Rodriguez</p>
+</div>
+<div class="page-roles">
+<p><strong>Developer Tester:</strong> Sara White</p>
+<p><strong>Peer Tester:</strong> Miguel Fernandez</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+<div class="callout callout-note"><strong>About this document</strong><br>These tests were originally written and performed by Sara White (developer) and Miguel Fernandez (peer tester) for the Module 5 test plan (<code>Module-5/BlueTeam_Mod5_TestPlan.docx</code>, Tests 3, 4). They were re-formatted into this layout by Claude. The steps, results, dates, comments, and screenshots are carried over from the original unchanged; the original recorded each result as Yes or No, shown here as Pass or Fail. The tests were not re-run.</div>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<li><a href="#test-1-registration">Test 1: Registration</a></li>
+<li><a href="#test-2-registration">Test 2: Registration</a></li>
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+</div>
+
+</section>
+
+<section id="test-1-registration">
+<h2>Test 1: Registration</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies password criteria is checked off as user creates password</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Open a browser and navigate to http://localhost:8080/marinawebsite/registration.jsp</td>
+<td>The account registration page should load with three cards (personal information, boat information, and user information) containing input fields</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S1_1.png" alt="Step 1"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 1 - The registration page loaded with all three cards: personal, boat and user information.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S1_2.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Under the user information section, enter “abc” into the password field. Do not delete “abc” after completing this step.</td>
+<td>Below the password fields, a checkmark should appear to the left of the password criteria list item “One lower case letter”</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S2_1.png" alt="Step 2"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 2 - Password 'abc' entered. Only 'One lowercase letter' is checked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S2_2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>In the password field, type “123” next to “abc”</td>
+<td>A checkmark should appear to the left of the password criteria list item “</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S3_1.png" alt="Step 3"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 3 - '123' added. 'One number' now checked as well.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S3_2.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>In the password field, type “DEF” next to “abc123”</td>
+<td>A checkmark should appear to the left of the password criteria list item “</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S4_1.png" alt="Step 4"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 4 - 'DEF' added. 'One uppercase letter' now checked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S4_2.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td>In the password field, type an exclamation point (“!”) after “abc123DEF”</td>
+<td>A checkmark should appear to the left of the password criteria list items “One special character (! $ % * #)” and “At least 10 characters”</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S5_1.png" alt="Step 5"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 3, Step 5 - '!' added. The special character rule and the ten character rule both check off together.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_1/T1_S5_2.png" alt="Step 5"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>this worked really nicely. Each item checked off quickly as soon as I typed the required characters.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>Confirmed. Each rule checked off on the keystroke that satisfied it. The length and special character rules both ticked together on the final character, since the password reached ten characters at the same moment the exclamation point was typed.</div>
+
+</section>
+<section id="test-2-registration">
+<h2>Test 2: Registration</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies account creation on registration page successfully creates database records</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 5, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 6, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Open a browser and navigate to http://localhost:8080/marinawebsite/registration.jsp<br>Or<br>http://localhost:8081/marinawebsite/registration.jsp</td>
+<td>The account registration page should load with three cards (personal information, boat information, and user information) containing input fields</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S1_1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>In the personal information section, enter your first and last name (or a name of your choosing)</td>
+<td>Input fields should hold information typed in by user</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S2_1.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>In the phone field, 555-555-5555</td>
+<td>“Phone number needs all 10 digits” message should disappear after entering full phone number. The field should contain the typed information.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S3_1.png" alt="Step 3"><img src="Screenshots/Registration/Test_2/T2_S3_2.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Select “United States” from the country drop down</td>
+<td>Drop down should display “Canada”, “United States” and “Other” as three options. After selecting “United States”, that selection should remain in the country field</td>
+<td><strong>Pass</strong></td>
+<td>Not recorded</td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S4_1.png" alt="Step 4"><img src="Screenshots/Registration/Test_2/T2_S4_2.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td>In the Streed Address Line field, enter:<br>123 ABC Drive<br>And for the city, enter: Bellevue</td>
+<td></td>
+<td><strong>Pass</strong></td>
+<td>Not recorded</td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S5_1.png" alt="Step 5"><img src="Screenshots/Registration/Test_2/T2_S5_2.png" alt="Step 5"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>6</td>
+<td>Select Nebraska from the state dropdown menu</td>
+<td>Dropdown menu should display 50 states. After selecting “Nebraska”, that selection should remain in the state field</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S6_1.png" alt="Step 6"><img src="Screenshots/Registration/Test_2/T2_S6_2.png" alt="Step 6"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>7</td>
+<td>Enter 55555 for the zip code field</td>
+<td>Zip code field should contain the entered zip code and message below stating “Enter a 5-digit ZIP, or ZIP +4 like 12345-6789” should disappear</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S7_1.png" alt="Step 7"><img src="Screenshots/Registration/Test_2/T2_S7_2.png" alt="Step 7"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>8</td>
+<td>For the boat information section, enter the following:<br>boat name: “Boatzilla”<br>boat length: 30<br>HIN: ABC1234DEF67<br>Enter “NE 1234 AB” for the registration number</td>
+<td>Message below the field stating “Registration Number should be a 2-letter state code, 4 to 7 digits, then AB” should disappear</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S8_1.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_2.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_3.png" alt="Step 8"><img src="Screenshots/Registration/Test_2/T2_S8_4.png" alt="Step 8"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>9</td>
+<td>In the user information section use the following:<br>Email: emailuser@email.email<br>Password: abc123DEF456!</td>
+<td>After entering information, the “create account” button should appear bolder and now be clickable</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S9_1.png" alt="Step 9"><img src="Screenshots/Registration/Test_2/T2_S9_2.png" alt="Step 9"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Steps 2 to 9 - The completed registration form. All password rules are met and Create Account is active.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S9_3.png" alt="Step 9"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>10</td>
+<td>Click the “create account” button</td>
+<td></td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara) - After clicking create account, here is the redirect:</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S10_1.png" alt="Step 10"><img src="Screenshots/Registration/Test_2/T2_S10_2.png" alt="Step 10"><img src="Screenshots/Registration/Test_2/T2_S10_3.png" alt="Step 10"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Step 10 - After clicking Create Account, the browser redirects to /?registered=true. Note there is no on-page confirmation message.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S10_4.png" alt="Step 10"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>11</td>
+<td>Confirm creation of a customer record with the following MySQL statements:<br><code>USE MoffatBayMarinaDB;</code><br><code>SELECT * FROM Customer WHERE email = “emailuser@email.email”;</code></td>
+<td></td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S11_1.png" alt="Step 11"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>12</td>
+<td>Confirm creation of a boat record with the following MySQL statements:<br><code>USE MoffatBayMarinaDB;</code><br><code>SELECT * FROM Boat WHERE boatName = "Boatzilla";</code></td>
+<td></td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">Developer (Sara)</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S12_1.png" alt="Step 12"></div><p class="screenshot-caption">Peer tester (Miguel) - Test 4, Steps 11 and 12 - Database verification. The Customer and Boat rows were both created, and the extra BoatOwnership query confirms the two are linked.</p><div class="screenshot-flex"><img src="Screenshots/Registration/Test_2/T2_S12_2.png" alt="Step 12"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>everything worked well. The fields were easy to navigate and everything was really easy to read. The only major issue I noticed is that after creating the account, it redirects you to the main page, but there’s no clear indication the account was successfully created. I think a simple message stating : “success! Your account has been created.” Or something along those lines would be useful.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>Confirmed, with three notes. First, I also filled the optional Boat Type and Boat Beam fields, which these steps leave blank - both saved correctly. Second, the registration number was accepted as NE1234AB with no spaces, so the field tolerates either format. Third, I ran one check beyond the written steps: SELECT * FROM BoatOwnership WHERE customerID = 53 returned a row linking the new customer to the new boat with today's start date and a null end date. That confirms registration writes all three tables, not just Customer and Boat. I also saw the same missing confirmation Sara flagged - the redirect lands on /?registered=true but nothing on the page tells the user the account was created.</div>
+
+</section>
+
+</body>
+</html>

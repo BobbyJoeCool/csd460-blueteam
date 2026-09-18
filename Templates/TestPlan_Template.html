@@ -1,0 +1,444 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Shared (Functional Test Plan, Module <#>)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — <page(s) covered by this plan>
+
+  HOW TO USE THIS TEMPLATE
+  1. Save a copy next to the module's .md test plan, named BlueTeam_Mod<#>_TestPlan.html.
+  2. Fill in this header comment, the <title> below, and the cover info at the top of <body>.
+  3. Test 1 below is a worked example with a comment on every part. Replace its placeholder text with your first test.
+  4. For each additional test, copy the "NEW TEST" block from the bottom of this file and paste it just above that block.
+  5. For each additional step in a test, copy the "NEW STEP" block from the bottom of this file and paste it inside that test's <table>, after the last </tbody>.
+  6. Add every test to the Table of Contents, and delete the copy-paste blocks at the bottom before exporting.
+  7. Export to PDF with DevNotes/Scripts/export-html.sh <this file> - each <section> becomes one PDF page.
+
+  Anything written as &lt;like this&gt; is a placeholder to replace. (&lt; and &gt; are how HTML writes < and >.)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Browser tab title, e.g. "Blue Team — Module 8 Test Plan" -->
+<title>Blue Team — Module &lt;#&gt; Test Plan</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 34%; }
+th:nth-child(3), td:nth-child(3) { width: 42%; }
+th:nth-child(4), td:nth-child(4) { width: 9%; }
+th:nth-child(5), td:nth-child(5) { width: 9%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Repeated header */
+tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
+tr.repeated-header + tr td { border-top: none; }
+tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
+
+/* Screenshot rows */
+tr.screenshot-row td {
+  background: #eef1f5;
+  padding: 10px 12px;
+  border-top: none;
+}
+.screenshot-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.screenshot-flex img {
+  flex: 1 1 auto;
+  max-width: 48%;
+  min-width: 200px;
+  margin: 0;
+}
+.screenshot-caption {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #444;
+  text-align: center;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each header+data+screenshot stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================================================================
+     COVER PAGE - the title, cover info, and Table of Contents together make
+     up the first page of the PDF export.
+     ====================================================================== -->
+<section id="cover-page">
+
+<!-- Title: one test plan per page. Replace <#> with the module number and <Page Name> with the page, e.g. "Functional Test - Module 8: Edit User Profile". -->
+<h1>Functional Test - Module &lt;#&gt;: &lt;Page Name&gt;</h1>
+
+<!-- Cover info: Project and Course stay the same every module.
+     Description: one to two sentences on which page(s), which flow, and what aspects this plan covers.
+     Date: the date the plan was written, as yyyy/mm/dd. -->
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> &lt;one to two sentences describing what this test plan covers&gt;</p>
+<p><strong>Date:</strong> &lt;yyyy/mm/dd&gt;</p>
+
+<!-- Page roles: who built this page and who tested it - use the names from "Page Role Assignments.md" at the repo root.
+     Group 1 is the build pair. Group 2 is the developer testers (each developer tests their own end).
+     Group 3 is the peer testers (the same-end developer from the other page reviews those tests).
+     Use full names. If one person covered both ends, list them on both lines. -->
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> &lt;Name&gt;</p>
+<p><strong>Back End Developer:</strong> &lt;Name&gt;</p>
+</div>
+<div class="page-roles">
+<p><strong>Front End Developer Tester:</strong> &lt;Name&gt;</p>
+<p><strong>Back End Developer Tester:</strong> &lt;Name&gt;</p>
+</div>
+<div class="page-roles">
+<p><strong>Front End Peer Tester:</strong> &lt;Name&gt;</p>
+<p><strong>Back End Peer Tester:</strong> &lt;Name&gt;</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+
+<!-- Table of Contents - one <li> per test.
+     Each href is "#" + that test's <section id="...">. The id is the test's
+     heading lowercased, punctuation removed, spaces turned into hyphens -
+     e.g. "Test 1: About Us Navigation" becomes "test-1-about-us-navigation".
+     Update both the id and this link any time a test's title changes. -->
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<li><a href="#test-1-test-title">Test 1: &lt;Test Title&gt;</a></li>
+<!-- Add one <li> here for each test you add. -->
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+
+<!-- Optional: a note that applies to the whole plan (shared test account, run order, starting data).
+     Delete it if not needed. callout-note = blue, for general notes. -->
+<div class="callout callout-note"><strong>&lt;Note title&gt;</strong><br>&lt;note text&gt;</div>
+
+</div>
+
+</section>
+
+<!-- ======================================================================
+     TEST 1 - WORKED EXAMPLE. Every test is one <section>, and each
+     <section> becomes one page when exported to PDF.
+     ====================================================================== -->
+
+<!-- id: matches this test's link in the Table of Contents (see the rule up there). -->
+<section id="test-1-test-title">
+
+<!-- Heading: "Test <#>: <short, specific title>" -->
+<h2>Test 1: &lt;Test Title&gt;</h2>
+
+<!-- Objective: what this test verifies, in one to two sentences. -->
+<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
+
+<!-- Badges: the developer fills in their full name and test date. The peer tester fills in theirs when they test.
+     Dates are written like "Sept 16, 2026". Leave &lt;date&gt; in place until the test is actually run. -->
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> &lt;Developer Name&gt; <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> &lt;Peer Tester Name&gt; <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+
+<table>
+<!-- Each step is one <tbody class="step-group">: a header row, the step row, and a screenshot row.
+     The header repeats on every step so each step stays readable on its own when a page breaks. -->
+<tbody class="step-group">
+<!-- Header row - never changes, copy it as-is. -->
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<!-- Step number. -->
+<td>1</td>
+<!-- Action: what the tester does, with the exact test data (logins, field values, URLs) so anyone can repeat it.
+     Plain text for one action. For several actions use a numbered list: <ol><li>First</li><li>Second</li></ol>
+     Wrap literal values in <code>...</code> and button names in <strong>...</strong>. -->
+<td>&lt;action to take&gt;</td>
+<!-- Expected Results: a specific, checkable result - avoid "page works correctly." -->
+<td>&lt;what should happen&gt;</td>
+<!-- Dev Test: the developer's result - <strong>Pass</strong> or <strong>Fail</strong>. -->
+<td>&lt;Pass/Fail&gt;</td>
+<!-- Peer Test: the peer tester's result - <strong>Pass</strong> or <strong>Fail</strong>. -->
+<td>&lt;Pass/Fail&gt;</td>
+</tr>
+<!-- Screenshot row: spans all five columns.
+     The caption says what the screenshot should show. Each <img> is one screenshot - add more <img> tags side by side
+     for several shots of the same step. src is relative to this HTML file, e.g. Screenshots/Test_1/T1_S1.png.
+     If a step has no screenshot (e.g. a pure database check with the query shown below), delete this whole row. -->
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">&lt;what the screenshot should show&gt;</p><div class="screenshot-flex"><img src="Screenshots/Test_1/T1_S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<!-- Add more steps here by pasting the NEW STEP block from the bottom of this file. -->
+</table>
+
+<!-- Optional: SQL for any database-check steps. Delete this block if the test has no queries.
+     Inside <pre><code>, write < as &lt;  > as &gt;  and & as &amp; - everything else is typed as-is. -->
+<p class="query-note">For step &lt;#&gt;, use this query:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT ...;</code></pre>
+<p class="query-note"><strong>Expected row count:</strong> &lt;#&gt;</p>
+
+<!-- Comments: one callout per note. callout-dev = developer (coral), callout-peer = peer tester (orange).
+     Add as many as needed; use <br> for line breaks inside one. -->
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (&lt;first name&gt;)</strong><br>&lt;2-3+ sentences: what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (&lt;first name&gt;)</strong><br>&lt;filled in by the peer tester&gt;</div>
+
+</section>
+
+<!-- Paste new tests here, above the copy-paste blocks. -->
+
+
+<!-- ======================================================================
+     COPY-PASTE BLOCKS - delete everything below this line (down to </body>) before exporting.
+
+     NEW TEST: copy everything between the START and END lines, paste it above this block,
+     then replace every <#> with the test number and fill in the placeholders.
+     The worked example (Test 1) above explains each part.
+
+     ----- NEW TEST - START -----
+<section id="test-#-test-title">
+<h2>Test #: &lt;Test Title&gt;</h2>
+<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> &lt;Developer Name&gt; <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> &lt;Peer Tester Name&gt; <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">&lt;what the screenshot should show&gt;</p><div class="screenshot-flex"><img src="Screenshots/Test_#/T#_S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (&lt;first name&gt;)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (&lt;first name&gt;)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+     ----- NEW TEST - END -----
+
+     NEW STEP: copy everything between the START and END lines and paste it inside a test's <table>,
+     right after its last </tbody>. Set the step number, and the step number in the screenshot path and alt text.
+
+     ----- NEW STEP - START -----
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>#</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><p class="screenshot-caption">&lt;what the screenshot should show&gt;</p><div class="screenshot-flex"><img src="Screenshots/Test_#/T#_S#.png" alt="Step #"></div></td></tr>
+</tbody>
+     ----- NEW STEP - END -----
+     ====================================================================== -->
+
+</body>
+</html>

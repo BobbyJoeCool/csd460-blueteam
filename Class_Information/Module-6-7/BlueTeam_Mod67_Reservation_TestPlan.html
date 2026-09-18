@@ -1,0 +1,646 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Shared (Functional Test Plan, Modules 6-7)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — Reservation & Reservation Summary
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team — Module 6-7 Test Plan: Reservation & Reservation Summary</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 34%; }
+th:nth-child(3), td:nth-child(3) { width: 42%; }
+th:nth-child(4), td:nth-child(4) { width: 9%; }
+th:nth-child(5), td:nth-child(5) { width: 9%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Repeated header */
+tr.repeated-header th { padding: 6px 10px; font-size: 12px; }
+tr.repeated-header + tr td { border-top: none; }
+tr.screenshot-row + tr.repeated-header th { border-top: 2px solid #0d3b4d; }
+
+/* Screenshot rows */
+tr.screenshot-row td {
+  background: #eef1f5;
+  padding: 10px 12px;
+  border-top: none;
+}
+.screenshot-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.screenshot-flex img {
+  flex: 1 1 auto;
+  max-width: 48%;
+  min-width: 200px;
+  margin: 0;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each header+data+screenshot stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="cover-page">
+<h1>Functional Test - Module 6-7: Reservation & Reservation Summary</h1>
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> Functional test plan for the Reservation (Book a Slip) page, its handoff to the Reservation Summary page, and the wait-list path.</p>
+<p><strong>Date:</strong> 2026/09/09</p>
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> Robert Breutzmann (Reservation), Carolina Rodriguez (Reservation Summary)</p>
+<p><strong>Back End Developer:</strong> Sara White (Reservation), Miguel Fernandez (Reservation Summary)</p>
+</div>
+<div class="page-roles">
+<p><strong>Developer Tester:</strong> Robert Breutzmann</p>
+<p><strong>Peer Tester:</strong> Carolina Rodriguez</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<li><a href="#test-1-new-slip-reservation-matches-through-to-the-reservation-summary-page-and-posts-to-mysql">Test 1: New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL</a></li>
+<li><a href="#test-2-reservation-page-reflects-reduced-availability-immediately-after-booking">Test 2: Reservation Page Reflects Reduced Availability Immediately After Booking</a></li>
+<li><a href="#test-3-a-full-slip-size-notifies-the-customer-offers-the-wait-list-and-never-creates-a-reservation">Test 3: A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation</a></li>
+<li><a href="#test-4-reservation-booking-and-cancellation-via-reservation-summary">Test 4: Reservation Booking and Cancellation via Reservation Summary</a></li>
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and fill out the Screenshots list below the table with the matching screenshot number for each item.</p>
+</div>
+
+</section>
+
+<section id="test-1-new-slip-reservation-matches-through-to-the-reservation-summary-page-and-posts-to-mysql">
+<h2>Test 1: New Slip Reservation Matches Through to the Reservation Summary Page and Posts to MySQL</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies that a new slip reservation submitted from the Reservation page carries the same boat, dock, and pricing details through to the Reservation Summary page, and that the booking (and any newly registered boat) is correctly written to the database.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 13,2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td><ol><li>Go to http://localhost:8080/marinawebsite/ (or http://localhost:8081/marinawebsite/).</li><li>Log in with elena.marsh@example.com / Password1.</li><li>Open the Reservation page (click "Book a Slip" or navigate directly to reservation.jsp).</li></ol></td>
+<td>The header shows "Welcome, Elena M." and the Reservation page loads showing the Choose Your Vessel dropdown (Elena's existing boat listed with a "(reserved)" tag), the 26/40/50 ft slip cards, and the three dock cards.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S1.png" alt="Step 1"><img src="Screenshots/Test_1/T1-S1a.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td><ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Test Skiff</li><li>Boat Type: Skiff</li><li>Boat Length: 22.0</li><li>Boat Beam: 8.0</li><li>HIN: QTB123456789</li><li>Registration Number: WA10001QT</li><li>Boat Year: 2024</li></ul></li><li>Click "Save boat."</li></ol></td>
+<td>The panel closes without reloading the page, "QA Test Skiff — 22.0 ft" appears in the Boat dropdown already selected, the status popup shows "Boat saved," and the page re-prices for a 26 ft boat.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>With "QA Test Skiff" selected, record the number shown on the 26 ft Slip card and the number shown on each of the Dock A, Dock B, and Dock C cards.</td>
+<td>The 26 ft Slip card shows a count greater than zero and is highlighted "Fits your boat"; each dock card shows its own open count for 26 ft slips; the Reservation Summary sidebar shows Vessel "QA Test Skiff — 22.0 ft" and Monthly Rate "\$231.00."</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td><ol><li>Select the Dock A radio button.</li><li>Check "Yes, I need an electric hookup."</li><li>Set the Start Date field to today's date.</li></ol></td>
+<td>The Reservation Summary sidebar updates live: Dock shows "Dock A," an Electric hookup line appears showing "\$10.50," Start Date shows today's date, Monthly Rate updates to "\$241.50," and the "Reserve My Slip" button becomes enabled.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S4.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td><ol><li>Record the Vessel, Dock, Start Date, Electric hookup, and Monthly Rate values shown in the Reservation Summary sidebar.</li><li>Click "Reserve My Slip."</li></ol></td>
+<td>The browser redirects to reservationSummary.jsp?confirmation=MB-##### with a new confirmation number, and the Reservation Summary page displays the same vessel, dock, start date, electric hookup, and \$241.50 monthly rate recorded just before submitting.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S5.png" alt="Step 5"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>6</td>
+<td>Confirm the new records in MySQL (see the query below the table).</td>
+<td>The Boat query returns one row for "QA Test Skiff" with boatLength 22.0. The BoatOwnership query returns one row linking that boat to customerID 1, with today's date as startDate and a NULL endDate. The Reservation query returns exactly one Active row for customerID 1 on Dock A, sizeFt 26, with a monthlyRate matching the total shown on the Reservation Summary page in Step 5.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_1/T1-S6.png" alt="Step 6"></div></td></tr>
+</tbody>
+</table>
+<p class="query-note">For step 6, use these queries:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT boatID, boatName, boatLength
+FROM Boat
+WHERE boatName = &#x27;QA Test Skiff&#x27;;
+
+SELECT * FROM BoatOwnership
+WHERE boatID = &lt;boatID from above&gt; AND customerID = 1;
+
+SELECT r.confirmationNumber, r.customerID, r.boatID, r.slipID, r.startDate, r.monthlyRate, r.reservationStatus,
+       s.slipNumber, d.dockNumber, sz.sizeFt
+FROM Reservation r
+JOIN Slip s ON s.slipID = r.slipID
+JOIN Dock d ON d.dockID = s.dockID
+JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
+WHERE r.confirmationNumber = &#x27;&lt;confirmation number from Step 5&gt;&#x27;;</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>Test passes. Minor visual bug with creating a new boat, the register a new boat popup modal scrolls weird, leaving the background "greying" exposing some of the page behind it and allowing for scrolling on the main page. Tester Fixed this before handing off to peer testing.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>Everything runs smoothly, only possible note is to make “Boat already reserved” in a bolder text for better visibility. SQL loads data entered and reservation shows how many docks available.</div>
+
+</section>
+
+<section id="test-2-reservation-page-reflects-reduced-availability-immediately-after-booking">
+<h2>Test 2: Reservation Page Reflects Reduced Availability Immediately After Booking</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies that after a slip is booked, the Reservation page marks that boat as already reserved and drops the affected slip-size and dock availability counts by exactly one, matching the database.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 13, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Immediately after Test 1, use the header navigation to return to http://localhost:8080/marinawebsite/reservation.jsp.</td>
+<td>The Reservation page performs a fresh page load (not the cached in-page state from before submitting) and shows the Choose Your Vessel dropdown again.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_2/T2-S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td>Open the Boat dropdown.</td>
+<td>"QA Test Skiff — 22.0 ft (reserved)" is listed with the "(reserved)" tag, reflecting the booking just made in Test 1.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_2/T2-S2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td>Select "QA Test Skiff — 22.0 ft (reserved)" from the dropdown.</td>
+<td>An inline message appears under the dropdown reading "QA Test Skiff already has an active reservation." and the "Reserve My Slip" button stays disabled: the boat cannot be booked into a second slip.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_2/T2-S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td><ol><li>With that boat still selected, compare the number now shown on the 26 ft Slip card to the number recorded in Test 1, Step 3.</li><li>Compare the Dock A count to the number recorded for Dock A in that same step.</li></ol></td>
+<td>The 26 ft Slip card reads exactly one less than the count recorded in Test 1; the Dock A card reads exactly one less than the count recorded for Dock A in Test 1; the Dock B and Dock C counts are unchanged, since only a Dock A slip was booked.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_2/T2-S4.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td>Confirm the same drop directly in MySQL (see the query below the table).</td>
+<td>Dock A's openSlips is exactly one less than it was before Test 1's booking. Dock B and Dock C are unchanged. The sum of openSlips across all three docks matches the total shown on the 26 ft Slip card in Step 4.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_2/T2-S5.png" alt="Step 5"></div></td></tr>
+</tbody>
+</table>
+<p class="query-note">For step 5, use this query:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT d.dockNumber,
+       SUM(CASE WHEN r.reservationID IS NULL THEN 1 ELSE 0 END) AS openSlips
+FROM Slip s
+JOIN Dock d ON d.dockID = s.dockID
+JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
+LEFT JOIN Reservation r ON r.slipID = s.slipID AND r.reservationStatus = &#x27;Active&#x27;
+WHERE sz.sizeFt = 26 AND s.slipStatus = &#x27;operational&#x27;
+GROUP BY d.dockNumber
+ORDER BY d.dockNumber;</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>This test fully passes. Before handing off to Peer tester, I added a summary of why the reservation cannot be booked below the disabled "RESERVE" button as a helper, so the "This boat already has a reservation" line now appears there as well.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>All steps passed. The reserved boat showed correctly, the system blocked a second reservation, and the slip/dock availability updated by one. The database results matched what was shown on the Reservation page.</div>
+
+</section>
+
+<section id="test-3-a-full-slip-size-notifies-the-customer-offers-the-wait-list-and-never-creates-a-reservation">
+<h2>Test 3: A Full Slip Size Notifies the Customer, Offers the Wait List, and Never Creates a Reservation</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies that selecting a boat whose matched slip size has no open slots shows the full-size notice instead of a dock/reservation flow, that joining the wait list writes a WaitList row and redirects to the Wait List Lookup page stub, and that no Reservation row is ever created for that boat.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 13, 2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td>Confirm the current 40 ft availability in MySQL before starting (see the query below the table).</td>
+<td>Per the seeded data, there are no open 40 ft slips. This query should return 0 | 0 | 0</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_3/T3-S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td><ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Open the Reservation page.</li><li>Register a new boat with:<ul><li>Boat Name: QA Overflow Boat</li><li>Boat Type: Sailboat</li><li>Boat Length: 35.0</li><li>Boat Beam: 11.0</li><li>HIN: QOB123456789</li><li>Registration Number: WA10003QT</li><li>Boat Year: 2023</li></ul></li><li>Select it from the dropdown.</li></ol></td>
+<td>The moment the boat is selected — before any dock is chosen — the availability panel shows "All of our 40 ft slips are currently reserved." All three dock radio buttons read "No 40 ft slips free here" and are disabled, and "Reserve My Slip" is disabled. No reservation can be submitted.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_3/T3-S2.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td><ol><li>Under the notice, confirm the wait-list question "Would you like to be added to the wait list for a 40 ft slip? We'll contact you when one opens up." appears with "Join the wait list" and "No thanks" buttons.</li><li>Click "Join the wait list."</li></ol></td>
+<td>The browser redirects to waitListLookup.jsp?notice=waitListJoined&size=40. Because the Wait List Lookup page has not been built yet, this lands on the shared "Coming Soon" placeholder for "The Wait List Lookup page" — the expected behavior until that page ships.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_3/T3-S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Confirm the result in MySQL (see the query below the table).</td>
+<td>The WaitList query returns one new row for customerID 1 at sizeFt 40 with status "Waiting." The Reservation query returns zero rows — "QA Overflow Boat" was never assigned a slip or booked.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_3/T3-S4.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td><ol><li>Go back to the Reservation page.</li><li>Select "QA Overflow Boat" again.</li><li>Click "Join the wait list" a second time.</li></ol></td>
+<td>Instead of a second entry, the wait-list panel shows "You're already on the wait list for a 40 ft slip," the Join button is hidden, and re-running the WaitList query from Step 5 still returns exactly one row for customerID 1 at size 40.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_3/T3-S5.png" alt="Step 5"></div></td></tr>
+</tbody>
+</table>
+<p class="query-note">For step 1, use this query:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT d.dockNumber,
+       SUM(CASE WHEN r.reservationID IS NULL THEN 1 ELSE 0 END) AS openSlips
+FROM Slip s
+JOIN Dock d ON d.dockID = s.dockID
+JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
+LEFT JOIN Reservation r ON r.slipID = s.slipID AND r.reservationStatus = &#x27;Active&#x27;
+WHERE sz.sizeFt = 40 AND s.slipStatus = &#x27;operational&#x27;
+GROUP BY d.dockNumber;</code></pre>
+<p class="query-note">For step 4, use these queries:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT w.waitListID, w.status, w.timeJoined, sz.sizeFt
+FROM WaitList w
+JOIN SlipSize sz ON sz.slipSizeID = w.slipSizeID
+WHERE w.customerID = 1
+ORDER BY w.timeJoined DESC
+LIMIT 1;
+
+SELECT * FROM Reservation r
+JOIN Boat b ON b.boatID = r.boatID
+WHERE b.boatName = &#x27;QA Overflow Boat&#x27;;</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>This test also passed. No notes to add as everything functioned exactly as it should. The test landed at a stub page, rather than the actual waitlist. The waitlist entry was created as the waitlistDAO stub was made to allow an entry to go into the database.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>All steps passed. The 40 ft slips showed no availability in both the page and MySQL, the overflow boat could not be reserved, and the wait-list option appeared as expected. Joining the wait list created one Waiting entry for customerID 1 at size 40, with no reservation created. A second attempt correctly showed that the customer was already on the wait list and did not create a duplicate entry.</div>
+
+</section>
+
+<section id="test-4-reservation-booking-and-cancellation-via-reservation-summary">
+<h2>Test 4: Reservation Booking and Cancellation via Reservation Summary</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verifies the full reservation lifecycle: booking a slip from the Reservation page, confirming the details on the Reservation Summary page, cancelling the reservation, and verifying the cancellation is reflected on both the Summary page and in the database.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 11, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 13,2026</span></div>
+<table>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>1</td>
+<td><ol><li>Log in as elena.marsh@example.com / Password1.</li><li>Navigate to the Reservation page.</li></ol></td>
+<td>The header shows "Welcome, Elena M." and the Reservation page loads. The boat dropdown lists "Salt Whisper — 24.5 ft (reserved)" since her existing boat already has an active reservation.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S1.png" alt="Step 1"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>2</td>
+<td><ol><li>Click "Register another boat."</li><li>In the panel, enter:<ul><li>Boat Name: QA Cancel Test</li><li>Boat Type: Skiff</li><li>Boat Length: 20.0</li></ul></li><li>Registration: WA10004QT </li><li> Leave Boat Beam, HIN, and Boat Year blank.</li><li>Click "Save boat."</li></ol></td>
+<td>The panel closes, "QA Cancel Test — 20.0 ft" appears in the dropdown already selected, and the page re-prices for a 26 ft slip. The Reservation Summary sidebar shows Vessel "QA Cancel Test — 20.0 ft" and Monthly Rate "\$210.00."</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S2.png" alt="Step 2"><img src="Screenshots/Test_4/T4-S2a.png" alt="Step 2"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>3</td>
+<td><ol><li>Select the Dock B radio button.</li><li>Set the Start Date field to today's date.</li></ol></td>
+<td>The Reservation Summary sidebar updates: Dock shows "Dock B," Start Date shows today's date, and the "Reserve My Slip" button becomes enabled.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S3.png" alt="Step 3"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>4</td>
+<td>Click "Reserve My Slip."</td>
+<td>The browser redirects to reservationSummary?confirmation=MB-##### with a new confirmation number. The Reservation Summary page shows status "Active," vessel "QA Cancel Test," location "Dock B, Slip #," start date matching today, and Monthly Rate "\$210.00/mo."</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S4.png" alt="Step 4"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>5</td>
+<td><ol><li>In the "Manage Your Reservation" section, click "Cancel Reservation."</li><li>When the browser confirmation dialog appears, click OK.</li></ol></td>
+<td>The page reloads. The hero area now shows a red ✗ mark with heading "Your Reservation Has Been Cancelled" and the text "This reservation is no longer active." The status band shows "Cancelled." The Cancel button is gone; only "Back to Reservations" remains.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S5.png" alt="Step 5"><img src="Screenshots/Test_4/T4-S5a.png" alt="Step 5"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>6</td>
+<td>Confirm the cancellation in MySQL (see the query below the table).</td>
+<td>The query returns one row with reservationStatus = "Cancelled" for customerID 1 and boatName "QA Cancel Test."</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S6.png" alt="Step 6"></div></td></tr>
+</tbody>
+<tbody class="step-group">
+<tr class="repeated-header"><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr>
+<tr>
+<td>7</td>
+<td><ol><li>Navigate back to the Reservation page.</li><li>Open the boat dropdown.</li></ol></td>
+<td>"QA Cancel Test — 20.0 ft" no longer shows the "(reserved)" tag, confirming the cancellation freed the boat for re-booking.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong></td>
+</tr>
+<tr class="screenshot-row"><td colspan="5"><div class="screenshot-flex"><img src="Screenshots/Test_4/T4-S7.png" alt="Step 7"></div></td></tr>
+</tbody>
+</table>
+<p class="query-note">For step 6, use this query:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+SELECT r.confirmationNumber, r.reservationStatus, r.customerID, b.boatName
+FROM Reservation r
+JOIN Boat b ON b.boatID = r.boatID
+WHERE b.boatName = &#x27;QA Cancel Test&#x27;;</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>This test performed just fine. I added some back end to this to ensure that this doesn't accidently submit twice.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>All steps passed. The new test boat was added and priced correctly, the reservation was created for Dock B with the expected rate, and the cancellation flow worked as expected. The Reservation Summary changed to Cancelled, the cancel button was removed, MySQL showed the reservation status as Cancelled, and the boat no longer appeared as reserved when returning to the Reservation page.</div>
+
+</section>
+
+</body>
+</html>
