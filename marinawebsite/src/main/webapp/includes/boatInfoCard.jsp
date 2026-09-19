@@ -97,6 +97,7 @@
                min="1" max="999.9" step="0.1"
                placeholder="45"
                value="${fn:escapeXml(boatLengthValue)}">
+        <div class="field-error" id="boatLengthError"></div>
     </div>
     <div class="form-group" id="boatBeamGroup">
         <label for="boatBeam">Boat Beam (ft)</label>
@@ -104,6 +105,7 @@
                min="1" max="999.9" step="0.1"
                placeholder="12"
                value="${fn:escapeXml(boatBeamValue)}">
+        <div class="field-error" id="boatBeamError"></div>
     </div>
 </div>
 

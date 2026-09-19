@@ -13,6 +13,7 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 
 <!DOCTYPE html>
@@ -96,11 +97,11 @@
                  it is said plainly here rather than left to be inferred from
                  the total. Both figures come from the Rate table. --%>
             <p class="pricing-note">
-                <strong>$<span id="ratePerFoot"></span> per foot</strong> of your
+                <strong><span id="ratePerFoot"></span> per foot</strong> of your
                 boat's length, per month &mdash; so the price follows your boat,
                 not the size of the slip it sits in.
                 <br />Add an electric hookup for a flat
-                <strong>$<span id="rateElectric"></span> a month</strong>.
+                <strong><span id="rateElectric"></span> a month</strong>.
             </p>
 
             <%-- Free slips per dock per size, known at page load. This is what
@@ -208,7 +209,7 @@
                                                     data-slip-size="${b.slipSizeFt}"
                                                     data-monthly-cents="${b.monthlyCents}"
                                                     data-boat-name="${fn:escapeXml(b.boatName)}"
-                                                    data-reserved="${b.hasActiveReservation}">${fn:escapeXml(b.boatName)} &mdash; ${b.boatLength} ft<c:if test="${b.hasActiveReservation}"> (reserved)</c:if></option>
+                                                    data-reserved="${b.hasActiveReservation}">${fn:escapeXml(b.boatName)} &mdash; <fmt:formatNumber value="${b.boatLength}" maxFractionDigits="1" /> ft<c:if test="${b.hasActiveReservation}"> (reserved)</c:if></option>
                                         </c:forEach>
                                     </select>
                                 </c:otherwise>

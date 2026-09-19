@@ -6,13 +6,13 @@ import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.WaitListDAO;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * Joins the signed-in customer to the wait list for a slip size.
@@ -40,15 +40,15 @@ public class ReservationWaitlistServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        Integer customerId = signedInCustomerId(request);
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             writeJson(response, "{\"ok\":false,\"error\":\"Please sign in to join the wait list.\"}");
             return;
         }
 
-        Integer slipSizeFt = parseInt(request.getParameter("slipSizeFt"));
-        if (slipSizeFt == null || (slipSizeFt != 26 && slipSizeFt != 40 && slipSizeFt != 50)) {
+        Integer slipSizeFt = Utils.parseInt(request.getParameter("slipSizeFt"));
+        if (!Utils.isSlipSize(slipSizeFt)) {
             writeJson(response, "{\"ok\":false,\"error\":\"Choose a valid slip size.\"}");
             return;
         }
@@ -64,26 +64,6 @@ public class ReservationWaitlistServlet extends HttpServlet {
 
         } catch (SQLException e) {
             throw new ServletException("Could not join the wait list.", e);
-        }
-    }
-
-    private Integer signedInCustomerId(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return null;
-        }
-        Object value = session.getAttribute("customerId");
-        return value instanceof Integer id ? id : null;
-    }
-
-    private Integer parseInt(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            return null;
         }
     }
 

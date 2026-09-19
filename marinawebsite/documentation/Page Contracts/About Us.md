@@ -98,7 +98,7 @@ Everything the contact form submits. The form POSTs to `/contact` (`ContactServl
 | `lastName` | text | Yes | `maxlength="50"`, matches `Contact.lastName`. Pre-filled from session when signed in |
 | `email` | email | Yes | `maxlength="255"`, matches `Contact.email`. Pre-filled from session when signed in. Checked with `MoffatBay.form.isValidEmail`, the same pattern `Utils.isValidEmail` uses server-side |
 | `boatName` | text | **No** | `maxlength="100"`, matches `Contact.boatName`. Free text — not a link to the `Boat` table, so someone can name a boat they haven't registered |
-| `boatLength` | number | **No** | `step="0.1"`, matches `Contact.boatLength` `DECIMAL(6,2)`. If filled in, must be a positive number no greater than 9999.9 |
+| `boatLength` | number | **No** | `step="0.1"`, matches `Contact.boatLength` `DECIMAL(6,2)`. If filled in, must be a positive number no greater than 999.9 — the same limit as every other boat form (`Utils.MAX_BOAT_DIMENSION`); this was 9999.9 until the shared-validation cleanup |
 | `reasonForContact` | select | Yes | One of the six `Contact.reasonForContact` ENUM values. A `<select>`, so nothing outside the list can be submitted from the page |
 | `message` | textarea | Yes | Capped at 2000 characters with a live counter. `Contact.message` is `TEXT`, so this cap is the form's choice, not the column's |
 

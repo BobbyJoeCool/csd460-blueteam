@@ -125,7 +125,9 @@ MoffatBay.aboutUs = (function () {
                 var length = Number(boatLength);
                 if (Number.isNaN(length) || length <= 0) {
                     fail("boatLength", "Enter a length in feet, or leave this blank.");
-                } else if (length > 9999.9) {
+                } else if (!MoffatBay.form.isValidBoatDimension(boatLength)) {
+                    /* Shared limit (MAX_BOAT_DIMENSION, 999.9 ft) - same as
+                       every other boat form and the server. */
                     fail("boatLength", "That length is longer than any boat we can moor.");
                 }
             }

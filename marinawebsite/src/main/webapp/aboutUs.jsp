@@ -318,7 +318,7 @@
                                id="boatLength"
                                name="boatLength"
                                min="0"
-                               max="9999.99"
+                               max="999.9"
                                step="0.1"
                                value="${not empty contactError ? fn:escapeXml(param.boatLength) : ''}">
                         <p class="field-error" id="boatLengthError"></p>

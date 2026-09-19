@@ -3,6 +3,8 @@ package com.moffatbaymarina.marinawebsite.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import com.moffatbaymarina.marinawebsite.util.Utils;
+
 /**
  * Represents a customer record from the Customer database table,
  * excluding {@code passwordHash}. This class also includes the
@@ -212,6 +214,17 @@ public class Customer implements Serializable {
      */
     public LocalDate getDateJoined() {
         return dateJoined;
+    }
+
+    /**
+     * The join date in the site-wide display format, e.g. "Sep 15, 2026".
+     * JSTL's {@code <fmt:formatDate>} only reads a {@code java.util.Date},
+     * so a page showing this {@code LocalDate} reads this getter instead.
+     *
+     * @return the formatted date, or "" if there isn't one
+     */
+    public String getDateJoinedDisplay() {
+        return Utils.formatDisplayDate(dateJoined);
     }
 
     /**

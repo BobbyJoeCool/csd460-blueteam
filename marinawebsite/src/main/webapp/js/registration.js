@@ -40,6 +40,8 @@
     var hinError = document.getElementById("hinError");
     var regNumberError = document.getElementById("regNumberError");
     var boatYearError = document.getElementById("boatYearError");
+    var boatLengthError = document.getElementById("boatLengthError");
+    var boatBeamError = document.getElementById("boatBeamError");
     var clearBoatInfoBtn = document.getElementById("clearBoatInfo");
     var clearPersonalInfoBtn = document.getElementById("clearPersonalInfo");
 
@@ -221,10 +223,25 @@
         return valid;
     }
 
+    // Length and beam share one rule (MoffatBay.form.isValidBoatDimension,
+    // same as the server's Utils.isValidBoatDimension). Blank passes here -
+    // boatSectionValid below is what makes Length required once the boat
+    // section is started.
+    function boatDimensionIsValid(field, errorEl, label) {
+        var value = field.value.trim();
+        var valid = value.length === 0 || MoffatBay.form.isValidBoatDimension(value);
+        var message = label + " should be a number of feet, more than 0 and no more than "
+            + MoffatBay.form.MAX_BOAT_DIMENSION + ".";
+        field.setCustomValidity(valid ? "" : message);
+        errorEl.textContent = (value.length > 0 && !valid) ? message : "";
+        return valid;
+    }
+
     function boatYearIsValid() {
         var value = boatFields.boatYear.value.trim();
         var valid = value.length === 0 || MoffatBay.form.isValidBoatYear(value);
-        var message = "Enter a 4-digit year, 1800 through " + new Date().getFullYear() + ".";
+        var message = "Enter a 4-digit year, " + MoffatBay.form.MIN_BOAT_YEAR
+            + " through " + new Date().getFullYear() + ".";
         boatFields.boatYear.setCustomValidity(valid ? "" : message);
         boatYearError.textContent = (value.length > 0 && !valid) ? message : "";
         return valid;
@@ -282,6 +299,8 @@
         var hinValid = hinIsValid();
         var regNumberValid = regNumberIsValid();
         var boatYearValid = boatYearIsValid();
+        var boatLengthValid = boatDimensionIsValid(boatFields.boatLength, boatLengthError, "Boat Length");
+        var boatBeamValid = boatDimensionIsValid(boatFields.boatBeam, boatBeamError, "Boat Beam");
         updateIdentificationNote();
         var boatValid = boatSectionValid();
 
@@ -297,7 +316,8 @@
 
         submitBtn.disabled = !(
             pwValid && matches && phoneComplete && countryCodeValid && emailValid && zipValid &&
-            hinValid && regNumberValid && boatYearValid && boatValid && requiredFieldsFilled
+            hinValid && regNumberValid && boatYearValid && boatLengthValid && boatBeamValid &&
+            boatValid && requiredFieldsFilled
         );
     }
 

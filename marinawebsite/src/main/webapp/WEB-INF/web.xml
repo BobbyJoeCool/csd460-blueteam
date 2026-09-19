@@ -4,6 +4,14 @@
          version="6.0">
   <display-name>Moffat Bay Marina</display-name>
 
+  <!-- One locale for every <fmt:formatNumber type="currency"> and
+       <fmt:formatDate> on the site, so money always shows as US dollars and
+       dates as "Jun 1, 2026" no matter what machine Tomcat runs on. -->
+  <context-param>
+    <param-name>jakarta.servlet.jsp.jstl.fmt.locale</param-name>
+    <param-value>en_US</param-value>
+  </context-param>
+
   <session-config>
     <session-timeout>30</session-timeout>
     <cookie-config>

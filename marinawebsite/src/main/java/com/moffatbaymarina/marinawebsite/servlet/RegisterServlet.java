@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
@@ -39,30 +38,11 @@ public class RegisterServlet extends HttpServlet {
 	 * here too - consolidated onto the single copy in Utils (used by
 	 * every page that now touches Customer fields, not just Registration)
 	 * as part of the Edit User Info build. See Utils' own comment on
-	 * EMAIL_PATTERN for why.
+	 * EMAIL_PATTERN for why. The HIN and Registration Number patterns and
+	 * the boat length/beam/year limits followed later, for the same reason -
+	 * this copy of the Registration Number pattern had drifted from the
+	 * Reservation page's and the browser's (see Utils.REG_NUMBER_PATTERN).
 	 */
-
-	private static final Pattern HIN_PATTERN =
-			Pattern.compile("^[A-Za-z]{3}[A-Za-z0-9]{9}$");
-
-	/*
-	 * State vessel Certificate of Number format, per 33 CFR 174.17 -
-	 * now requires the state's 2-letter prefix as part of the typed
-	 * Registration Number, since there's no longer a separate
-	 * Registration State field. See the Registration contract's
-	 * "Boat Fields" section.
-	 */
-	private static final Pattern REG_NUMBER_PATTERN =
-			Pattern.compile("^[A-Za-z]{2}\\s?\\d{4,7}\\s?[A-Za-z]{2}$");
-
-	/*
-	 * Canadian Pleasure Craft Licence numbers carry a literal leading "C"
-	 * (the country code) that the US format has no equivalent for, plus a
-	 * wider digit range - see the Registration contract's "Boat Fields"
-	 * section for why US and Canadian registrations use different patterns.
-	 */
-	private static final Pattern CA_REG_NUMBER_PATTERN =
-			Pattern.compile("^C\\d{4,8}\\s?[A-Za-z]{2}$");
 
 	private static final java.util.Set<String> VALID_COUNTRIES =
 			java.util.Set.of("US", "CA", "OTHER");
@@ -94,42 +74,42 @@ public class RegisterServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 
-		String firstName = clean(request.getParameter("firstName"));
-		String lastName = clean(request.getParameter("lastName"));
-		String email = clean(request.getParameter("email"))
+		String firstName = Utils.clean(request.getParameter("firstName"));
+		String lastName = Utils.clean(request.getParameter("lastName"));
+		String email = Utils.clean(request.getParameter("email"))
 				.toLowerCase(Locale.ROOT);
 
 		String phoneCountryCode =
-				clean(request.getParameter("phoneCountryCode"));
-		String phone = clean(request.getParameter("phone"));
+				Utils.clean(request.getParameter("phoneCountryCode"));
+		String phone = Utils.clean(request.getParameter("phone"));
 
 		String streetAddress =
-				clean(request.getParameter("streetAddress"));
+				Utils.clean(request.getParameter("streetAddress"));
 		String streetAddress2 =
-				clean(request.getParameter("streetAddress2"));
-		String city = clean(request.getParameter("city"));
-		String state = clean(request.getParameter("state"))
+				Utils.clean(request.getParameter("streetAddress2"));
+		String city = Utils.clean(request.getParameter("city"));
+		String state = Utils.clean(request.getParameter("state"))
 				.toUpperCase(Locale.ROOT);
-		String zipCode = clean(request.getParameter("zipCode"));
-		String country = clean(request.getParameter("country"))
+		String zipCode = Utils.clean(request.getParameter("zipCode"));
+		String country = Utils.clean(request.getParameter("country"))
 				.toUpperCase(Locale.ROOT);
 
-		String boatName = clean(request.getParameter("boatName"));
-		String regNumber = clean(request.getParameter("regNumber"))
+		String boatName = Utils.clean(request.getParameter("boatName"));
+		String regNumber = Utils.clean(request.getParameter("regNumber"))
 				.toUpperCase(Locale.ROOT);
 		String boatLengthText =
-				clean(request.getParameter("boatLength"));
-		String hin = clean(request.getParameter("hin"))
+				Utils.clean(request.getParameter("boatLength"));
+		String hin = Utils.clean(request.getParameter("hin"))
 				.toUpperCase(Locale.ROOT);
-		String boatType = clean(request.getParameter("boatType"));
+		String boatType = Utils.clean(request.getParameter("boatType"));
 		String boatBeamText =
-				clean(request.getParameter("boatBeam"));
+				Utils.clean(request.getParameter("boatBeam"));
 		String boatYearText =
-				clean(request.getParameter("boatYear"));
+				Utils.clean(request.getParameter("boatYear"));
 
-		String password = value(request.getParameter("password"));
+		String password = Utils.orEmpty(request.getParameter("password"));
 		String confirmPassword =
-				value(request.getParameter("confirmPassword"));
+				Utils.orEmpty(request.getParameter("confirmPassword"));
 
 		String validationError = validateCustomer(
 				firstName,
@@ -154,9 +134,9 @@ public class RegisterServlet extends HttpServlet {
 			return;
 		}
 
-		BigDecimal boatLength = parseDecimal(boatLengthText);
-		BigDecimal boatBeam = parseDecimal(boatBeamText);
-		Integer boatYear = parseInteger(boatYearText);
+		BigDecimal boatLength = Utils.parseDecimal(boatLengthText);
+		BigDecimal boatBeam = Utils.parseDecimal(boatBeamText);
+		Integer boatYear = Utils.parseInt(boatYearText);
 
 		boolean boatEntered = anyPresent(
 				boatName,
@@ -213,9 +193,9 @@ public class RegisterServlet extends HttpServlet {
 			customer.setPhone(phone);
 			customer.setPhoneCountryCode(phoneCountryCode);
 			customer.setStreetAddress(streetAddress);
-			customer.setStreetAddress2(emptyToNull(streetAddress2));
+			customer.setStreetAddress2(Utils.emptyToNull(streetAddress2));
 			customer.setCity(city);
-			customer.setState(emptyToNull(state));
+			customer.setState(Utils.emptyToNull(state));
 			customer.setZipCode(zipCode);
 			customer.setCountry(country);
 
@@ -239,7 +219,7 @@ public class RegisterServlet extends HttpServlet {
 					"Customer registration failed.",
 					exception);
 
-			String message = isDuplicateKey(exception)
+			String message = Utils.isDuplicateKey(exception)
 					? "That email or boat registration is already in use."
 					: "Registration could not be completed. Please try again.";
 
@@ -291,8 +271,8 @@ public class RegisterServlet extends HttpServlet {
                 boat.setBoatName(boatName);
                 boat.setRegNumber(regNumber);
                 boat.setBoatLength(boatLength);
-                boat.setHIN(emptyToNull(hin));
-                boat.setBoatType(emptyToNull(boatType));
+                boat.setHIN(Utils.emptyToNull(hin));
+                boat.setBoatType(Utils.emptyToNull(boatType));
                 boat.setBoatBeam(boatBeam);
                 boat.setBoatYear(boatYear);
 
@@ -332,17 +312,17 @@ public class RegisterServlet extends HttpServlet {
 			String password,
 			String confirmPassword) {
 
-		if (isBlank(firstName)
-				|| isBlank(lastName)
-				|| isBlank(email)
-				|| isBlank(phoneCountryCode)
-				|| isBlank(phone)
-				|| isBlank(streetAddress)
-				|| isBlank(city)
-				|| isBlank(zipCode)
-				|| isBlank(country)
-				|| isBlank(password)
-				|| isBlank(confirmPassword)) {
+		if (Utils.isBlank(firstName)
+				|| Utils.isBlank(lastName)
+				|| Utils.isBlank(email)
+				|| Utils.isBlank(phoneCountryCode)
+				|| Utils.isBlank(phone)
+				|| Utils.isBlank(streetAddress)
+				|| Utils.isBlank(city)
+				|| Utils.isBlank(zipCode)
+				|| Utils.isBlank(country)
+				|| Utils.isBlank(password)
+				|| Utils.isBlank(confirmPassword)) {
 
 			return "Please complete all required fields.";
 		}
@@ -356,7 +336,7 @@ public class RegisterServlet extends HttpServlet {
 		// has no state/province concept, so the field is disabled
 		// client-side and not required here - see the Registration
 		// contract's "Country" section.
-		if (!"OTHER".equals(country) && isBlank(state)) {
+		if (!"OTHER".equals(country) && Utils.isBlank(state)) {
 			return "Please complete all required fields.";
 		}
 
@@ -379,7 +359,7 @@ public class RegisterServlet extends HttpServlet {
 
 		if (streetAddress.length() > 100
 				|| city.length() > 50
-				|| (!isBlank(state) && state.length() != 2)) {
+				|| (!Utils.isBlank(state) && state.length() != 2)) {
 			return "Enter valid address information.";
 		}
 
@@ -412,7 +392,7 @@ public class RegisterServlet extends HttpServlet {
 			Integer boatYear,
 			String country) {
 
-        if (isBlank(boatName) || isBlank(boatLengthText)) {
+        if (Utils.isBlank(boatName) || Utils.isBlank(boatLengthText)) {
             return "Boat Name and Boat Length are required when adding a boat.";
         }
 
@@ -420,28 +400,15 @@ public class RegisterServlet extends HttpServlet {
             return "Boat Length must be a valid number.";
         }
 
-        if (boatName.length() > 50
-                || boatLength.compareTo(BigDecimal.ZERO) <= 0
-                || boatLength.compareTo(
-                        new BigDecimal("999.9")) > 0) {
-
+        if (boatName.length() > 50 || !Utils.isValidBoatDimension(boatLength)) {
             return "Enter a boat length between 1 and 999.9 feet.";
         }
 
-		if (!isBlank(boatBeamText)
-				&& (boatBeam == null
-				|| boatBeam.compareTo(BigDecimal.ZERO) <= 0
-				|| boatBeam.compareTo(
-						new BigDecimal("999.9")) > 0)) {
-
+		if (!Utils.isBlank(boatBeamText) && !Utils.isValidBoatDimension(boatBeam)) {
 			return "Boat Beam must be a valid number.";
 		}
 
-		if (!isBlank(boatYearText)
-				&& (boatYear == null
-				|| boatYear < 1800
-				|| boatYear > java.time.Year.now().getValue())) {
-
+		if (!Utils.isBlank(boatYearText) && !Utils.isValidBoatYear(boatYear)) {
 			return "Enter a valid four-digit boat year.";
 		}
 
@@ -453,7 +420,7 @@ public class RegisterServlet extends HttpServlet {
 		 * the owner to call the Marina instead of blocking submission.
 		 * Each one, if actually provided, still has to be well-formed.
 		 */
-		if (!isBlank(hin) && !HIN_PATTERN.matcher(hin).matches()) {
+		if (!Utils.isBlank(hin) && !Utils.isValidHin(hin)) {
 			return "HIN should be 12 characters: 3 letters, then 9 more "
 					+ "letters or numbers.";
 		}
@@ -462,15 +429,13 @@ public class RegisterServlet extends HttpServlet {
 		 * Registration Number carries its own state/province prefix now -
 		 * there's no separate Registration State field to pair it with.
 		 */
-		if (!isBlank(regNumber)) {
-			if ("CA".equals(country)
-					&& !CA_REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+		if (!Utils.isBlank(regNumber)) {
+			if ("CA".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
 				return "Enter a valid Canadian Registration Number, "
 						+ "e.g. C1234 AB.";
 			}
 
-			if ("US".equals(country)
-					&& !REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+			if ("US".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
 				return "Enter a valid Registration Number, including the "
 						+ "state prefix, e.g. WN1234 AB.";
 			}
@@ -501,56 +466,10 @@ public class RegisterServlet extends HttpServlet {
 
 	private boolean anyPresent(String... values) {
 		for (String value : values) {
-			if (!isBlank(value)) {
+			if (!Utils.isBlank(value)) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private BigDecimal parseDecimal(String value) {
-		if (isBlank(value)) {
-			return null;
-		}
-
-		try {
-			return new BigDecimal(value);
-		} catch (NumberFormatException exception) {
-			return null;
-		}
-	}
-
-	private Integer parseInteger(String value) {
-		if (isBlank(value)) {
-			return null;
-		}
-
-		try {
-			return Integer.valueOf(value);
-		} catch (NumberFormatException exception) {
-			return null;
-		}
-	}
-
-	private boolean isDuplicateKey(SQLException exception) {
-		return exception.getErrorCode() == 1062
-				|| (exception.getSQLState() != null
-				&& exception.getSQLState().startsWith("23"));
-	}
-
-	private String clean(String value) {
-		return value == null ? "" : value.trim();
-	}
-
-	private String value(String value) {
-		return value == null ? "" : value;
-	}
-
-	private String emptyToNull(String value) {
-		return isBlank(value) ? null : value;
-	}
-
-	private boolean isBlank(String value) {
-		return value == null || value.isBlank();
 	}
 }

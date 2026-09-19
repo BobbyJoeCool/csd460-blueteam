@@ -145,7 +145,7 @@ public class EditProfileServlet extends HttpServlet {
             if (!touched(request, field)) {
                 continue;
             }
-            String value = clean(request.getParameter(field));
+            String value = Utils.clean(request.getParameter(field));
             if (value.isEmpty() && REQUIRED_FIELDS.contains(field)) {
                 request.setAttribute("formError",
                         "That request could not be processed. Please reload the page and try again.");
@@ -385,9 +385,5 @@ public class EditProfileServlet extends HttpServlet {
         if (check.fails(value)) {
             errors.put(field, message);
         }
-    }
-
-    private String clean(String value) {
-        return value == null ? "" : value.trim();
     }
 }

@@ -2,25 +2,36 @@ package com.moffatbaymarina.marinawebsite.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Year;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
- * Handles reservation lookup requests for signed-in customers.
+ * Backs the My Reservations page: lists the signed-in customer's
+ * reservations, newest first, with optional filters.
  *
- * <p>The servlet reads the signed-in customer's ID from the session
- * and returns only reservations that belong to that customer.
- * Optional filters include reservation number, year, month, and
- * newest/oldest sorting.
+ * <p>Results are always limited to the {@code customerId} in the session,
+ * so a customer can only ever see their own reservations, whatever is typed
+ * into the filters or the URL. Visiting with no filters lists everything.
+ *
+ * <p>Optional filters (all GET query parameters): {@code reservationNumber}
+ * (part or all of a confirmation number), {@code year}, {@code month},
+ * {@code status}, and {@code sort} ({@code newest} or {@code oldest}). A
+ * filter value that isn't valid is ignored rather than failing the page -
+ * the dropdowns can't produce one, so it only happens when a URL is edited
+ * by hand. The one exception is the reservation number, which is typed, so
+ * an invalid one gets a message.
  *
  * @author Rodriguez, C.
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
@@ -29,7 +40,19 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/reservations")
 public class LookUpReservationServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
     private static final String VIEW = "/lookUpReservation.jsp";
+
+    /**
+     * Letters, digits and hyphens only - enough for any part of a
+     * confirmation number like MB-00061, and it keeps LIKE's % and _
+     * wildcards out of the search. Twin of formValidation.js's
+     * isValidReservationSearch.
+     */
+    private static final Pattern RESERVATION_SEARCH = Pattern.compile("^[A-Za-z0-9-]{1,20}$");
+
+    /** The only statuses anything in the app ever sets (see ReservationDAO). */
+    private static final Set<String> STATUSES = Set.of("Active", "Cancelled");
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
 
@@ -37,87 +60,75 @@ public class LookUpReservationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Require a signed-in customer.
-        Integer customerId = signedInCustomerId(request);
-
-        System.out.println("Customer ID being used: " + customerId);
-
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
-        request.setAttribute("signInRequired", true);
-        request.setAttribute("signInRedirectTo", "/reservations");
-
-        request.getRequestDispatcher(VIEW)
-                .forward(request, response);
-        return;
+            // Same pattern as ReservationSummaryServlet: stay on this page,
+            // show a sign-in panel, and send them back here afterwards.
+            request.setAttribute("signInRequired", true);
+            request.setAttribute("signInRedirectTo", "/reservations");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            request.getRequestDispatcher(VIEW).forward(request, response);
+            return;
         }
 
-        // Optional search filters from Sara's form.
-        String reservationNumber =
-                request.getParameter("reservationNumber");
-
-        String year =
-                request.getParameter("year");
-
-        String month =
-                request.getParameter("month");
-
-        String sort =
-                request.getParameter("sort");
-                
-
-        // Newest first is the default.
-        String order = "DESC";
-
-        if ("oldest".equals(sort)) {
-            order = "ASC";
+        String reservationNumber = Utils.emptyToNull(
+                Utils.clean(request.getParameter("reservationNumber")));
+        if (reservationNumber != null && !RESERVATION_SEARCH.matcher(reservationNumber).matches()) {
+            request.setAttribute("filterError",
+                    "Reservation numbers only contain letters, numbers and dashes, like MB-00001.");
+            reservationNumber = null;
         }
+
+        int thisYear = Year.now().getValue();
+        Integer year = Utils.parseIntInRange(request.getParameter("year"),
+                Utils.MIN_RESERVATION_YEAR, thisYear + Utils.MAX_RESERVATION_YEARS_AHEAD);
+        Integer month = Utils.parseIntInRange(request.getParameter("month"), 1, 12);
+
+        String status = Utils.clean(request.getParameter("status"));
+        if (!STATUSES.contains(status)) {
+            status = null;
+        }
+
+        boolean oldestFirst = "oldest".equals(request.getParameter("sort"));
 
         try {
-                List<ReservationDetails> reservations =
-                        reservationDAO.findReservationsByCustomer(
-                                customerId,
-                                reservationNumber,
-                                year,
-                                month,
-                                order
-                        );
+            List<ReservationDetails> reservations = reservationDAO.findReservationsByCustomer(
+                    customerId, reservationNumber, year, month, status, oldestFirst);
+            List<Integer> reservationYears = reservationDAO.findReservationYears(customerId);
 
-                System.out.println("Reservations found: " + reservations.size());
+            request.setAttribute("reservations", reservations);
+            request.setAttribute("reservationYears", reservationYears);
 
-                request.setAttribute("reservations", reservations);
+            // The filters as actually applied (invalid values already
+            // dropped), so the form can show what the results reflect.
+            request.setAttribute("searchNumber", reservationNumber);
+            request.setAttribute("selectedYear", year);
+            request.setAttribute("selectedMonth", month);
+            request.setAttribute("selectedStatus", status);
+            request.setAttribute("oldestFirst", oldestFirst);
 
-                request.setAttribute("lookupPerformed", true);
+            // Tells the page which empty message to show: "nothing matches
+            // these filters" versus "you don't have any reservations yet".
+            request.setAttribute("filtersApplied",
+                    reservationNumber != null || year != null || month != null || status != null);
 
-                request.getRequestDispatcher(VIEW)
-                        .forward(request, response);
+            request.getRequestDispatcher(VIEW).forward(request, response);
 
         } catch (SQLException e) {
-            throw new ServletException(
-                    "Unable to load reservations.",
-                    e
-            );
+            throw new ServletException("Unable to load reservations.", e);
         }
     }
 
     /**
-     * Gets the signed-in customer's ID from the session.
+     * Renders the page exactly as {@link #doGet} does. Nothing is ever
+     * submitted to this page by POST - this exists for the login modal: when
+     * a sign-in attempt fails, LoginServlet forwards its POST back to the page
+     * it came from so the modal can re-open with the error. Without this, a
+     * wrong password typed on My Reservations ended on a 405 error page.
      */
-    private Integer signedInCustomerId(HttpServletRequest request) {
-
-        HttpSession session = request.getSession(false);
-
-        if (session == null) {
-            return null;
-        }
-
-        Object customerId =
-                session.getAttribute("customerId");
-
-        if (customerId instanceof Number number) {
-                return number.intValue();
-        }
-
-        return null;
-}
-
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
 }
