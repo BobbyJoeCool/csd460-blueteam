@@ -99,6 +99,39 @@
     color: var(--color-text-heading);
 }
 
+/*
+=========================================================
+SORT RESULTS
+========================================================= */
+
+.sort-button {
+    background-color: var(--color-deep-marine);
+    color: white;
+    border: 1px solid var(--color-deep-marine);
+    border-radius: 6px;
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sort-button:hover {
+    opacity: 0.9;
+}
+
+.sort-form {
+    display: flex;
+    align-items: end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.sort-form label {
+    font-weight: 600;
+}
+
+.sort-form select {
+    min-width: 10rem;
+}
 
 /* =========================================================
    INDIVIDUAL RESERVATION CARD
@@ -153,11 +186,6 @@
 .reservation-details__column strong {
     display: inline-block;
     margin-bottom: 0.2rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    opacity: 0.75;
 }
 
 
@@ -192,7 +220,18 @@
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+
+        .sort-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-form select,
+    .sort-button {
+        width: 100%;
+    }
 }
+
 
 .lookup-message {
     margin-top: 1rem;
@@ -204,3 +243,4 @@
 
 
 }
+
