@@ -16,18 +16,16 @@ package com.moffatbaymarina.marinawebsite.servlet;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Year;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -51,12 +49,6 @@ import jakarta.servlet.http.HttpSession;
 public class ReservationBoatServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Pattern HIN_PATTERN =
-            Pattern.compile("^[A-Za-z]{3}[A-Za-z0-9]{9}$");
-    private static final Pattern REG_NUMBER_PATTERN =
-            Pattern.compile("^[A-Za-z]{2}[- ]?\\d{4,7}[- ]?[A-Za-z]{2}$");
-    private static final Pattern CA_REG_NUMBER_PATTERN =
-            Pattern.compile("^C\\d{4,8}[- ]?[A-Za-z]{2}$");
 
     private final BoatDAO boatDAO = new BoatDAO();
     private final ReservationDAO reservationDAO = new ReservationDAO();
@@ -69,30 +61,30 @@ public class ReservationBoatServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        HttpSession session = request.getSession(false);
-        Object idValue = session == null ? null : session.getAttribute("customerId");
-        if (!(idValue instanceof Integer customerId)) {
+        Integer customerId = Utils.signedInCustomerId(request);
+        if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             writeError(response, "Please sign in before registering a boat.");
             return;
         }
 
+        HttpSession session = request.getSession(false);
         Customer customer = session.getAttribute("customer") instanceof Customer c ? c : null;
         String country = customer == null || customer.getCountry() == null
                 ? "US"
                 : customer.getCountry().toUpperCase(Locale.ROOT);
 
-        String boatName = clean(request.getParameter("boatName"));
-        String regNumber = clean(request.getParameter("regNumber")).toUpperCase(Locale.ROOT);
-        String boatLengthText = clean(request.getParameter("boatLength"));
-        String hin = clean(request.getParameter("hin")).toUpperCase(Locale.ROOT);
-        String boatType = clean(request.getParameter("boatType"));
-        String boatBeamText = clean(request.getParameter("boatBeam"));
-        String boatYearText = clean(request.getParameter("boatYear"));
+        String boatName = Utils.clean(request.getParameter("boatName"));
+        String regNumber = Utils.clean(request.getParameter("regNumber")).toUpperCase(Locale.ROOT);
+        String boatLengthText = Utils.clean(request.getParameter("boatLength"));
+        String hin = Utils.clean(request.getParameter("hin")).toUpperCase(Locale.ROOT);
+        String boatType = Utils.clean(request.getParameter("boatType"));
+        String boatBeamText = Utils.clean(request.getParameter("boatBeam"));
+        String boatYearText = Utils.clean(request.getParameter("boatYear"));
 
-        BigDecimal boatLength = parseDecimal(boatLengthText);
-        BigDecimal boatBeam = parseDecimal(boatBeamText);
-        Integer boatYear = parseInteger(boatYearText);
+        BigDecimal boatLength = Utils.parseDecimal(boatLengthText);
+        BigDecimal boatBeam = Utils.parseDecimal(boatBeamText);
+        Integer boatYear = Utils.parseInt(boatYearText);
 
         String error = validate(
                 boatName, regNumber, boatLengthText, boatLength,
@@ -105,10 +97,10 @@ public class ReservationBoatServlet extends HttpServlet {
 
         Boat boat = new Boat();
         boat.setBoatName(boatName);
-        boat.setRegNumber(emptyToNull(regNumber));
+        boat.setRegNumber(Utils.emptyToNull(regNumber));
         boat.setBoatLength(boatLength);
-        boat.setHIN(emptyToNull(hin));
-        boat.setBoatType(emptyToNull(boatType));
+        boat.setHIN(Utils.emptyToNull(hin));
+        boat.setBoatType(Utils.emptyToNull(boatType));
         boat.setBoatBeam(boatBeam);
         boat.setBoatYear(boatYear);
 
@@ -121,13 +113,13 @@ public class ReservationBoatServlet extends HttpServlet {
                         conn, "SLIP_PER_FOOT_MONTHLY");
                 conn.commit();
 
-                int slipSizeFt = slipSizeFor(boatLength);
-                int monthlyCents = toCents(boatLength.multiply(perFootRate));
+                int slipSizeFt = Utils.slipSizeFor(boatLength);
+                int monthlyCents = Utils.toCents(boatLength.multiply(perFootRate));
 
                 response.getWriter().write(
                         "{\"ok\":true,"
                         + "\"boatId\":" + boatId + ","
-                        + "\"boatName\":\"" + jsonEscape(boatName) + "\","
+                        + "\"boatName\":\"" + Utils.jsonEscape(boatName) + "\","
                         + "\"boatLength\":\"" + boatLength.toPlainString() + "\","
                         + "\"slipSizeFt\":" + slipSizeFt + ","
                         + "\"monthlyCents\":" + monthlyCents
@@ -135,7 +127,7 @@ public class ReservationBoatServlet extends HttpServlet {
 
             } catch (SQLException e) {
                 conn.rollback();
-                if (isDuplicateKey(e)) {
+                if (Utils.isDuplicateKey(e)) {
                     writeError(response, "That HIN or boat registration is already in use.");
                     return;
                 }
@@ -164,9 +156,7 @@ public class ReservationBoatServlet extends HttpServlet {
         if (boatName.isBlank() || boatLengthText.isBlank()) {
             return "Boat Name and Boat Length are required when adding a boat.";
         }
-        if (boatName.length() > 50 || boatLength == null
-                || boatLength.compareTo(BigDecimal.ZERO) <= 0
-                || boatLength.compareTo(new BigDecimal("999.9")) > 0) {
+        if (boatName.length() > 50 || !Utils.isValidBoatDimension(boatLength)) {
             return "Enter a boat length between 1 and 999.9 feet.";
         }
         if (boatType.length() > 30) {
@@ -175,77 +165,29 @@ public class ReservationBoatServlet extends HttpServlet {
         if (hin.isBlank() && regNumber.isBlank()) {
             return "Enter either a HIN or a Registration Number.";
         }
-        if (!hin.isBlank() && !HIN_PATTERN.matcher(hin).matches()) {
+        if (!hin.isBlank() && !Utils.isValidHin(hin)) {
             return "HIN should be 12 characters: 3 letters, then 9 more letters or numbers.";
         }
         if (!regNumber.isBlank()) {
-            if ("CA".equals(country) && !CA_REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+            if ("CA".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
                 return "Enter a valid Canadian Registration Number, e.g. C1234 AB.";
             }
-            if ("US".equals(country) && !REG_NUMBER_PATTERN.matcher(regNumber).matches()) {
+            if ("US".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
                 return "Enter a valid Registration Number, including the state prefix, e.g. WN1234 AB.";
             }
         }
-        if (!boatBeamText.isBlank()
-                && (boatBeam == null
-                || boatBeam.compareTo(BigDecimal.ZERO) <= 0
-                || boatBeam.compareTo(new BigDecimal("999.9")) > 0)) {
+        if (!boatBeamText.isBlank() && !Utils.isValidBoatDimension(boatBeam)) {
             return "Boat Beam must be a valid number.";
         }
-        if (!boatYearText.isBlank()
-                && (boatYear == null || boatYear < 1800 || boatYear > Year.now().getValue())) {
+        if (!boatYearText.isBlank() && !Utils.isValidBoatYear(boatYear)) {
             return "Enter a valid four-digit boat year.";
         }
         return null;
     }
 
-    private int slipSizeFor(BigDecimal length) {
-        if (length.compareTo(new BigDecimal("26")) <= 0) return 26;
-        if (length.compareTo(new BigDecimal("40")) <= 0) return 40;
-        if (length.compareTo(new BigDecimal("50")) <= 0) return 50;
-        return 0;
-    }
-
-    private int toCents(BigDecimal dollars) {
-        return dollars.movePointRight(2)
-                .setScale(0, RoundingMode.HALF_UP)
-                .intValueExact();
-    }
-
-    private BigDecimal parseDecimal(String value) {
-        if (value == null || value.isBlank()) return null;
-        try { return new BigDecimal(value); }
-        catch (NumberFormatException e) { return null; }
-    }
-
-    private Integer parseInteger(String value) {
-        if (value == null || value.isBlank()) return null;
-        try { return Integer.valueOf(value); }
-        catch (NumberFormatException e) { return null; }
-    }
-
-    private boolean isDuplicateKey(SQLException e) {
-        return e.getErrorCode() == 1062
-                || (e.getSQLState() != null && e.getSQLState().startsWith("23"));
-    }
-
-    private String clean(String value) {
-        return value == null ? "" : value.trim();
-    }
-
-    private String emptyToNull(String value) {
-        return value == null || value.isBlank() ? null : value;
-    }
-
     private void writeError(HttpServletResponse response, String message) throws IOException {
         response.getWriter().write("{\"ok\":false,\"error\":\""
-                + jsonEscape(message) + "\"}");
+                + Utils.jsonEscape(message) + "\"}");
     }
 
-    private String jsonEscape(String value) {
-        return value.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\r", "\\r")
-                .replace("\n", "\\n");
-    }
 }

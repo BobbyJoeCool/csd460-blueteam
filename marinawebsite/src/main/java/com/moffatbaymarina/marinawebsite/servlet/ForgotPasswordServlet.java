@@ -93,9 +93,9 @@ public class ForgotPasswordServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        String email = clean(request.getParameter("email")).toLowerCase(Locale.ROOT);
-        String code = clean(request.getParameter("verificationCode"));
-        String newPassword = value(request.getParameter("newPassword"));
+        String email = Utils.clean(request.getParameter("email")).toLowerCase(Locale.ROOT);
+        String code = Utils.clean(request.getParameter("verificationCode"));
+        String newPassword = Utils.orEmpty(request.getParameter("newPassword"));
 
         if (email.isEmpty() || code.isEmpty() || newPassword.isEmpty()) {
             showError(request, response, "That code doesn't match - check your email and try again.");
@@ -148,7 +148,8 @@ public class ForgotPasswordServlet extends HttpServlet {
             // from here, same as any other password change. Auto-login
             // would turn the fixed demo code into a way to take over any
             // locked account, not just a UX shortcut.
-            String target = safeRedirectTarget(request);
+            String target = Utils.safeRedirectTarget(
+                    request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT);
             target += (target.contains("?") ? "&" : "?") + "notice=passwordReset";
             response.sendRedirect(request.getContextPath() + target);
 
@@ -165,23 +166,8 @@ public class ForgotPasswordServlet extends HttpServlet {
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
         request.setAttribute("forgotPasswordError", message);
-        RequestDispatcher dispatcher = request.getRequestDispatcher(safeRedirectTarget(request));
+        RequestDispatcher dispatcher = request.getRequestDispatcher(Utils.safeRedirectTarget(
+                request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT));
         dispatcher.forward(request, response);
-    }
-
-    private String safeRedirectTarget(HttpServletRequest request) {
-        String redirectTo = request.getParameter(PARAM_REDIRECT_TO);
-        boolean looksSafe = redirectTo != null && !redirectTo.isBlank()
-                && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-                && !redirectTo.contains("://");
-        return looksSafe ? redirectTo : DEFAULT_REDIRECT;
-    }
-
-    private String clean(String value) {
-        return value == null ? "" : value.trim();
-    }
-
-    private String value(String value) {
-        return value == null ? "" : value;
     }
 }

@@ -43,6 +43,11 @@ public class ReservationDAO {
      * which dock, which slip, what size. The Rate row comes along for the
      * electric fee so the total can be itemised - LEFT JOIN because a missing
      * rate row should blank one line, not lose the whole reservation.
+     *
+     * No WHERE clause: each method below appends its own. Every column here is
+     * read by mapDetails(), so a column added or renamed here has to change
+     * there too - which is why there's one copy of this query, not one per
+     * method (findReservationsByCustomer used to carry a second copy).
      */
     private static final String SELECT_DETAILS = """
             SELECT  r.reservationID,
@@ -69,7 +74,6 @@ public class ReservationDAO {
             JOIN Dock     d  ON d.dockID     = s.dockID
             JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
             LEFT JOIN Rate e ON e.rateCode   = 'ELECTRIC_MONTHLY'
-            WHERE r.confirmationNumber = ?
             """;
 
     /**
@@ -90,7 +94,8 @@ public class ReservationDAO {
             throws SQLException {
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SELECT_DETAILS)) {
+             PreparedStatement stmt = conn.prepareStatement(
+                     SELECT_DETAILS + " WHERE r.confirmationNumber = ?")) {
 
             stmt.setString(1, confirmationNumber);
 
@@ -100,104 +105,122 @@ public class ReservationDAO {
         }
     }
 
-    /*
-    * Finds reservations belonging to one customer and 
-    * filters by confirmation number, year, month, and sort order.
-    */
+    /**
+     * Lists one customer's reservations for the My Reservations page, with
+     * optional filters. Every filter is bound as a parameter; the only thing
+     * built into the SQL text is the fixed ASC/DESC keyword.
+     *
+     * <p>Always limited to {@code customerId} - which the caller must take from
+     * the session, never from the request - so no combination of filters can
+     * return somebody else's reservation.
+     *
+     * @param customerId the signed-in customer
+     * @param reservationNumber part or all of a confirmation number (e.g.
+     *        {@code "61"} or {@code "MB-00061"}), or {@code null} for any. The
+     *        caller must have already limited it to letters, digits and
+     *        hyphens, so it can't carry LIKE wildcards.
+     * @param year a start-date year, or {@code null} for any
+     * @param month a start-date month, 1-12, or {@code null} for any
+     * @param status a reservation status such as {@code "Active"}, or
+     *        {@code null} for any
+     * @param oldestFirst {@code true} to sort by start date oldest first,
+     *        {@code false} for newest first
+     * @return the matching reservations; empty, never {@code null}, if none match
+     * @throws SQLException if the lookup fails
+     */
     public List<ReservationDetails> findReservationsByCustomer(
-        int customerId,
-        String reservationNumber,
-        String year,
-        String month,
-        String order)
-        throws SQLException {
+            int customerId,
+            String reservationNumber,
+            Integer year,
+            Integer month,
+            String status,
+            boolean oldestFirst) throws SQLException {
 
-    StringBuilder sql = new StringBuilder("""
-            SELECT  r.reservationID,
-                    r.confirmationNumber,
-                    r.customerID,
-                    CONCAT(c.firstName, ' ', c.lastName) AS guestName,
-                    r.startDate,
-                    r.monthlyRate,
-                    r.reservationStatus,
-                    r.electricalHookup,
-                    b.boatName,
-                    b.boatType,
-                    b.boatLength,
-                    b.regNumber,
-                    d.dockNumber,
-                    d.dockDescription,
-                    s.slipNumber,
-                    sz.sizeFt,
-                    e.rateAmount AS electricMonthlyRate
-            FROM Reservation r
-            JOIN Customer c
-                ON c.customerID = r.customerID
-            JOIN Boat b
-                ON b.boatID = r.boatID
-            JOIN Slip s
-                ON s.slipID = r.slipID
-            JOIN Dock d
-                ON d.dockID = s.dockID
-            JOIN SlipSize sz
-                ON sz.slipSizeID = s.slipSizeID
-            LEFT JOIN Rate e
-                ON e.rateCode = 'ELECTRIC_MONTHLY'
-            WHERE r.customerID = ?
-            """);
-    List<Object> parameters = new ArrayList<>();
-    parameters.add(customerId);
+        StringBuilder sql = new StringBuilder(SELECT_DETAILS)
+                .append(" WHERE r.customerID = ?");
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(customerId);
 
-    if (reservationNumber != null
-            && !reservationNumber.isBlank()) {
+        if (reservationNumber != null) {
+            sql.append(" AND r.confirmationNumber LIKE ?");
+            parameters.add("%" + reservationNumber + "%");
+        }
+        if (year != null) {
+            sql.append(" AND YEAR(r.startDate) = ?");
+            parameters.add(year);
+        }
+        if (month != null) {
+            sql.append(" AND MONTH(r.startDate) = ?");
+            parameters.add(month);
+        }
+        if (status != null) {
+            sql.append(" AND r.reservationStatus = ?");
+            parameters.add(status);
+        }
 
-        sql.append(" AND r.confirmationNumber = ?");
-        parameters.add(reservationNumber.trim());
-    }
+        // reservationID breaks ties, so two leases starting the same day
+        // always come back in the same order.
+        String direction = oldestFirst ? "ASC" : "DESC";
+        sql.append(" ORDER BY r.startDate ").append(direction)
+           .append(", r.reservationID ").append(direction);
 
-    if (year != null && !year.isBlank()) {
-        sql.append(" AND YEAR(r.startDate) = ?");
-        parameters.add(Integer.parseInt(year));
-    }
+        List<ReservationDetails> reservations = new ArrayList<>();
 
-    if (month != null && !month.isBlank()) {
-        sql.append(" AND MONTH(r.startDate) = ?");
-        parameters.add(Integer.parseInt(month));
-    }
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-    // order has already been restricted to ASC or DESC by the servlet.
-    sql.append(" ORDER BY r.startDate ")
-       .append("ASC".equals(order) ? "ASC" : "DESC");
+            for (int i = 0; i < parameters.size(); i++) {
+                Object value = parameters.get(i);
+                if (value instanceof Integer number) {
+                    stmt.setInt(i + 1, number);
+                } else {
+                    stmt.setString(i + 1, value.toString());
+                }
+            }
 
-    List<ReservationDetails> reservations =
-            new ArrayList<>();
-
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement stmt =
-                 conn.prepareStatement(sql.toString())) {
-
-        for (int i = 0; i < parameters.size(); i++) {
-
-            Object value = parameters.get(i);
-
-            if (value instanceof Integer integer) {
-                stmt.setInt(i + 1, integer);
-            } else {
-                stmt.setString(i + 1, value.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reservations.add(mapDetails(rs));
+                }
             }
         }
 
-        try (ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                reservations.add(mapDetails(rs));
-            }
-        }
+        return reservations;
     }
 
-    return reservations;
-}
+    /**
+     * The years this customer has reservations starting in, newest first -
+     * what the My Reservations Year filter offers, so it never lists a year
+     * with nothing in it and never needs editing when a new year starts.
+     *
+     * @param customerId the signed-in customer
+     * @return the distinct start-date years; empty if the customer has none
+     * @throws SQLException if the lookup fails
+     */
+    public List<Integer> findReservationYears(int customerId) throws SQLException {
+        String sql = """
+                SELECT DISTINCT YEAR(startDate) AS startYear
+                FROM Reservation
+                WHERE customerID = ?
+                ORDER BY startYear DESC
+                """;
 
+        List<Integer> years = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, customerId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    years.add(rs.getInt("startYear"));
+                }
+            }
+        }
+
+        return years;
+    }
 
     /**
      * Cancels a reservation, setting its status rather than deleting the row -

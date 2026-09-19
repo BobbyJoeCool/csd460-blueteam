@@ -100,8 +100,10 @@ MoffatBay.reservation = (function () {
 
 
 
+    // Shared formatter (formValidation.js), so live figures match the
+    // server's <fmt:formatNumber type="currency"> exactly.
     function money(cents) {
-        return "$" + (cents / 100).toFixed(2);
+        return MoffatBay.form.formatMoney(cents);
     }
 
     function setText(el, message) {
@@ -297,11 +299,11 @@ MoffatBay.reservation = (function () {
                                 + "the size it needs.");
             } else if (!boatSize) {
                 setText(sizeHint, opt.dataset.boatName + " is "
-                                + opt.dataset.boatLength
-                                + " ft, which is larger than any slip we have.");
+                                + MoffatBay.form.formatFeet(opt.dataset.boatLength)
+                                + ", which is larger than any slip we have.");
             } else {
                 setText(sizeHint, opt.dataset.boatName + " is "
-                                + opt.dataset.boatLength + " ft, so it needs a "
+                                + MoffatBay.form.formatFeet(opt.dataset.boatLength) + ", so it needs a "
                                 + boatSize + " ft slip.");
             }
         }
@@ -309,8 +311,8 @@ MoffatBay.reservation = (function () {
 
     /** Fills the rates into the pricing note above the form. */
     function fillRates() {
-        if (ratePerFootEl)  { setText(ratePerFootEl,  (perFootCents / 100).toFixed(2)); }
-        if (rateElectricEl) { setText(rateElectricEl, (electricCents / 100).toFixed(2)); }
+        if (ratePerFootEl)  { setText(ratePerFootEl,  money(perFootCents)); }
+        if (rateElectricEl) { setText(rateElectricEl, money(electricCents)); }
     }
 
     // ------------------------------------------------- reservation summary
@@ -320,14 +322,14 @@ MoffatBay.reservation = (function () {
         var wantsElec = !!(electric && electric.checked);
 
         setText(summaryBoat, opt
-            ? opt.dataset.boatName + " (" + opt.dataset.boatLength + " ft)"
+            ? opt.dataset.boatName + " (" + MoffatBay.form.formatFeet(opt.dataset.boatLength) + ")"
             : DASH);
 
         var dock = selectedDock();
         setText(summaryDock, dock ? "Dock " + dock.dockNumber : DASH);
 
         setText(summaryDate, checkInDate && checkInDate.value
-            ? checkInDate.value
+            ? MoffatBay.form.formatDisplayDate(checkInDate.value)
             : DASH);
 
         if (summaryElecLn) { summaryElecLn.hidden = !wantsElec; }
@@ -493,7 +495,7 @@ MoffatBay.reservation = (function () {
         opt.dataset.monthlyCents = boat.monthlyCents;
         opt.dataset.boatName     = boat.boatName;
         opt.dataset.reserved     = "false";
-        opt.textContent = boat.boatName + " — " + boat.boatLength + " ft";
+        opt.textContent = boat.boatName + " — " + MoffatBay.form.formatFeet(boat.boatLength);
 
         boatSelect.appendChild(opt);
         boatSelect.disabled = false;
@@ -533,6 +535,8 @@ MoffatBay.reservation = (function () {
         var hin  = (document.getElementById("hin")       || {}).value || "";
         var reg  = (document.getElementById("regNumber") || {}).value || "";
         var year = (document.getElementById("boatYear")  || {}).value || "";
+        var length = (document.getElementById("boatLength") || {}).value || "";
+        var beam = (document.getElementById("boatBeam")  || {}).value || "";
 
         var country = boatPanel ? boatPanel.dataset.country : "";
 
@@ -551,6 +555,12 @@ MoffatBay.reservation = (function () {
         }
         if (year.trim() !== "" && !f.isValidBoatYear(year.trim())) {
             return "Enter a valid four-digit boat year.";
+        }
+        if (length.trim() !== "" && !f.isValidBoatDimension(length)) {
+            return "Enter a boat length between 1 and " + f.MAX_BOAT_DIMENSION + " feet.";
+        }
+        if (beam.trim() !== "" && !f.isValidBoatDimension(beam)) {
+            return "Boat Beam must be a number of feet, no more than " + f.MAX_BOAT_DIMENSION + ".";
         }
         return "";
     }
@@ -735,11 +745,9 @@ MoffatBay.reservation = (function () {
         });
     }
 
+    // Shared with every page via formValidation.js.
     function todayIso() {
-        var d = new Date();
-        var m = String(d.getMonth() + 1).padStart(2, "0");
-        var day = String(d.getDate()).padStart(2, "0");
-        return d.getFullYear() + "-" + m + "-" + day;
+        return MoffatBay.form.todayIso();
     }
 
 

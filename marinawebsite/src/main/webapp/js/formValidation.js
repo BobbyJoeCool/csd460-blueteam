@@ -3,11 +3,18 @@
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Robert Breutzmann
  * Shared client-side form helpers: phone formatting, password rule
- * checking, email format checking. Any page can pull this in with
+ * checking, email format checking, boat measurement limits, and the
+ * site-wide money/date/length display formats. Any page can pull this in with
  *   <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
  * and use window.MoffatBay.form.* - written first for Registration,
  * meant for Login / Edit User Info / anywhere else that repeats these
  * same checks instead of copy-pasting the logic per page.
+ *
+ * In practice it's already on every page: includes/loginModal.jsp loads it,
+ * and the header includes the login modal.
+ *
+ * Server-side twin: util/Utils.java. Every limit or pattern that lives in
+ * both files must match - change them together, in the same commit.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -24,6 +31,11 @@ MoffatBay.form = (function () {
      * it, an address the server accepts would be refused by the browser.
      */
     var EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    // Boat limits - must match Utils.MIN_BOAT_YEAR and
+    // Utils.MAX_BOAT_DIMENSION (Boat.boatLength is a DECIMAL(4,1)).
+    var MIN_BOAT_YEAR = 1800;
+    var MAX_BOAT_DIMENSION = 999.9;
 
     /**
      * Checks whether value is a well-formed email address.
@@ -98,9 +110,43 @@ MoffatBay.form = (function () {
      * @returns {boolean} true if value is a plausible boat model year
      */
     function isValidBoatYear(value) {
-        // Requires exactly 4 digits, the first two being 18, 19, or 20.
-        if (!/^(18|19|20)\d{2}$/.test(value || "")) { return false; }
-        return Number(value) <= new Date().getFullYear();  // False is entered year is after current year.
+        // Requires exactly 4 digits.
+        if (!/^\d{4}$/.test(value || "")) { return false; }
+        var year = Number(value);
+        // MIN_BOAT_YEAR through the current year - nobody can register a
+        // boat that hasn't been built yet. Same rule as Utils.isValidBoatYear.
+        return year >= MIN_BOAT_YEAR && year <= new Date().getFullYear();
+    }
+
+    /**
+     * Checks a boat length or beam: a number more than 0 and no more than
+     * MAX_BOAT_DIMENSION feet. Same rule as Utils.isValidBoatDimension.
+     * Blank is not valid here - callers decide whether the field is optional.
+     * @param {string|number} value - the length/beam as typed
+     * @returns {boolean} true if it's a number in range
+     */
+    function isValidBoatDimension(value) {
+        var text = String(value === undefined || value === null ? "" : value).trim();
+        if (!/^\d+(\.\d+)?$|^\.\d+$/.test(text)) { return false; }
+        var feet = Number(text);
+        return feet > 0 && feet <= MAX_BOAT_DIMENSION;
+    }
+
+    /*
+     * My Reservations' Reservation Number filter: letters, digits and
+     * hyphens, up to 20 - any part of a confirmation number like MB-00061.
+     * Same rule as LookUpReservationServlet's RESERVATION_SEARCH.
+     */
+    var RESERVATION_SEARCH_PATTERN = /^[A-Za-z0-9-]{1,20}$/;
+
+    /**
+     * Checks a My Reservations reservation-number search.
+     * @param {string} value - the search as typed; "" counts as valid, the filter is optional
+     * @returns {boolean} true if empty or made only of letters, digits and hyphens
+     */
+    function isValidReservationSearch(value) {
+        var text = (value || "").trim();
+        return text === "" || RESERVATION_SEARCH_PATTERN.test(text);
     }
 
     /*
@@ -259,6 +305,65 @@ MoffatBay.form = (function () {
         }
     }
 
+    // ------------------------------------------------------------------
+    // Display formatting. Same shapes the server's JSPs produce, so a value
+    // the page fills in live looks exactly like one rendered on the server.
+    // ------------------------------------------------------------------
+
+    var MONEY_FORMAT = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+    var MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    /**
+     * Formats a whole number of cents as US dollars - the same output as
+     * the JSPs' <fmt:formatNumber type="currency"> (en_US, set in web.xml).
+     * @param {number} cents - e.g. 48500
+     * @returns {string} e.g. "$485.00"
+     */
+    function formatMoney(cents) {
+        return MONEY_FORMAT.format((Number(cents) || 0) / 100);
+    }
+
+    /**
+     * Formats a length in feet, dropping a trailing ".0".
+     * @param {string|number} value - e.g. "32.0" or 32.5
+     * @returns {string} e.g. "32 ft" or "32.5 ft", or "" if not a number
+     */
+    function formatFeet(value) {
+        var feet = Number(value);
+        if (value === "" || value === null || value === undefined || isNaN(feet)) { return ""; }
+        return (Math.round(feet * 10) / 10) + " ft";
+    }
+
+    /**
+     * Formats a yyyy-MM-dd date (what <input type="date"> holds) the
+     * site-wide way - the same "MMM d, yyyy" pattern as Utils and every
+     * <fmt:formatDate>. Parsed by hand rather than with new Date(string),
+     * which reads it as UTC midnight and shows the day before anywhere
+     * west of Greenwich.
+     * @param {string} iso - e.g. "2026-06-01"
+     * @returns {string} e.g. "Jun 1, 2026", or the input unchanged if it isn't a yyyy-MM-dd date
+     */
+    function formatDisplayDate(iso) {
+        var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+        if (!match) { return iso || ""; }
+        var month = Number(match[2]);
+        if (month < 1 || month > 12) { return iso; }
+        return MONTH_NAMES[month - 1] + " " + Number(match[3]) + ", " + match[1];
+    }
+
+    /**
+     * Today's date as yyyy-MM-dd in the visitor's own time zone - the
+     * format a date input's value and min use.
+     * @returns {string} e.g. "2026-09-19"
+     */
+    function todayIso() {
+        var d = new Date();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return d.getFullYear() + "-" + m + "-" + day;
+    }
+
     var PASSWORD_RULES = {
         length: { label: "At least 10 characters", test: function (v) { return v.length >= 10; } },
         upper: { label: "One uppercase letter", test: function (v) { return /[A-Z]/.test(v); } },
@@ -289,6 +394,14 @@ MoffatBay.form = (function () {
         isValidZip: isValidZip,
         isValidCountryCode: isValidCountryCode,
         isValidBoatYear: isValidBoatYear,
+        isValidBoatDimension: isValidBoatDimension,
+        isValidReservationSearch: isValidReservationSearch,
+        MIN_BOAT_YEAR: MIN_BOAT_YEAR,
+        MAX_BOAT_DIMENSION: MAX_BOAT_DIMENSION,
+        formatMoney: formatMoney,
+        formatFeet: formatFeet,
+        formatDisplayDate: formatDisplayDate,
+        todayIso: todayIso,
         isValidRegNumber: isValidRegNumber,
         isValidHIN: isValidHIN,
         extractPhoneDigits: extractPhoneDigits,

@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
@@ -15,6 +14,7 @@ import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.DockAvailability;
 import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -22,7 +22,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * Loads the Reservation page and creates reservations.
@@ -53,7 +52,7 @@ public class ReservationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Integer customerId = signedInCustomerId(request);
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             request.getRequestDispatcher(VIEW).forward(request, response);
             return;
@@ -72,8 +71,8 @@ public class ReservationServlet extends HttpServlet {
 
             request.setAttribute("ownedBoats", ownedBoats);
             request.setAttribute("docks", docks);
-            request.setAttribute("perFootCents", toCents(perFootRate));
-            request.setAttribute("electricCents", toCents(electricRate));
+            request.setAttribute("perFootCents", Utils.toCents(perFootRate));
+            request.setAttribute("electricCents", Utils.toCents(electricRate));
             request.getRequestDispatcher(VIEW).forward(request, response);
 
         } catch (SQLException e) {
@@ -89,7 +88,7 @@ public class ReservationServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        Integer customerId = signedInCustomerId(request);
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             writeJson(response, "{\"ok\":false,\"error\":\"Please sign in to reserve a slip.\"}");
@@ -98,9 +97,9 @@ public class ReservationServlet extends HttpServlet {
 
         //Read the submitted form
          
-        Integer boatId = parseInt(request.getParameter("boatId"));
-        Integer dockId = parseInt(request.getParameter("dockId"));
-        LocalDate startDate = parseDate(request.getParameter("checkInDate"));
+        Integer boatId = Utils.parseInt(request.getParameter("boatId"));
+        Integer dockId = Utils.parseInt(request.getParameter("dockId"));
+        LocalDate startDate = Utils.parseDate(request.getParameter("checkInDate"));
         boolean electricalHookup = request.getParameter("wantsElectric") != null;
 
         /*
@@ -145,12 +144,12 @@ public class ReservationServlet extends HttpServlet {
                 if (boat.getHasActiveReservation()) {
                     conn.rollback();
                     writeJson(response, "{\"ok\":false,\"boatError\":\""
-                            + jsonEscape(boat.getBoatName())
+                            + Utils.jsonEscape(boat.getBoatName())
                             + " already has an active reservation.\"}");
                     return;
                 }
 
-                int slipSizeFt = slipSizeFor(boat.getBoatLength());
+                int slipSizeFt = Utils.slipSizeFor(boat.getBoatLength());
 
                 if (slipSizeFt == 0) {
                     conn.rollback();
@@ -214,7 +213,7 @@ public class ReservationServlet extends HttpServlet {
 
                 writeJson(response,
                         "{\"ok\":true,\"confirmationNumber\":\""
-                                + jsonEscape(confirmation) + "\"}");
+                                + Utils.jsonEscape(confirmation) + "\"}");
 
             } catch (SQLException e) {
                 conn.rollback();
@@ -229,80 +228,13 @@ public class ReservationServlet extends HttpServlet {
                     "Reservation could not be completed.", e);
         }
     }
-    /**
-     * Helper method determines if a login session exists.
-     * If yes, checks for customerId and returns that ID.
-     * If no session or customerId exists, returns null.
-     */
-    private Integer signedInCustomerId(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return null;
-        }
-        Object value = session.getAttribute("customerId");
-        return value instanceof Integer id ? id : null;
-    }
 
     private void fillReservationValues(Boat boat, BigDecimal perFootRate) {
-        boat.setSlipSizeFt(slipSizeFor(boat.getBoatLength()));
-        boat.setMonthlyCents(toCents(boat.getBoatLength().multiply(perFootRate)));
-    }
-
-    private int slipSizeFor(BigDecimal boatLength) {
-        if (boatLength == null) {
-            return 0;
-        }
-        if (boatLength.compareTo(new BigDecimal("26")) <= 0) {
-            return 26;
-        }
-        if (boatLength.compareTo(new BigDecimal("40")) <= 0) {
-            return 40;
-        }
-        if (boatLength.compareTo(new BigDecimal("50")) <= 0) {
-            return 50;
-        }
-        return 0;
-    }
-
-    private int toCents(BigDecimal dollars) {
-        return dollars.movePointRight(2)
-                .setScale(0, RoundingMode.HALF_UP)
-                .intValueExact();
-    }
-
-    private Integer parseInt(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    private LocalDate parseDate(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
+        boat.setSlipSizeFt(Utils.slipSizeFor(boat.getBoatLength()));
+        boat.setMonthlyCents(Utils.toCents(boat.getBoatLength().multiply(perFootRate)));
     }
 
     private void writeJson(HttpServletResponse response, String json) throws IOException {
         response.getWriter().write(json);
-    }
-
-    private String jsonEscape(String value) {
-        if (value == null) {
-            return "";
-        }
-        return value.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\r", "\\r")
-                .replace("\n", "\\n");
     }
 }

@@ -58,15 +58,15 @@ public class ContactServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String firstName = clean(request.getParameter("firstName"));
-        String lastName = clean(request.getParameter("lastName"));
-        String email = clean(request.getParameter("email"));
-        String boatName = clean(request.getParameter("boatName"));
-        String boatLengthText = clean(request.getParameter("boatLength"));
-        String reasonForContact = clean(request.getParameter("reasonForContact"));
-        String message = clean(request.getParameter("message"));
+        String firstName = Utils.clean(request.getParameter("firstName"));
+        String lastName = Utils.clean(request.getParameter("lastName"));
+        String email = Utils.clean(request.getParameter("email"));
+        String boatName = Utils.clean(request.getParameter("boatName"));
+        String boatLengthText = Utils.clean(request.getParameter("boatLength"));
+        String reasonForContact = Utils.clean(request.getParameter("reasonForContact"));
+        String message = Utils.clean(request.getParameter("message"));
 
-        BigDecimal boatLength = parseDecimal(boatLengthText);
+        BigDecimal boatLength = Utils.parseDecimal(boatLengthText);
         String validationError = validate(
                 firstName,
                 lastName,
@@ -87,7 +87,7 @@ public class ContactServlet extends HttpServlet {
         contact.setFirstName(firstName);
         contact.setLastName(lastName);
         contact.setEmail(email);
-        contact.setBoatName(emptyToNull(boatName));
+        contact.setBoatName(Utils.emptyToNull(boatName));
         contact.setBoatLength(boatLength);
         contact.setReasonForContact(reasonForContact);
         contact.setMessage(message);
@@ -139,7 +139,10 @@ public class ContactServlet extends HttpServlet {
             if (boatLength == null || boatLength.compareTo(BigDecimal.ZERO) <= 0) {
                 return "Enter a length in feet, or leave this blank.";
             }
-            if (boatLength.compareTo(new BigDecimal("9999.9")) > 0) {
+            // Same limit as a registered boat (Utils.MAX_BOAT_DIMENSION) - this
+            // used to allow up to 9999.9 while every other boat form stopped at
+            // 999.9.
+            if (!Utils.isValidBoatDimension(boatLength)) {
                 return "That length is longer than any boat we can moor.";
             }
         }
@@ -151,24 +154,5 @@ public class ContactServlet extends HttpServlet {
         }
 
         return null;
-    }
-
-    private BigDecimal parseDecimal(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return new BigDecimal(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    private String clean(String value) {
-        return value == null ? "" : value.trim();
-    }
-
-    private String emptyToNull(String value) {
-        return value == null || value.isBlank() ? null : value;
     }
 }

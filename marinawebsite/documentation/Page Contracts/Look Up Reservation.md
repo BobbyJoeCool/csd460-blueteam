@@ -1,8 +1,8 @@
-# Page Contract: Look Up Reservation
+# Page Contract: My Reservations (Look Up Reservation)
 
 ## Page Name
 
-Look Up Reservation
+My Reservations. Originally planned as "Look Up Reservation", and the files still carry that name (`lookUpReservation.jsp`, `LookUpReservationServlet`, `css/lookUpReservation.css`); everything a visitor sees says My Reservations.
 
 ## Module / Week
 
@@ -17,11 +17,12 @@ Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
 
 ### Front End
 
-- [x] Search fields use `reservationNumber`, `year`, `month`, and `sort`.
+- [x] Filter fields use `reservationNumber`, `year`, `month`, `status`, and `sort`, all in one form.
 - [x] Results display on the same `lookUpReservation.jsp` page.
 - [x] Results use the `reservations` request attribute.
-- [x] Look Up Reservation only appears in the navigation when the customer is signed in.
+- [x] My Reservations only appears in the navigation when the customer is signed in.
 - [x] Results can be sorted newest or oldest.
+- [x] The filter form shows the filters currently applied, and offers "Clear filters" whenever any are.
 
 ### Back End
 
@@ -33,18 +34,20 @@ Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
 - [x] The page is read-only.
 - [x] Servlet mapping is `/reservations`.
 - [x] Lookup uses `GET`.
+- [x] Visiting the page with no filters lists all of the customer's reservations, newest first.
+- [x] A filter value that isn't valid (e.g. `?month=13` typed into the URL) is ignored, never an error page.
 
 ---
 
 ## Login Requirement
 
-Look Up Reservation is only available to signed-in customers.
+My Reservations is only available to signed-in customers.
 
 The servlet uses the `customerId` stored in the session to make sure customers can only retrieve reservations that belong to their own account.
 
 Logged-out users are not allowed to search for reservations by confirmation number alone.
 
-The navigation link for Look Up Reservation is only displayed when a customer is signed in.
+The navigation link for My Reservations is only displayed when a customer is signed in. A signed-out visitor who reaches `/reservations` anyway (bookmark, link, back button) gets a sign-in panel instead of the page, and returns to My Reservations after signing in.
 
 ## Scaffold Include
 
@@ -55,81 +58,88 @@ This page includes the shared header/footer and identifies itself for nav highli
     <jsp:param name="activePage" value="lookup" />
 </jsp:include>
 
-<!-- Look Up Reservation page content -->
+<!-- My Reservations page content -->
 
 <jsp:include page="/includes/footer.jsp" />
 ```
 
-> The `activePage` value `"lookup"` must match what the header checks. See the scaffold contract for the full reference table.
+> The `activePage` value `"lookup"` must match what the header checks. `includes/header.jsp` highlights the My Reservations link for it. See the scaffold contract for the full reference table.
 
 ## Front End Variables
 
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| `reservationNumber` | Text | No | Reservation confirmation number such as `MB-00001` |
-| `year` | Select | No | Can be left as All Years |
-| `month` | Select | No | Can be left as All Months |
-| `sort` | Select | No | `newest` or `oldest` |
+| `reservationNumber` | Text | No | All or part of a confirmation number, e.g. `MB-00001` or `00001`. Letters, digits and hyphens only, up to 20 characters. |
+| `year` | Select | No | Lists only the years the customer has reservations in, plus All Years |
+| `month` | Select | No | 1–12, or All Months |
+| `status` | Select | No | `Active`, `Cancelled`, or All Statuses |
+| `sort` | Select | No | `newest` (default) or `oldest` |
 
 ## Back End Parameters
 
 | Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
-| `customerId` | Integer | Session | Identifies the signed-in customer and limits results to that customer |
-| `reservationNumber` | String | Query string | Optional reservation number filter |
-| `year` | String | Query string | Optional year filter |
-| `month` | String | Query string | Optional month filter |
-| `sort` | String | Query string | Controls newest or oldest ordering |
+| `customerId` | Integer | Session | Identifies the signed-in customer and limits results to that customer. Read with `Utils.signedInCustomerId`. |
+| `reservationNumber` | String | Query string | Optional; partial match. Must match `^[A-Za-z0-9-]{1,20}$`, otherwise it's ignored and a message is shown |
+| `year` | Integer | Query string | Optional; parsed with `Utils.parseIntInRange` (2000 to 5 years ahead). Invalid values are ignored |
+| `month` | Integer | Query string | Optional; parsed with `Utils.parseIntInRange` (1–12). Invalid values are ignored |
+| `status` | String | Query string | Optional; `Active` or `Cancelled`, anything else is ignored |
+| `sort` | String | Query string | `oldest` sorts oldest first; anything else sorts newest first |
 
 ## Database Returns
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| `findReservationsByCustomer(...)` | `customerId`, `reservationNumber`, `year`, `month`, `order` | `List<ReservationDetails>` | Returns only reservations belonging to the signed-in customer. Returns an empty list if no match is found. |
+| `findReservationsByCustomer(...)` | `int customerId`, `String reservationNumber`, `Integer year`, `Integer month`, `String status`, `boolean oldestFirst` | `List<ReservationDetails>` | Returns only reservations belonging to the signed-in customer. Returns an empty list if no match is found. `null` for any filter means "any". |
+| `findReservationYears(customerId)` | `int customerId` | `List<Integer>` | The distinct start-date years the customer has reservations in, newest first. Feeds the Year filter. |
+
+Both share `ReservationDAO`'s one `SELECT_DETAILS` query with `findDetailsByConfirmation`, so the three can't drift apart.
 
 ### ReservationDetails Fields Used by the JSP
 
 The JSP displays the following values from each `ReservationDetails` object:
 
 - `confirmationNumber`
-- `guestName`
-- `slipNumber`
-- `startDate`
-- `monthlyRate`
-- `reservationStatus`
-- `boatName`
+- `reservationStatus` (shown as Lease Status)
+- `startDate` (formatted `MMM d, yyyy`)
+- `dockNumber` and `slipNumber`
+- `slipSizeFt`
+- `monthlyRate` (formatted as currency)
+- `boatName` and `boatLength`
+- `electricalHookup`
+
+`guestName` is still on `ReservationDetails` but no longer shown: every reservation on this page belongs to the signed-in customer, so it repeated their own name on every card.
 
 ## Validation Rules
 
 - **Client-side (UX only, not trusted):**
-  - Reservation number, year, and month are optional.
-  - Year and month are selected from dropdown lists.
+  - Every filter is optional.
+  - Year, month, status and sort are dropdowns.
+  - `js/lookUpReservation.js` checks the reservation number with `MoffatBay.form.isValidReservationSearch` before the form is sent.
 
 - **Server-side (source of truth):**
   - A valid signed-in session with a `customerId` is required.
   - The `customerId` from the session is always included in the reservation query.
   - Customers cannot retrieve another customer's reservation.
+  - Every filter is bound as a query parameter; none is built into the SQL text.
   - Sort defaults to newest first unless `oldest` is selected.
-
-## Error Handling
 
 ## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| No matching reservation | `No reservation found.` | Results area on `lookUpReservation.jsp` |
-| Customer is not signed in | Sign-in is required before reservation lookup | Look Up Reservation page / login flow |
-| Database lookup fails | Request fails with a servlet error | Server-side error handling |
+| Customer has no reservations at all | `You don't have any reservations yet.` plus a Book a Slip button | Results area on `lookUpReservation.jsp` |
+| Filters match nothing | `No reservations match these filters.` plus Clear filters | Results area on `lookUpReservation.jsp` |
+| Reservation number has invalid characters | `Reservation numbers only contain letters, numbers and dashes, like MB-00001.` | Under the Reservation Number box (in the browser before sending, and from the server if it gets through) |
+| Invalid year / month / status in the URL | None: the filter is ignored | — |
+| Customer is not signed in | `Sign In to View Your Reservations` panel with a Sign In button (HTTP 401) | `lookUpReservation.jsp`, in place of the filters and results |
+| Database lookup fails | Request fails with a servlet error | Server-side error handling (same as Reservation Summary) |
 
 ## Login State Differences
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-## Login State Differences
-
-| Item | Logged In | Logged Out |
-| --- | --- | --- |
-| Look Up Reservation nav link | Displayed | Hidden |
-| Reservation lookup | Available | Not available |
+| My Reservations nav link | Displayed | Hidden |
+| Reservation lookup | Available | Not available; a sign-in panel is shown instead |
 | Customer identification | Uses session `customerId` | No lookup allowed |
 | Reservation results | Only reservations belonging to the signed-in customer | None |

@@ -65,16 +65,15 @@ public class EditProfilePasswordServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        HttpSession session = request.getSession(false);
-        Object idValue = session == null ? null : session.getAttribute("customerId");
-        if (!(idValue instanceof Integer customerId)) {
+        Integer customerId = Utils.signedInCustomerId(request);
+        if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             writeError(response, "Please sign in before changing your password.");
             return;
         }
 
-        String currentPassword = value(request.getParameter("currentPassword"));
-        String newPassword = value(request.getParameter("newPassword"));
+        String currentPassword = Utils.orEmpty(request.getParameter("currentPassword"));
+        String newPassword = Utils.orEmpty(request.getParameter("newPassword"));
 
         if (currentPassword.isEmpty() || newPassword.isEmpty()) {
             writeError(response, "Enter your current password and a new password.");
@@ -114,18 +113,7 @@ public class EditProfilePasswordServlet extends HttpServlet {
         }
     }
 
-    private String value(String value) {
-        return value == null ? "" : value;
-    }
-
     private void writeError(HttpServletResponse response, String message) throws IOException {
-        response.getWriter().write("{\"ok\":false,\"error\":\"" + jsonEscape(message) + "\"}");
-    }
-
-    private String jsonEscape(String value) {
-        return value.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\r", "\\r")
-                .replace("\n", "\\n");
+        response.getWriter().write("{\"ok\":false,\"error\":\"" + Utils.jsonEscape(message) + "\"}");
     }
 }

@@ -65,7 +65,7 @@ Every page must use its assigned string exactly. Update this table as pages are 
 | Reservation (Book a Slip) | `reservation` |
 | Reservation Summary | *(none — not a nav link)* |
 | Contact Us | *(retired — `contact.jsp` deleted 2026-09-14, see the update note below)* |
-| Look Up Reservation | *(none — not a nav link)* |
+| My Reservations (Look Up Reservation) | `lookup` — nav link shown only when signed in |
 | Wait List Lookup | *(none — not a nav link)* |
 | Edit User Info | *(none — not a nav link)* |
 

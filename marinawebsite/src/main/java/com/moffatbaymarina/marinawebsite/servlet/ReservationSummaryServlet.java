@@ -1,17 +1,19 @@
 package com.moffatbaymarina.marinawebsite.servlet;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * Backs the Reservation Summary page - see
@@ -77,7 +79,7 @@ public class ReservationSummaryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Integer customerId = signedInCustomerId(request);
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             showSignInRequired(request, response);
             return;
@@ -122,7 +124,7 @@ public class ReservationSummaryServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Integer customerId = signedInCustomerId(request);
+        Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             showSignInRequired(request, response);
             return;
@@ -165,21 +167,6 @@ public class ReservationSummaryServlet extends HttpServlet {
     }
 
     /**
-     * Reads the signed-in customer's ID from the session.
-     *
-     * @param request the incoming request
-     * @return the customer ID, or {@code null} if nobody is signed in
-     */
-    private Integer signedInCustomerId(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return null;
-        }
-        Object customerId = session.getAttribute("customerId");
-        return customerId instanceof Integer id ? id : null;
-    }
-
-    /**
      * Shows the page's own signed-out state rather than bouncing the visitor
      * to the landing page.
      *
@@ -204,9 +191,15 @@ public class ReservationSummaryServlet extends HttpServlet {
          * without this.
          */
         String confirmation = request.getParameter(PARAM_CONFIRMATION);
+        /*
+         * URL-encoded because this ends up inside a JavaScript string in the
+         * page's Sign In button - unencoded, a crafted confirmation value
+         * containing a quote could break out of that string and run script.
+         * Encoding also turns it into a valid query string value.
+         */
         String returnTo = "/reservationSummary"
                 + (confirmation != null && !confirmation.isBlank()
-                        ? "?confirmation=" + confirmation.trim()
+                        ? "?confirmation=" + URLEncoder.encode(confirmation.trim(), StandardCharsets.UTF_8)
                         : "");
 
         request.setAttribute("signInRedirectTo", returnTo);

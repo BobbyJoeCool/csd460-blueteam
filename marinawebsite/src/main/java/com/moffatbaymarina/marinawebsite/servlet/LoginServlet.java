@@ -134,7 +134,7 @@ public class LoginServlet extends HttpServlet {
      * Stores the four session attributes from the Login contract's
      * "What the Session Remembers" (loggedIn, customer, customerId,
      * displayName), then redirects to wherever
-     * {@link #safeRedirectTarget(HttpServletRequest)} says is safe.
+     * {@link Utils#safeRedirectTarget(String, String)} says is safe.
      *
      * <p>Invalidates any pre-existing session and starts a fresh one first,
      * per OWASP's Session Management Cheat Sheet guidance to regenerate the
@@ -171,26 +171,11 @@ public class LoginServlet extends HttpServlet {
          * Deliberately only on this path - a successful login, and only
          * a successful login.
          */
-        String target = safeRedirectTarget(request);
+        String target = Utils.safeRedirectTarget(
+                request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT);
         target += (target.contains("?") ? "&" : "?") + "notice=loggedIn";
 
         response.sendRedirect(request.getContextPath() + target);
-    }
-
-    /**
-     * Same-site-only guard from the Login contract's "Where the User
-     * Lands After Login".
-     *
-     * @param request the login request
-     * @return the submitted redirectTo value if it looks like a same-site
-     *         relative path, otherwise {@link #DEFAULT_REDIRECT}
-     */
-    private String safeRedirectTarget(HttpServletRequest request) {
-        String redirectTo = request.getParameter(PARAM_REDIRECT_TO);
-        boolean looksSafe = redirectTo != null && !redirectTo.isBlank()
-                && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-                && !redirectTo.contains("://");
-        return looksSafe ? redirectTo : DEFAULT_REDIRECT;
     }
 
     /**
@@ -235,7 +220,7 @@ public class LoginServlet extends HttpServlet {
 
     /**
      * Shared last step for both failure cases: forwards the request to
-     * {@link #safeRedirectTarget(HttpServletRequest)} - the same page
+     * {@link Utils#safeRedirectTarget(String, String)} - the same page
      * the login modal was submitted from - so whatever attributes were
      * just set are available to it and the modal can re-open with the
      * error shown inline. There is no separate error page.
@@ -247,7 +232,8 @@ public class LoginServlet extends HttpServlet {
      */
     private void forwardToOriginPage(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(safeRedirectTarget(request));
+        RequestDispatcher dispatcher = request.getRequestDispatcher(Utils.safeRedirectTarget(
+                request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT));
         dispatcher.forward(request, response);
     }
 }

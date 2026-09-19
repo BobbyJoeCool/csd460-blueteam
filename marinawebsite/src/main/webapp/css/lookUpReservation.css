@@ -3,6 +3,10 @@
  * CSD 460 Capstone - Moffat Bay Marina
  * css/lookUpReservation.css
  *
+ * My Reservations page (lookUpReservation.jsp). Depends on site.css for the
+ * palette tokens, .hero-band, .form-group, .field-hint, .field-error and
+ * .btn-primary.
+ *
  * Front End: Sara White
  * Back End: Carolina Rodriguez
  * Primary Author/Owner: Sara White
@@ -36,7 +40,34 @@
 
 
 /* =========================================================
-   LOOKUP CARD
+   SIGNED-OUT PANEL
+   ========================================================= */
+
+.lookup-signin {
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+.lookup-signin h2 {
+    margin: 0 0 0.75rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: var(--color-text-heading);
+}
+
+.lookup-signin .btn-primary {
+    margin: 0.5rem 0 1rem;
+}
+
+
+/* =========================================================
+   FILTER CARD
    ========================================================= */
 
 .reservation-lookup {
@@ -57,20 +88,36 @@
 
 
 /* =========================================================
-   LOOKUP FORM
+   FILTER FORM
    ========================================================= */
 
 .lookup-form {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
-    align-items: end;
+    align-items: start;
 }
 
-.lookup-form .btn-primary {
+.lookup-form .field-hint,
+.lookup-form .field-error {
+    margin: 0;
+}
+
+.lookup-form__actions {
     grid-column: 1 / -1;
-    justify-self: start;
-    margin-top: 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.lookup-clear {
+    color: var(--color-link);
+    font-weight: 600;
+}
+
+.lookup-clear:hover {
+    color: var(--color-link-hover);
 }
 
 
@@ -85,6 +132,11 @@
 }
 
 .results-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
     margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid
@@ -99,39 +151,12 @@
     color: var(--color-text-heading);
 }
 
-/*
-=========================================================
-SORT RESULTS
-========================================================= */
-
-.sort-button {
-    background-color: var(--color-deep-marine);
-    color: white;
-    border: 1px solid var(--color-deep-marine);
-    border-radius: 6px;
-    padding: 0.65rem 1rem;
-    font-weight: 600;
-    cursor: pointer;
+.results-count {
+    margin: 0;
+    color: var(--color-text-muted);
+    opacity: 0.75;
 }
 
-.sort-button:hover {
-    opacity: 0.9;
-}
-
-.sort-form {
-    display: flex;
-    align-items: end;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.sort-form label {
-    font-weight: 600;
-}
-
-.sort-form select {
-    min-width: 10rem;
-}
 
 /* =========================================================
    INDIVIDUAL RESERVATION CARD
@@ -183,9 +208,27 @@ SORT RESULTS
     line-height: 1.45;
 }
 
+/* Labels a step lighter than the values under them, so the two read apart. */
 .reservation-details__column strong {
     display: inline-block;
     margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    opacity: 0.8;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
+
+.lookup-empty {
+    text-align: center;
+}
+
+.lookup-message {
+    margin: 0 0 1rem;
+    font-weight: 600;
 }
 
 
@@ -197,6 +240,10 @@ SORT RESULTS
 
     .lookup-form {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .lookup-form__number {
+        grid-column: 1 / -1;
     }
 }
 
@@ -210,8 +257,7 @@ SORT RESULTS
         grid-template-columns: 1fr;
     }
 
-    .lookup-form .btn-primary {
-        grid-column: auto;
+    .lookup-form__actions .btn-primary {
         width: 100%;
         text-align: center;
     }
@@ -220,27 +266,4 @@ SORT RESULTS
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-
-        .sort-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .sort-form select,
-    .sort-button {
-        width: 100%;
-    }
 }
-
-
-.lookup-message {
-    margin-top: 1rem;
-    font-weight: 600;
-}
-
-.lookup-message--error {
-    color: #b42318;
-
-
-}
-

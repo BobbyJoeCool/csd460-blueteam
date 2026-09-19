@@ -198,16 +198,14 @@
                   Read-only: dateJoined isn't editable, but it's the one
                   account fact a customer might actually want to look up.
 
-                  Printed straight, not through <fmt:formatDate>. Customer
-                  carries dateJoined as a LocalDate, and fmt:formatDate only
-                  accepts a java.util.Date - the same mismatch that made
-                  ReservationDetails keep a java.util.Date on purpose. This
-                  renders as 2026-09-15, which is unambiguous, and the
-                  alternative is converting a value nothing else needs
-                  converted.
+                  Not through <fmt:formatDate>: Customer carries dateJoined
+                  as a LocalDate, and fmt:formatDate only accepts a
+                  java.util.Date. dateJoinedDisplay formats it with the
+                  site-wide date pattern (Utils.DISPLAY_DATE_PATTERN), so it
+                  reads "Sep 15, 2026" like every other date on the site.
                 --%>
                 <input type="text" id="memberSince" disabled
-                       value="${fn:escapeXml(sessionScope.customer.dateJoined)}">
+                       value="${fn:escapeXml(sessionScope.customer.dateJoinedDisplay)}">
             </div>
 
             <div class="account-actions">
