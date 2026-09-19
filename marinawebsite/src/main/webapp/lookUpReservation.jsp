@@ -155,7 +155,7 @@
                         <option value="oldest">Oldest First</option>
                     </select>
 
-                    <button type="submit" class="btn-secondary">
+                    <button type="submit" class="btn-secondary sort-button">
                         Sort
                     </button>
 
@@ -173,10 +173,18 @@
 
                         <div class="reservation-details">
 
+
+                            <div class="reservation-details__column">
+
                                 <p>
                                     <strong>Guest Name</strong><br>
                                     ${reservation.guestName}
 
+                                </p>
+
+                                 <p>
+                                    <strong>Start Date</strong><br>
+                                    ${reservation.startDate}
                                 </p>
 
                                 <p>
@@ -184,18 +192,20 @@
                                     ${reservation.slipNumber}
                                 </p>
 
-                                <p>
-                                    <strong>Start Date</strong><br>
-                                    ${reservation.startDate}
+                                <p> 
+                                    <strong>Slip Size</strong><br>
+                                    ${reservation.slipSizeFt}
                                 </p>
+                            </div>
+
+                            <div class="reservation-details__column">
 
                                 <p>
                                     <strong>Monthly Rate</strong><br>
                                     ${reservation.monthlyRate}
                                 </p>
-                            </div>
+                            
 
-                            <div class="reservation-details__column">
                                 <p>
                                     <strong>Lease Status</strong><br>
                                     ${reservation.reservationStatus}
@@ -204,6 +214,11 @@
                                 <p>
                                     <strong>Boat</strong><br>
                                     ${reservation.boatName}
+                                </p>
+
+                                <p>
+                                    <strong>Boat Length</strong><br>
+                                    ${reservation.boatLength}
                                 </p>
 
                             </div>
