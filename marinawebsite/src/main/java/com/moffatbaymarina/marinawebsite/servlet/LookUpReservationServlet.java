@@ -64,17 +64,6 @@ public class LookUpReservationServlet extends HttpServlet {
         String sort =
                 request.getParameter("sort");
                 
-        boolean lookupRequested =
-        reservationNumber != null
-        || year != null
-        || month != null
-        || sort != null;
-
-        if (!lookupRequested) {
-        request.getRequestDispatcher(VIEW)
-                .forward(request, response);
-        return;
-        }
 
         // Newest first is the default.
         String order = "DESC";
