@@ -199,28 +199,40 @@ To prevent issues during uploading/merging during the testing process, each pers
 
 Agree on and record field/variable names for this page in its Page Contract doc before coding. Branch and PR as above. This is the last new-page module - budget slack this week for polishing anything lagging from Weeks 4-6, not just the one new page.
 
-**Wait List Lookup**
+**Wait List**
 
 | Role | Assigned To |
 | --- | --- |
-| Front End | |
-| Back End | |
+| Front End | Sara |
+| Back End | Miguel |
+
+**My Fleets**
+
+| Role | Assigned To |
+| --- | --- |
+| Front End | Robert |
+| Back End | Carolina |
 
 **Testing - Module 9**
 
-| Page | Tester |
-| --- | --- |
-| Wait List Lookup | |
+For each page, we will do at least 2 tests (though 2 per person is probably better, but creating tests just to fill a "number requirement" that test the same things is not a good use of time).  Each tester will take the developer roll on a test for the page they developed.
 
-**Web Application Cleanup and Polish**
+- The Front end developer will ensure that everything renders and looks correct, and all front end logic works as it is supposed to.
+- The Back End developer will ensure that everything that is supposed to connect to other parts of the website/app (database connections, servlets, DAOs, etc) works as expected.
+- The peer tester will test any tests done by the same-end developer on the other side (Front end developer will look at the front end developers tests for the other page) so as to keep the testing clear.
+
+To prevent issues during uploading/merging during the testing process, each person's tests needs to be seperate word documents, to be consolodated once all testing is done.  
+
+
+**Web Application Cleanup and Polish - Module 10/11**
 
 ## Appendix: Rotation Tracker
 
 This keeps track of who does what task in each week.  `(#)` being the week they did this task.  Should be easy to see if one person has done more of something than everyone else, and balance the workload evenly.
 
-| Person   | Front End | Back End | Testing |
-| -------- | ----------| -------- | ------- |
-| Robert   | (4)(5)    | (4)(7)   | (5)(7)  |
-| Miguel   | (4)(5)    | (5)(7)   | (4)(7)  |
-| Sara     | (4)(7)    | (5)(5)   | (4)(7)  |
-| Carolina | (4)(5)(7) | (4)      | (5)(7)  |
+| Person   | Front End | Back End | Testing   |
+| -------- | ----------| -------- | --------- |
+| Robert   | (4)(5)(9) | (4)(7)   | (5)(7)(9) |
+| Miguel   | (4)(5)    | (5)(7)(9)| (4)(7)(9) |
+| Sara     | (4)(7)(9) | (5)(5)   | (4)(7)(9) |
+| Carolina | (4)(5)(7) | (4)(9)   | (5)(7)(9) |

@@ -181,6 +181,74 @@ body::before {
 }
 
 /* ==========================================================================
+   Moffat Bay Lodge — one wide card, same look as the benefit cards
+   ========================================================================== */
+
+.lodge-section {
+	background: transparent;
+	padding: 0 1.5rem 4rem;
+}
+
+/* Photo on the left (a third of the card), text on the right; stacks on narrow screens */
+.lodge-card {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+	gap: 2rem;
+	align-items: center;
+	padding: 1.5rem;
+}
+
+.lodge-card__figure {
+	margin: 0;
+}
+
+.lodge-card__image {
+	display: block;
+	width: 100%;
+	object-fit: cover;
+	border-radius: 8px;
+}
+
+.lodge-card__caption {
+	margin-top: 0.35rem;
+	color: var(--color-text-muted);
+	font-size: 0.7rem;
+	font-style: italic;
+	opacity: 0.7;
+	text-align: right;
+}
+
+.lodge-card h2 {
+	margin: 0 0 0.75rem;
+	color: var(--color-text-heading);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.5rem;
+}
+
+.lodge-card p {
+	margin: 0 0 1.5rem;
+	color: var(--color-text-body);
+	font-size: 0.95rem;
+	line-height: 1.55;
+}
+
+/* Centered under the (left-aligned) text */
+.lodge-card .btn-secondary {
+	display: block;
+	width: fit-content;
+	margin: 0 auto;
+	background: var(--color-cta-secondary-bg);
+	color: var(--color-surface-neutral);
+	border-color: var(--color-cta-secondary-bg);
+}
+
+.lodge-card .btn-secondary:hover {
+	background: var(--color-cta-secondary-bg-hover);
+	border-color: var(--color-cta-secondary-bg-hover);
+	color: var(--color-charcoal-navy);
+}
+
+/* ==========================================================================
    Responsive layout
    ========================================================================== */
 
@@ -189,6 +257,22 @@ body::before {
 		grid-template-columns: 1fr;
 		max-width: 520px;
 		margin: 0 auto;
+	}
+
+	.lodge-card {
+		grid-template-columns: 1fr;
+		max-width: 520px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.lodge-card__figure {
+		width: 66%;
+		margin: 0 auto;
+	}
+
+	.lodge-card__caption {
+		text-align: center;
 	}
 }
 
@@ -204,7 +288,8 @@ body::before {
 	}
 
 	.benefits-section,
-	.reservation-section {
+	.reservation-section,
+	.lodge-section {
 		padding-left: 1rem;
 		padding-right: 1rem;
 	}

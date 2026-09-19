@@ -165,6 +165,42 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 			</div>
 		</section>
 
+		<!-- Moffat Bay Lodge -->
+		<section class="lodge-section" aria-labelledby="lodgeHeading">
+			<div class="section-container">
+				<article class="benefit-card lodge-card">
+					<figure class="lodge-card__figure">
+						<img
+							class="lodge-card__image"
+							src="${pageContext.request.contextPath}/images/MoffatBayLodge.png"
+							alt="Moffat Bay Lodge at dusk: a timber lodge with lit windows and balconies, stone paths and gardens, set against tall evergreens">
+						<figcaption class="lodge-card__caption">
+							Image generated with Gemini AI.
+						</figcaption>
+					</figure>
+
+					<div class="lodge-card__body">
+						<h2 id="lodgeHeading">Stay Ashore at Moffat Bay Lodge</h2>
+
+						<p>
+							Just up from the docks, Moffat Bay Lodge is the
+							island's new resort, with rooms from double full
+							to king. Spend your days hiking, kayaking, whale
+							watching, or scuba diving, then rest ashore. With
+							no road to Joviedsa Island, guests arrive by water
+							or by air on the island's small airstrip.
+						</p>
+
+						<a
+							class="btn-secondary"
+							href="${pageContext.request.contextPath}/lodge.jsp">
+							Visit Moffat Bay Lodge
+						</a>
+					</div>
+				</article>
+			</div>
+		</section>
+
 	</main>
 
 	<jsp:include page="/includes/footer.jsp" />

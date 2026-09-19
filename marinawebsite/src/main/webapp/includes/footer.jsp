@@ -48,6 +48,10 @@
                 <a href="${pageContext.request.contextPath}/about#formHeading">
                     Contact
                 </a>
+
+                <a href="${pageContext.request.contextPath}/lodge.jsp">
+                    Moffat Bay Lodge
+                </a>
             </nav>
         </section>
 
