@@ -53,8 +53,7 @@
             <a href="${pageContext.request.contextPath}/reservation"
             class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
             <c:if test="${not empty sessionScope.customerId}">
-            <a href="${pageContext.request.contextPath}/reservations">
-                Look Up Reservation </a></c:if>
+            <a href="${pageContext.request.contextPath}/reservations">My Reservations</a></c:if>
         </div>
 
         <%-- Signed-in state. loggedIn and displayName are both set by
