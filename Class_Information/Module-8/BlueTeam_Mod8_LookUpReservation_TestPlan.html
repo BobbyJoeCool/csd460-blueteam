@@ -380,7 +380,95 @@ tbody.step-group {
 
 </section>
 
-<!-- Add Sara's front-end tests here from the NEW TEST block in TestPlan_Template.html at the repo root (as Test 3 onward), and list each one in the Table of Contents above. -->
+<section id="test-3-customer-can-filter-reservation-results">
+<h2>Test 3: My Reservations — Customer Can Filter Reservation Results</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the My Reservation Page (Look Up Reservation) correctly filters and sorts reservations.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 19, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;yyyy/mm/dd&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Navigate to <code>http://localhost:XXXX/marinawebsite/</code> and click the login button on the right side of the header.</td>
+<td>A popup window with user login fields should appear after clicking the login button.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Login with the following credentials:<br>Username: <code>joshua.foster@example.com</code><br>Password: <code>Foster10!</code></td>
+<td>After logging in, the header should say “Welcome, Joshua F.” next to the Log Out button on the right side of the header.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>In the navigation header, click the My Reservations link.</td>
+<td>The My Reservations page loads. The Filter Your Reservations card displays the Reservation Number field; Year, Month, Status, and Sort By dropdowns; and the Apply Filters button. Two reservation cards are displayed under Your Reservations.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>In the filter card, use the dropdown menu for Month and select April. Click the Apply Filters button.</td>
+<td>The only reservation card should be for reservation <code>MB-00015</code> with a start date of Apr 17, 2026.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>In the filter card, change the month dropdown menu back to All Months. Then select Oldest First under the Sort By dropdown menu. Click the Apply Filters button.</td>
+<td>Both reservation cards should display and reservation # <code>MB-00015</code> should be ordered first.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Under the Status dropdown on the filter card, select Cancelled and click Apply Filters.</td>
+<td>No reservations should appear and a message that reads “No reservations match these filters.” should display. Below the message a Clear Filters hyperlink should appear.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Using the Reservation Number field, type in <code>MB-00015</code> and click Apply Filters.</td>
+<td>Only reservation # <code>MB-00015</code> should appear in the results.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>To the right of the Apply Filters button, verify the Clear Filters hyperlink is visible and then click it.</td>
+<td>All filter options should reset to their default settings and the Clear Filters hyperlink should disappear. All reservations should appear under Your Reservations again.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;pass/fail&gt;</td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>Everything worked as expected. Each option on the filter card properly filtered out reservations. The sort functions worked as well and typing in a reservation number showed that specific reservation only. Everything was easy to read and understand.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>&lt;filled in by the peer tester&gt;</div>
+
+</section>
+
+</body>
+</html>
+
 
 </body>
 </html>
