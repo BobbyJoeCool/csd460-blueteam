@@ -291,6 +291,8 @@ tbody.step-group {
 <li><a href="#test-2-partial-save-writes-only-the-changed-columns">Test 2: Partial Save Writes Only the Changed Columns</a></li>
 <li><a href="#test-3-change-password-retires-the-old-one-immediately">Test 3: Change Password Retires the Old One Immediately</a></li>
 <li><a href="#test-4-lockout-reset-clears-the-lock-and-replaces-the-password">Test 4: Lockout Reset Clears the Lock and Replaces the Password</a></li>
+<li><a href="#test-5-profile-form-partial-update-and-confirmation">Test 5: Profile Form, Partial Update and Confirmation</a></li>
+<li><a href="#test-6-password-modals-front-end-behaviour">Test 6: Password Modals, Front End Behaviour</a></li>
 </ul>
 <p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and enter <strong>Pass</strong> or <strong>Fail</strong>. The <u>peer tester</u> should provide their name, date tested, enter <strong>Pass</strong> or <strong>Fail</strong> for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 
@@ -302,6 +304,17 @@ tbody.step-group {
 <li>Phone country code: <code>1</code> · Phone: <code>3605550199</code></li>
 <li>Street address: <code>100 Test Way</code> · Address line 2: <em>(blank)</em></li>
 <li>City: <code>Anacortes</code> · State: <code>WA</code> · ZIP: <code>98221</code> · Country: <code>US</code></li>
+</ul></div>
+
+<div class="callout callout-note"><strong>Separate test account for Tests 5-6</strong><br>Miguel's two front-end tests use their own customer, created in Test 5's first step, so they can be run in any order relative to Robert's and neither set disturbs the other. Run Test 5 before Test 6, since Test 6 starts from the account Test 5 creates. Starting test data:
+<ul>
+<li>First name: <code>QA</code> · Last name: <code>Frontend</code></li>
+<li>Email: <code>qa.frontend@example.com</code></li>
+<li>Password: <code>TestPass1!</code> (left as <code>Newpass99!</code> after Test 6)</li>
+<li>Phone country code: <code>1</code> · Phone: <code>3605550150</code></li>
+<li>Street address: <code>1 Test Way</code> · Address line 2: <em>(blank)</em></li>
+<li>City: <code>Moffat Bay</code> · State: <code>WA</code> · ZIP: <code>98110</code> · Country: <code>US</code></li>
+<li>No boat registered</li>
 </ul></div>
 
 </div>
@@ -549,6 +562,246 @@ WHERE email = 'qa.edittest.updated@example.com';</code></pre>
 <h4>Comments</h4>
 <div class="callout callout-dev"><strong>Developer (Robert)</strong><br>I ran into no issues with this test. Everything functioned as expected and no unexpected issues came up. Same note from above about the password error and username error presenting the same results.</div>
 <div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+
+</section>
+
+<section id="test-5-profile-form-partial-update-and-confirmation">
+<h2>Test 5: Profile Form, Partial Update and Confirmation</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the Edit User Profile form renders pre-filled from the signed-in customer's session, that only fields the customer actually changed are submitted, that the confirmation panel lists those changes accurately before anything is written, and that the post-save summary reports them afterwards and only once.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 19, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Register a new customer at <code>/registration.jsp</code>: first name <code>QA</code>, last name <code>Frontend</code>, phone <code>(360) 555-0150</code>, country United States, street <code>1 Test Way</code>, city <code>Moffat Bay</code>, state Washington, ZIP <code>98110</code>, email <code>qa.frontend@example.com</code>, password <code>TestPass1!</code>. Leave the whole Boat Information column empty.</td>
+<td>Account is created and the site confirms it with the "Account created — welcome aboard" popup.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The registration form filled in with the test data from Step 1, before submitting.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Sign in as <code>qa.frontend@example.com</code> / <code>TestPass1!</code>, then click the "Welcome, QA F." greeting in the header.</td>
+<td>The account page loads at <code>/editProfile</code> with every field already filled in from the account — including the phone shown as <code>(360)-555-0150</code> rather than as bare digits. "Save changes" is greyed out and the hint below it reads "Nothing changed yet."</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The account page pre-filled from the session after Step 2, with Save changes greyed out.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Retype the email in capitals as <code>QA.FRONTEND@EXAMPLE.COM</code> and move focus out of the field.</td>
+<td>"Save changes" stays greyed out and the hint still reads "Nothing changed yet." Changing only the letter case is not a change, because the server lowercases the email before it compares — so the page compares the same way rather than offering to save something that would write nothing.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The email retyped in capitals after Step 3, with Save changes still greyed out.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Restore the email to <code>qa.frontend@example.com</code>, then change City from <code>Moffat Bay</code> to <code>Friday Harbor</code>.</td>
+<td>The City field picks up a blue border marking it as edited, "Save changes" becomes clickable, and the hint changes to "1 field will be saved." No other field is marked.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">City changed to Friday Harbor after Step 4 — blue border on the field and "1 field will be saved" under the button.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Click "Save changes".</td>
+<td>The Save button is replaced by a panel headed "Save these changes?" listing exactly one row — <code>City &nbsp;Moffat Bay → Friday Harbor</code>, old value struck through — with "Yes, save" and "Go back" buttons. Nothing has been written to the database yet.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The confirmation panel from Step 5, listing only the City change before anything is saved.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S5.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Click "Go back".</td>
+<td>The panel disappears and the Save button returns, still enabled. City still reads <code>Friday Harbor</code> — "Go back" returns the customer to editing, it does not undo the edit.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">After Step 6's "Go back" — panel gone, Save button back, and the City edit still in place.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S6.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S6.png" alt="Step 6"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Click "Save changes" again, then "Yes, save".</td>
+<td>The page reloads at <code>/editProfile</code>, the "Profile updated" popup appears, and a summary box above the form reads "Saved. Here's what changed:" with the single row <code>City &nbsp;Moffat Bay → Friday Harbor</code>.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Profile updated" popup and the change summary after Step 7's save, listing City and nothing else.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S7.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S7.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Refresh the page.</td>
+<td>The summary box is gone and no second save takes place. The form still shows <code>Friday Harbor</code>. The summary is shown once and does not re-announce an old edit on refresh.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">After Step 8's refresh — the summary box has gone and the saved value remains.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S8.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S8.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>9</td>
+<td>Change Country to <code>Canada</code>, choose <code>British Columbia</code> for Province, then click "Save changes".</td>
+<td>As soon as Canada is chosen the State label becomes "Province" and the list becomes Canadian provinces. The confirmation panel then lists three rows using readable names rather than stored codes: <code>City</code>, <code>State/Province &nbsp;Washington → British Columbia</code>, and <code>Country &nbsp;United States → Canada</code>. Washington is still named even though it is no longer one of the options.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Step 9 confirmation panel, naming Washington and United States in full on the old side after the province list has already been replaced.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S9.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S9.png" alt="Step 9"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>10</td>
+<td>Click "Yes, save".</td>
+<td>All three changes save and the summary lists City, State/Province and Country. <strong>Note the difference in wording:</strong> the summary reports the stored values (<code>WA → BC</code>, <code>US → CA</code>) where the confirmation panel in Step 9 named them in full. Both are correct, but see the developer comment below.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Step 10 summary after saving — the same three changes, reported as stored codes rather than as the names shown a moment earlier.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_5/T5_S10.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_5/T5_S10.png" alt="Step 10"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>11</td>
+<td>Set Country back to <code>United States</code>, State to <code>Washington</code> and City to <code>Moffat Bay</code>, then save.</td>
+<td>The account returns to its starting values, and "Save changes" goes back to greyed out with "Nothing changed yet." — confirming the page recognises that nothing differs from what is on file.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">No screenshot needed — this step restores the test account for the next run.</p></td>
+</tr>
+</tbody>
+</table>
+<h4>Database Check (Step 7)</h4>
+<pre><code>USE MoffatBayMarinaDB;
+SELECT firstName, city, state, country FROM Customer WHERE email = 'qa.frontend@example.com';</code></pre>
+<p>Expected after Step 7: one row, <code>QA | Friday Harbor | WA | US</code>. <code>firstName</code>, <code>state</code> and <code>country</code> are untouched, which is what "only what changed is submitted" means in practice.</p>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>All eleven steps pass. Two worth understanding rather than just ticking. Step 3 looks like a non-event but it is the point of the partial update: the servlet lowercases the email before building its own diff, so the page has to compare the same way or it would offer to save a change that writes nothing. Step 9 needed a fix during development — the confirmation panel was reading whichever option was selected at that moment for both sides of the arrow, so it showed "British Columbia → British Columbia"; the label each field held when the page loaded is now captured on load, which is also why Washington can still be named after the province list has replaced it.<br><br>One thing I did <em>not</em> fix, for the peer tester to be aware of rather than to raise as a failure: Step 9 names values in full and Step 10 reports them as codes, one right after the other. The panel is built in the browser from the dropdown labels; the summary is rendered by the servlet from the stored column values, which have no idea "WA" means Washington. Both are accurate and nothing is wrong, but a customer reading them back to back has to work out they are the same thing. Fixing it properly means the servlet putting display labels in the diff, which is back end work — logging it for Module 9 polish.<br><br>Also for the peer tester: after Step 9 the State field is genuinely blank until a province is chosen, and saving at that point gives "Choose a state or province." under the field. That is correct behaviour, not a bug.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
+
+</section>
+
+<section id="test-6-password-modals-front-end-behaviour">
+<h2>Test 6: Password Modals, Front End Behaviour</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify the front end of both password flows — that the change-password modal refuses a wrong current password and a mismatched confirmation without leaving the page, and that the reset reached from the locked-out login modal never reveals whether an email address is registered.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 19, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Signed in as <code>qa.frontend@example.com</code> / <code>TestPass1!</code> on <code>/editProfile</code>, click "Change password".</td>
+<td>A modal opens headed "Change your password" with Current, New and Confirm fields, and the "Your password must contain" checklist inside it with all five rules unticked.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The change-password modal as it opens in Step 1, with the rules checklist unticked.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S1.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Type <code>Marina123!</code> into New password and watch the checklist.</td>
+<td>The rules tick off one at a time as each is satisfied, all five green by the end. The checklist is the modal's own, so Registration's identical checklist on another page is unaffected.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">All five password rules ticked green inside the modal after Step 2.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S2.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Enter Current <code>Zzzzzzzz9!</code> (deliberately wrong), New <code>Newpass99!</code>, Confirm <code>Newpass99!</code>, and click "Update password".</td>
+<td>A red banner appears inside the modal reading "Current password is incorrect." The modal stays open, the page does not reload, and nothing is written — the current password is checked on the server, not just in the browser.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The wrong current password refused in Step 3, with the modal still open and the page not reloaded.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S3.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Enter Current <code>TestPass1!</code>, New <code>Marina123!</code>, Confirm <code>Marina456!</code>, and click "Update password".</td>
+<td>"Both passwords must match." appears under the Confirm field. Nothing is sent to the server — a typo is caught in the browser before it can become the customer's password.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The mismatched confirmation caught in Step 4, before the request is sent.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S4.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Correct Confirm to <code>Marina123!</code> and click "Update password".</td>
+<td>The modal closes and a "Password updated" popup appears. The page does not reload — this flow answers with JSON rather than a page, unlike the reset below.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The "Password updated" popup after Step 5's successful change, with the page still in place.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S5.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Log out and sign in with <code>qa.frontend@example.com</code> / <code>Marina123!</code>.</td>
+<td>Sign-in succeeds. The old password no longer works.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">No screenshot needed — confirms the change from Step 5 actually took effect.</p></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Log out. Attempt to sign in three times as <code>qa.frontend@example.com</code> with the wrong password <code>Wrongpass9!</code>.</td>
+<td>The first two attempts give the generic "The username or password you entered is incorrect." with the notice that accounts lock after 3 attempts. The third gives "This account has been locked after multiple failed login attempts." together with a "Reset your password" button — the only route back in, since a locked-out visitor has no session to reach an account page with.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The locked-out login modal after Step 7's third failed attempt, offering the reset.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S6.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S6.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Click "Reset your password". In the modal that opens, enter code <code>99999</code> (wrong) with New and Confirm both <code>Newpass99!</code>, and submit.</td>
+<td>The modal opens with <code>qa.frontend@example.com</code> already in the email field, carried over from the failed sign-in. On submit it re-renders already open with "That code doesn't match - check your email and try again." at the top.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Step 8 — the reset refused for a <strong>registered</strong> email with a wrong code. Compare this with the next step.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S7.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S7.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>9</td>
+<td>Change the email to <code>nobody@example.com</code>, leaving the code as <code>99999</code> and the same passwords, and submit.</td>
+<td><strong>The message is word for word identical to Step 8</strong>, in the same place and the same styling. Nothing distinguishes an address that has an account from one that does not, so this endpoint cannot be used to find out which emails are registered.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Step 9 — the same refusal for an <strong>unregistered</strong> email. Placed beside the previous screenshot, the only difference is the address typed in.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S8.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S8.png" alt="Step 9"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>10</td>
+<td>Set the email back to <code>qa.frontend@example.com</code>, enter code <code>12345</code>, New and Confirm both <code>Newpass99!</code>, and submit.</td>
+<td>The page redirects to the landing page and the "Password reset — sign in with your new password" popup appears.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The confirmation popup after Step 10's successful reset.</p><div class="cell-shots"><a href="Screenshots/EditUserProfile/Test_6/T6_S9.png" target="_blank"><img src="Screenshots/EditUserProfile/Test_6/T6_S9.png" alt="Step 10"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>11</td>
+<td>Sign in with <code>qa.frontend@example.com</code> / <code>Newpass99!</code>.</td>
+<td>Sign-in succeeds on the first attempt, with no lockout message — the reset cleared the lock and set the new password together, rather than only changing the password.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">No screenshot needed — the successful sign-in is what proves the lockout was cleared.</p></td>
+</tr>
+</tbody>
+</table>
+<h4>Database Check (Step 3)</h4>
+<pre><code>USE MoffatBayMarinaDB;
+SELECT passwordHash = SHA2('TestPass1!', 256) AS unchanged FROM Customer WHERE email = 'qa.frontend@example.com';</code></pre>
+<p>Expected: one row, <code>unchanged</code> = <code>1</code>. The refused change in Step 3 writes nothing.</p>
+<h4>Database Check (Step 10)</h4>
+<pre><code>USE MoffatBayMarinaDB;
+SELECT accountLocked, failedLoginAttempts,
+       passwordHash = SHA2('Newpass99!', 256) AS is_new_password
+FROM Customer WHERE email = 'qa.frontend@example.com';</code></pre>
+<p>Expected: one row, <code>0 | 0 | 1</code> — the reset clears the lockout and the failed-attempt count at the same time as changing the password.</p>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>All eleven steps pass. Steps 8 and 9 are what this test exists for, and the two screenshots are meant to be compared side by side: the reset endpoint is reachable without signing in, so if a registered address answered differently from an unregistered one, anyone could use it to work out which emails have accounts — the same reasoning the Login contract records for its single generic failure message.<br><br>This was a real bug in the first version of the back end, caught during review of PR #187: the password-format check ran <em>after</em> the account lookup, so sending any email with the public demo code <code>12345</code> and a deliberately weak password answered "New password does not meet the required rules" for a real account and "That code doesn't match" for an unknown one. Moving the format check above the lookup makes both answers identical, which is what Steps 8 and 9 confirm on screen.<br><br>Two notes for the peer tester. The test account is left with the password <code>Newpass99!</code> rather than the <code>TestPass1!</code> it was registered with — that is the expected end state of Step 10, not a mistake. And the site's password rule accepts only <code>! $ % * #</code> as special characters, so <code>@</code> is rejected; the checklist does spell the five out, but it catches people out.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
 
 </section>
 
