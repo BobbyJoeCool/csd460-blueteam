@@ -37,10 +37,18 @@
      prepends getContextPath() itself. On a failed attempt the request URI
      is /forgotPassword, so a submitted redirectTo is reused rather than
      recomputed. --%>
+<%-- The original URI, not the forwarded one - a servlet that forwards to
+     its own JSP leaves getRequestURI() reporting the forward's target, so
+     the reset would send the customer to a raw .jsp that skips its
+     servlet's doGet. See the fuller note in includes/loginModal.jsp. --%>
+<c:set var="forgotOriginalUri"
+       value="${not empty requestScope['jakarta.servlet.forward.request_uri']
+                ? requestScope['jakarta.servlet.forward.request_uri']
+                : pageContext.request.requestURI}"/>
 <c:set var="forgotCurrentPath"
-       value="${fn:substring(pageContext.request.requestURI,
+       value="${fn:substring(forgotOriginalUri,
                              fn:length(pageContext.request.contextPath),
-                             fn:length(pageContext.request.requestURI))}"/>
+                             fn:length(forgotOriginalUri))}"/>
 <c:set var="forgotRedirectTo"
        value="${not empty param.redirectTo ? param.redirectTo : forgotCurrentPath}"/>
 
