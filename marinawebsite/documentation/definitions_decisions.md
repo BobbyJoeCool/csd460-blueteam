@@ -34,6 +34,24 @@ Source of truth: the client's marina map
 | 40 ft | 24 | 8 | 4-7, 16-19 |
 | 50 ft | 18 | 6 | 1-3, 13-15 |
 
+## Slip Naming
+
+Every slip has a short code, and it's what's physically painted on the slip itself, so it's the name a customer reads standing on the dock and the one they'll use on the phone.
+
+Format: the dock letter, a hyphen, then the slip number padded to **two digits**.
+
+| Slip | Code |
+| --- | --- |
+| Dock A, slip 2 | `A-02` |
+| Dock B, slip 21 | `B-21` |
+| Dock C, slip 11 | `C-11` |
+
+Notes for anyone rendering this:
+
+- The code is **composed, not stored**. There is no slip-code column - build it from `Dock.dockNumber` and `Slip.slipNumber`. If it ever becomes a column, this section is out of date and the table wins.
+- Pad to **at least** two digits. Every dock currently stops at 24 slips, so two is always enough today; writing it as "at least two" means a future dock numbered past 99 widens the code instead of silently breaking the format.
+- Spell out the long form at least once wherever the code appears, e.g. "Dock A, Slip 2 (A-02)" - the code alone is unambiguous on the dock, but not to someone reading it for the first time on a screen.
+
 ## Slip Pricing
 
 Source of truth: the `Rate` table, added in `MoffatBayMarinaDB_V1-5-0_update.sql`.
