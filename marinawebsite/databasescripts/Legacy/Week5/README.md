@@ -8,12 +8,14 @@ stand up a database.**
 To build the database, run the consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../MoffatBayMarinaDB_V1-7-0.sql
+mysql -u root -p < ../../MoffatBayMarinaDB_V1-8-0.sql
 ```
 
 That single file produces the same schema these four produce in sequence (on
-top of `MoffatBayMarinaDB_V1-4-0.sql` below), and it is the one that gets
-maintained going forward.
+top of `MoffatBayMarinaDB_V1-4-0.sql` below), plus everything added since - see
+[`../Week6/README.md`](../Week6/README.md) for what came after V1-7-0. These
+four stopped being the maintained path once V1-7-0.sql (itself later
+superseded - see Week6) was written; they are kept only as history.
 
 ## What's here
 

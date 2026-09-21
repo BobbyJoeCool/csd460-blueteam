@@ -17,7 +17,7 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 
 **Not started.** `waitListLookup.jsp` is the Coming Soon stub. What already exists and this page builds on:
 
-- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-7-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
+- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-8-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
 - `TerminationNotice` table: `reservationID`, `noticeDate`, `terminationDate`, `noticeStatus` (`Submitted` / `Pending` / `Approved` / `Withdrawn` / `Completed`). Nothing on the site writes to it yet, but it is the only place the schema records **when a slip tenancy ends** — which is what the wait estimate needs.
 - `WaitListDAO.isWaiting()` / `insert()` — joining happens on the Reservation page's "all slips full" prompt (`/reservation/waitlist`). This page doesn't change that.
 - `ReservationDAO.countAvailableForSize()` — open slips right now, by size.

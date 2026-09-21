@@ -14,8 +14,8 @@
 
 <p align="center">
   <img alt="Status" src="https://img.shields.io/badge/status-in%20development-f4a261?style=flat-square">
-  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.7.0-0a6e8c?style=flat-square">
-  <img alt="Module" src="https://img.shields.io/badge/module-8-ff6f59?style=flat-square">
+  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.8.0-0a6e8c?style=flat-square">
+  <img alt="Module" src="https://img.shields.io/badge/module-9-ff6f59?style=flat-square">
   <img alt="Team" src="https://img.shields.io/badge/team-Blue-16262e?style=flat-square">
 </p>
 
@@ -26,9 +26,9 @@
 Moffat Bay Marina is a fictional marina on Joviedsa Island in Washington's San
 Juan Islands. This repository is the team's build of its customer-facing
 website: visitors can read about the marina, register an account, sign in, and
-reserve one of the marina's 72 slips. Looking up an existing reservation,
-editing a profile, and joining the wait list are still being built — see
-[What's Built](#whats-built).
+reserve one of the marina's 72 slips, look up a reservation they've already
+made, and edit their profile and boats. The wait list and the My Fleet page are
+the last two still being built — see [What's Built](#whats-built).
 
 It's a full-stack Jakarta EE application — JSP and JSTL on the front end, Java
 servlets and DAOs on the back end, MySQL underneath, packaged with Maven and
@@ -38,16 +38,16 @@ Built for **CSD 460 — Capstone Project**.
 
 ## The Team
 
-| | Role this module (Module 8 — Look Up Reservation, Edit User Info) |
+| | Role this module (Module 9 — Wait List, My Fleet) |
 | --- | --- |
-| **Robert Breutzmann** — *Team Lead* | Back End: Edit User Info / Register a New Boat |
-| **Miguel Fernandez** | Front End: Edit User Info / Register a New Boat |
-| **Carolina Rodriguez** | Back End: Look Up Reservation |
-| **Sara White** | Front End: Look Up Reservation |
+| **Robert Breutzmann** — *Team Lead* | Front End: My Fleet |
+| **Miguel Fernandez** | Back End: Wait List |
+| **Carolina Rodriguez** | Back End: My Fleet |
+| **Sara White** | Front End: Wait List |
 
 Role rotates every module — see
-[`Page Role Assignments.md`](Page%20Role%20Assignments.md) for the full
-history and how assignments are decided.
+[`Page Role Assignments.md`](marinawebsite/documentation/Page%20Role%20Assignments.md)
+for the full history and how assignments are decided.
 
 ## The Marina
 
@@ -66,24 +66,34 @@ so every page tells the same story:
 
 ## What's Built
 
-| Page | Status |
-| --- | --- |
-| Landing page | Complete |
-| Login (modal, available site-wide) | Complete |
-| Registration | Complete |
-| Shared header, footer and navigation | Complete |
-| About Us (includes contact info and the contact form) | Complete |
-| Reservation (Book a Slip) | Complete |
-| Reservation Summary | Complete |
-| Look Up Reservation | Placeholder — in progress, Module 8 |
-| Edit User Info / Register a New Boat | Placeholder — in progress, Module 8 |
-| Wait List Lookup | Placeholder — not started, Module 9 |
+Each page is built by a Front End / Back End pair that rotates every module.
+Who built what:
+
+| Page | Front End | Back End | Status |
+| --- | --- | --- | --- |
+| Landing page | Carolina Rodriguez | Carolina Rodriguez | Complete — Module 5 |
+| Shared header, footer and navigation | Sara White | — | Complete — Module 5 |
+| Login (modal, available site-wide) | Miguel Fernandez | Robert Breutzmann | Complete — Module 5 |
+| Registration | Robert Breutzmann | Carolina Rodriguez | Complete — Module 5 |
+| Reservation (Book a Slip) | Robert Breutzmann | Sara White | Complete — Module 6 |
+| About Us (includes contact info and the contact form) | Miguel Fernandez | Sara White | Complete — Module 7 |
+| Reservation Summary | Carolina Rodriguez | Miguel Fernandez | Complete — Module 7 |
+| Look Up Reservation | Sara White | Carolina Rodriguez | Complete — Module 8 |
+| Edit User Info / Register a New Boat | Miguel Fernandez | Robert Breutzmann | Complete — Module 8 |
+| Wait List | Sara White | Miguel Fernandez | In progress — Module 9 |
+| My Fleet | Robert Breutzmann | Carolina Rodriguez | In progress — Module 9 |
+
+Landing is the one page without a true pair: it was static enough that Carolina
+built the page and whatever minimal back end it needed, while Sara built the
+shared header/footer scaffold every later page plugs into.
+
+`lodge.jsp` is an unscheduled placeholder — it exists only so the Moffat Bay
+Lodge link in the footer resolves rather than 404s.
 
 Contact Us was cut as its own page by a professor-directed syllabus change
-(Sep 7, 2026) and folded into About Us. `contact.jsp` still exists as an
-unlinked placeholder route left over from before that change; the real
-contact info and form live on About Us now, posting to the same `/contact`
-servlet.
+(Sep 7, 2026) and folded into About Us. `contact.jsp` has since been removed;
+the contact info and form live on About Us now, still posting to the same
+`/contact` servlet, which keeps `ContactServlet` and `ContactDAO` in play.
 
 ## Tech Stack
 
@@ -142,19 +152,32 @@ so build the database first if the site can't connect.
 One script builds everything from scratch:
 
 ```bash
-mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-7-0.sql
+mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-8-0.sql
 ```
 
 > **This script is destructive** — it drops `MoffatBayMarinaDB` if it already
 > exists and rebuilds it empty. That's the intent for a fresh setup, but don't
 > run it against a database holding work you want to keep.
 
-`MoffatBayMarinaDB_V1-7-0.sql` builds all twelve tables (including `Rate`,
-added in 1.5.0) and their seed data in one pass, at the schema's current
-version. It replaces the step-by-step path that actually built it —
-`V1-0-0` plus every update through `V1-7-0` — which lives under
-`databasescripts/Legacy/` (`Week4/`, then `Week5/`) purely as history; running
-those individually is not the way to stand a database up.
+`MoffatBayMarinaDB_V1-8-0.sql` builds all thirteen tables (including `Rate`,
+added in 1.5.0, and the `DatabaseVersion` ledger) and their seed data in one
+pass, at the schema's current version. It replaces the step-by-step path that
+actually built it — `V1-0-0` plus every update through `V1-8-0` — which lives
+under `databasescripts/Legacy/` (`Week4/`, `Week5/`, then `Week6/`) purely as
+history; running those individually is not the way to stand a database up.
+
+Every seeded account's password follows one pattern, so you don't need to open
+the script to sign in as a test user:
+
+```
+Moffat + <LastName> + <two-digit customerID> + !
+```
+
+`elena.marsh@example.com` (customer 1) is `MoffatMarsh01!`, and
+`joshua.foster@example.com` (customer 10) is `MoffatFoster10!`. Version 1.8.0
+reset all 59 seeded accounts to this pattern because 29 of them had seed
+passwords the site's own validation would reject — a tester could sign in with
+a password a real customer would never be allowed to choose.
 
 Check where you landed at any time:
 

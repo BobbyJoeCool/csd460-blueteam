@@ -7,7 +7,7 @@ got to where it is. Don't run them to stand up a database.**
 To build the database, run the current consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../../MoffatBayMarinaDB_V1-7-0.sql
+mysql -u root -p < ../../MoffatBayMarinaDB_V1-8-0.sql
 ```
 
 That single file produces the same schema these five produce in sequence, plus
