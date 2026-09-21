@@ -20,8 +20,9 @@
                         failed sign-in, the same value regardless of whether
                         the email is registered, so the message can't be used
                         to identify real accounts.
-    param.email       - what they typed. Survives the forward, so the field
-                        refills without the servlet having to hand it back.
+    loginFlashEmail   - what they typed, so the field refills. In the
+                        session rather than a request parameter, because the
+                        failure path redirects rather than forwarding.
 
   Author: Miguel Fernandez
   Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
@@ -32,18 +33,56 @@
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <%--
+  The failure message from LoginServlet, read once and cleared.
+
+  It arrives in the session rather than as request attributes because the
+  failure path redirects now instead of forwarding - see that servlet's
+  class comment for why it had to change. A redirect drops request
+  attributes, so the four values ride in the session and this is the one
+  place that reads them. <c:remove> immediately afterwards is what makes it
+  a flash: the error shows on the page the customer lands on and does not
+  follow them around the site.
+--%>
+<c:set var="loginError" value="${sessionScope.loginFlashError}"/>
+<c:set var="accountLocked" value="${sessionScope.loginFlashAccountLocked}"/>
+<c:set var="lockoutThreshold" value="${sessionScope.loginFlashLockoutThreshold}"/>
+<c:set var="loginEmail" value="${sessionScope.loginFlashEmail}"/>
+<c:remove var="loginFlashError" scope="session"/>
+<c:remove var="loginFlashAccountLocked" scope="session"/>
+<c:remove var="loginFlashLockoutThreshold" scope="session"/>
+<c:remove var="loginFlashEmail" scope="session"/>
+
+<%--
   redirectTo has to be context-relative, because LoginServlet prepends
-  getContextPath() before redirecting. So "/reservation.jsp", never
-  "/marinawebsite/reservation.jsp".
+  getContextPath() before redirecting. So "/reservation", never
+  "/marinawebsite/reservation".
 
   On a failed attempt the request URI is /login, not the page the user
   started on, so the submitted redirectTo is reused when it's there and
   only falls back to the current path on a first, clean render.
+
+  The ORIGINAL URI, not the forwarded one. A servlet that forwards to its
+  own JSP - ReservationServlet does exactly that for a signed-out visitor -
+  leaves getRequestURI() reporting the forward's target, so this used to
+  capture "/reservation.jsp" while the browser still showed "/reservation".
+  Signing in then sent the customer to the raw JSP, which skips the
+  servlet's doGet, so the page rendered with none of its data: "No boats
+  registered" in the dropdown and reservation.js opening the Register a Boat
+  panel over a customer who already owns two. Same class of bug as the
+  .jsp links fixed in Module 7, arriving by a different route.
+
+  The container stashes the real URI in jakarta.servlet.forward.request_uri
+  whenever a forward has happened, so prefer that and fall back to
+  getRequestURI() when it hasn't.
 --%>
+<c:set var="originalUri"
+       value="${not empty requestScope['jakarta.servlet.forward.request_uri']
+                ? requestScope['jakarta.servlet.forward.request_uri']
+                : pageContext.request.requestURI}"/>
 <c:set var="currentPath"
-       value="${fn:substring(pageContext.request.requestURI,
+       value="${fn:substring(originalUri,
                              fn:length(pageContext.request.contextPath),
-                             fn:length(pageContext.request.requestURI))}"/>
+                             fn:length(originalUri))}"/>
 <c:set var="loginRedirectTo"
        value="${not empty param.redirectTo ? param.redirectTo : currentPath}"/>
 
@@ -107,7 +146,7 @@
                 <button type="button"
                         class="login-modal__submit"
                         id="lockedResetTrigger"
-                        data-email="${fn:escapeXml(param.email)}">
+                        data-email="${fn:escapeXml(loginEmail)}">
                     Reset your password
                 </button>
 
@@ -128,7 +167,7 @@
                         <input type="email"
                                id="loginEmail"
                                name="email"
-                               value="${fn:escapeXml(param.email)}"
+                               value="${fn:escapeXml(loginEmail)}"
                                maxlength="100"
                                autocomplete="email"
                                required>

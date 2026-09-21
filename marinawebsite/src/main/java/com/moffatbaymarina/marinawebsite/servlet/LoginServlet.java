@@ -7,7 +7,6 @@ import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,12 +25,24 @@ import jakarta.servlet.http.HttpSession;
  * link back to the homepage" on one point (team decision, not yet
  * reflected in the contract doc): there is no separate error page.
  * Login is a modal that can be opened from any page, so on failure
- * this servlet forwards back to whatever page the modal was opened
- * on - the same {@code redirectTo} field used for a success redirect
- * - with {@code loginError} (and {@code accountLocked}) set as
- * request attributes. Whatever page that is needs to check for those
- * attributes and re-open the modal with the error shown inline; that
- * part is Front End's to build.
+ * this servlet sends the visitor back to whatever page the modal was
+ * opened on - the same {@code redirectTo} field used for a success
+ * redirect - with the message waiting for it. That page re-opens the
+ * modal with the error shown inline.
+ *
+ * <p><strong>Failure redirects; it does not forward.</strong> It used to
+ * forward, and that worked only because {@code redirectTo} happened to
+ * name a raw {@code .jsp}. Once that value was corrected to the servlet
+ * path - so a <em>successful</em> login runs the target's {@code doGet}
+ * instead of rendering its JSP with none of its data - forwarding began
+ * re-invoking the target servlet with this login POST, so signing in
+ * from the Reservation page called {@code ReservationServlet.doPost}
+ * and answered with the booking endpoint's "Please sign in to reserve a
+ * slip" JSON. One value cannot be both a JSP to forward to and a
+ * servlet path to redirect to, so the failure path redirects as well
+ * and the message rides in the session for exactly one read - the same
+ * approach {@code EditProfileServlet} takes with its before/after diff,
+ * and for the same reason: a redirect drops request attributes.
  *
  * <p>Every invalid-credentials failure also sets
  * {@code lockoutThreshold}, so the modal can tell the user that accounts
@@ -59,13 +70,26 @@ public class LoginServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT = "/";
     private static final int MAX_FAILED_ATTEMPTS = 3;
 
+    /*
+     * Session keys for the one-read failure message. Prefixed rather than
+     * named "loginError" outright, so they can't collide with the
+     * page-scoped variables includes/loginModal.jsp reads them into, and so
+     * it is obvious in a session dump where they came from. The modal
+     * clears all four with <c:remove> as it renders; nothing else reads
+     * them.
+     */
+    private static final String FLASH_ERROR = "loginFlashError";
+    private static final String FLASH_LOCKED = "loginFlashAccountLocked";
+    private static final String FLASH_THRESHOLD = "loginFlashLockoutThreshold";
+    private static final String FLASH_EMAIL = "loginFlashEmail";
+
     private final CustomerDAO customerDAO = new CustomerDAO();
 
     /**
      * Entry point for every POST to /login. Runs the full login check
      * (lookup, lockout, password compare, attempt counting) and either
-     * logs the user in or shows one of the two failure pages. Every
-     * outcome ends in a redirect or a forward to the response.
+     * logs the user in or sends them back with one of the two failure
+     * messages. Every outcome ends in a redirect.
      *
      * <p>Used to also route a demo "Unlock Account" reset click
      * ({@code action=reset}) - retired as part of the Edit User Info
@@ -75,9 +99,9 @@ public class LoginServlet extends HttpServlet {
      * rather than a plain no-verification reset.
      *
      * @param request the incoming login request
-     * @param response the response to redirect or forward
+     * @param response the response to redirect
      * @throws ServletException if the login lookup/update fails
-     * @throws IOException if the redirect or forward fails
+     * @throws IOException if the redirect fails
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -189,15 +213,15 @@ public class LoginServlet extends HttpServlet {
      * appeared for real accounts would identify them.
      *
      * @param request the request to attach the error message to
-     * @param response the response to forward
-     * @throws ServletException if the forward fails
-     * @throws IOException if the forward fails
+     * @param response the response to redirect
+     * @throws IOException if the redirect fails
      */
     private void showInvalidCredentials(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.setAttribute("loginError", "The username or password you entered is incorrect.");
-        request.setAttribute("lockoutThreshold", MAX_FAILED_ATTEMPTS);
-        forwardToOriginPage(request, response);
+            throws IOException {
+        HttpSession session = request.getSession(true);
+        session.setAttribute(FLASH_ERROR, "The username or password you entered is incorrect.");
+        session.setAttribute(FLASH_THRESHOLD, MAX_FAILED_ATTEMPTS);
+        redirectToOriginPage(request, response);
     }
 
     /**
@@ -207,33 +231,42 @@ public class LoginServlet extends HttpServlet {
      * opened on.
      *
      * @param request the request to attach the error message and flag to
-     * @param response the response to forward
-     * @throws ServletException if the forward fails
-     * @throws IOException if the forward fails
+     * @param response the response to redirect
+     * @throws IOException if the redirect fails
      */
     private void showAccountLocked(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.setAttribute("loginError", "This account has been locked after multiple failed login attempts.");
-        request.setAttribute("accountLocked", Boolean.TRUE);
-        forwardToOriginPage(request, response);
+            throws IOException {
+        HttpSession session = request.getSession(true);
+        session.setAttribute(FLASH_ERROR, "This account has been locked after multiple failed login attempts.");
+        session.setAttribute(FLASH_LOCKED, Boolean.TRUE);
+        redirectToOriginPage(request, response);
     }
 
     /**
-     * Shared last step for both failure cases: forwards the request to
-     * {@link Utils#safeRedirectTarget(String, String)} - the same page
-     * the login modal was submitted from - so whatever attributes were
-     * just set are available to it and the modal can re-open with the
-     * error shown inline. There is no separate error page.
+     * Shared last step for both failure cases: redirects to
+     * {@link Utils#safeRedirectTarget(String, String)} - the same page the
+     * login modal was submitted from - where the modal re-opens with the
+     * message the caller just put in the session.
      *
-     * @param request the request carrying the error attributes
-     * @param response the response to forward
-     * @throws ServletException if the forward fails
-     * @throws IOException if the forward fails
+     * <p>The submitted email travels with it so the field refills. It used
+     * to survive on its own as a request parameter through the forward; a
+     * redirect starts a clean request, so it goes in the session with the
+     * rest. It is also what the locked-out state hands the reset modal, and
+     * it is deliberately not put in the URL, where it would end up in
+     * browser history and server logs.
+     *
+     * @param request the login request
+     * @param response the response to redirect
+     * @throws IOException if the redirect fails
      */
-    private void forwardToOriginPage(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Utils.safeRedirectTarget(
+    private void redirectToOriginPage(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String submittedEmail = request.getParameter(PARAM_IDENTIFIER);
+        if (submittedEmail != null && !submittedEmail.isBlank()) {
+            request.getSession(true).setAttribute(FLASH_EMAIL, submittedEmail.trim());
+        }
+
+        response.sendRedirect(request.getContextPath() + Utils.safeRedirectTarget(
                 request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT));
-        dispatcher.forward(request, response);
     }
 }
