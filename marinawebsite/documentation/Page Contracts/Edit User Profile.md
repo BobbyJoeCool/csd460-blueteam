@@ -58,7 +58,7 @@ None of the three modals/pages this contract describes (the main form, the Chang
 
 ### Which Fields Are Editable
 
-Every column on the `Customer` table (`databasescripts/MoffatBayMarinaDB_V1-7-0.sql` — the schema was consolidated after this contract cited the now-relocated `V1-4-0.sql`, see `databasescripts/Legacy/Week5/`), whether the customer should be able to change it here, and why. Confirmed below.
+Every column on the `Customer` table (`databasescripts/MoffatBayMarinaDB_V1-8-0.sql` — the schema has been consolidated twice since this contract first cited `V1-4-0.sql`, see `databasescripts/Legacy/Week5/` and `databasescripts/Legacy/Week6/`), whether the customer should be able to change it here, and why. Confirmed below.
 
 | Column | Editable? | Notes |
 | --- | --- | --- |
