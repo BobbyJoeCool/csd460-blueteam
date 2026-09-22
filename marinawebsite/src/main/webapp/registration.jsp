@@ -109,6 +109,7 @@
 <jsp:include page="/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/passwordRules.js"></script>
+<script src="${pageContext.request.contextPath}/js/boatFields.js"></script>
 <script src="${pageContext.request.contextPath}/js/registration.js"></script>
 
 </body>

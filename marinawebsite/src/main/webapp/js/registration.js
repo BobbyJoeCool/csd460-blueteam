@@ -83,22 +83,11 @@
      * the state/province prefix as part of the number itself.
      */
     function applyCountryToBoatSection() {
-        var value = country.value;
-
-        if (value === "CA") {
-            regNumberLabel.textContent = "Registration Number (Province)";
-            boatFields.regNumber.disabled = false;
-            boatFields.regNumber.placeholder = "e.g. C1234 AB";
-        } else if (value === "OTHER") {
-            regNumberLabel.textContent = "Registration Number (State)";
-            boatFields.regNumber.disabled = true;
-        } else {
-            regNumberLabel.textContent = "Registration Number (State)";
-            boatFields.regNumber.disabled = false;
-            boatFields.regNumber.placeholder = "e.g. WN1234 AB";
-        }
-
-        foreignRegistrationBadge.hidden = value !== "OTHER";
+        boat.applyCountry(country.value, {
+            regNumberLabel: regNumberLabel,
+            regNumberInput: boatFields.regNumber,
+            foreignBadge: foreignRegistrationBadge
+        });
     }
 
     /**
@@ -203,24 +192,30 @@
         return value.length > 0 && valid;
     }
 
-    function hinIsValid() {
-        var value = boatFields.hin.value.trim();
-        var valid = MoffatBay.form.isValidHIN(value);
-        var message = "HIN should be 12 characters: 3 letters, then 9 more letters or numbers.";
-        boatFields.hin.setCustomValidity(valid ? "" : message);
-        hinError.textContent = (value.length > 0 && !valid) ? message : "";
+    /*
+     * The boat rules and their wording now live in js/boatFields.js, shared
+     * with the Reservation page's boat panel and My Fleet. What stays here
+     * is this page's way of reporting them: mark the field invalid for the
+     * browser, and write the message into that field's own error box only
+     * once the person has typed something.
+     */
+    var boat = MoffatBay.boatFields;
+
+    function reportBoat(field, errorEl, valid, message) {
+        field.setCustomValidity(valid ? "" : message);
+        errorEl.textContent = (field.value.trim().length > 0 && !valid) ? message : "";
         return valid;
     }
 
+    function hinIsValid() {
+        return reportBoat(boatFields.hin, hinError,
+            boat.hinIsValid(boatFields.hin.value), boat.MESSAGES.hin);
+    }
+
     function regNumberIsValid() {
-        var value = boatFields.regNumber.value.trim();
-        var valid = MoffatBay.form.isValidRegNumber(value, country.value);
-        var message = country.value === "CA"
-            ? "Registration Number should be a C followed by 4 to 8 digits then 2 letters, e.g. C1234 AB."
-            : "Registration Number should be a 2-letter state code, 4 to 7 digits, then 2 letters, e.g. WN1234 AB.";
-        boatFields.regNumber.setCustomValidity(valid ? "" : message);
-        regNumberError.textContent = (value.length > 0 && !valid) ? message : "";
-        return valid;
+        return reportBoat(boatFields.regNumber, regNumberError,
+            boat.regNumberIsValid(boatFields.regNumber.value, country.value),
+            boat.regNumberMessage(country.value));
     }
 
     // Length and beam share one rule (MoffatBay.form.isValidBoatDimension,
@@ -228,23 +223,13 @@
     // boatSectionValid below is what makes Length required once the boat
     // section is started.
     function boatDimensionIsValid(field, errorEl, label) {
-        var value = field.value.trim();
-        var valid = value.length === 0 || MoffatBay.form.isValidBoatDimension(value);
-        var message = label + " should be a number of feet, more than 0 and no more than "
-            + MoffatBay.form.MAX_BOAT_DIMENSION + ".";
-        field.setCustomValidity(valid ? "" : message);
-        errorEl.textContent = (value.length > 0 && !valid) ? message : "";
-        return valid;
+        return reportBoat(field, errorEl,
+            boat.boatDimensionIsValid(field.value), boat.MESSAGES.dimension(label));
     }
 
     function boatYearIsValid() {
-        var value = boatFields.boatYear.value.trim();
-        var valid = value.length === 0 || MoffatBay.form.isValidBoatYear(value);
-        var message = "Enter a 4-digit year, " + MoffatBay.form.MIN_BOAT_YEAR
-            + " through " + new Date().getFullYear() + ".";
-        boatFields.boatYear.setCustomValidity(valid ? "" : message);
-        boatYearError.textContent = (value.length > 0 && !valid) ? message : "";
-        return valid;
+        return reportBoat(boatFields.boatYear, boatYearError,
+            boat.boatYearIsValid(boatFields.boatYear.value), boat.MESSAGES.boatYear());
     }
 
     // HIN is the primary/default way to identify a boat, Registration
@@ -253,9 +238,7 @@
     // #identificationNote just tells an owner who has neither that they
     // can call the Marina, instead of blocking the form.
     function identificationMissing() {
-        var hinFilled = boatFields.hin.value.trim() !== "";
-        var regFilled = boatFields.regNumber.value.trim() !== "";
-        return !hinFilled && !regFilled;
+        return !boat.identificationSatisfied(boatFields.hin.value, boatFields.regNumber.value);
     }
 
     function boatSectionTouched() {

@@ -99,6 +99,41 @@
 		transparent
 	);
 
+	/* Record field badge - a stored value shown read-only, label above value.
+     Golden hour is the one palette accent otherwise used only for hovers, so
+     these never compete with an ocean-blue status pill sitting above them.
+     The label is golden hour carried 45% of the way to the body text colour:
+     5.33:1 on the badge fill and 5.50:1 on a card, which matters because it
+     is the smallest text on the page. */
+	--color-record-badge-bg: color-mix(
+		in srgb,
+		var(--color-golden-hour) 17%,
+		var(--color-surface-neutral)
+	);
+	--color-record-badge-border: var(--color-golden-hour);
+	--color-record-badge-label: color-mix(
+		in srgb,
+		var(--color-golden-hour) 45%,
+		var(--color-charcoal-navy)
+	);
+	--color-record-badge-value: var(--color-deep-marine);
+
+	/* Status pill - "what is this thing doing right now". Two tints: the
+     active/known state in ocean blue, the neutral/idle state in the body
+     colour, both light enough to read dark text on. */
+	--color-status-active-bg: color-mix(
+		in srgb,
+		var(--color-ocean-blue) 12%,
+		transparent
+	);
+	--color-status-active-text: var(--color-deep-marine);
+	--color-status-idle-bg: color-mix(
+		in srgb,
+		var(--color-charcoal-navy) 7%,
+		transparent
+	);
+	--color-status-idle-text: var(--color-charcoal-navy);
+
 	/* Status colors */
 	--color-error: #b3261e;
 	--color-success: var(--color-ocean-blue);
@@ -121,6 +156,11 @@
      is then exactly this tall whatever the browser does with the font, so
      the number here is the header's height rather than a guess at it. */
 	--header-height: 4.5rem;
+
+	/* Corner radius for a content card (.detail-card and anything that wants
+     to match it). Inner elements inside one stay smaller - a nested corner
+     reads wrong when it matches the box around it. */
+	--radius-card: 12px;
 }
 
 /* ==========================================================================
@@ -159,6 +199,42 @@ a {
 
 a:hover {
     color: var(--color-link-hover);
+}
+
+/* ==========================================================================
+   Salmon watermark — fixed behind the content of every page
+
+   Lived in index.css until it became the site's backdrop rather than the
+   landing page's. Fixed rather than scrolling, so it stays put as a page
+   moves under it, and pointer-events: none so it can never intercept a
+   click.
+
+   main and .site-footer are lifted above it. .site-header is deliberately
+   left alone: header.css already parks it at z-index 10 so it paints over
+   anything that scrolls under it, and naming it here would quietly drop it
+   to 1 on every page.
+   ========================================================================== */
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("../images/SalishSalmon-FullTransparent.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 420px auto;
+    opacity: 0.06;
+}
+
+main,
+.site-footer {
+    position: relative;
+    z-index: 1;
 }
 
 /* ==========================================================================
@@ -296,6 +372,31 @@ a:hover {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
         url("../images/Slip_Closeup.png");
+}
+
+/* My Fleet: BoatYard_Sunset.png, a 58-70% gradient - heavier than any other
+   hero on the site, and measured rather than guessed. The sun sits dead
+   centre on the horizon, exactly where the heading goes, so this is the
+   hardest backdrop any of our heroes has to carry light text over. At the
+   Reservation hero's 48-62% the title only reaches 2.33:1 against the
+   brightest pixel behind it; 58-70% brings it to 2.99:1, just ahead of
+   Reservation's own 2.76:1 and well ahead of the landing hero's 1.73:1.
+
+   Worth knowing: none of the site's heroes clear WCAG AA on that measure -
+   they all lean on .hero-band h1's text-shadow, which helps a reader but
+   earns no credit in the standard. This one is now the best of them rather
+   than an exception to them. Fixing the pattern properly is a site-wide
+   job, not a My Fleet one.
+
+   Shorter than the landing hero; people arrive here to manage their boats,
+   not admire the view.
+   Used by: myFleet.jsp (#fleetHero) */
+#fleetHero {
+    min-height: 17rem;
+    padding: 3.5rem 1.5rem;
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.58), rgba(13, 59, 77, 0.7)),
+        url("../images/BoatYard_Sunset.png");
 }
 
 #reservationHero h1 {
@@ -516,4 +617,428 @@ a:hover {
 .btn-clear-section:hover {
     border-color: var(--color-cta-secondary-bg);
     color: var(--color-cta-secondary-bg);
+}
+
+
+/* --------------------------------------------------------------------------
+   "What changed" summary and the confirmation step.
+   Used by: editUserInfo.jsp (inline, beneath the form),
+            myFleet.jsp (inside the Edit modal, and above the fleet after a save)
+
+   Moved here from editUserInfo.css when My Fleet became the second user of
+   the same rows. What differs between the two pages is the box around them,
+   which each page still owns - Edit User Info shows its confirmation inline
+   on purpose, so the fields it is asking about stay visible behind it, while
+   My Fleet's is already inside a modal because its form is.
+   -------------------------------------------------------------------------- */
+
+.change-summary__title {
+	margin: 0 0 0.6rem;
+	font-weight: 600;
+}
+
+.change-summary__list {
+	margin: 0;
+}
+
+.change-summary__row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	padding: 0.3rem 0;
+}
+
+.change-summary__row + .change-summary__row {
+	border-top: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+}
+
+.change-summary__row dt {
+	flex: 0 0 9rem;
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.change-summary__row dd {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin: 0;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+/* The old value is struck through as well as faded - the arrow and the
+   colour shouldn't be the only things saying which one is gone. */
+.change-summary__old {
+	color: var(--color-text-muted);
+	opacity: 0.75;
+	text-decoration: line-through;
+}
+
+.change-summary__arrow {
+	color: var(--color-text-muted);
+	opacity: 0.6;
+}
+
+.change-summary__new {
+	font-weight: 600;
+}
+
+@media (max-width: 600px) {
+	.change-summary__row dt {
+		flex-basis: 100%;
+	}
+}
+
+.confirm-changes {
+	max-width: 46rem;
+	margin: 0.5rem 0 0;
+	padding: 1.25rem 1.5rem;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-ocean-blue);
+	border-radius: 10px;
+}
+
+.confirm-changes[hidden] {
+	display: none;
+}
+
+.confirm-changes__title {
+	margin: 0 0 0.75rem;
+	color: var(--color-text-heading);
+	font-size: 1.1rem;
+}
+
+.confirm-changes__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Card title — the name of the thing a card is about.
+   Used by: myFleet.jsp (boat name)
+
+   Small caps rather than full capitals: capitals keep their height while
+   lowercase letters drop to x-height, so a name keeps the shape a reader
+   recognises instead of flattening into a uniform block.
+   -------------------------------------------------------------------------- */
+
+.card-title {
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.4375rem;
+    font-weight: normal;
+    font-variant: small-caps;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.055em;
+    text-align: center;
+    color: var(--color-deep-marine);
+}
+
+/* --------------------------------------------------------------------------
+   Detail card — a bordered panel about one record.
+   Used by: myFleet.jsp (one per boat)
+
+   The same object as .reservation-card on Look Up Reservation, which
+   predates this and keeps its own 8px corners for now. If that page ever
+   adopts --radius-card, the two become one class.
+   -------------------------------------------------------------------------- */
+
+.detail-card {
+    padding: 1.125rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border) 22%, transparent);
+    border-radius: var(--radius-card);
+    /* Half-transparent, like .benefit-card on the landing page, so the
+       salmon behind it reads through rather than being boxed out. */
+    background: color-mix(in srgb, var(--color-bg-card) 50%, transparent);
+    box-shadow: 0 6px 14px
+        color-mix(in srgb, var(--color-charcoal-navy) 10%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Record badges — a record's stored fields, read-only, label above value.
+   Used by: myFleet.jsp
+
+   Every column is a max-content track, so each badge is exactly as wide as
+   the longest value in its own column and no wider; space-around then sits
+   the columns in from the card's edges. The COLUMN COUNT belongs to the
+   page, since it depends on how wide the card is — see .fleet-badges in
+   myFleet.css.
+
+   A field with nothing stored keeps its badge and goes dashed rather than
+   being left out, so an owner can see what is missing and add it.
+   -------------------------------------------------------------------------- */
+
+.record-badges {
+    display: grid;
+    gap: 0.625rem 1rem;
+    justify-content: space-around;
+}
+
+.record-badge {
+    padding: 0.4375rem 0.75rem;
+    border: 1px solid var(--color-record-badge-border);
+    border-radius: 7px;
+    background: var(--color-record-badge-bg);
+    text-align: center;
+}
+
+.record-badge__label {
+    display: block;
+    margin-bottom: 0.25rem;
+    padding-bottom: 0.1875rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-record-badge-label) 30%, transparent);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-record-badge-label);
+}
+
+.record-badge__value {
+    font-size: 0.875rem;
+    line-height: 1.3;
+    font-weight: 600;
+    color: var(--color-record-badge-value);
+}
+
+.record-badge--empty {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--color-border) 28%, transparent);
+    background: transparent;
+}
+
+.record-badge--empty .record-badge__value {
+    font-weight: normal;
+    color: var(--color-text-muted);
+    opacity: 0.55;
+}
+
+/* --------------------------------------------------------------------------
+   Status pill — what a record is doing right now.
+   Used by: myFleet.jsp (reserved / open to reserve)
+
+   Always rendered, never only-when-interesting: a boat with no reservation
+   is still an answer to "what is this doing", and a badge that shows up only
+   sometimes reads as a glitch when it does.
+   -------------------------------------------------------------------------- */
+
+.status-pill-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.status-pill {
+    margin: 0;
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.1875rem 0.5625rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.status-pill__dot {
+    font-size: 0.9375rem;
+}
+
+.status-pill__label {
+    font-weight: 600;
+}
+
+.status-pill__detail {
+    color: var(--color-text-muted);
+    opacity: 0.8;
+}
+
+.status-pill__code {
+    font-weight: 500;
+    color: var(--color-text-muted);
+    opacity: 0.8;
+}
+
+.status-pill--active {
+    background: var(--color-status-active-bg);
+    color: var(--color-status-active-text);
+}
+
+.status-pill--active .status-pill__dot {
+    color: var(--color-ocean-blue);
+}
+
+.status-pill--idle {
+    background: var(--color-status-idle-bg);
+    color: var(--color-status-idle-text);
+}
+
+.status-pill--idle .status-pill__dot {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   Modal — backdrop, centred box, header with a close button.
+   Used by: myFleet.jsp (Add/Edit a boat, Remove confirmation)
+
+   New with My Fleet. The login modal, the change-password modal and the
+   Reservation page's boat panel each hand-rolled their own before this
+   existed; they are deliberately left alone this module rather than
+   migrated, since all three are finished and tested. They are the obvious
+   candidates whenever someone is next in those files.
+   -------------------------------------------------------------------------- */
+
+.modal[hidden] {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.modal__backdrop {
+    position: fixed;
+    inset: 0;
+    border: none;
+    padding: 0;
+    background: var(--color-overlay-backdrop);
+}
+
+.modal__box {
+    position: relative;
+    width: min(38.75rem, 100%);
+    margin: auto;
+    padding: 1.625rem;
+    border-radius: 14px;
+    background: var(--color-bg-surface);
+    box-shadow: 0 18px 44px
+        color-mix(in srgb, var(--color-deep-marine) 35%, transparent);
+}
+
+.modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+}
+
+.modal__title {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.3125rem;
+    font-weight: normal;
+    font-variant: small-caps;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.05em;
+    color: var(--color-deep-marine);
+}
+
+.modal__close {
+    min-width: 44px;
+    min-height: 44px;
+    margin: -0.625rem -0.5rem 0 0;
+    border: none;
+    background: transparent;
+    font-size: 1.375rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.modal__close:hover {
+    color: var(--color-link-hover);
+}
+
+.modal__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Action buttons on a light surface — a filled one and its outlined pair.
+   Used by: myFleet.jsp (Edit / Remove on each card, and the modal actions)
+
+   .btn-secondary is white-bordered on purpose, for the dark hero it was
+   written for; on a card it disappears. These are the same idea in the
+   secondary CTA colour, for the light backgrounds the rest of the site
+   uses. The 44px minimum is a touch target, not padding - it is what makes
+   these usable on a phone, so it stays even when the type gets smaller.
+   -------------------------------------------------------------------------- */
+
+.btn-action,
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.5625rem 1.25rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-action {
+    border: 1px solid var(--color-cta-secondary-bg);
+    background: var(--color-cta-secondary-bg);
+    color: var(--color-cta-secondary-text);
+}
+
+.btn-action:hover:not(:disabled) {
+    background: var(--color-cta-secondary-bg-hover);
+    border-color: var(--color-cta-secondary-bg-hover);
+    color: var(--color-charcoal-navy);
+}
+
+.btn-outline {
+    border: 1px solid var(--color-cta-secondary-bg);
+    background: transparent;
+    color: var(--color-cta-secondary-bg);
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: var(--color-cta-secondary-bg-hover);
+    border-color: var(--color-cta-secondary-bg-hover);
+    color: var(--color-charcoal-navy);
+}
+
+.btn-action:disabled,
+.btn-outline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

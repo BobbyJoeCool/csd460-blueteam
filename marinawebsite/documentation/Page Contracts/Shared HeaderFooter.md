@@ -68,6 +68,7 @@ Every page must use its assigned string exactly. Update this table as pages are 
 | My Reservations (Look Up Reservation) | `lookup` — nav link shown only when signed in |
 | Wait List Lookup | *(none — not a nav link)* |
 | Edit User Info | *(none — not a nav link)* |
+| My Fleet | `myfleet` — reserved, not a nav link today; reached from the **My Fleet** button on Edit User Info |
 
 > Login is a modal, not a nav destination — it doesn't set `activePage`.
 

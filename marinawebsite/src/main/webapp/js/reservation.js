@@ -521,48 +521,34 @@ MoffatBay.reservation = (function () {
 
     /**
      * The format checks the Registration page does on the same fields.
-     * registration.js can't be loaded here (it wires up elements that only
-     * exist over there and would throw), but formValidation.js is already
-     * on the page via the header, so the checks themselves are shared rather
-     * than a second copy of the rules.
+     *
+     * The rules and their wording now live in js/boatFields.js, shared by
+     * this panel, Registration and My Fleet. This used to be a second copy
+     * of them, written here because registration.js can't be loaded on this
+     * page (it wires up elements that only exist over there and would
+     * throw) - the shared file exists so that reason stops costing a copy.
+     *
+     * The messages changed slightly when the two copies were merged; see
+     * the note above MESSAGES in boatFields.js for which wording won and
+     * why.
      *
      * @returns {string} a message, or "" if everything is fine
      */
     function checkBoatFields() {
-        var f = MoffatBay.form;
-        if (!f) { return ""; }
+        var boat = MoffatBay.boatFields;
+        if (!boat) { return ""; }
 
-        var hin  = (document.getElementById("hin")       || {}).value || "";
-        var reg  = (document.getElementById("regNumber") || {}).value || "";
-        var year = (document.getElementById("boatYear")  || {}).value || "";
-        var length = (document.getElementById("boatLength") || {}).value || "";
-        var beam = (document.getElementById("boatBeam")  || {}).value || "";
+        function valueOf(id) {
+            return (document.getElementById(id) || {}).value || "";
+        }
 
-        var country = boatPanel ? boatPanel.dataset.country : "";
-
-        if (hin.trim() === "" && reg.trim() === "") {
-            return "Enter either a HIN or a Registration Number.";
-        }
-        if (!f.isValidHIN(hin.trim().toUpperCase())) {
-            return "HIN should be 12 characters: 3 letters, then 9 more "
-                 + "letters or numbers.";
-        }
-        if (!f.isValidRegNumber(reg.trim().toUpperCase(), country)) {
-            return country === "CA"
-                ? "Enter a valid Canadian Registration Number, e.g. C1234 AB."
-                : "Enter a valid Registration Number, including the state "
-                  + "prefix, e.g. WN1234 AB.";
-        }
-        if (year.trim() !== "" && !f.isValidBoatYear(year.trim())) {
-            return "Enter a valid four-digit boat year.";
-        }
-        if (length.trim() !== "" && !f.isValidBoatDimension(length)) {
-            return "Enter a boat length between 1 and " + f.MAX_BOAT_DIMENSION + " feet.";
-        }
-        if (beam.trim() !== "" && !f.isValidBoatDimension(beam)) {
-            return "Boat Beam must be a number of feet, no more than " + f.MAX_BOAT_DIMENSION + ".";
-        }
-        return "";
+        return boat.firstProblem({
+            hin: valueOf("hin"),
+            regNumber: valueOf("regNumber"),
+            boatYear: valueOf("boatYear"),
+            boatLength: valueOf("boatLength"),
+            boatBeam: valueOf("boatBeam")
+        }, boatPanel ? boatPanel.dataset.country : "");
     }
 
     
@@ -814,6 +800,32 @@ MoffatBay.reservation = (function () {
         if (boatPanelLead) { boatPanelLead.hidden = false; }
         openBoatPanel();
     }
+
+    /**
+     * Arriving from My Fleet's "Reserve a Slip" link, which carries
+     * ?boatId= so the customer lands here with the boat they were looking
+     * at already chosen, rather than having to find it again in a dropdown
+     * they just came from.
+     *
+     * Front end only, on purpose: the servlet doesn't need to know. An id
+     * that isn't in the dropdown - someone else's boat, a removed one, or
+     * a hand-typed number - is ignored and the page opens on its default
+     * exactly as before. Nothing here is trusted; the boat is re-checked
+     * against the customer on submit as it always was.
+     */
+    function preselectBoatFromQuery() {
+        if (!boatSelect || boatSelect.disabled) { return; }
+
+        var wanted = new URLSearchParams(window.location.search).get("boatId");
+        if (!wanted) { return; }
+
+        var match = Array.prototype.some.call(boatSelect.options, function (opt) {
+            return opt.value === wanted;
+        });
+        if (match) { boatSelect.value = wanted; }
+    }
+
+    preselectBoatFromQuery();
 
     refresh();
 

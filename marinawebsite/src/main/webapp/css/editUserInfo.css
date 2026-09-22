@@ -76,70 +76,13 @@
 }
 
 /* ==========================================================================
-   "What changed" summary
+   "What changed" summary and the confirmation step
+
+   Both moved to site.css when My Fleet became their second user - that
+   page shows the same old -> new rows, inside its Edit modal rather than
+   inline. Only the bits that are true of THIS page are still here (the
+   submit row hiding, below).
    ========================================================================== */
-
-.change-summary__title {
-	margin: 0 0 0.6rem;
-	font-weight: 600;
-}
-
-.change-summary__list {
-	margin: 0;
-}
-
-.change-summary__row {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 0.5rem;
-	padding: 0.3rem 0;
-}
-
-.change-summary__row + .change-summary__row {
-	border-top: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
-}
-
-.change-summary__row dt {
-	flex: 0 0 9rem;
-	margin: 0;
-	color: var(--color-text-muted);
-	font-size: 0.85rem;
-	font-weight: 600;
-}
-
-.change-summary__row dd {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 0.5rem;
-	margin: 0;
-	min-width: 0;
-	overflow-wrap: anywhere;
-}
-
-/* The old value is struck through as well as faded - the arrow and the
-   colour shouldn't be the only things saying which one is gone. */
-.change-summary__old {
-	color: var(--color-text-muted);
-	opacity: 0.75;
-	text-decoration: line-through;
-}
-
-.change-summary__arrow {
-	color: var(--color-text-muted);
-	opacity: 0.6;
-}
-
-.change-summary__new {
-	font-weight: 600;
-}
-
-@media (max-width: 600px) {
-	.change-summary__row dt {
-		flex-basis: 100%;
-	}
-}
 
 /* ==========================================================================
    Save row
@@ -215,40 +158,6 @@
 	border-color: var(--color-error);
 	background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
 	color: var(--color-error);
-}
-
-/* ==========================================================================
-   Confirmation step
-
-   Takes the Save button's place rather than covering the form, so the
-   fields it is asking about stay visible behind it - the whole point of
-   doing this inline instead of as a third modal.
-   ========================================================================== */
-
-.confirm-changes {
-	max-width: 46rem;
-	margin: 0.5rem 0 0;
-	padding: 1.25rem 1.5rem;
-	background: var(--color-bg-card);
-	border: 1px solid var(--color-ocean-blue);
-	border-radius: 10px;
-}
-
-.confirm-changes[hidden] {
-	display: none;
-}
-
-.confirm-changes__title {
-	margin: 0 0 0.75rem;
-	color: var(--color-text-heading);
-	font-size: 1.1rem;
-}
-
-.confirm-changes__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-	margin-top: 1.25rem;
 }
 
 /* The submit row is hidden outright while the panel is up, so the page
