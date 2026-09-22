@@ -16,30 +16,8 @@
 	max-width: none;
 }
 
-/* ==========================================================================
-   Salmon watermark — fixed behind all content
-   ========================================================================== */
-
-body::before {
-	content: "";
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 0;
-	pointer-events: none;
-	background-image: url("../images/SalishSalmon-FullTransparent.png");
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-size: 420px auto;
-	opacity: 0.06;
-}
-
-.site-header, main, .site-footer {
-	position: relative;
-	z-index: 1;
-}
+/* The salmon watermark moved to site.css when it became the backdrop for
+   every page rather than just this one. Nothing to do here any more. */
 
 /* ==========================================================================
    Hero section — landing-page-specific hero children.

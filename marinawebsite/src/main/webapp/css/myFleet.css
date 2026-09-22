@@ -1,0 +1,369 @@
+/*
+ * src/main/webapp/css/myFleet.css
+ * Author: Robert Breutzmann
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * CSD 460 - Capstone Project - Marina Website Project
+ *
+ * What is true of My Fleet and nothing else.
+ *
+ * The pieces other pages will want live in site.css instead: .detail-card,
+ * .card-title, .record-badge(s), .status-pill, .modal, and the
+ * .change-summary / .confirm-changes rows. What is left here is how this
+ * page arranges them - the list, the card's footer row, and the two modals'
+ * page-specific bits.
+ */
+
+/* ==========================================================================
+   Page frame
+
+   This page loads registration.css for the boat card's .form-column, and
+   that stylesheet restyles bare `main` - a max-width and page padding meant
+   for the Registration form. It leaks onto every page that borrows those
+   classes (Edit User Info and Reservation too). Undone here rather than
+   there, because changing registration.css would move three finished pages;
+   myFleet.css loads after it, so this wins for this page alone.
+
+   .fleet-page then owns its own width, and the hero above it - which sits
+   outside main - spans the window.
+   ========================================================================== */
+
+main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.fleet-page {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+}
+
+/* ==========================================================================
+   Heading above the list
+
+   Centred and large, with the count carried in a badge beside it rather
+   than set off in a corner - the two belong to each other, and reading
+   "Your Boats 4 boats" as one line is the whole point.
+
+   Pulled in to the same width as the cards below it: a full-width rule
+   sitting over inset cards reads as a mistake rather than a choice.
+   ========================================================================== */
+
+.fleet-header {
+    width: 70%;
+    margin: 0 auto 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 20%, transparent);
+    text-align: center;
+}
+
+.fleet-header__title {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.875rem;
+    font-weight: normal;
+    color: var(--color-text-heading);
+}
+
+.fleet-count-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ocean-blue) 12%, transparent);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-deep-marine);
+}
+
+/* ==========================================================================
+   Add a Boat
+
+   Below the fleet, not beside the heading: adding one is what you do after
+   reading the list, and putting the page's single primary CTA at the top
+   made it compete with the boats it was sitting above.
+   ========================================================================== */
+
+.fleet-add-row {
+    width: 70%;
+    margin: 1.5rem auto 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   The list
+
+   Most customers own one or two boats, so the default is one card per row,
+   narrowed and centred rather than stretched across the page - a single
+   wide card with six short values in it is mostly empty space. Four or more
+   boats and it becomes two columns, which is also where the badges drop
+   from three across to two.
+   ========================================================================== */
+
+.fleet-list {
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.fleet-list--two-up {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+/* Three badge columns on a full-width card, two once the cards are halved.
+   .record-badges in site.css owns everything else about them. */
+.fleet-badges {
+    grid-template-columns: repeat(3, max-content);
+}
+
+.fleet-list--two-up .fleet-badges {
+    grid-template-columns: repeat(2, max-content);
+}
+
+/* ==========================================================================
+   Card footer — Edit, Remove, and where the boat's reservation is
+   ========================================================================== */
+
+.fleet-card__actions {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+/* Reads as an action rather than body text, without competing with the two
+   buttons beside it - the confirmation number in the status pill above is
+   the same destination, just quieter. */
+.fleet-card__reservation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 44px;
+    padding: 0.5625rem 1rem;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-ocean-blue) 10%, transparent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.fleet-card__reservation:hover {
+    background: color-mix(in srgb, var(--color-ocean-blue) 18%, transparent);
+    color: var(--color-link);
+}
+
+.fleet-card__hint {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    opacity: 0.8;
+}
+
+/* The "Reserve a Slip" link inside an idle status pill. */
+.status-pill__link {
+    font-weight: 600;
+    color: var(--color-link);
+}
+
+/* ==========================================================================
+   Empty fleet
+   ========================================================================== */
+
+.fleet-empty {
+    width: 70%;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+}
+
+.fleet-empty__message {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--color-text-body);
+}
+
+/* ==========================================================================
+   "Saved. Here's what changed" panel
+
+   .change-summary__* rows come from site.css; this is the box around them
+   and its dismiss button.
+   ========================================================================== */
+
+.fleet-saved {
+    width: 70%;
+    margin: 0 auto 1.25rem;
+}
+
+.fleet-saved__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.fleet-saved__head .change-summary__title {
+    margin-bottom: 0.25rem;
+}
+
+/* ==========================================================================
+   The boat modal
+
+   A locked field is disabled rather than read-only: that greys it, takes it
+   out of the tab order, and - the reason it matters - means the browser
+   never submits it. A submitted boatLength on an edit is a structural
+   rejection, so the markup enforces the rule instead of the script having
+   to strip the field before sending.
+   ========================================================================== */
+
+.modal__box--narrow {
+    width: min(28rem, 100%);
+}
+
+#boatModal input:disabled {
+    background: color-mix(in srgb, var(--color-border) 10%, var(--color-bg-surface));
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+/* A field the customer may still fill in once, and then never again. The
+   grey of a disabled field says "you can't"; nothing else on screen would
+   say "you can, but only once". */
+.fleet-set-once {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-golden-hour) 28%, transparent);
+    color: var(--color-record-badge-label);
+}
+
+.fleet-field-note {
+    margin: 0.3125rem 0 0;
+    font-size: 0.78125rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
+.fleet-save-hint {
+    margin: 0.5rem 0 0;
+    text-align: right;
+    font-size: 0.78125rem;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
+.fleet-confirm__lede {
+    margin: 0 0 0.75rem;
+    font-size: 0.84375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+}
+
+/* The modal's own Clear/Revert button, which boatInfoCard.jsp renders. */
+#boatModal .btn-clear-section {
+    margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   The remove confirmation
+   ========================================================================== */
+
+.fleet-remove__question {
+    margin: 0 0 0.625rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-body);
+}
+
+.fleet-remove__note {
+    margin: 0;
+    font-size: 0.84375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
+/* ==========================================================================
+   Narrow screens
+
+   One card per row whatever the fleet size, and the narrowing that makes a
+   short list look deliberate on a desktop only wastes space here.
+   ========================================================================== */
+
+@media (max-width: 56rem) {
+    .fleet-list--two-up {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .fleet-list--two-up .fleet-badges {
+        grid-template-columns: repeat(3, max-content);
+    }
+}
+
+@media (max-width: 40rem) {
+    .fleet-page {
+        padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .fleet-header,
+    .fleet-list,
+    .fleet-empty,
+    .fleet-saved,
+    .fleet-add-row {
+        width: 100%;
+    }
+
+    .fleet-header__title {
+        font-size: 1.5rem;
+    }
+
+    /* Full width, so the one thing you came here to do is easy to hit. */
+    .fleet-add-row .btn-primary {
+        width: 100%;
+    }
+
+    .fleet-badges,
+    .fleet-list--two-up .fleet-badges {
+        grid-template-columns: repeat(2, max-content);
+    }
+
+    /* Edit and Remove split the row; the reservation link gets its own. */
+    .fleet-card__actions > .btn-secondary,
+    .fleet-card__actions > .btn-outline {
+        flex: 1 1 0;
+    }
+
+    .fleet-card__reservation,
+    .fleet-card__hint {
+        flex: 1 1 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
