@@ -1,0 +1,307 @@
+<!--
+  Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+  Primary Author/Owner - Shared (Functional Test Plan, Module 9)
+  CSD 460 - Capstone Project - Marina Website Project
+  Functional Test Plan — My Fleet
+
+  Cover page only for now. The tests are written in two separate files so testers don't conflict:
+    - BreutzmannTest.html  (Front End tests - Robert Breutzmann, peer tested by Sara White)
+    - RodriguezTest.html  (Back End tests - Carolina Rodriguez, peer tested by Miguel Fernandez)
+  Once testing is done, paste each <section> from those files below the cover page, renumber the tests in
+  order (heading, section id, screenshot folders), and add each one to the Table of Contents.
+  Export to PDF with DevNotes/Scripts/export-html.sh <this file> - each <section> becomes one PDF page.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team — Module 9 My Fleet Test Plan</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+/* Default column widths: screenshots in the Peer Test cell */
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
+}
+.cell-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: #fff;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each step row stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="cover-page">
+
+<h1>Functional Test - Module 9: My Fleet</h1>
+
+<p><strong>Project:</strong> Blue Team — Moffat Bay Marina</p>
+<p><strong>Course:</strong> CSD 460 - Capstone Project</p>
+<p><strong>Description:</strong> Test plan for the My Fleet page (Robert — Front End, Carolina — Back End): viewing each owned boat and its reservation status, and adding, editing, and removing boats.</p>
+<p><strong>Date:</strong> 2026/09/23</p>
+
+<div class="page-roles">
+<p><strong>Front End Developer:</strong> Robert Breutzmann</p>
+<p><strong>Back End Developer:</strong> Carolina Rodriguez</p>
+</div>
+<div class="page-roles">
+<p><strong>Front End Developer Tester:</strong> Robert Breutzmann</p>
+<p><strong>Back End Developer Tester:</strong> Carolina Rodriguez</p>
+</div>
+<div class="page-roles">
+<p><strong>Front End Peer Tester:</strong> Sara White</p>
+<p><strong>Back End Peer Tester:</strong> Miguel Fernandez</p>
+</div>
+<p>To complete the test case plan, fill out the information for Project, Course, Description and Date in the header above.</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#cover-page">Cover Page</a></li>
+<!-- Add one <li> per test when the tests are combined in, e.g.
+<li><a href="#test-1-test-title">Test 1: &lt;Test Title&gt;</a></li> -->
+</ul>
+<p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
+</div>
+
+</section>
+
+<!-- Paste the tests from BreutzmannTest.html and RodriguezTest.html here. -->
+
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!--
+  My Fleet - Front End tests (Module 9)
+  Developer Tester: Robert Breutzmann    Peer Tester: Sara White
+
+  This file holds ONLY Robert's test pages. They get pasted into BlueTeam_Mod9_MyFleet_TestPlan.html
+  (which has the cover page) once testing is done - kept separate so testers don't conflict when committing.
+
+  What to test: everything renders and looks correct, and all front-end logic (forms, client-side validation, modals, navigation, login-state differences) works as it should.
+
+  HOW TO FILL IT IN
+  - Developer (Robert): write each test's title, objective, and steps (action + expected result, with exact
+    test data), run it, then fill in your Tested On date, Dev Test Pass/Fail, and Developer comment.
+  - Peer Tester (Sara): run each step, fill in your Tested On date, Peer Test Pass/Fail, screenshots, and comment.
+  - More tests: copy the NEW TEST block at the bottom and paste it above the blocks. Renumber it (heading, id, screenshot paths).
+  - More steps: copy the NEW STEP block and paste it inside the test's <table>, after the last </tbody>.
+  - Screenshots go in Screenshots/Breutzmann/Test_#/T#_S#.png (relative to this folder). Delete the caption and
+    cell-shots div for steps without one.
+  - SQL for a database check goes under the table in <pre><code>...</code></pre> (write < as &lt;, > as &gt;, & as &amp;).
+  - Anything written as &lt;like this&gt; is a placeholder to replace.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Fleet Front End Tests — Robert Breutzmann</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+/* Default column widths: screenshots in the Peer Test cell */
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
+}
+.cell-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: #fff;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each step row stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="test-1-fleet-layout-at-2-and-4-boats">
+<h2>Test 1: Fleet Layout at 2 and 4 Boats</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that My Fleet displays correctly with a 2-boat fleet (one card per row) and a 4-boat fleet (two columns), at full width, as the browser window narrows, and in a phone simulator - including that reserved boats cannot be removed.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="callout callout-note"><strong>Before running Tests 1-3</strong><br>The database must be at version 1.9.0 (run <code>databasescripts/MoffatBayMarinaDB_V1-9-0_update.sql</code> after the 1.8.0 build; check with <code>currentVersion.sql</code>). That update gives two customers the fleets these tests need:<br>&bull; <strong>Desmond Okafor</strong> (<code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>) - 2 boats: Second Wind (reserved, MB-00002) and Harbor Light (not reserved).<br>&bull; <strong>Arthur Penhale</strong> (<code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code>) - 4 boats: Little Bear (reserved, MB-00005), Wandering Albatross (reserved, MB-00006, no HIN), Kestrel (not reserved), and Morning Tide (not reserved; Type, Registration, Beam and Year left blank).<br>Run the tests in order: Test 2 changes Wandering Albatross and Kestrel, so Test 1 should see them first. To run Test 2 again, use the reset query under Test 2.</div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>. Open <strong>Edit User Info</strong> and click the <strong>My Fleet</strong> button.</td>
+<td>My Fleet opens with the hero banner, a heading reading <strong>Your Boats</strong> with a <strong>2 boats</strong> badge, and two boat cards stacked one per row, centred at about 70% of the page width. An <strong>Add a Boat</strong> button sits below the cards.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Desmond's fleet at full browser width</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Look at the <strong>Second Wind</strong> card.</td>
+<td>Boat name centred in small caps. Blue status badge: <strong>Reserved &mdash; Dock A, Slip 4 (A-04)</strong>, <em>since Jul 1, 2026 &middot; MB-00002</em>. Six field badges (Type, HIN, Length, Registration, Beam, Year) three across, all filled in. <strong>Edit</strong> is clickable; <strong>Remove</strong> is greyed out and can't be clicked, with the hint <em>Cancel this boat's reservation before removing it</em>. A <strong>View Reservation MB-00002 &rarr;</strong> link is shown.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Second Wind card - reserved badge, disabled Remove and hint</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Look at the <strong>Harbor Light</strong> card.</td>
+<td>Grey status badge reading <strong>Open to Reserve</strong> with a <strong>Reserve a Slip &rarr;</strong> link. All six field badges filled in. Both <strong>Edit</strong> and <strong>Remove</strong> are clickable. No View Reservation link and no removal hint.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Harbor Light card - open badge, both buttons enabled</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Slowly drag the browser window narrower, from full width down to about 400px wide.</td>
+<td>Cards stay one per row the whole way. Below about 640px the cards widen to fill the page, the field badges drop from three across to two across, and the Add a Boat button stretches full width. At no width does text overlap, spill out of a badge or card, or cause a sideways scrollbar. Remove on Second Wind stays greyed out.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Desmond's fleet at a narrow window width</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Open Developer Tools and turn on the device toolbar (Chrome: <strong>Toggle device toolbar</strong>, Ctrl+Shift+M / Cmd+Shift+M). Select <strong>iPhone 12 Pro</strong> and reload the page.</td>
+<td>Page fits the phone width with no sideways scrolling. Cards one per row, badges two across, boat names and status badges readable (the reserved badge may wrap onto several lines). Edit and Remove share a row; the View Reservation link sits on its own line. Every button is large enough to tap. Remove on Second Wind stays greyed out.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Desmond's fleet in the iPhone 12 Pro simulator</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S5.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Turn the device toolbar off and restore the window to full width. Log out, then log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open <strong>My Fleet</strong> the same way as step 1.</td>
+<td>Heading badge reads <strong>4 boats</strong>. The cards are laid out in <strong>two columns</strong> (two rows of two), and each card's field badges are two across instead of three.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Arthur's fleet at full browser width - two columns</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S6.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S6.png" alt="Step 6"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Look at the <strong>Little Bear</strong> and <strong>Wandering Albatross</strong> cards.</td>
+<td>Both show the blue reserved badge: Little Bear <strong>Dock A, Slip 9 (A-09)</strong>, <em>since May 1, 2026 &middot; MB-00005</em>; Wandering Albatross <strong>Dock A, Slip 2 (A-02)</strong>, <em>since May 7, 2026 &middot; MB-00006</em>. On both, Remove is greyed out with the removal hint, and a View Reservation link is shown. Wandering Albatross's <strong>HIN</strong> badge is dashed and untinted, showing an em dash (&mdash;).</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Little Bear and Wandering Albatross cards</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S7.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S7.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Look at the <strong>Kestrel</strong> and <strong>Morning Tide</strong> cards.</td>
+<td>Both show the grey <strong>Open to Reserve</strong> badge with a Reserve a Slip link, and both have Edit and Remove clickable. Kestrel's badges are all filled in. Morning Tide's <strong>Type</strong>, <strong>Registration</strong>, <strong>Beam</strong> and <strong>Year</strong> badges are dashed and untinted with an em dash; only its HIN and Length are filled in.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Kestrel and Morning Tide cards - dashed blank badges on Morning Tide</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S8.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S8.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>9</td>
+<td>Slowly drag the browser window narrower, from full width down to about 400px wide.</td>
+<td>Below about 900px the two columns become <strong>one card per row</strong>, and the badges go back to three across. Below about 640px the cards fill the page width and the badges drop to two across. No overlapping text, spilled badges, or sideways scrollbar at any width. Remove stays greyed out on the two reserved boats.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Arthur's fleet after it collapses to one column</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S9.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S9.png" alt="Step 9"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>10</td>
+<td>Turn the device toolbar back on, select <strong>iPhone 12 Pro</strong>, and reload.</td>
+<td>Same phone layout as step 5: one card per row, badges two across, no sideways scrolling, all buttons tappable. The dashed blank badges on Morning Tide still read clearly as empty. Remove stays greyed out on Little Bear and Wandering Albatross.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Arthur's fleet in the iPhone 12 Pro simulator</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S10.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S10.png" alt="Step 10"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+
+<section id="test-2-edit-a-boat">
+<h2>Test 2: Edit a Boat</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the Edit popup fills in the boat's current details, locks the fields that can't change (Length always, HIN once set), lets the customer add a missing HIN once, and shows an accurate old &rarr; new confirmation before saving and a summary after saving.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open <strong>My Fleet</strong>. Click <strong>Edit</strong> on <strong>Wandering Albatross</strong>.</td>
+<td>A popup titled <strong>Edit Wandering Albatross</strong> opens, with every field filled in to match the card. <strong>Boat Length</strong> is greyed out and can't be clicked into, with a note explaining that length sets the slip size and rate. <strong>HIN</strong> is empty but editable, with a <strong>Set once</strong> marker and a note that it can't be changed once saved. The clear button reads <strong>Revert Changes</strong>. <strong>Save Changes</strong> is disabled, with <em>Nothing changed yet.</em> beneath it.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Edit Wandering Albatross - Length locked, HIN marked Set once</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Type <code>WAB36C1968AL</code> into the HIN field, then click <strong>Save Changes</strong>.</td>
+<td>No error appears under the HIN field, and Save Changes becomes clickable once the HIN is typed. Clicking it replaces the form with the confirmation <strong>Save these changes?</strong>, listing exactly one row: <strong>HIN</strong>: <em>empty</em> &rarr; <code>WAB36C1968AL</code>, and reading <em>Nothing has been sent yet. Only this field will be saved &mdash; everything else on Wandering Albatross stays as it is.</em> Buttons: <strong>Go back</strong> and <strong>Yes, save</strong>.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Confirmation popup for adding the HIN</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Click <strong>Go back</strong> and check the HIN field, then click <strong>Save Changes</strong> again and click <strong>Yes, save</strong>.</td>
+<td>Go back returns to the form with <code>WAB36C1968AL</code> still in the HIN field (nothing was undone or sent), and Save Changes brings the same one-row confirmation back. After Yes, save, the popup closes and My Fleet reloads. A <strong>Saved. Here's what changed:</strong> panel appears above the cards, listing <strong>HIN</strong>: <em>empty</em> &rarr; <code>WAB36C1968AL</code>. Wandering Albatross's HIN badge now shows <code>WAB36C1968AL</code>, filled in rather than dashed.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Change summary after adding the HIN, and the updated card</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Click the <strong>&times;</strong> on the summary panel. Then click <strong>Edit</strong> on Wandering Albatross again, look at the HIN field, and click <strong>Cancel</strong>.</td>
+<td>The summary panel closes. In the Edit popup, <strong>HIN</strong> now shows <code>WAB36C1968AL</code>, greyed out and not editable, with a note that a hull number doesn't change; the Set once marker is gone. Cancel closes the popup with nothing saved.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Wandering Albatross HIN now locked</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Click <strong>Edit</strong> on <strong>Kestrel</strong>.</td>
+<td>Popup titled <strong>Edit Kestrel</strong>, filled in to match the card. <strong>Boat Length</strong> and <strong>HIN</strong> are both greyed out and not editable (Kestrel already has a HIN). Boat Name, Registration Number, Boat Type, Boat Beam and Year are editable. Save Changes is disabled.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Edit Kestrel - Length and HIN both locked</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S5.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Change <strong>Boat Type</strong> to <code>Center Console</code> and <strong>Year</strong> to <code>2020</code>. Then click <strong>Revert Changes</strong>.</td>
+<td>After typing, the hint reads <em>2 fields will be saved.</em> Revert Changes puts Boat Type back to <code>Powerboat</code> and Year back to <code>2019</code> (it does not blank the form), and Save Changes is disabled again with <em>Nothing changed yet.</em></td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Kestrel after Revert Changes</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S6.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S6.png" alt="Step 6"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Change <strong>Boat Type</strong> to <code>Center Console</code> and <strong>Year</strong> to <code>2020</code> again, then click <strong>Save Changes</strong>.</td>
+<td>Confirmation lists exactly two rows: <strong>Boat type</strong>: <code>Powerboat</code> &rarr; <code>Center Console</code>, and <strong>Boat year</strong>: <code>2019</code> &rarr; <code>2020</code>. It reads <em>Only these 2 fields will be saved &mdash; everything else on Kestrel stays as it is.</em> No other fields are listed.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Confirmation popup for the Kestrel edit</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S7.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S7.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Click <strong>Yes, save</strong>.</td>
+<td>My Fleet reloads with the <strong>Saved. Here's what changed:</strong> panel listing the same two rows. Kestrel's card shows Type <code>Center Console</code> and Year <code>2020</code>; every other badge is unchanged.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Change summary after the Kestrel edit, and the updated card</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S8.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S8.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+</table>
+<p class="query-note">To run Test 2 again, put both boats back first:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+UPDATE Boat SET HIN = NULL WHERE HIN = 'WAB36C1968AL';
+UPDATE Boat SET boatType = 'Powerboat', boatYear = 2019 WHERE HIN = 'PNH61A2B3C45';</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+
+<section id="test-3-page-links">
+<h2>Test 3: Page Links</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that My Fleet's links and buttons take the customer to the right place: My Fleet from Edit User Info, Add a Boat, View Reservation, and Reserve a Slip (with the right boat already selected).</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>. Open <strong>Edit User Info</strong> and click the <strong>My Fleet</strong> button.</td>
+<td>My Fleet opens showing Desmond's two boats (Second Wind and Harbor Light) - not the empty <em>You haven't registered any boats yet.</em> message.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">My Fleet reached from Edit User Info</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Click <strong>Add a Boat</strong>.</td>
+<td>A popup titled <strong>Add a Boat</strong> opens with every field blank and editable (including Boat Length and HIN). The clear button reads <strong>Clear Boat Info</strong> and the save button reads <strong>Save Boat</strong>.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Add a Boat popup</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Click <strong>Cancel</strong> to close the popup. Then, on the Second Wind card, click <strong>View Reservation MB-00002 &rarr;</strong>.</td>
+<td>The popup closes with nothing saved. The Look Up Reservation page then opens showing reservation <strong>MB-00002</strong> for Second Wind at Dock A, Slip 4.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Look Up Reservation showing MB-00002</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S3.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Go back to My Fleet. On the Harbor Light card, click <strong>Reserve a Slip &rarr;</strong>.</td>
+<td>The Book a Slip (Reservation) page opens with <strong>Harbor Light</strong> already selected in the boat dropdown.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Reservation page with Harbor Light pre-selected</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Log out, then log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open My Fleet. On the <strong>Morning Tide</strong> card, click <strong>Reserve a Slip &rarr;</strong>.</td>
+<td>The Reservation page opens with <strong>Morning Tide</strong> selected in the boat dropdown - the boat whose link was clicked, not simply the first boat in the list.</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Reservation page with Morning Tide pre-selected</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S5.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+
+<!-- Paste new tests here, above the copy-paste blocks. -->
+
+
+<!-- ======================================================================
+     COPY-PASTE BLOCKS - delete before the tests are combined.
+
+     ----- NEW TEST - START -----
+<section id="test-#-test-title">
+<h2>Test #: &lt;Test Title&gt;</h2>
+<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_#/T#_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_#/T#_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+     ----- NEW TEST - END -----
+
+     ----- NEW STEP - START -----
+<tbody class="step-group">
+<tr>
+<td>#</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_#/T#_S#.png" target="_blank"><img src="Screenshots/Breutzmann/Test_#/T#_S#.png" alt="Step #"></a></div></td>
+</tr>
+</tbody>
+     ----- NEW STEP - END -----
+     ====================================================================== -->
+
+</body>
+</html>

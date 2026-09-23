@@ -1,0 +1,342 @@
+<!--
+  Wait List - Back End tests (Module 9)
+  Developer Tester: Miguel Fernandez    Peer Tester: Carolina Rodriguez
+
+  This file holds ONLY Miguel's test pages. They get pasted into BlueTeam_Mod9_WaitList_TestPlan.html
+  (which has the cover page) once testing is done - kept separate so testers don't conflict when committing.
+
+  What to test: everything that connects to the rest of the site works as expected: servlets, server-side validation, session handling, DAOs, and database round-trips.
+
+  HOW TO FILL IT IN
+  - Developer (Miguel): write each test's title, objective, and steps (action + expected result, with exact
+    test data), run it, then fill in your Tested On date, Dev Test Pass/Fail, and Developer comment.
+  - Peer Tester (Carolina): run each step, fill in your Tested On date, Peer Test Pass/Fail, screenshots, and comment.
+  - More tests: copy the NEW TEST block at the bottom and paste it above the blocks. Renumber it (heading, id, screenshot paths).
+  - More steps: copy the NEW STEP block and paste it inside the test's <table>, after the last </tbody>.
+  - Screenshots go in Screenshots/Fernandez/Test_#/T#_S#.png (relative to this folder). Delete the caption and
+    cell-shots div for steps without one.
+  - SQL for a database check goes under the table in <pre><code>...</code></pre> (write < as &lt;, > as &gt;, & as &amp;).
+  - Anything written as &lt;like this&gt; is a placeholder to replace.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wait List Back End Tests — Miguel Fernandez</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 36px 44px;
+  max-width: 1520px;
+  background: #fff;
+  color: #1c2430;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #0d3b4d; }
+h2 {
+  font-size: 22px;
+  margin: 32px 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #0d3b4d;
+}
+h3 { font-size: 17px; margin-top: 18px; }
+h4 { font-size: 15px; margin: 18px 0 6px 0; color: #0d3b4d; }
+p { margin: 8px 0; }
+a { color: #0a6e8c; }
+strong { color: #16262e; }
+ul { margin: 6px 0; padding-left: 22px; }
+li { margin: 2px 0; }
+
+/* Cover info */
+.cover-info { margin-bottom: 10px; }
+.cover-info p { margin: 2px 0; font-size: 15px; }
+
+/* Page roles on the cover page */
+.page-roles { margin: 14px 0; }
+.page-roles p { margin: 2px 0; }
+
+/* Test objective */
+.test-objective { font-style: italic; margin-bottom: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 10px 6px 0;
+  line-height: 1.4;
+}
+.badge-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+.badge-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+.badge-date-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.badge-date {
+  font-style: italic;
+}
+.badge-dev { background: #ff6f59; color: #fff; }
+.badge-peer { background: #f4a261; color: #16262e; }
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 14px 0;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 3px solid #0d3b4d;
+}
+th, td {
+  border: 1px solid #c7cdd6;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+/* Default column widths: screenshots in the Peer Test cell */
+th:nth-child(1), td:nth-child(1) { width: 6%; }
+th:nth-child(2), td:nth-child(2) { width: 24%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 7%; }
+th:nth-child(5), td:nth-child(5) { width: 37%; }
+/* Screenshots in the Dev Test cell */
+table.shots-dev th:nth-child(4), table.shots-dev td:nth-child(4) { width: 37%; }
+table.shots-dev th:nth-child(5), table.shots-dev td:nth-child(5) { width: 7%; }
+/* Screenshots in both cells */
+table.shots-both th:nth-child(1), table.shots-both td:nth-child(1) { width: 6%; }
+table.shots-both th:nth-child(2), table.shots-both td:nth-child(2) { width: 17%; }
+table.shots-both th:nth-child(3), table.shots-both td:nth-child(3) { width: 19%; }
+table.shots-both th:nth-child(4), table.shots-both td:nth-child(4) { width: 29%; }
+table.shots-both th:nth-child(5), table.shots-both td:nth-child(5) { width: 29%; }
+th { background: #0d3b4d; color: #fff; }
+/* Tint Developer and Tester data columns */
+td:nth-child(4) { background: #ffe4df; }
+td:nth-child(5) { background: #fdebd0; }
+ol, ul { margin: 4px 0; padding-left: 22px; }
+
+/* Screenshots live in the tester's Pass/Fail cell, under the result */
+tbody.step-group + tbody.step-group td { border-top: 2px solid #0d3b4d; }
+.cell-caption {
+  margin: 8px 0 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
+}
+.cell-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cell-shots a {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+}
+.cell-shots a:only-child { flex-basis: 100%; }
+.cell-shots img {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: #fff;
+}
+
+/* Code blocks */
+pre {
+  background: #0d3b4d;
+  color: #e8edf3;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+pre code { background: none; color: inherit; padding: 0; }
+code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* Callout boxes */
+.callout {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.callout-dev {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-peer {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-note {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+.callout-bug {
+  border-left: 5px solid #ff6f59;
+  background: #ffe4df;
+}
+.callout-warn {
+  border-left: 5px solid #f4a261;
+  background: #fdebd0;
+}
+.callout-info {
+  border-left: 5px solid #0a6e8c;
+  background: #e8f4f8;
+}
+
+/* Query notes */
+.query-note { font-size: 14px; color: #444; margin-top: 14px; }
+
+/* Images outside tables */
+img {
+  max-width: 100%;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
+  margin: 6px 0 10px 0;
+  display: block;
+}
+
+/* Section dividers — visible on screen */
+section {
+  border-top: 6px solid #0d3b4d;
+  margin-top: 40px;
+  padding-top: 24px;
+}
+section:first-of-type {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Page layout for PDF export */
+@page {
+  size: Letter;
+  margin: 0.5in 0.4in;
+}
+
+/* Step groups — each step row stays together */
+tbody.step-group {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print / PDF — each test starts a new page */
+@media print {
+  body { padding: 0; }
+  section {
+    page-break-before: always;
+    border-top: 6px solid #0d3b4d;
+    padding-top: 18px;
+  }
+  section:first-of-type {
+    page-break-before: avoid;
+    border-top: none;
+  }
+  tbody.step-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  tr { page-break-inside: avoid; }
+  td, th { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+  .callout { page-break-inside: avoid; }
+  .badge { page-break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+
+<section id="test-1-test-title">
+<h2>Test 1: &lt;Test Title&gt;</h2>
+<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+
+<!-- Paste new tests here, above the copy-paste blocks. -->
+
+
+<!-- ======================================================================
+     COPY-PASTE BLOCKS - delete before the tests are combined.
+
+     ----- NEW TEST - START -----
+<section id="test-#-test-title">
+<h2>Test #: &lt;Test Title&gt;</h2>
+<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_#/T#_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_#/T#_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+</section>
+     ----- NEW TEST - END -----
+
+     ----- NEW STEP - START -----
+<tbody class="step-group">
+<tr>
+<td>#</td>
+<td>&lt;action to take&gt;</td>
+<td>&lt;what should happen&gt;</td>
+<td>&lt;Pass/Fail&gt;</td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_#/T#_S#.png" target="_blank"><img src="Screenshots/Fernandez/Test_#/T#_S#.png" alt="Step #"></a></div></td>
+</tr>
+</tbody>
+     ----- NEW STEP - END -----
+     ====================================================================== -->
+
+</body>
+</html>
