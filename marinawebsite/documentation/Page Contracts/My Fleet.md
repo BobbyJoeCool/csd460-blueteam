@@ -15,7 +15,9 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 
 ## Current Status (2026-09-21)
 
-**Design settled, no page code written.** `myFleet.jsp` is still the Coming Soon stub (`includes/comingSoon.jsp`).
+**Back End implemented and in testing.**
+
+The My Fleet Back End supports loading the customer's fleet, adding a boat, editing an owned boat, and removing a boat through a soft ownership update.
 
 Every Front End decision this contract left open is now made, and four amendments were made to the version signed off on 2026-09-18 — they're marked **Amended 2026-09-21** in place, and listed together under [Amendments](#amendments). The design was reviewed against a full mockup before any of it was written down.
 
@@ -102,7 +104,7 @@ A signed-in customer lands on My Fleet and sees **one card per boat they current
 - [x] **Every edit and remove re-checks ownership.** `boatId` arrives from a hidden form field, so it is untrusted. Before touching a boat, the servlet loads it with `BoatDAO.findOwnedBoat(conn, customerId, boatId)`. If that returns `null` (not their boat, or not a boat), the request is rejected with no write — exactly the same outcome whether the boat belongs to someone else or doesn't exist.
 - [x] **Partial update, validate-all-then-write.** Same two rules as Edit User Info: only touched fields are submitted, and if any one of them fails validation, nothing is written. See [Editing a Boat](#editing-a-boat).
 - [x] **"Delete" is a soft remove, not a `DELETE`.** See [Removing a Boat](#removing-a-boat).
-- [ ] **One shared server-side validator.** Add and Edit on this page must enforce exactly what `ReservationBoatServlet.validate()` enforces today. Recommend moving those rules into one shared class (e.g. `util/BoatValidator`) that returns every failing field as `Map<String, String>`, with `ReservationBoatServlet` showing just the first message as it does now. Two copies of the rules will drift. **Still open — Back End's call**, since it modifies a finished servlet.
+- [x] **One shared server-side validator.** My Fleet Add and Edit use `util/BoatValidator` for shared server-side boat validation. `BoatValidator` uses the normalized validation helpers in `Utils.java` so My Fleet follows the same boat rules used elsewhere in the application.
 - [x] **Servlet URL mapping.** One URL per action, one servlet class each, following the `/reservation` + `/reservation/boat` and `/editProfile` + `/editProfile/password` pattern rather than an `action` parameter:
 
   | URL | Method | Servlet | Does |
@@ -112,14 +114,23 @@ A signed-in customer lands on My Fleet and sees **one card per boat they current
   | `/myFleet/edit` | POST | `MyFleetEditServlet` | Updates changed fields on an owned boat |
   | `/myFleet/remove` | POST | `MyFleetRemoveServlet` | Ends ownership of an owned boat |
 
+  **Back End implementation status (2026-09-24):**
+
+- `MyFleetServlet` loads the signed-in customer's current fleet.
+- `MyFleetAddServlet` adds a new `Boat` row and `BoatOwnership` row in one transaction.
+- `MyFleetEditServlet` verifies ownership, validates only submitted editable fields, and calls `BoatDAO.updateBoat()`.
+- `MyFleetRemoveServlet` verifies ownership and Active reservation status, then ends ownership with `BoatDAO.endOwnership()`.
+- `customerId` comes from the session only.
+- Remove is a soft remove; no `Boat` row is deleted.
+
   These are plain form POSTs that redirect — **not** the fetch/JSON shape `ReservationBoatServlet` uses. That page returns JSON because it has a dropdown to update in place; My Fleet just reloads.
 
 - [x] **Success redirects, failure forwards.** Same shape as `EditProfileServlet`. A success redirects to `/myFleet?notice=boatAdded` / `boatRemoved` (and `boatUpdated`, if Amendment 4 doesn't land), so a refresh can't resubmit; `statusPopup.js` turns the notice into a toast. A validation failure forwards back to `myFleet.jsp` with `fieldErrors`, `formError`, and `openForm` (`add` or `edit`, plus `editBoatId`) so the page reopens the same modal with the customer's typed values still in it.
-- [ ] **Post-save change summary. Amendment 4, optional.** On a successful edit, stash the old → new diff in the session and promote it in `doGet` — exactly what `EditProfileServlet` already does for Edit User Info, where `editUserInfo.jsp` renders it from a `changes` attribute shaped `Map<String, String[]>` of `{old, new}`. Building the same shape here lets the front end reuse that rendering almost unchanged.
+- [x] **Edit success handling.** The optional Amendment 4 post-save old → new summary was not implemented. A successful Edit redirects to:
 
-  It must show **exactly once**: a refresh must not re-announce an old edit. That is what the session flash buys over a query parameter.
+  `/myFleet?notice=boatUpdated`
 
-  **If this lands, drop the `boatUpdated` toast** — the panel says the same thing and doesn't time out. `boatAdded` and `boatRemoved` keep theirs; there's no diff to show for either.
+  and the page shows the standard success toast. The old → new confirmation still happens before submit on the Front End.
 
 ---
 
@@ -253,9 +264,18 @@ Field names reuse `boatInfoCard.jsp`'s existing `name` attributes, so the card w
 | `regNumber` | `String` | Form field | Uppercased; country-specific pattern; duplicate-checked on change |
 | `boatYear` | `Integer` | Form field | 1800 – current year; blank → `NULL` |
 | `notice` | `String` | Query string (GET `/myFleet`) | `boatAdded` / `boatRemoved` (and `boatUpdated` if Amendment 4 doesn't land) — drives the toast |
-| `changes` | `Map<String, String[]>` | Session flash, promoted in `doGet` | Amendment 4. `{old, new}` per changed field. Same shape `EditProfileServlet` uses. |
 
 ## Database Returns
+
+**Implemented for My Fleet:**
+
+- `BoatDAO.findFleetByCustomerId()`
+- `BoatDAO.findOwnedBoat()`
+- `BoatDAO.updateBoat()`
+- `BoatDAO.regNumberInUseByAnotherBoat()`
+- `BoatDAO.hinInUseByAnotherBoat()`
+- `BoatDAO.endOwnership()`
+- `BoatDAO.activeReservationLocation()`
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
@@ -264,9 +284,9 @@ Field names reuse `boatInfoCard.jsp`'s existing `name` attributes, so the card w
 | *(new)* `BoatDAO.updateBoat()` | `Connection`, `int boatId`, `Map<String, String> changedFields` | `void`, throws `SQLException` (caller rolls back) | Key absent = untouched; key present + empty = set `NULL` (optional columns only). Column names from a fixed whitelist |
 | *(new)* `BoatDAO.regNumberInUseByAnotherBoat()` | `Connection`, `String regNumber`, `int boatId` | `boolean` | Excludes this boat's own row |
 | *(new)* `BoatDAO.hinInUseByAnotherBoat()` | `Connection`, `String hin`, `int boatId` | `boolean` | **Required** — the HIN-once decision above approved it |
-| *(new)* `BoatDAO.endOwnership()` | `Connection`, `int boatId`, `int customerId` | `int` rows updated | `0` = nothing to end (not theirs / already removed) → reject |
+| **(new)** `BoatDAO.endOwnership()` | `Connection`, `int boatId`, `int customerId` | `int` rows updated | `0` = nothing to end (not theirs / already removed) → reject |
+| **(new)** `BoatDAO.activeReservationLocation()` | `Connection`, `int boatId` | `String` or `null` | Returns the Active reservation location, such as `Dock A, Slip 2 (A-02)`, for the Remove warning |
 | `BoatDAO.insertBoat()` | `Connection`, `Boat` | `int` new `boatID` | Already exists |
-| `BoatDAO.insertOwnership()` | `Connection`, `int boatId`, `int customerId` | `void` | Already exists |
 
 ### Boat Bean Properties Used by the JSP
 
@@ -304,7 +324,7 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 | Non-editable field (`boatLength`, a set `HIN`) or blank `boatName` submitted on Edit | Not a user-facing message — a Front End bug or tampering. Rejected outright. | N/A |
 | Add succeeds | "Boat added" | `MoffatBay.statusPopup` toast after redirect |
 | Remove succeeds | "Boat removed from your fleet" | `MoffatBay.statusPopup` toast after redirect |
-| Edit succeeds | "Saved. Here's what changed:" with one old → new row per changed field, dismissible, shown once | Panel above the updated card (Amendment 4). Falls back to a "Boat updated" toast if that doesn't land. |
+| Edit succeeds | "Boat updated" | `MoffatBay.statusPopup` toast after redirect |
 | Database failure | Standard servlet error page | `error.jsp` |
 
 ## Login State Differences

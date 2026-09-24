@@ -1,6 +1,9 @@
 package com.moffatbaymarina.marinawebsite.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 /**
  * Represents a boat stored in the Boat database table.
@@ -28,6 +31,12 @@ public class Boat {
     private int slipSizeFt;
     private int monthlyCents;
     private boolean hasActiveReservation;
+
+    // My Fleet derived values; null when the boat has no Active reservation.
+    private String activeConfirmationNumber;
+    private String activeDockNumber;
+    private Integer activeSlipNumber;
+    private LocalDate activeStartDate;
 
 // Constructor-----------------------------------------------------------------------------------------------------
     public Boat() {
@@ -123,4 +132,47 @@ public class Boat {
     public void setHasActiveReservation(boolean hasActiveReservation) {
         this.hasActiveReservation = hasActiveReservation;
     }
+
+    public String getActiveConfirmationNumber() {
+    return activeConfirmationNumber;
+    }
+
+    public void setActiveConfirmationNumber(String activeConfirmationNumber) {
+        this.activeConfirmationNumber = activeConfirmationNumber;
+    }
+
+    public String getActiveDockNumber() {
+        return activeDockNumber;
+    }
+
+    public void setActiveDockNumber(String activeDockNumber) {
+        this.activeDockNumber = activeDockNumber;
+    }
+
+    public Integer getActiveSlipNumber() {
+        return activeSlipNumber;
+    }
+
+    public void setActiveSlipNumber(Integer activeSlipNumber) {
+        this.activeSlipNumber = activeSlipNumber;
+    }
+
+    public LocalDate getActiveStartDate() {
+        return activeStartDate;
+    }
+
+    public void setActiveStartDate(LocalDate activeStartDate) {
+        this.activeStartDate = activeStartDate;
+    }
+
+    /**
+     * JSTL's fmt:formatDate cannot format LocalDate directly, so My Fleet
+     * reads this display-ready property instead.
+     */
+    public String getActiveStartDateDisplay() {
+        return Utils.formatDisplayDate(activeStartDate);
+    }
 }
+
+
+
