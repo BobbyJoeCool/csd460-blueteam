@@ -101,7 +101,8 @@ MoffatBay.myFleet = (function () {
         boatLength: "boatLength",
         boatBeam: "boatBeam",
         hin: "hin",
-        regNumber: "regNumber"
+        regNumber: "regNumber",
+        boatYear: "boatYear"
     };
 
     var mode = "add";          // "add" or "edit"
@@ -369,7 +370,7 @@ MoffatBay.myFleet = (function () {
         });
 
         if (confirmLede) {
-            confirmLede.textContent = "Nothing has been sent yet. Only "
+            confirmLede.textContent = "Nothing has been set yet. Only "
                 + (changed.length === 1 ? "this field" : "these " + changed.length + " fields")
                 + " will be saved — everything else on "
                 + (originals.boatName || "this boat") + " stays as it is.";

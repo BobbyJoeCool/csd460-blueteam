@@ -273,26 +273,165 @@ tbody.step-group {
 </head>
 <body>
 
-<section id="test-1-test-title">
-<h2>Test 1: &lt;Test Title&gt;</h2>
-<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
-<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<section id="test-1-my-fleet-add-and-edit-boat">
+<h2>Test 1: My Fleet Add and Edit Boat</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the My Fleet backend loads the signed-in customer's current boats, adds a new boat with an ownership record, and updates only the fields changed during Edit.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date"> Sept 24, 2026</span></div>
 <div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
 <tr>
 <td>1</td>
-<td>&lt;action to take&gt;</td>
-<td>&lt;what should happen&gt;</td>
-<td>&lt;Pass/Fail&gt;</td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+<td>Go to <code>http://localhost:8080/marinawebsite/</code>, sign in with <code>desmond.okafor@example.com</code> and password <code>MoffatOkafor02!</code>, then open <code>/myFleet</code>.</td>
+<td>The signed-in customer's currently owned boats are displayed.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption"> Showing the signed-in customer's current boats</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Click <strong>Add a Boat</strong> button.</td>
+<td>A popup opens with a form for adding a new boat.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Add a Boat popup after Step 2, showing the blank boat information form.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Enter the following boat information: 
+  Boat Name: <code>TestBoat</code>, Boat Type: <code>PowerBoat</code>, Boat Length: <code>20</code>, Registration Number: <code>WA10002QT</code>, and Boat Year: <code>2020</code>. 
+  Leave HIN and Boat Beam blank, then click <strong>Save</strong>.</td>
+<td>The new boat is added, the popup closes, and the boat appears in My Fleet.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The new boat displayed in My Fleet after Step 3.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Click <strong>Edit</strong> on the new boat, change one editable field such as Boat Year or Boat Name, confirm the change, and save.</td>
+<td>A confirmation popup shows the changes that will be made. After confirming and saving, the page redirects back to My Fleet and displays the updated value.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">The boat card after Step 4, showing the updated value.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+
+</table>
+
+<h4>Comments</h4>
+
+<div class="callout callout-dev">
+<strong>Developer (Carolina)</strong><br>
+The My Fleet backend loaded the signed-in customer's current boats correctly. I checked MySQL during testing to make sure the database was updating correctly. 
+Adding a boat created both the <code>Boat</code> and <code>BoatOwnership</code> records. 
+After editing the boat, I checked MySQL again and confirmed that only the field I changed was updated, while the locked boat length and HIN stayed the same. 
+I did not run into any backend issues during this test.
+
+<Strong>**Note for front-end:</Strong> Wording on "are you sure you want to edit/remove this boat?" needs to be adjusted. 
+<Strong>**Revised</Strong> Already fixed.
+</div>
+
+<div class="callout callout-peer">
+<strong>Peer Tester (Miguel)</strong><br>
+&lt;filled in by the peer tester&gt;
+</div>
+</section>
+
+
+<section id="test-2-my-fleet-remove-and-ownership-protection">
+<h2>Test 2: My Fleet Removal, Ownership Protection and Database Updates</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the My Fleet backend removes a boat by ending ownership instead of deleting the boat and 
+  blocks removal when the boat has an active reservation</p>
+
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez<span class="badge-sep">|</span><span class="badge-date-label">Tested On:</span><span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez<span class="badge-sep">|</span><span class="badge-date-label">Tested On:</span><span class="badge-date">&lt;date&gt;</span></div>
+
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+
+<tr>
+<td>1</td>
+<td>Stay signed into same user, run the following SQL in MySQL:
+  <pre><code>SELECT
+    b.boatID,
+    b.boatName,
+    bo.customerID,
+    bo.startDate,
+    bo.endDate
+FROM Boat b
+JOIN BoatOwnership bo
+    ON b.boatID = bo.boatID
+WHERE b.boatName = 'TestBoat';</code></pre></td>
+<td>The <code>Boat</code> row and matching <code>BoatOwnership</code> row are returned, and <code>BoatOwnership.endDate</code> is <code>NULL</code>.
+</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Database shows active ownership</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Choose an owned boat with no Active reservation and remove it from My Fleet. </td>
+<td>The boat disappears from My Fleet</td><td>
+<strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">My Fleet after Step 2, showing the removed boat no longer appears.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>  
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td> Checking removal from backend- Run the following SQL in MySQL:
+  <pre><code>SELECT
+    b.boatID,
+    b.boatName,
+    bo.customerID,
+    bo.startDate,
+    bo.endDate
+FROM Boat b
+JOIN BoatOwnership bo
+    ON b.boatID = bo.boatID
+WHERE b.boatName = 'TestBoat';</code></pre></td>
+<td> The <code>Boat</code> row remains in the database, while <code>BoatOwnership.endDate</code> shows the end date.</td>
+<td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">Backend database after Step 3, showing the updated ownership record.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Choose an owned boat with an active reservation and try to remove it from My Fleet. </td>
+<td>The Remove button is disabled and a message explains that the Active reservation must be cancelled before the boat can be removed.</td>
+<td></td><strong>Pass</strong></td>
+<td>&lt;Pass/Fail&gt;<p class="cell-caption">My Fleet after Step 4, shows the boat with the active reservation.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 </table>
+
 <h4>Comments</h4>
-<div class="callout callout-dev"><strong>Developer (Carolina)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
-<div class="callout callout-peer"><strong>Peer Tester (Miguel)</strong><br>&lt;filled in by the peer tester&gt;</div>
+
+<div class="callout callout-dev">
+<strong>Developer (Carolina)</strong><br>
+The Remove flow worked as expected. Before removing the boat, I checked MySQL and confirmed that the boat had a current <code>BoatOwnership</code> record with <code>endDate</code> set to <code>NULL</code>. 
+After removing the boat from My Fleet, I ran the query again and confirmed that the <code>Boat</code> row was still in the database while the matching <code>BoatOwnership.endDate</code> was updated with the removal date. 
+This confirmed that Remove performs a soft remove instead of deleting the boat. 
+A boat with an Active reservation was blocked from removal. 
+</div>
+
+<div class="callout callout-peer">
+<strong>Peer Tester (Miguel)</strong><br>
+&lt;filled in by the peer tester&gt;
+</div>
+
 </section>
 
 <!-- Paste new tests here, above the copy-paste blocks. -->

@@ -9,6 +9,9 @@ import java.util.List;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.moffatbaymarina.marinawebsite.model.Boat;
 
@@ -29,6 +32,16 @@ public class BoatDAO {
          * @param boat boat being registered
          * @throws SQLException if the insert fails
          */
+    private static final Set<String> EDITABLE_COLUMNS =
+            Set.of(
+                    "boatName",
+                    "HIN",
+                    "regNumber",
+                    "boatType",
+                    "boatBeam",
+                    "boatYear"
+            );
+
     public int insertBoat(Connection conn, Boat boat) throws SQLException {
 
         String sql = """
@@ -118,32 +131,388 @@ public class BoatDAO {
      * checks active-reservation status for dropdown menu to prevent
      * duplicate reservations for the same boat
      */
-    public List<Boat> findByCustomerId(Connection conn, int customerId)
-            throws SQLException {
-        String sql = """
-                SELECT b.boatID, b.boatName, b.boatLength,
-                       EXISTS (SELECT 1 FROM Reservation r 
-                       WHERE r.boatID = b.boatID
-                       AND r.reservationStatus = 'Active') 
-                       AS hasActiveReservation 
-                FROM Boat b
-                JOIN BoatOwnership bo ON bo.boatID = b.boatID
-                WHERE bo.customerID = ? AND bo.endDate IS NULL
-                ORDER BY b.boatName
-                """;
+    
 
-        List<Boat> boats = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, customerId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    boats.add(mapReservationBoat(rs));
-                }
+    public List<Boat> findByCustomerId(
+        Connection conn,
+        int customerId)
+        throws SQLException {
+
+    String sql = """
+            SELECT
+                b.boatID,
+                b.boatName,
+                b.boatLength,
+                EXISTS (
+                    SELECT 1
+                    FROM Reservation r
+                    WHERE r.boatID = b.boatID
+                      AND r.reservationStatus = 'Active'
+                ) AS hasActiveReservation
+            FROM Boat b
+            JOIN BoatOwnership bo
+                ON bo.boatID = b.boatID
+            WHERE bo.customerID = ?
+              AND bo.endDate IS NULL
+            ORDER BY b.boatName
+            """;
+
+    List<Boat> boats = new ArrayList<>();
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, customerId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                boats.add(mapReservationBoat(rs));
             }
         }
-        return boats;
     }
 
+    return boats;
+}
+
+public List<Boat> findFleetByCustomerId(
+        Connection conn,
+        int customerId)
+        throws SQLException {
+
+    String sql = """
+            SELECT
+                b.boatID,
+                b.boatName,
+                b.regNumber,
+                b.boatLength,
+                b.HIN,
+                b.boatType,
+                b.boatBeam,
+                b.boatYear,
+                r.confirmationNumber AS activeConfirmationNumber,
+                r.startDate AS activeStartDate,
+                d.dockNumber AS activeDockNumber,
+                s.slipNumber AS activeSlipNumber
+            FROM Boat b
+            JOIN BoatOwnership bo
+                ON bo.boatID = b.boatID
+               AND bo.customerID = ?
+               AND bo.endDate IS NULL
+            LEFT JOIN Reservation r
+                ON r.reservationID = (
+                    SELECT r2.reservationID
+                    FROM Reservation r2
+                    WHERE r2.boatID = b.boatID
+                      AND r2.reservationStatus = 'Active'
+                    ORDER BY r2.startDate, r2.reservationID
+                    LIMIT 1
+                )
+            LEFT JOIN Slip s
+                ON s.slipID = r.slipID
+            LEFT JOIN Dock d
+                ON d.dockID = s.dockID
+            ORDER BY b.boatName, b.boatID
+            """;
+
+    List<Boat> boats = new ArrayList<>();
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, customerId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                boats.add(mapFleetBoat(rs));
+            }
+        }
+    }
+
+    return boats;
+}
+
+public Boat findOwnedBoat(
+        Connection conn,
+        int customerId,
+        int boatId)
+        throws SQLException {
+
+    String sql = """
+            SELECT
+                b.boatID,
+                b.boatName,
+                b.regNumber,
+                b.boatLength,
+                b.HIN,
+                b.boatType,
+                b.boatBeam,
+                b.boatYear
+            FROM Boat b
+            JOIN BoatOwnership bo
+                ON bo.boatID = b.boatID
+            WHERE b.boatID = ?
+              AND bo.customerID = ?
+              AND bo.endDate IS NULL
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, boatId);
+        stmt.setInt(2, customerId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? mapFullBoat(rs) : null;
+        }
+    }
+}
+
+public void updateBoat(
+        Connection conn,
+        int boatId,
+        Map<String, String> changedFields)
+        throws SQLException {
+
+    if (changedFields == null || changedFields.isEmpty()) {
+        return;
+    }
+
+    Map<String, String> fields = new LinkedHashMap<>();
+
+    for (Map.Entry<String, String> entry : changedFields.entrySet()) {
+
+        String column =
+                "hin".equals(entry.getKey())
+                        ? "HIN"
+                        : entry.getKey();
+
+        if (EDITABLE_COLUMNS.contains(column)) {
+            fields.put(column, entry.getValue());
+        }
+    }
+
+    if (fields.isEmpty()) {
+        return;
+    }
+
+    StringBuilder sql = new StringBuilder(
+            "UPDATE Boat SET "
+    );
+
+    int count = 0;
+
+    for (String column : fields.keySet()) {
+
+        if (count > 0) {
+            sql.append(", ");
+        }
+
+        sql.append(column).append(" = ?");
+        count++;
+    }
+
+    sql.append(" WHERE boatID = ?");
+
+    try (PreparedStatement stmt =
+            conn.prepareStatement(sql.toString())) {
+
+        int index = 1;
+
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+
+            String column = entry.getKey();
+            String value = entry.getValue();
+
+            if (value == null || value.isBlank()) {
+
+                if ("boatYear".equals(column)) {
+                    stmt.setNull(index++, Types.INTEGER);
+
+                } else if ("boatBeam".equals(column)) {
+                    stmt.setNull(index++, Types.DECIMAL);
+
+                } else {
+                    stmt.setNull(index++, Types.VARCHAR);
+                }
+
+            } else if ("boatYear".equals(column)) {
+
+                stmt.setInt(
+                        index++,
+                        Integer.parseInt(value)
+                );
+
+            } else if ("boatBeam".equals(column)) {
+
+                stmt.setBigDecimal(
+                        index++,
+                        new BigDecimal(value)
+                );
+
+            } else {
+
+                stmt.setString(
+                        index++,
+                        value
+                );
+            }
+        }
+
+        stmt.setInt(index, boatId);
+
+        if (stmt.executeUpdate() != 1) {
+            throw new SQLException(
+                    "Boat update did not update one row."
+            );
+        }
+    }
+}
+
+public boolean regNumberInUseByAnotherBoat(
+        Connection conn,
+        String regNumber,
+        int boatId)
+        throws SQLException {
+
+    return identifierInUse(
+            conn,
+            "regNumber",
+            regNumber,
+            boatId
+    );
+}
+
+public boolean hinInUseByAnotherBoat(
+        Connection conn,
+        String hin,
+        int boatId)
+        throws SQLException {
+
+    return identifierInUse(
+            conn,
+            "HIN",
+            hin,
+            boatId
+    );
+}
+
+private boolean identifierInUse(
+        Connection conn,
+        String column,
+        String value,
+        int boatId)
+        throws SQLException {
+
+    if (value == null || value.isBlank()) {
+        return false;
+    }
+
+    if (!"regNumber".equals(column)
+            && !"HIN".equals(column)) {
+
+        throw new IllegalArgumentException(
+                "Unsupported identifier column"
+        );
+    }
+
+    String sql =
+            "SELECT 1 FROM Boat WHERE "
+                    + column
+                    + " = ? AND boatID <> ? LIMIT 1";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, value);
+        stmt.setInt(2, boatId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            return rs.next();
+        }
+    }
+}
+
+/**
+ * Soft remove.
+ */
+public int endOwnership(
+        Connection conn,
+        int boatId,
+        int customerId)
+        throws SQLException {
+
+    String sql = """
+            UPDATE BoatOwnership
+            SET endDate = CURRENT_DATE
+            WHERE boatID = ?
+              AND customerID = ?
+              AND endDate IS NULL
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, boatId);
+        stmt.setInt(2, customerId);
+
+        return stmt.executeUpdate();
+    }
+}
+
+public boolean hasActiveReservation(
+        Connection conn,
+        int boatId)
+        throws SQLException {
+
+    String sql = """
+            SELECT 1
+            FROM Reservation
+            WHERE boatID = ?
+              AND reservationStatus = 'Active'
+            LIMIT 1
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, boatId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            return rs.next();
+        }
+    }
+}
+
+/**
+ * Used for friendly removal error.
+ */
+public String activeReservationLocation(
+        Connection conn,
+        int boatId)
+        throws SQLException {
+
+    String sql = """
+            SELECT d.dockNumber, s.slipNumber
+            FROM Reservation r
+            JOIN Slip s ON s.slipID = r.slipID
+            JOIN Dock d ON d.dockID = s.dockID
+            WHERE r.boatID = ?
+              AND r.reservationStatus = 'Active'
+            ORDER BY r.startDate, r.reservationID
+            LIMIT 1
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, boatId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (!rs.next()) {
+                return null;
+            }
+
+            String dock = rs.getString("dockNumber");
+            int slip = rs.getInt("slipNumber");
+
+            return "Dock "
+                    + dock
+                    + ", Slip "
+                    + slip
+                    + " ("
+                    + dock
+                    + "-"
+                    + String.format("%02d", slip)
+                    + ")";
+        }
+    }
+}
 
     private Boat mapReservationBoat(ResultSet rs) throws SQLException {
         Boat boat = new Boat();
@@ -154,6 +523,62 @@ public class BoatDAO {
         return boat;
     }
 
+    private Boat mapFullBoat(ResultSet rs) throws SQLException {
+    Boat boat = new Boat();
+
+    boat.setBoatId(rs.getInt("boatID"));
+    boat.setBoatName(rs.getString("boatName"));
+    boat.setRegNumber(rs.getString("regNumber"));
+    boat.setBoatLength(rs.getBigDecimal("boatLength"));
+    boat.setHIN(rs.getString("HIN"));
+    boat.setBoatType(rs.getString("boatType"));
+    boat.setBoatBeam(rs.getBigDecimal("boatBeam"));
+
+    int year = rs.getInt("boatYear");
+
+    boat.setBoatYear(
+            rs.wasNull()
+                    ? null
+                    : year
+    );
+
+    return boat;
+}
+
+    private Boat mapFleetBoat(ResultSet rs) throws SQLException {
+    Boat boat = mapFullBoat(rs);
+
+    boat.setActiveConfirmationNumber(
+            rs.getString("activeConfirmationNumber")
+    );
+
+    boat.setActiveDockNumber(
+            rs.getString("activeDockNumber")
+    );
+
+    int slip = rs.getInt("activeSlipNumber");
+
+    boat.setActiveSlipNumber(
+            rs.wasNull()
+                    ? null
+                    : slip
+    );
+
+    java.sql.Date start =
+            rs.getDate("activeStartDate");
+
+    boat.setActiveStartDate(
+            start == null
+                    ? null
+                    : start.toLocalDate()
+    );
+
+    boat.setHasActiveReservation(
+            boat.getActiveConfirmationNumber() != null
+    );
+
+    return boat;
+}
 
 
 
