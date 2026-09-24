@@ -73,13 +73,12 @@ MoffatBay.statusPopup = (function () {
             return "Thanks — we'll be in touch as soon as we can.";
         },
 
-        /* My Fleet. There is deliberately no boatUpdated here: a successful
-           edit shows the full old -> new panel on the page instead, which
-           says the same thing and does not time out before it is read. Add
-           and Remove have no diff to show, so they stay toasts. See
-           Amendment 4 in the My Fleet contract. */
+        /* My Fleet. */
         boatAdded: function () {
             return "Boat added";
+        },
+        boatUpdated: function () {
+            return "Boat updated";
         },
         boatRemoved: function () {
             return "Boat removed from your fleet";

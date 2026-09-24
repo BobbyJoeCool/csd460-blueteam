@@ -224,7 +224,7 @@
                     My Fleet.
                 </p>
                 <a class="btn-secondary account-fleet-link"
-                   href="${pageContext.request.contextPath}/myFleet.jsp">My Fleet</a>
+                   href="${pageContext.request.contextPath}/myFleet">My Fleet</a>
             </div>
 
         </div>
