@@ -7,7 +7,7 @@ Two separate things need to go to a beta tester, and they serve opposite purpose
 Don't narrate steps or name buttons. State the goal and let them find the path; write down anywhere they hesitate, guess, or ask "wait, how do I—". Give this as one block, in order, since later tasks depend on earlier ones (you need an account before you can book, a boat before you can reserve a slip for it):
 
 1. Create an account for yourself on the site.
-2. Add a boat to your account — pick any name and length you like; use the reference card below only if it asks for something you don't know off-hand (like a HIN).
+2. Add a boat to your account — pick any name and length you like; use the reference card below only if it asks for something you don't know off-hand (like a HIN). (Make sure the boat length is between 41 and 50 feet, or less than 26 feet so it will be able to be booked at a slip!)
 3. Book a slip for that boat.
 4. Navigate to the Home Screen.
 5. Without any hints from me (or uding the back button), find your reservation again and confirm the details are right.
