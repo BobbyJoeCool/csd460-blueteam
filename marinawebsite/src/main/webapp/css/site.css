@@ -346,10 +346,11 @@ main,
    Page-specific hero overrides — photo and overlay only.
    -------------------------------------------------------------------------- */
 
-/* Registration, About Us, My Reservations: Marina.png, 60% overlay. */
+/* Registration, About Us, My Reservations, Waitlist Lookup: Marina.png, 60% overlay. */
 #registrationHero,
 #aboutHero,
-#lookUpReservationHero {
+#lookUpReservationHero,
+#waitListLookupHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
         url("../images/Marina.png");
