@@ -1,0 +1,184 @@
+/*
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * CSD 460 Capstone - Moffat Bay Marina
+ * css/waitListLookup.css
+ *
+ * Wait List Lookup page (waitListLookup.jsp).
+ * Depends on site.css for palette variables, hero styling and buttons.
+ *
+ * Front End: Sara White
+ * Back End: Miguel Fernadez
+ * Primary Author/Owner: Sara White
+ */
+
+
+/* The hero (#waitListLookupHero) is styled in site.css. */
+
+
+/* =========================================================
+   PAGE LAYOUT
+   ========================================================= */
+
+.waitlist-lookup-page {
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+}
+
+
+/* =========================================================
+   CURRENT WAITLIST SECTION
+   ========================================================= */
+
+.waitlist-availability-card {
+    padding: 1.5rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+.waitlist-availability-card h2,
+.your-waitlist-status h2 {
+    margin: 0 0 1.25rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: var(--color-text-heading);
+}
+
+
+/* =========================================================
+   SLIP SIZE SUMMARY CARDS
+   ========================================================= */
+
+.waitlist-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.waitlist-summary-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border) 22%, transparent);
+    border-radius: 8px;
+    background: var(--color-bg-surface);
+}
+
+.waitlist-summary-card h3 {
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: var(--color-deep-marine);
+    text-align: center;
+}
+
+.waitlist-summary-card p {
+    margin: 0 0 0.75rem;
+    line-height: 1.45;
+}
+
+.waitlist-summary-card strong {
+    color: var(--color-text-muted);
+}
+
+.waitlist-summary-card .btn-action {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+
+/* =========================================================
+   CUSTOMER WAITLIST STATUS
+   ========================================================= */
+
+.your-waitlist-status {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--color-bg-surface);
+    border-radius: 10px;
+}
+
+.your-waitlist-status > p {
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.waitlist-entry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+}
+
+.waitlist-entry-card {
+    padding: 1.5rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border) 22%, transparent);
+    border-radius: 8px;
+    background: var(--color-bg-card);
+}
+
+.waitlist-entry-card h3 {
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: var(--color-deep-marine);
+}
+
+.waitlist-entry-card p {
+    margin: 0 0 0.75rem;
+    line-height: 1.45;
+}
+
+.waitlist-entry-card p:last-child {
+    margin-bottom: 0;
+}
+
+.waitlist-entry-card strong {
+    color: var(--color-text-muted);
+}
+
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 48rem) {
+
+    .waitlist-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 36rem) {
+
+    .waitlist-lookup-page {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .waitlist-availability-card,
+    .your-waitlist-status {
+        padding: 1.25rem;
+    }
+
+    .waitlist-summary-card,
+    .waitlist-entry-card {
+        padding: 1.25rem;
+    }
+
+    .your-waitlist-status .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+}
