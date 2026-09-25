@@ -157,6 +157,12 @@ public class MyFleetEditServlet extends HttpServlet {
                 request.setAttribute("openForm", "edit");
                 request.setAttribute("editBoatId", boatId);
 
+                // Which fields this edit actually sent. An edit only posts
+                // the fields that changed, so the rest aren't in the
+                // request - the page must refill those from the boat on
+                // file, not from the (absent) submitted values.
+                request.setAttribute("postedFields", String.join(",", changed.keySet()));
+
                 request.setAttribute(
                         "fleet",
                         boatDAO.findFleetByCustomerId(conn, customerId)

@@ -17,8 +17,12 @@
       signInRedirectTo          where to return after signing in, handed to
                                 the login modal by the Sign in button.
 
-    Cancelling POSTs back here with action=cancel and the confirmation
-    number. See documentation/Page Contracts/Reservation Summary.md.
+    A confirmation screen only: the servlet shows it right after a booking,
+    a cancellation, a 30-day notice or a withdrawn notice, and sends any other visit to My
+    Reservations, which is where reservations are viewed and changed. The
+    hero says which of these just happened, read from the reservation
+    itself (cancelled / notice withdrawn / notice open / otherwise booked). See
+    documentation/Page Contracts/Reservation Summary.md.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
@@ -88,7 +92,7 @@
 
         <div class="summary-error-actions">
             <a class="btn-primary summary-link-button"
-               href="${pageContext.request.contextPath}/reservation">Return to Reservations</a>
+               href="${pageContext.request.contextPath}/reservations">Go to My Reservations</a>
         </div>
     </c:when>
 
@@ -102,6 +106,28 @@
                 <h1>Your Reservation Has Been Cancelled</h1>
                 <p class="summary-lede">
                     This reservation is no longer active.
+                </p>
+            </c:when>
+
+            <c:when test="${reservation.noticeStatus == 'Withdrawn'}">
+                <div class="summary-success-mark" aria-hidden="true">&#10003;</div>
+                <p class="summary-eyebrow">30-Day Notice Withdrawn</p>
+                <h1>Your Lease Continues</h1>
+                <p class="summary-lede">
+                    Your notice has been withdrawn, and your lease carries on
+                    month to month at the same rate.
+                </p>
+            </c:when>
+
+            <c:when test="${reservation.noticeOpen}">
+                <div class="summary-success-mark" aria-hidden="true">&#10003;</div>
+                <p class="summary-eyebrow">30-Day Notice Received</p>
+                <h1>Your Lease End Date Is Set</h1>
+                <p class="summary-lede">
+                    Your lease end date is
+                    <fmt:formatDate value="${reservation.terminationDate}" pattern="MMM d, yyyy" />.
+                    Your monthly rate continues until then, and you may
+                    withdraw this notice until ${reservation.noticeWithdrawalCutoffDays} days before that date.
                 </p>
             </c:when>
 
@@ -160,6 +186,14 @@
                                 <dd><fmt:formatDate value="${reservation.startDate}" pattern="MMM d, yyyy" /></dd>
                             </div>
 
+                            <%-- A lease only has an end date once notice is given. --%>
+                            <c:if test="${reservation.noticeOpen and not empty reservation.terminationDate}">
+                                <div>
+                                    <dt>Lease End Date</dt>
+                                    <dd><fmt:formatDate value="${reservation.terminationDate}" pattern="MMM d, yyyy" /></dd>
+                                </div>
+                            </c:if>
+
                             <c:if test="${not empty reservation.baseMonthlyRate}">
                                 <div>
                                     <dt>Slip Rental</dt>
@@ -191,32 +225,17 @@
             <section class="summary-actions" aria-labelledby="actionsHeading">
                 <div>
                     <p class="summary-section__kicker">Need to make a change?</p>
-                    <h2 id="actionsHeading">Manage Your Reservation</h2>
+                    <h2 id="actionsHeading">Manage Your Reservations</h2>
                     <p>
-                        You can return to the reservation page, or cancel this
-                        reservation. Cancelling can't be undone - you would need
-                        to book again.
+                        Changes are made on My Reservations: cancel a
+                        reservation before its lease starts, or give 30 days'
+                        notice once it has.
                     </p>
                 </div>
 
                 <div class="summary-actions__buttons">
                     <a class="btn-primary summary-link-button"
-                       href="${pageContext.request.contextPath}/reservation">Back to Reservations</a>
-                    <%-- Only an Active reservation can be cancelled. The servlet
-                         checks this as well - the confirm() below is a courtesy,
-                         not a control. --%>
-                    <c:if test="${reservation.active}">
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/reservationSummary"
-                              onsubmit="return confirm('Cancel this reservation? This cannot be undone.');">
-                            <input type="hidden" name="action" value="cancel">
-                            <input type="hidden" name="confirmation"
-                                   value="${reservation.confirmationNumber}">
-                            <button type="submit" class="summary-cancel-button">
-                                Cancel Reservation
-                            </button>
-                        </form>
-                    </c:if>
+                       href="${pageContext.request.contextPath}/reservations">Go to My Reservations</a>
                 </div>
             </section>
         </div>

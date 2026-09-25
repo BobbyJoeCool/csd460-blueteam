@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,7 +24,8 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
  * Data access for the {@code Reservation} table.
  *
  * <p>This file currently holds the read side only - what the Reservation
- * Summary page needs to look a booking up and to cancel it. The booking
+ * Summary page needs to look a booking up, and what My Reservations needs
+ * to cancel one, or record or withdraw a 30-day termination notice. The booking
  * insert, slip assignment and availability queries belong to the Reservation
  * page and are being added separately; both halves live here on purpose so
  * there is one place that knows how a reservation is stored.
@@ -43,6 +45,9 @@ public class ReservationDAO {
      * which dock, which slip, what size. The Rate row comes along for the
      * electric fee so the total can be itemised - LEFT JOIN because a missing
      * rate row should blank one line, not lose the whole reservation.
+     * TerminationNotice is LEFT JOINed for the same reason - most
+     * reservations never have one - and its reservationID is UNIQUE, so the
+     * join can't turn one reservation into two rows.
      *
      * No WHERE clause: each method below appends its own. Every column here is
      * read by mapDetails(), so a column added or renamed here has to change
@@ -66,7 +71,10 @@ public class ReservationDAO {
                     d.dockDescription,
                     s.slipNumber,
                     sz.sizeFt,
-                    e.rateAmount AS electricMonthlyRate
+                    e.rateAmount AS electricMonthlyRate,
+                    tn.noticeStatus,
+                    tn.noticeDate,
+                    tn.terminationDate
             FROM Reservation r
             JOIN Customer c ON c.customerID = r.customerID
             JOIN Boat     b  ON b.boatID     = r.boatID
@@ -74,6 +82,7 @@ public class ReservationDAO {
             JOIN Dock     d  ON d.dockID     = s.dockID
             JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
             LEFT JOIN Rate e ON e.rateCode   = 'ELECTRIC_MONTHLY'
+            LEFT JOIN TerminationNotice tn ON tn.reservationID = r.reservationID
             """;
 
     /**
@@ -227,11 +236,15 @@ public class ReservationDAO {
      * the marina still needs to know the booking happened, and BR-16 keeps a
      * reservation tied to the customer who made it.
      *
+     * <p>Only a reservation that hasn't started can be cancelled. Once the
+     * start date arrives the lease is running, and ending it takes 30 days'
+     * notice instead - see {@link #submitTerminationNotice}.
+     *
      * <p>The customer ID is part of the WHERE clause, not checked beforehand.
      * A caller that checked first and then updated would leave a gap between
      * the two where the answer could change; this way the database decides,
-     * and a row count of zero means it was not theirs, not there, or already
-     * cancelled.
+     * and a row count of zero means it was not theirs, not there, already
+     * cancelled, or already started.
      *
      * @param reservationId the reservation to cancel
      * @param customerId the customer the reservation must belong to
@@ -246,6 +259,7 @@ public class ReservationDAO {
                 WHERE reservationID = ?
                   AND customerID = ?
                   AND reservationStatus = 'Active'
+                  AND startDate > CURDATE()
                 """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -253,6 +267,164 @@ public class ReservationDAO {
 
             stmt.setInt(1, reservationId);
             stmt.setInt(2, customerId);
+            return stmt.executeUpdate() == 1;
+        }
+    }
+
+    /**
+     * Withdraws a customer's open termination notice (BR-23), so the lease
+     * carries on month to month. The row is kept with status
+     * {@code Withdrawn} - the history stays, and a later notice reuses it
+     * (see {@link #submitTerminationNotice}).
+     *
+     * <p>One UPDATE whose WHERE clause holds every rule, so there's no gap
+     * between checking and changing: the reservation is this customer's and
+     * Active, the notice is Submitted, Pending or Approved, and its last day
+     * is no earlier than {@code earliestLastDay}. The caller passes today
+     * plus {@code Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS}, so the cutoff lives
+     * only in Utils. A notice with no last day recorded can be withdrawn.
+     *
+     * @param reservationId the reservation whose notice to withdraw
+     * @param customerId the customer it must belong to
+     * @param earliestLastDay the earliest last day that can still be withdrawn
+     * @return {@code true} if a notice was withdrawn, {@code false} if none
+     *         qualified (not theirs, none open, or past the cutoff)
+     * @throws SQLException if the update fails
+     */
+    public boolean withdrawTerminationNotice(int reservationId, int customerId,
+            LocalDate earliestLastDay) throws SQLException {
+        String sql = """
+                UPDATE TerminationNotice tn
+                JOIN Reservation r ON r.reservationID = tn.reservationID
+                SET tn.noticeStatus = 'Withdrawn'
+                WHERE tn.reservationID = ?
+                  AND r.customerID = ?
+                  AND r.reservationStatus = 'Active'
+                  AND tn.noticeStatus IN ('Submitted', 'Pending', 'Approved')
+                  AND (tn.terminationDate IS NULL OR tn.terminationDate >= ?)
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, reservationId);
+            stmt.setInt(2, customerId);
+            stmt.setDate(3, Date.valueOf(earliestLastDay));
+            return stmt.executeUpdate() == 1;
+        }
+    }
+
+    /**
+     * Records a customer's 30-day termination notice (BR-21) on a lease that
+     * has started, with the last day they chose.
+     *
+     * <p>The caller has already checked the date against
+     * {@code Utils.isValidTerminationDate}. This method checks everything
+     * that depends on the database, inside one transaction with the rows
+     * locked, so two submits at once can't both get through:
+     *
+     * <ul>
+     *   <li>the reservation is this customer's, Active, and has started;</li>
+     *   <li>it has no open notice. {@code TerminationNotice.reservationID} is
+     *       UNIQUE, so a reservation only ever has one row: a Withdrawn one
+     *       (BR-23) is reused for the new notice rather than added to.</li>
+     * </ul>
+     *
+     * <p>{@code terminationDate} is filled in on submission with the day the
+     * customer asked for; {@code noticeStatus} starts at {@code Submitted}.
+     *
+     * @param reservationId the reservation the notice is for
+     * @param customerId the customer it must belong to
+     * @param lastDay the lease's requested last day
+     * @return {@code true} if the notice was recorded, {@code false} if the
+     *         reservation wasn't eligible (not theirs, not Active, not
+     *         started, or a notice already open)
+     * @throws SQLException if the database work fails
+     */
+    public boolean submitTerminationNotice(int reservationId, int customerId, LocalDate lastDay)
+            throws SQLException {
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                boolean recorded = recordNotice(conn, reservationId, customerId, lastDay);
+                if (recorded) {
+                    conn.commit();
+                } else {
+                    conn.rollback();
+                }
+                return recorded;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    /**
+     * The body of {@link #submitTerminationNotice}, run inside its
+     * transaction.
+     */
+    private boolean recordNotice(Connection conn, int reservationId, int customerId,
+            LocalDate lastDay) throws SQLException {
+
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT 1
+                FROM Reservation
+                WHERE reservationID = ?
+                  AND customerID = ?
+                  AND reservationStatus = 'Active'
+                  AND startDate <= CURDATE()
+                FOR UPDATE
+                """)) {
+            stmt.setInt(1, reservationId);
+            stmt.setInt(2, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+            }
+        }
+
+        String existingStatus = null;
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT noticeStatus
+                FROM TerminationNotice
+                WHERE reservationID = ?
+                FOR UPDATE
+                """)) {
+            stmt.setInt(1, reservationId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    existingStatus = rs.getString("noticeStatus");
+                }
+            }
+        }
+
+        String sql;
+        if (existingStatus == null) {
+            sql = """
+                    INSERT INTO TerminationNotice
+                        (terminationDate, reservationID, noticeDate, noticeStatus)
+                    VALUES (?, ?, CURDATE(), 'Submitted')
+                    """;
+        } else if ("Withdrawn".equals(existingStatus)) {
+            sql = """
+                    UPDATE TerminationNotice
+                    SET terminationDate = ?,
+                        noticeDate = CURDATE(),
+                        noticeStatus = 'Submitted'
+                    WHERE reservationID = ?
+                    """;
+        } else {
+            return false;
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(lastDay));
+            stmt.setInt(2, reservationId);
             return stmt.executeUpdate() == 1;
         }
     }
@@ -494,6 +666,10 @@ public class ReservationDAO {
         details.setSlipSizeFt(rs.getInt("sizeFt"));
 
         details.setElectricMonthlyRate(rs.getBigDecimal("electricMonthlyRate"));
+
+        details.setNoticeStatus(rs.getString("noticeStatus"));
+        details.setNoticeDate(rs.getDate("noticeDate"));
+        details.setTerminationDate(rs.getDate("terminationDate"));
 
         return details;
     }

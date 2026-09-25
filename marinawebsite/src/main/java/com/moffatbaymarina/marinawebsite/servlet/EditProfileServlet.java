@@ -94,16 +94,9 @@ public class EditProfileServlet extends HttpServlet {
         // (see doPost) rather than forwarding directly, so a page refresh
         // reloads the page instead of re-submitting the save - same
         // problem RegisterServlet already avoids by redirecting on its
-        // own success case. The diff can't ride along on a redirect's
-        // request attributes (a redirect is a brand new request), so it's
-        // stashed in the session for exactly one read: promoted to a
-        // request attribute here, then removed immediately, so a later
-        // refresh of this same page doesn't keep re-showing an old diff.
-        Object diff = session.getAttribute("profileUpdateDiff");
-        if (diff != null) {
-            request.setAttribute("changes", diff);
-            session.removeAttribute("profileUpdateDiff");
-        }
+        // own success case. The "Profile updated" toast is all the page
+        // shows afterwards: the old -> new list is shown BEFORE saving, in
+        // the page's confirmation popup, not after.
 
         request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
     }
@@ -206,8 +199,8 @@ public class EditProfileServlet extends HttpServlet {
         }
 
         // ------------------------------------------------------------
-        // 3. Capture old values before writing anything - needed for the
-        //    before/after diff summary the contract asks for.
+        // 3. Compare against what's on file, so only fields that really
+        //    differ are written.
         // ------------------------------------------------------------
         Map<String, String[]> changes = new LinkedHashMap<>();
         for (Map.Entry<String, String> field : submitted.entrySet()) {
@@ -267,12 +260,10 @@ public class EditProfileServlet extends HttpServlet {
         }
 
         // Redirect, not forward - a refresh of the result page then just
-        // reloads it instead of re-submitting the same update. The diff
-        // can't travel as a request attribute across a redirect, so it
-        // rides in the session for the one read doGet gives it above; the
-        // confirmation toast reuses the same ?notice= mechanism statusPopup.js
-        // already understands (loggedIn, registered, passwordReset).
-        session.setAttribute("profileUpdateDiff", changes);
+        // reloads it instead of re-submitting the same update. The
+        // "Profile updated" toast reuses the same ?notice= mechanism
+        // statusPopup.js already understands (loggedIn, registered,
+        // passwordReset).
         response.sendRedirect(request.getContextPath() + "/editProfile?notice=profileUpdated");
     }
 

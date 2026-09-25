@@ -29,10 +29,13 @@
     <jsp:param name="activePage" value="register" />
 </jsp:include>
 
-<section class="hero-band" id="registrationHero">
-    <h1>Create Your Moffat Bay Marina Account</h1>
-    <p>An account is required to reserve a slip. It only takes a minute.</p>
-</section>
+<header class="hero-band" id="registrationHero">
+    <div class="hero-band__content">
+        <h1>Create Your Moffat Bay Marina Account</h1>
+        <p class="hero-band__lede">An account is required to reserve a slip. It only takes a minute.</p>
+    </div>
+    <p class="hero-band__credit">Hero image created with Google Gemini</p>
+</header>
 
 <c:if test="${not empty requestScope.formError}">
     <div class="form-banner" role="alert">${fn:escapeXml(requestScope.formError)}</div>

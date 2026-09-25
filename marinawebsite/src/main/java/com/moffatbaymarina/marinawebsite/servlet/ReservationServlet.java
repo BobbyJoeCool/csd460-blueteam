@@ -211,6 +211,10 @@ public class ReservationServlet extends HttpServlet {
 
                 conn.commit();
 
+                // reservation.js navigates to the Summary page next; this is
+                // what lets it show this one reservation.
+                ReservationSummaryServlet.grantAccess(request, confirmation);
+
                 writeJson(response,
                         "{\"ok\":true,\"confirmationNumber\":\""
                                 + Utils.jsonEscape(confirmation) + "\"}");

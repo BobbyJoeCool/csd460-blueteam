@@ -2,6 +2,7 @@ package com.moffatbaymarina.marinawebsite.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,12 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Backs the My Reservations page: lists the signed-in customer's
  * reservations, newest first, with optional filters.
+ *
+ * <p>Each reservation also carries what can be done with it: cancelled
+ * before its lease starts, given 30 days' notice after, or that notice
+ * withdrawn until the cutoff before its last day. Those buttons
+ * post to ReservationChangeServlet; a refusal comes back here as a one-time
+ * {@code actionError} banner.
  *
  * <p>Results are always limited to the {@code customerId} in the session,
  * so a customer can only ever see their own reservations, whatever is typed
@@ -98,6 +105,20 @@ public class LookUpReservationServlet extends HttpServlet {
 
             request.setAttribute("reservations", reservations);
             request.setAttribute("reservationYears", reservationYears);
+
+            // A cancel or notice that ReservationChangeServlet turned down.
+            request.setAttribute("actionError",
+                    Utils.takeSessionAttribute(request, ReservationChangeServlet.ERROR_FLASH));
+
+            // The notice popup's date range, so the 30-day rule (BR-21)
+            // lives only in Utils and the date picker just reads it.
+            LocalDate today = LocalDate.now();
+            request.setAttribute("earliestTerminationDate", Utils.earliestTerminationDate(today).toString());
+            request.setAttribute("latestTerminationDate", Utils.latestTerminationDate(today).toString());
+            request.setAttribute("earliestTerminationDisplay",
+                    Utils.formatDisplayDate(Utils.earliestTerminationDate(today)));
+            request.setAttribute("minNoticeDays", Utils.MIN_TERMINATION_NOTICE_DAYS);
+            request.setAttribute("noticeWithdrawalCutoffDays", Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS);
 
             // The filters as actually applied (invalid values already
             // dropped), so the form can show what the results reflect.

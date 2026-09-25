@@ -25,6 +25,21 @@
       filtersApplied    - picks between the two empty-state messages.
       filterError       - a reservation number with characters no
                           confirmation number has.
+      actionError       - a cancel or 30-day notice that was turned down,
+                          shown once.
+      earliestTerminationDate / latestTerminationDate (yyyy-MM-dd),
+      earliestTerminationDisplay, minNoticeDays
+                        - the notice popup's date range (BR-21).
+      noticeWithdrawalCutoffDays
+                        - how many days before a notice's last day it can
+                          still be withdrawn (BR-23), for the card's wording.
+
+    Each card offers Cancel Reservation before its lease starts, Submit
+    30-Day Notice after, and Withdraw Notice while a notice is open and
+    it's not yet too close to the last day. Each opens a popup and posts to
+    ReservationChangeServlet (/reservations/cancel, /reservations/notice,
+    /reservations/withdraw), which lands on the Reservation Summary as the
+    confirmation.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
@@ -60,7 +75,7 @@
         <jsp:param name="activePage" value="lookup" />
     </jsp:include>
 
-    <section class="hero-band" id="lookUpReservationHero">
+    <header class="hero-band" id="lookUpReservationHero">
         <div class="hero-band__content">
             <h1>My Reservations</h1>
 
@@ -68,7 +83,8 @@
                 Your upcoming and past slip reservations.
             </p>
         </div>
-    </section>
+        <p class="hero-band__credit">Hero image created with Google Gemini</p>
+    </header>
 
     <main class="lookup-page">
 
@@ -182,6 +198,13 @@
 
         </section>
 
+        <%-- A cancel or notice ReservationChangeServlet turned down. --%>
+        <c:if test="${not empty actionError}">
+            <div class="form-banner lookup-banner" role="alert">
+                <c:out value="${actionError}" />
+            </div>
+        </c:if>
+
         <c:choose>
 
             <c:when test="${not empty reservations}">
@@ -198,7 +221,12 @@
 
                     <c:forEach var="reservation" items="${reservations}">
 
-                        <article class="reservation-card">
+                        <article class="reservation-card"
+                                 data-confirmation="${fn:escapeXml(reservation.confirmationNumber)}"
+                                 data-boat-name="${fn:escapeXml(reservation.boatName)}"
+                                 data-location="Dock ${fn:escapeXml(reservation.dockNumber)}, Slip ${reservation.slipNumber}"
+                                 data-start="<fmt:formatDate value='${reservation.startDate}' pattern='MMM d, yyyy' />"
+                                 data-last-day="<fmt:formatDate value='${reservation.terminationDate}' pattern='MMM d, yyyy' />">
 
                             <h3>Reservation <c:out value="${reservation.confirmationNumber}" /></h3>
 
@@ -209,6 +237,20 @@
                                         <strong>Start Date</strong><br>
                                         <fmt:formatDate value="${reservation.startDate}" pattern="MMM d, yyyy" />
                                     </p>
+
+                                    <%-- Only while a notice is in progress: that's when
+                                         the lease has an end date. --%>
+                                    <c:if test="${reservation.noticeOpen}">
+                                        <p>
+                                            <strong>Lease End Date</strong><br>
+                                            <c:choose>
+                                                <c:when test="${not empty reservation.terminationDate}">
+                                                    <fmt:formatDate value="${reservation.terminationDate}" pattern="MMM d, yyyy" />
+                                                </c:when>
+                                                <c:otherwise>Not set yet</c:otherwise>
+                                            </c:choose>
+                                        </p>
+                                    </c:if>
 
                                     <p>
                                         <strong>Dock / Slip</strong><br>
@@ -228,6 +270,13 @@
                                         <c:out value="${reservation.reservationStatus}" />
                                     </p>
 
+                                    <c:if test="${not empty reservation.noticeStatus}">
+                                        <p>
+                                            <strong>30-Day Notice</strong><br>
+                                            <c:out value="${reservation.noticeStatus}" />
+                                        </p>
+                                    </c:if>
+
                                     <p>
                                         <strong>Monthly Rate</strong><br>
                                         <fmt:formatNumber value="${reservation.monthlyRate}" type="currency" />/mo
@@ -246,6 +295,39 @@
                                 </div>
 
                             </div>
+
+                            <%-- What can be done depends on whether the lease has
+                                 started (ReservationDetails decides; the servlet
+                                 and DAO re-check). Before: cancel outright. After:
+                                 30 days' notice. With a notice open: withdraw it,
+                                 until the cutoff before its last day (BR-23).
+                                 Each button opens a popup below. --%>
+                            <c:if test="${reservation.cancellable or reservation.noticeAllowed or (reservation.active and reservation.noticeOpen)}">
+                                <div class="reservation-card__actions">
+                                    <c:choose>
+                                        <c:when test="${reservation.cancellable}">
+                                            <button type="button" class="btn-outline btn-danger js-open-cancel">Cancel Reservation</button>
+                                            <span class="reservation-card__hint">Available until your lease starts.</span>
+                                        </c:when>
+                                        <c:when test="${reservation.noticeAllowed}">
+                                            <button type="button" class="btn-outline js-open-notice">Submit 30-Day Notice</button>
+                                            <span class="reservation-card__hint">Your lease has started, so ending it takes at least 30 days' notice.</span>
+                                        </c:when>
+                                        <c:when test="${reservation.noticeWithdrawable}">
+                                            <button type="button" class="btn-outline js-open-withdraw">Withdraw Notice</button>
+                                            <span class="reservation-card__hint">
+                                                <c:choose>
+                                                    <c:when test="${not empty reservation.withdrawDeadlineDisplay}">Changed your mind? You may withdraw this notice until ${noticeWithdrawalCutoffDays} days before your lease end date (<c:out value="${reservation.withdrawDeadlineDisplay}" />).</c:when>
+                                                    <c:otherwise>Changed your mind? You may withdraw this notice until ${noticeWithdrawalCutoffDays} days before your lease end date.</c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="reservation-card__hint">This notice can no longer be withdrawn. A notice may be withdrawn until ${noticeWithdrawalCutoffDays} days before the lease end date, which was <c:out value="${reservation.withdrawDeadlineDisplay}" />.</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </c:if>
 
                         </article>
 
@@ -276,6 +358,121 @@
 </c:choose>
 
     </main>
+
+<c:if test="${not signInRequired and not empty reservations}">
+
+<%-- Cancel confirmation. Filled in by lookUpReservation.js from the card
+     that was clicked; open/close comes from modal.js. --%>
+<div class="modal" id="cancelModal" role="dialog" aria-modal="true"
+     aria-labelledby="cancelModalTitle" hidden>
+
+    <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+    <div class="modal__box modal__box--narrow">
+
+        <div class="modal__header">
+            <h2 class="modal__title" id="cancelModalTitle">Cancel this reservation?</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="modal__question" id="cancelQuestion"></p>
+        <p class="modal__note">
+            Cancelling can't be undone. The slip is released, and you would
+            need to book again to get one.
+        </p>
+
+        <form method="post" action="${pageContext.request.contextPath}/reservations/cancel">
+            <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
+            <div class="modal__actions">
+                <button type="button" class="btn-outline" data-modal-close>Keep Reservation</button>
+                <button type="submit" class="btn-action btn-danger">Yes, Cancel It</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<%-- 30-day termination notice (BR-21). The date range comes from
+     LookUpReservationServlet, which reads it from Utils - the rule has one
+     home, and TerminationNotice/ReservationChangeServlet check it again. --%>
+<div class="modal" id="noticeModal" role="dialog" aria-modal="true"
+     aria-labelledby="noticeModalTitle" hidden>
+
+    <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+    <div class="modal__box modal__box--narrow">
+
+        <div class="modal__header">
+            <h2 class="modal__title" id="noticeModalTitle">Submit 30-Day Notice</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="modal__question" id="noticeQuestion"></p>
+        <p class="modal__note">
+            Your lease is month-to-month and needs at least ${minNoticeDays}
+            days' notice. Choose your lease end date: the last day your boat
+            will be in the slip.
+        </p>
+
+        <form method="post" action="${pageContext.request.contextPath}/reservations/notice" id="noticeForm" novalidate>
+            <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
+
+            <div class="form-group lookup-notice__date">
+                <label for="lastDay">Lease End Date</label>
+                <input type="date" id="lastDay" name="lastDay" required
+                       min="${earliestTerminationDate}" max="${latestTerminationDate}"
+                       value="${earliestTerminationDate}"
+                       aria-describedby="lastDayHint lastDayError">
+                <p class="field-hint" id="lastDayHint">
+                    The earliest you can choose is <c:out value="${earliestTerminationDisplay}" />.
+                </p>
+                <p class="field-error" id="lastDayError"></p>
+            </div>
+
+            <div class="modal__actions">
+                <button type="button" class="btn-outline" data-modal-close>Go Back</button>
+                <button type="submit" class="btn-action">Submit Notice</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<%-- Withdraw a 30-day notice (BR-23). Allowed until
+     Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS before the notice's last day; the
+     button only shows while it is, and the DAO checks again. --%>
+<div class="modal" id="withdrawModal" role="dialog" aria-modal="true"
+     aria-labelledby="withdrawModalTitle" hidden>
+
+    <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+    <div class="modal__box modal__box--narrow">
+
+        <div class="modal__header">
+            <h2 class="modal__title" id="withdrawModalTitle">Withdraw your 30-day notice?</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="modal__question" id="withdrawQuestion"></p>
+        <p class="modal__note">
+            Your lease carries on month to month at the same rate, as if the
+            notice had never been given. You may withdraw a notice until
+            ${noticeWithdrawalCutoffDays} days before your lease end date, and
+            you can give notice again later.
+        </p>
+
+        <form method="post" action="${pageContext.request.contextPath}/reservations/withdraw">
+            <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
+            <div class="modal__actions">
+                <button type="button" class="btn-outline" data-modal-close>Keep Notice</button>
+                <button type="submit" class="btn-action">Yes, Withdraw It</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</c:if>
 
 <jsp:include page="/includes/footer.jsp" />
 

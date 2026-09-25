@@ -57,11 +57,11 @@ MoffatBay.statusPopup = (function () {
         reservationCancelled: function () {
             return "Reservation cancelled";
         },
-        /* The cancel went through but changed nothing, which in practice
-           means it had already been cancelled - usually a double click or
-           a resubmitted form. Says so rather than claiming success. */
-        reservationNotCancelled: function () {
-            return "That reservation was already cancelled";
+        terminationNoticeSubmitted: function () {
+            return "30-day notice submitted";
+        },
+        terminationNoticeWithdrawn: function () {
+            return "30-day notice withdrawn";
         },
 
         waitListJoined: function (size) {

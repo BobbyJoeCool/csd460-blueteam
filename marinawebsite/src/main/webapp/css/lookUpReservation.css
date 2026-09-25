@@ -13,18 +13,8 @@
  */
 
 
-/* =========================================================
-   HERO
-   ========================================================= */
-
-#lookUpReservationHero {
-    background-image:
-        linear-gradient(
-            rgba(13, 59, 77, 0.6),
-            rgba(13, 59, 77, 0.6)
-        ),
-        url("../images/Marina.png");
-}
+/* The hero (#lookUpReservationHero) is styled entirely in site.css,
+   alongside every other page's hero. */
 
 
 /* =========================================================
@@ -219,6 +209,42 @@
 
 
 /* =========================================================
+   CARD ACTIONS (Cancel Reservation / Submit 30-Day Notice)
+   The buttons are site.css's .btn-outline (+ .btn-danger), and
+   the popups they open are site.css's shared .modal.
+   ========================================================= */
+
+.reservation-card__actions {
+    margin-top: 1.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.reservation-card__hint {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
+/* A turned-down cancel or notice, above the list. */
+.lookup-banner {
+    max-width: none;
+    margin: 0 0 1.5rem;
+}
+
+/* The notice popup's date picker, between the note and the buttons. */
+.lookup-notice__date {
+    margin-top: 1rem;
+}
+
+
+/* =========================================================
    EMPTY STATES
    ========================================================= */
 
@@ -265,5 +291,9 @@
     .reservation-details {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .reservation-card__actions > button {
+        flex: 1 1 100%;
     }
 }

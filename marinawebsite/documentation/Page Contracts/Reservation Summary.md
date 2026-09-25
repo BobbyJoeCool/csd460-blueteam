@@ -14,6 +14,18 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 - Back End: Miguel
 - Testing: Robert
 
+## Amended 2026-09-24: Confirmation Screen Only
+
+This page is now **only** a confirmation screen, shown right after a reservation changes: booked (Reservation page), cancelled, given 30 days' notice, or that notice withdrawn (all three on My Reservations). It is no longer a page to browse to, and it no longer cancels anything. Changes are made on My Reservations; see that contract.
+
+- **Access.** Whatever made the change calls `ReservationSummaryServlet.grantAccess()` (or `redirectTo()`, which grants and redirects), storing that one confirmation number in the session as `reservationSummaryAccess`. A GET for any other confirmation number redirects to `/reservations?reservationNumber=...`. The grant isn't used up on the first view, so a refresh still works; the next change replaces it, and signing in again starts a session without one.
+- **What it shows.** The hero reads the reservation itself: cancelled → "Your Reservation Has Been Cancelled"; notice `Withdrawn` → "Your Lease Continues"; a notice open (`noticeOpen`) → "Your Lease End Date Is Set" with the last day; otherwise → "Your Slip Is Reserved".
+- **No POST.** Cancelling moved to `POST /reservations/cancel` (`ReservationChangeServlet`), and only works before the lease starts. After that, `POST /reservations/notice` records a 30-day termination notice.
+- **Manage section.** The Cancel button is gone; the page links to My Reservations instead.
+- **Signed out.** The sign-in panel's button now returns to `/reservations`, since a fresh session has no grant to show a summary.
+
+Sections below that describe direct access, the POST, or the Cancel button are **superseded** by this amendment and marked where they appear.
+
 ## Open Questions / Decisions Needed
 
 ### Front End Owns
@@ -46,12 +58,12 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
   | `confirmation` | query string | The confirmation number, e.g. `MB-00061` |
   | `reservation` | request attribute | A `ReservationDetails` bean, set on success |
   | `reservationSummaryError` | request attribute | A ready-to-display message, set instead of `reservation` when there is nothing to show |
-  | `notice` | query string | `reservationCancelled` / `reservationNotCancelled` after a cancel, read by the shared status popup |
+  | `notice` | query string | `reservationCancelled` after a cancel, `terminationNoticeSubmitted` after a 30-day notice, `terminationNoticeWithdrawn` after withdrawing one, read by the shared status popup (**amended 2026-09-24**) |
 
   `reservation` and `reservationSummaryError` are never both set. The page shows one
   or the other.
 
-- [x] **Is this page accessible directly by URL?** Yes. `GET
+- [x] **Is this page accessible directly by URL?** **Superseded 2026-09-24: no, only right after a change - see the amendment above.** Originally: yes. `GET
   /reservationSummary?confirmation=MB-00061` works at any time, not only
   straight after booking. Look Up Reservation will redirect here next module,
   so building it any other way would mean rewriting it in a week.
@@ -82,11 +94,11 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
   real, which is the same reasoning the Login contract uses for its single
   generic failure message.
 
-- [x] **Servlet URL mapping:** `/reservationSummary`, GET and POST.
+- [x] **Servlet URL mapping:** `/reservationSummary`, GET only (**amended 2026-09-24**; the POST moved to `/reservations/cancel`).
 
 ### Cancelling a Reservation
 
-The Reservation contract puts cancellation here, since this is the one place a
+**Superseded 2026-09-24.** Cancelling moved to My Reservations (`POST /reservations/cancel`), and only a reservation whose lease hasn't started can be cancelled. The rules below still hold there. Originally: the Reservation contract put cancellation here, since this is the one place a
 customer already has a reservation in front of them.
 
 - **POST** to `/reservationSummary` with `action=cancel` and `confirmation`.
@@ -111,7 +123,13 @@ live across four tables and the DAO joins them once.
 | `${reservation.confirmationNumber}` | String | e.g. `MB-00061` |
 | `${reservation.startDate}` | java.util.Date | Lease start. A `java.util.Date` rather than `LocalDate` on purpose - JSTL's `<fmt:formatDate>` only accepts one, and `rs.getDate()` already returns a `java.sql.Date`, so nothing is converted |
 | `${reservation.reservationStatus}` | String | `Active` / `Cancelled` / `Completed` |
-| `${reservation.active}` | boolean | Convenience for showing the Cancel button |
+| `${reservation.active}` | boolean | `reservationStatus` is `Active` |
+| `${reservation.started}` | boolean | **Added 2026-09-24.** Start date is today or earlier |
+| `${reservation.cancellable}` | boolean | **Added 2026-09-24.** Active and not started |
+| `${reservation.noticeAllowed}` | boolean | **Added 2026-09-24.** Active, started, no notice open |
+| `${reservation.noticeOpen}` | boolean | **Added 2026-09-24.** Notice status is `Submitted`, `Pending` or `Approved` |
+| `${reservation.noticeStatus}` | String | **Added 2026-09-24.** From `TerminationNotice`; null if none |
+| `${reservation.noticeDate}` / `${reservation.terminationDate}` | java.util.Date | **Added 2026-09-24.** When notice was given / the chosen last day |
 | `${reservation.cancelled}` | boolean | Convenience for the cancelled styling |
 | `${reservation.boatName}` | String | |
 | `${reservation.boatType}` | String | Sailboat, powerboat and so on. May be null - optional at registration |
@@ -154,7 +172,7 @@ This page includes the shared header/footer and identifies itself for nav highli
 
 ## Front End Variables
 
-The page displays a reservation; the only thing it submits is a cancellation.
+**Amended 2026-09-24:** the page submits nothing; the table below is historical. Originally: the page displays a reservation; the only thing it submits is a cancellation.
 
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
@@ -203,7 +221,8 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | Reservation belongs to another customer | Same message | Same — deliberately indistinguishable from the two above, so the page can't be used to discover which confirmation numbers exist |
 | Not signed in | No message on this page | **Corrected** — this used to say "redirected to the landing page," which doesn't match what's built. `ReservationSummaryServlet` forwards (doesn't redirect) to this same page, HTTP 401, with `signInRedirectTo` set as a request attribute. `reservationSummary.jsp` renders its own "Sign in to view your reservation" panel and hands `signInRedirectTo` to the login modal, so the confirmation number in the URL survives and a successful sign-in lands right back here — a redirect to the landing page would have thrown that away |
 | Cancel succeeded | "Reservation cancelled" | Shared status popup, via `?notice=reservationCancelled` |
-| Cancel did nothing (already cancelled) | Wording via `?notice=reservationNotCancelled` | Shared status popup |
+| 30-day notice submitted | "30-day notice submitted" | Shared status popup, via `?notice=terminationNoticeSubmitted` |
+| Confirmation number not the one just changed | No message | **Added 2026-09-24.** Redirect to My Reservations, filtered to that number |
 | Database failure | Standard error page | `error.jsp`, per `web.xml` |
 
 ## Login State Differences
@@ -212,4 +231,4 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | --- | --- | --- |
 | Reservation summary | Shown, if the reservation is theirs | **Corrected** — this page's own sign-in panel is shown (forward, not a redirect to the landing page), with the login modal opened from there; returns here after signing in |
 | Someone else's reservation | Same "couldn't find that reservation" message as one that doesn't exist | n/a |
-| Cancel button | Shown only while the reservation is `Active` | n/a |
+| Cancel button | **Removed 2026-09-24** - cancelling is on My Reservations | n/a |

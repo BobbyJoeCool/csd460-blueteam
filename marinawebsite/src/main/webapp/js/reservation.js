@@ -802,7 +802,7 @@ MoffatBay.reservation = (function () {
     }
 
     /**
-     * Arriving from My Fleet's "Reserve a Slip" link, which carries
+     * Arriving from My Fleet's "Book a Slip" link, which carries
      * ?boatId= so the customer lands here with the boat they were looking
      * at already chosen, rather than having to find it again in a dropdown
      * they just came from.
