@@ -22,7 +22,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Reserve a Slip - Moffat Bay Marina</title>
+    <title>Book a Slip - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
     <%-- registration.css carries registration-specific layout (form columns,

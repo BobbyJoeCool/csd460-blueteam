@@ -62,7 +62,7 @@ Every page must use its assigned string exactly. Update this table as pages are 
 | --- | --- |
 | Landing | `home` |
 | About Us | `about` |
-| Reservation (Book a Slip) | `reservation` |
+| Reservation (Book a Slip) | `reservation` — the nav link reads **Book a Slip** (**renamed from "Reservations" 2026-09-24**, so it can't be confused with My Reservations). Planned: once Wait List ships, a **Reservations** dropdown holding My Reservations, Book a Slip and Wait List. |
 | Reservation Summary | *(none — not a nav link)* |
 | Contact Us | *(retired — `contact.jsp` deleted 2026-09-14, see the update note below)* |
 | My Reservations (Look Up Reservation) | `lookup` — nav link shown only when signed in |

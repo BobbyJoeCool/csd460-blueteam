@@ -51,7 +51,7 @@
             <a href="${pageContext.request.contextPath}/about"
             class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
             <a href="${pageContext.request.contextPath}/reservation"
-            class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
+            class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Book a Slip</a>
             <c:if test="${not empty sessionScope.customerId}">
             <a href="${pageContext.request.contextPath}/reservations"
             class="${param.activePage == 'lookup' ? 'nav-active' : ''}">My Reservations</a>
@@ -100,6 +100,11 @@
 </header>
 
 <script src="${pageContext.request.contextPath}/js/header.js" defer></script>
+
+<!-- Open/close for the shared .modal component (My Fleet, My Reservations).
+     Deferred like the pages' own scripts, and earlier in the page, so it
+     is ready before any of them runs. -->
+<script src="${pageContext.request.contextPath}/js/modal.js" defer></script>
 
 <!-- Show/hide eye on every password field on the page, the modals below
      included. Deferred, so it runs after the whole page has been parsed. -->

@@ -19,14 +19,21 @@ import jakarta.servlet.http.HttpServletResponse;
  * Backs the Reservation Summary page - see
  * {@code documentation/Page Contracts/Reservation Summary.md}.
  *
+ * <p><strong>A confirmation screen, not a page to browse to.</strong> It is
+ * shown right after a reservation changes - booked on the Reservation page,
+ * or cancelled or given 30 days' notice on My Reservations - and nowhere
+ * else. Those three actions call {@link #grantAccess} before redirecting
+ * here, which remembers that one confirmation number in the session. Asking
+ * for any other confirmation number sends the customer to My Reservations,
+ * filtered to it, which is where reservations are looked at and managed.
+ * The grant isn't used up on the first view, so a refresh still works; the
+ * next change replaces it, and signing in again starts a fresh session
+ * without one.
+ *
  * <p><strong>GET</strong> {@code /reservationSummary?confirmation=MB-00061}
  * looks the reservation up fresh from the database and forwards to the JSP.
- * The Reservation page redirects here after a booking rather than forwarding,
- * so a refresh re-reads a reservation instead of making a second one.
- *
- * <p><strong>POST</strong> with {@code action=cancel} cancels it. The
- * Reservation contract puts cancellation on this page because it is the one
- * place a customer already has a reservation in front of them.
+ * Every action redirects here rather than forwarding, so a refresh re-reads
+ * the reservation instead of repeating the change.
  *
  * <p>Two things this servlet exists to enforce:
  *
@@ -55,8 +62,9 @@ public class ReservationSummaryServlet extends HttpServlet {
     private static final String VIEW = "/reservationSummary.jsp";
 
     private static final String PARAM_CONFIRMATION = "confirmation";
-    private static final String PARAM_ACTION = "action";
-    private static final String ACTION_CANCEL = "cancel";
+
+    /** Session attribute holding the one confirmation number this page may show. */
+    private static final String SUMMARY_ACCESS = "reservationSummaryAccess";
 
     /** Same wording whether the reservation is missing or someone else's. */
     private static final String NOT_FOUND_MESSAGE =
@@ -85,15 +93,24 @@ public class ReservationSummaryServlet extends HttpServlet {
             return;
         }
 
-        String confirmation = request.getParameter(PARAM_CONFIRMATION);
-        if (confirmation == null || confirmation.isBlank()) {
+        String confirmation = Utils.clean(request.getParameter(PARAM_CONFIRMATION));
+        if (confirmation.isEmpty()) {
             showNotFound(request, response);
+            return;
+        }
+
+        // Only the reservation that was just booked or changed. Anything
+        // else is looked at on My Reservations.
+        if (!confirmation.equals(request.getSession().getAttribute(SUMMARY_ACCESS))) {
+            response.sendRedirect(request.getContextPath()
+                    + "/reservations?reservationNumber="
+                    + URLEncoder.encode(confirmation, StandardCharsets.UTF_8));
             return;
         }
 
         try {
             ReservationDetails details =
-                    reservationDAO.findDetailsByConfirmation(confirmation.trim());
+                    reservationDAO.findDetailsByConfirmation(confirmation);
 
             // Missing and not-yours are deliberately the same outcome here.
             if (details == null || details.getCustomerId() != customerId) {
@@ -110,60 +127,35 @@ public class ReservationSummaryServlet extends HttpServlet {
     }
 
     /**
-     * Cancels a reservation, then redirects back to this page so the customer
-     * sees the cancelled state re-read from the database rather than a stale
-     * copy of the page they submitted from. Redirect and not forward, so a
-     * refresh cannot re-submit the cancellation.
+     * Lets this session see the Summary page for one reservation - called by
+     * whatever just booked or changed it, right before redirecting here.
+     * Replaces any earlier grant, so only the latest change can be shown.
      *
-     * @param request the incoming request
+     * @param request the request that made the change
+     * @param confirmationNumber the reservation's confirmation number
+     */
+    public static void grantAccess(HttpServletRequest request, String confirmationNumber) {
+        request.getSession().setAttribute(SUMMARY_ACCESS, confirmationNumber);
+    }
+
+    /**
+     * Grants access to one reservation's summary and redirects there, with a
+     * {@code notice} keyword for statusPopup.js. The one way an action that
+     * already sends a real redirect (rather than JSON) lands on this page.
+     *
+     * @param request the request that made the change
      * @param response the response to redirect
-     * @throws ServletException if the update fails
+     * @param confirmationNumber the reservation's confirmation number
+     * @param notice the statusPopup.js keyword, e.g. {@code reservationCancelled}
      * @throws IOException if the redirect fails
      */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        Integer customerId = Utils.signedInCustomerId(request);
-        if (customerId == null) {
-            showSignInRequired(request, response);
-            return;
-        }
-
-        String confirmation = request.getParameter(PARAM_CONFIRMATION);
-        if (!ACTION_CANCEL.equals(request.getParameter(PARAM_ACTION))
-                || confirmation == null || confirmation.isBlank()) {
-            showNotFound(request, response);
-            return;
-        }
-
-        try {
-            ReservationDetails details =
-                    reservationDAO.findDetailsByConfirmation(confirmation.trim());
-
-            if (details == null || details.getCustomerId() != customerId) {
-                showNotFound(request, response);
-                return;
-            }
-
-            /*
-             * customerId goes into the UPDATE's WHERE clause as well, so the
-             * database is what actually enforces ownership. The check above is
-             * for the message; this is for the guarantee.
-             */
-            boolean cancelled =
-                    reservationDAO.cancel(details.getReservationId(), customerId);
-
-            String notice = cancelled ? "reservationCancelled" : "reservationNotCancelled";
-            response.sendRedirect(request.getContextPath()
-                    + "/reservationSummary?confirmation="
-                    + java.net.URLEncoder.encode(details.getConfirmationNumber(),
-                            java.nio.charset.StandardCharsets.UTF_8)
-                    + "&notice=" + notice);
-
-        } catch (SQLException e) {
-            throw new ServletException("Reservation cancellation failed", e);
-        }
+    public static void redirectTo(HttpServletRequest request, HttpServletResponse response,
+            String confirmationNumber, String notice) throws IOException {
+        grantAccess(request, confirmationNumber);
+        response.sendRedirect(request.getContextPath()
+                + "/reservationSummary?confirmation="
+                + URLEncoder.encode(confirmationNumber, StandardCharsets.UTF_8)
+                + "&notice=" + notice);
     }
 
     /**
@@ -172,9 +164,8 @@ public class ReservationSummaryServlet extends HttpServlet {
      *
      * <p>The JSP already handles this: it checks for
      * {@code sessionScope.customerId} itself and renders a "Sign in to view
-     * your reservation" panel with a button that opens the login modal. A
-     * redirect elsewhere would throw away the URL they were trying to reach,
-     * and the confirmation number with it.
+     * your reservation" panel with a button that opens the login modal,
+     * which then sends them to My Reservations.
      *
      * @param request the incoming request
      * @param response the response to forward
@@ -185,22 +176,11 @@ public class ReservationSummaryServlet extends HttpServlet {
             throws ServletException, IOException {
 
         /*
-         * Where the login modal should send them once they are signed in.
-         * The modal's own redirectTo is built from the request URI, which
-         * carries no query string, so the confirmation number would be lost
-         * without this.
+         * Back to My Reservations, not to this page: signing in starts a fresh
+         * session, which has no grant to show any summary, so this page would
+         * only bounce them there anyway.
          */
-        String confirmation = request.getParameter(PARAM_CONFIRMATION);
-        /*
-         * URL-encoded because this ends up inside a JavaScript string in the
-         * page's Sign In button - unencoded, a crafted confirmation value
-         * containing a quote could break out of that string and run script.
-         * Encoding also turns it into a valid query string value.
-         */
-        String returnTo = "/reservationSummary"
-                + (confirmation != null && !confirmation.isBlank()
-                        ? "?confirmation=" + URLEncoder.encode(confirmation.trim(), StandardCharsets.UTF_8)
-                        : "");
+        String returnTo = "/reservations";
 
         request.setAttribute("signInRedirectTo", returnTo);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

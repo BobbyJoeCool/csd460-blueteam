@@ -2,7 +2,12 @@ package com.moffatbaymarina.marinawebsite.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.Set;
+
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 /**
  * Everything the Reservation Summary page shows, in one flat object.
@@ -62,6 +67,15 @@ public class ReservationDetails implements Serializable {
     /* From Rate, only so the total can be itemised */
     private BigDecimal electricMonthlyRate;
 
+    /* From TerminationNotice - all null when no notice was ever given */
+    private String noticeStatus;
+    private Date noticeDate;
+    private Date terminationDate;
+
+    /** Notice statuses that still count: the lease is on its way out. */
+    private static final Set<String> OPEN_NOTICE_STATUSES =
+            Set.of("Submitted", "Pending", "Approved");
+
     /**
      * The slip rent on its own, with the electric fee taken back off the
      * total, so the page can show an itemised receipt. Zero-safe: with no
@@ -93,6 +107,143 @@ public class ReservationDetails implements Serializable {
      */
     public boolean isActive() {
         return "Active".equalsIgnoreCase(reservationStatus);
+    }
+
+    /**
+     * Whether the lease has begun: its start date is today or earlier. Once
+     * it has, the reservation can't simply be cancelled - the customer gives
+     * 30 days' notice instead (BR-21).
+     *
+     * @return {@code true} if the start date is on or before today
+     */
+    public boolean isStarted() {
+        LocalDate start = toLocalDate(startDate);
+        return start != null && !start.isAfter(LocalDate.now());
+    }
+
+    /**
+     * Whether the customer may withdraw their termination notice and keep
+     * the lease (BR-23): Active, a notice open, and today no later than
+     * {@link Utils#NOTICE_WITHDRAWAL_CUTOFF_DAYS} days before its last day.
+     * ReservationDAO.withdrawTerminationNotice() enforces the same thing in
+     * its WHERE clause.
+     *
+     * @return {@code true} if the notice can be withdrawn
+     */
+    public boolean isNoticeWithdrawable() {
+        return isActive() && isNoticeOpen()
+                && Utils.isNoticeWithdrawable(toLocalDate(terminationDate), LocalDate.now());
+    }
+
+    /**
+     * {@link Utils#NOTICE_WITHDRAWAL_CUTOFF_DAYS}, for pages that word the
+     * rule ("until 14 days before your lease end date") so the number is
+     * never typed into a JSP.
+     *
+     * @return how many days before the lease end date a notice can be withdrawn
+     */
+    public int getNoticeWithdrawalCutoffDays() {
+        return Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS;
+    }
+
+    /**
+     * The last day the open notice can be withdrawn, formatted for the page,
+     * e.g. "Oct 16, 2026" - or "" when there is no notice or no last day.
+     *
+     * @return the formatted withdrawal deadline
+     */
+    public String getWithdrawDeadlineDisplay() {
+        LocalDate lastDay = toLocalDate(terminationDate);
+        return lastDay == null ? "" : Utils.formatDisplayDate(Utils.lastDayToWithdraw(lastDay));
+    }
+
+    /**
+     * The fields are java.util.Date for JSTL's sake (see startDate), but the
+     * rules compare LocalDates. The DAO fills them with java.sql.Date, which
+     * converts directly.
+     */
+    private static LocalDate toLocalDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return date instanceof java.sql.Date sqlDate
+                ? sqlDate.toLocalDate()
+                : date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    /**
+     * Whether a termination notice is in progress - submitted, under review
+     * or approved. A withdrawn or completed one doesn't count.
+     *
+     * @return {@code true} if a notice is open on this reservation
+     */
+    public boolean isNoticeOpen() {
+        return noticeStatus != null && OPEN_NOTICE_STATUSES.contains(noticeStatus);
+    }
+
+    /**
+     * Whether the customer may cancel outright: Active, and not started yet.
+     * My Reservations shows Cancel Reservation only when this is true, and
+     * ReservationDAO.cancel() enforces the same thing in its WHERE clause.
+     *
+     * @return {@code true} if this reservation can be cancelled
+     */
+    public boolean isCancellable() {
+        return isActive() && !isStarted();
+    }
+
+    /**
+     * Whether the customer may give 30 days' notice: Active, started, and no
+     * notice already open. ReservationDAO.submitTerminationNotice() enforces
+     * the same thing inside its transaction.
+     *
+     * @return {@code true} if a termination notice can be submitted
+     */
+    public boolean isNoticeAllowed() {
+        return isActive() && isStarted() && !isNoticeOpen();
+    }
+
+    /**
+     * @return the termination notice's status, e.g. {@code Submitted}, or
+     *         {@code null} if none was ever given
+     */
+    public String getNoticeStatus() {
+        return noticeStatus;
+    }
+
+    /**
+     * @param noticeStatus the termination notice's status
+     */
+    public void setNoticeStatus(String noticeStatus) {
+        this.noticeStatus = noticeStatus;
+    }
+
+    /**
+     * @return the day the termination notice was given, or {@code null}
+     */
+    public Date getNoticeDate() {
+        return noticeDate;
+    }
+
+    /**
+     * @param noticeDate the day the termination notice was given
+     */
+    public void setNoticeDate(Date noticeDate) {
+        this.noticeDate = noticeDate;
+    }
+
+    /**
+     * @return the lease's last day as given in the notice, or {@code null}
+     */
+    public Date getTerminationDate() {
+        return terminationDate;
+    }
+
+    /**
+     * @param terminationDate the lease's last day as given in the notice
+     */
+    public void setTerminationDate(Date terminationDate) {
+        this.terminationDate = terminationDate;
     }
 
     /**

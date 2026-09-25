@@ -177,7 +177,7 @@ main {
     opacity: 0.8;
 }
 
-/* The "Reserve a Slip" link inside an idle status pill. */
+/* The "Book a Slip" link inside an idle status pill. */
 .status-pill__link {
     font-weight: 600;
     color: var(--color-link);
@@ -238,10 +238,6 @@ main {
    to strip the field before sending.
    ========================================================================== */
 
-.modal__box--narrow {
-    width: min(28rem, 100%);
-}
-
 #boatModal input:disabled {
     background: color-mix(in srgb, var(--color-border) 10%, var(--color-bg-surface));
     color: var(--color-text-muted);
@@ -290,24 +286,8 @@ main {
     margin-top: 0.5rem;
 }
 
-/* ==========================================================================
-   The remove confirmation
-   ========================================================================== */
-
-.fleet-remove__question {
-    margin: 0 0 0.625rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--color-text-body);
-}
-
-.fleet-remove__note {
-    margin: 0;
-    font-size: 0.84375rem;
-    line-height: 1.5;
-    color: var(--color-text-muted);
-    opacity: 0.85;
-}
+/* The remove confirmation is styled entirely by site.css's shared
+   .modal__box--narrow, .modal__question and .modal__note. */
 
 /* ==========================================================================
    Narrow screens
@@ -317,9 +297,14 @@ main {
    ========================================================================== */
 
 @media (max-width: 56rem) {
+    /* stretch undoes the grid's align-items: start, which in a flex column
+       would shrink each card to its own content - so a reserved card (long
+       status badge and hint) came out wider than the unreserved one next
+       to it, and the widths alternated down the list. */
     .fleet-list--two-up {
         display: flex;
         flex-direction: column;
+        align-items: stretch;
     }
 
     .fleet-list--two-up .fleet-badges {
@@ -354,8 +339,11 @@ main {
         grid-template-columns: repeat(2, max-content);
     }
 
-    /* Edit and Remove split the row; the reservation link gets its own. */
-    .fleet-card__actions > .btn-secondary,
+    /* Edit and Remove split the row; the reservation link gets its own.
+       Edit and a disabled Remove are .btn-action, an enabled Remove is
+       .btn-outline - both classes have to be listed, or only the enabled
+       Remove stretches and it swallows the row. */
+    .fleet-card__actions > .btn-action,
     .fleet-card__actions > .btn-outline {
         flex: 1 1 0;
     }

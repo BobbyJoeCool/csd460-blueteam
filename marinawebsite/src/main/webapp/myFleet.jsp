@@ -146,7 +146,11 @@
             </div>
         </c:if>
 
-        <c:if test="${not empty formError}">
+        <%-- Page-level errors only (e.g. a Remove that was turned down). An
+             error from a failed Add or Edit belongs to the popup that reopens
+             with it - myFleet.js puts it in that popup's own banner - so it
+             doesn't linger on the page after the popup is closed. --%>
+        <c:if test="${not empty formError and empty openForm}">
             <div class="form-banner form-banner--error" id="formError" role="alert">
                 <c:out value="${formError}" />
             </div>
@@ -222,7 +226,7 @@
                                             <%-- ?boatId= opens the Reservation page with this boat
                                                  already picked; reservation.js reads it on load. --%>
                                             <a class="status-pill__link"
-                                               href="${ctx}/reservation?boatId=${fn:escapeXml(boat.boatId)}">Reserve a Slip <span aria-hidden="true">&rarr;</span></a>
+                                               href="${ctx}/reservation?boatId=${fn:escapeXml(boat.boatId)}">Book a Slip <span aria-hidden="true">&rarr;</span></a>
                                         </p>
                                     </c:otherwise>
                                 </c:choose>
@@ -264,7 +268,7 @@
                                         <button type="button" class="btn-action" disabled>Remove</button>
                                         <a class="fleet-card__reservation"
                                            href="${ctx}/reservations?reservationNumber=${fn:escapeXml(boat.activeConfirmationNumber)}">View Reservation <c:out value="${boat.activeConfirmationNumber}" /> <span aria-hidden="true">&rarr;</span></a>
-                                        <span class="fleet-card__hint">Cancel this boat's reservation before removing it</span>
+                                        <span class="fleet-card__hint">This boat can't be removed from your account while it's part of an active reservation.</span>
                                     </c:when>
                                     <c:otherwise>
                                         <button type="button" class="btn-outline js-remove-boat">Remove</button>
@@ -326,7 +330,9 @@
      aria-labelledby="boatModalTitle"
      data-country="${fn:escapeXml(sessionScope.customer.country)}"
      data-open-form="${fn:escapeXml(openForm)}"
-     data-edit-boat-id="${fn:escapeXml(editBoatId)}" hidden>
+     data-edit-boat-id="${fn:escapeXml(editBoatId)}"
+     data-posted-fields="${fn:escapeXml(postedFields)}"
+     data-form-error="${not empty openForm ? fn:escapeXml(formError) : ''}" hidden>
 
     <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
 
@@ -406,8 +412,8 @@
             <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
         </div>
 
-        <p class="fleet-remove__question" id="removeQuestion"></p>
-        <p class="fleet-remove__note">
+        <p class="modal__question" id="removeQuestion"></p>
+        <p class="modal__note">
             The boat leaves your fleet and stops appearing when you book a
             slip. Any reservation it has already had is kept.
         </p>

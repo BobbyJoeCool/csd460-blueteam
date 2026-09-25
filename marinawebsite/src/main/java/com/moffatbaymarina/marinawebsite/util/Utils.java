@@ -120,6 +120,28 @@ public class Utils {
     public static final int MAX_RESERVATION_YEARS_AHEAD = 5;
 
     /**
+     * BR-21: a lease that has started ends on a last day at least this many
+     * days after the notice is given. The one copy of the rule - the notice
+     * popup's date picker gets its min from {@link #earliestTerminationDate}
+     * through the page, rather than keeping a second 30 in JavaScript.
+     */
+    public static final int MIN_TERMINATION_NOTICE_DAYS = 30;
+
+    /**
+     * How far ahead a last day may be chosen. Not a business rule so much as
+     * a sanity limit, so a mistyped year can't book a notice decades out.
+     */
+    public static final int MAX_TERMINATION_NOTICE_DAYS = 365;
+
+    /**
+     * BR-23: a customer may withdraw a termination notice - and keep the
+     * lease - up to this many days before the notice's last day. Change it
+     * here; My Reservations, ReservationChangeServlet and the DAO all read
+     * it through {@link #isNoticeWithdrawable} / {@link #lastDayToWithdraw}.
+     */
+    public static final int NOTICE_WITHDRAWAL_CUTOFF_DAYS = 14;
+
+    /**
      * The site-wide display format for a date, e.g. "Jun 1, 2026". Every
      * {@code <fmt:formatDate>} on the site uses this same pattern, and
      * formValidation.js's formatDisplayDate produces the same shape.
@@ -280,6 +302,79 @@ public class Utils {
         }
     }
 
+    /**
+     * The earliest last day a termination notice given on {@code today} may
+     * ask for (BR-21).
+     *
+     * @param today the day the notice is given
+     * @return {@code today} plus {@link #MIN_TERMINATION_NOTICE_DAYS}
+     */
+    public static LocalDate earliestTerminationDate(LocalDate today) {
+        return today.plusDays(MIN_TERMINATION_NOTICE_DAYS);
+    }
+
+    /**
+     * The latest last day a termination notice given on {@code today} may
+     * ask for.
+     *
+     * @param today the day the notice is given
+     * @return {@code today} plus {@link #MAX_TERMINATION_NOTICE_DAYS}
+     */
+    public static LocalDate latestTerminationDate(LocalDate today) {
+        return today.plusDays(MAX_TERMINATION_NOTICE_DAYS);
+    }
+
+    /**
+     * Whether {@code lastDay} is an acceptable last day for a termination
+     * notice given on {@code today}: at least 30 days out (BR-21), and no
+     * further than {@link #latestTerminationDate}.
+     *
+     * @param lastDay the requested last day; may be {@code null}
+     * @param today the day the notice is given
+     * @return {@code true} if present and in range
+     */
+    public static boolean isValidTerminationDate(LocalDate lastDay, LocalDate today) {
+        return lastDay != null
+                && !lastDay.isBefore(earliestTerminationDate(today))
+                && !lastDay.isAfter(latestTerminationDate(today));
+    }
+
+    /**
+     * The last day a termination notice ending on {@code lastDay} can still
+     * be withdrawn (BR-23).
+     *
+     * @param lastDay the notice's last day
+     * @return {@code lastDay} minus {@link #NOTICE_WITHDRAWAL_CUTOFF_DAYS}
+     */
+    public static LocalDate lastDayToWithdraw(LocalDate lastDay) {
+        return lastDay.minusDays(NOTICE_WITHDRAWAL_CUTOFF_DAYS);
+    }
+
+    /**
+     * Whether a notice ending on {@code lastDay} can still be withdrawn on
+     * {@code today}: up to and including {@link #lastDayToWithdraw}. A notice
+     * with no last day recorded can always be withdrawn - there is no end
+     * date for the cutoff to count back from.
+     *
+     * @param lastDay the notice's last day; may be {@code null}
+     * @param today the day the customer asks
+     * @return {@code true} if the notice can still be withdrawn
+     */
+    public static boolean isNoticeWithdrawable(LocalDate lastDay, LocalDate today) {
+        return lastDay == null || !lastDay.isBefore(earliestWithdrawableLastDay(today));
+    }
+
+    /**
+     * The same rule turned around, for the database: on {@code today}, a
+     * notice can still be withdrawn if its last day is on or after this.
+     *
+     * @param today the day the customer asks
+     * @return {@code today} plus {@link #NOTICE_WITHDRAWAL_CUTOFF_DAYS}
+     */
+    public static LocalDate earliestWithdrawableLastDay(LocalDate today) {
+        return today.plusDays(NOTICE_WITHDRAWAL_CUTOFF_DAYS);
+    }
+
     // ------------------------------------------------------------------
     // Boat rules
     // ------------------------------------------------------------------
@@ -421,6 +516,27 @@ public class Utils {
         }
         Object value = session.getAttribute("customerId");
         return value instanceof Integer id ? id : null;
+    }
+
+    /**
+     * Reads a one-time session value and removes it - the "flash" half of
+     * post/redirect/get. A redirect is a brand new request, so anything the
+     * page after it needs to show once (a change summary, an error) rides in
+     * the session, and taking it out on the first read means a refresh
+     * doesn't show it again.
+     *
+     * @param request the incoming request
+     * @param name the session attribute
+     * @return its value, or {@code null} if there's no session or no value
+     */
+    public static Object takeSessionAttribute(HttpServletRequest request, String name) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
+        Object value = session.getAttribute(name);
+        session.removeAttribute(name);
+        return value;
     }
 
     /**

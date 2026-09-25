@@ -37,7 +37,8 @@
  * editable - see the Validation Rules section of the My Fleet contract.
  *
  * Requires formValidation.js (loaded on every page by includes/loginModal.jsp
- * through the header) and boatFields.js, which myFleet.jsp loads first.
+ * through the header), modal.js (loaded on every page by the header) and
+ * boatFields.js, which myFleet.jsp loads first.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -107,7 +108,6 @@ MoffatBay.myFleet = (function () {
 
     var mode = "add";          // "add" or "edit"
     var originals = {};        // what each field held when the modal opened
-    var lastFocused = null;    // whatever opened the modal, to restore on close
 
     function control(field) {
         return document.getElementById(field);
@@ -157,18 +157,9 @@ MoffatBay.myFleet = (function () {
         hideConfirmation();
     }
 
-    function openModal(modal) {
-        lastFocused = document.activeElement;
-        modal.hidden = false;
-        var first = modal.querySelector("input:not([type=hidden]):not(:disabled), button");
-        if (first) { first.focus(); }
-    }
-
-    function closeModal(modal) {
-        modal.hidden = true;
-        if (lastFocused && typeof lastFocused.focus === "function") { lastFocused.focus(); }
-        lastFocused = null;
-    }
+    /* Open/close, the close buttons and Escape all come from modal.js. */
+    var openModal = MoffatBay.modal.open;
+    var closeModal = MoffatBay.modal.close;
 
     /**
      * Add: a blank card, posting to /myFleet/add.
@@ -378,6 +369,9 @@ MoffatBay.myFleet = (function () {
 
         boatForm.hidden = true;
         confirmPanel.hidden = false;
+        /* Disabled after a click to stop a double save; a Back-button
+           return to this page brings it back still disabled. */
+        document.getElementById("confirmSaveBoat").disabled = false;
         document.getElementById("confirmSaveBoat").focus();
     }
 
@@ -583,15 +577,32 @@ MoffatBay.myFleet = (function () {
         /* openEdit filled the fields from the card, which holds what is ON
            FILE - that is what originals should be, so "changed" still means
            changed from what is stored rather than from the rejected attempt.
-           The visible values go back to what the customer typed. A locked
-           field keeps the stored value; it was never submitted. */
+           The visible values go back to what the customer typed - but only
+           for fields the request actually carried. An edit posts just the
+           fields that changed, so every other field came back blank from
+           the server; overwriting with those blanks emptied everything the
+           customer hadn't touched. An Add posts every field, so it restores
+           them all. A locked field keeps the stored value; it was never
+           submitted. */
+        var posted = boatModal.dataset.postedFields;
+        var postedList = posted ? posted.split(",") : null;
         FIELDS.forEach(function (field) {
             var el = control(field);
-            if (el && !el.disabled) { el.value = typed[field] || ""; }
+            if (!el || el.disabled) { return; }
+            if (open === "edit" && postedList && postedList.indexOf(field) === -1) { return; }
+            el.value = typed[field] || "";
         });
 
         updateSaveState();
+        setBanner(boatModal.dataset.formError || "");
         applyServerFieldErrors();
+
+        /* The failed save was a POST to /myFleet/add or /myFleet/edit, and
+           that is the address the browser now shows. Put /myFleet back, so
+           a refresh reloads the page instead of offering to resubmit. */
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, "", addAction.replace(/\/add$/, ""));
+        }
     }
 
     /* ------------------------------------------------------------------
@@ -613,19 +624,6 @@ MoffatBay.myFleet = (function () {
         btn.addEventListener("click", function () {
             openRemove(btn.closest(".fleet-card"));
         });
-    });
-
-    [boatModal, removeModal].forEach(function (modal) {
-        if (!modal) { return; }
-        modal.querySelectorAll("[data-modal-close]").forEach(function (el) {
-            el.addEventListener("click", function () { closeModal(modal); });
-        });
-    });
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key !== "Escape") { return; }
-        if (removeModal && !removeModal.hidden) { closeModal(removeModal); }
-        else if (!boatModal.hidden) { closeModal(boatModal); }
     });
 
     boatForm.addEventListener("submit", handleSubmit);

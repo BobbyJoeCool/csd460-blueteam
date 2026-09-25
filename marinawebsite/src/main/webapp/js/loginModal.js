@@ -35,7 +35,7 @@ MoffatBay.loginModal = (function () {
      *   prepends the context path itself, so never "/marinawebsite/...").
      *   Optional: leave it out and the modal falls back to the page the user
      *   is already on, which is right for a plain "Log In" control but wrong
-     *   for a control that names somewhere else - a "Reserve a Slip" button
+     *   for a control that names somewhere else - a "Book a Slip" button
      *   should land on the reservation page, not back where it was clicked.
      */
     function open(redirectTo) {

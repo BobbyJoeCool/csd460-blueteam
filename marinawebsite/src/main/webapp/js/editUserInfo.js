@@ -193,9 +193,8 @@ MoffatBay.editUserInfo = (function () {
     }
 
     /**
-     * Fills the confirmation panel with one row per changed field, old on
-     * the left and new on the right, and shows it in place of the Save
-     * button.
+     * Fills the confirmation popup with one row per changed field, old on
+     * the left and new on the right, and opens it (modal.js).
      *
      * Built from the form as it stands at this moment rather than from
      * anything captured earlier, so what is listed here and what gets
@@ -204,10 +203,9 @@ MoffatBay.editUserInfo = (function () {
      * @param {string[]} changed - the fields about to be saved
      */
     function showConfirmation(changed) {
-        var panel = document.getElementById("confirmChanges");
+        var modal = document.getElementById("confirmChangesModal");
         var list = document.getElementById("confirmChangesList");
-        var row = document.getElementById("accountSubmitRow");
-        if (!panel || !list) { return; }
+        if (!modal || !list) { return; }
 
         list.textContent = "";
 
@@ -251,21 +249,8 @@ MoffatBay.editUserInfo = (function () {
             list.appendChild(wrapper);
         });
 
-        if (row) { row.hidden = true; }
-        panel.hidden = false;
-        document.getElementById("confirmSave").focus();
-    }
-
-    /**
-     * Puts the Save button back and hides the confirmation panel, leaving
-     * every field exactly as it was - "Go back" is a return to editing, not
-     * an undo.
-     */
-    function hideConfirmation() {
-        var panel = document.getElementById("confirmChanges");
-        var row = document.getElementById("accountSubmitRow");
-        if (panel) { panel.hidden = true; }
-        if (row) { row.hidden = false; }
+        document.getElementById("confirmSave").disabled = false;
+        MoffatBay.modal.open(modal);
     }
 
     /**
@@ -531,7 +516,7 @@ MoffatBay.editUserInfo = (function () {
         }
 
         /* The real form never navigates. Saving happens from the
-           confirmation panel below, which posts a form built for the
+           confirmation popup, which posts a form built for the
            purpose - see submitOnlyChanged. */
         event.preventDefault();
         showConfirmation(changed);
@@ -540,22 +525,15 @@ MoffatBay.editUserInfo = (function () {
     var confirmButton = document.getElementById("confirmSave");
     if (confirmButton) {
         confirmButton.addEventListener("click", function () {
-            /* Re-read rather than trusting the list that was drawn: nothing
-               can change behind the panel, but the submitted set should
-               come from the form either way. */
+            /* One click, one save. Re-read rather than trusting the list
+               that was drawn: nothing can change behind the popup, but the
+               submitted set should come from the form either way. Go Back,
+               the x, the backdrop and Escape all just close the popup
+               (modal.js), leaving every field as it was. */
+            confirmButton.disabled = true;
             submitOnlyChanged(changedFields());
         });
     }
-
-    var cancelButton = document.getElementById("cancelSave");
-    if (cancelButton) {
-        cancelButton.addEventListener("click", hideConfirmation);
-    }
-
-    /* Editing anything while the panel is up means the list behind it is
-       already out of date, so it steps aside and the customer confirms
-       again. */
-    form.addEventListener("input", hideConfirmation);
 
     return {
         changedFields: changedFields,

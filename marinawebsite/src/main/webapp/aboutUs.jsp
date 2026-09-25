@@ -56,6 +56,7 @@
             <h1>About Moffat Bay Marina</h1>
             <p class="hero-band__lede">Your Harbor Between Horizons</p>
         </div>
+        <p class="hero-band__credit">Hero image created with Google Gemini</p>
     </section>
 
     <div class="about-page">

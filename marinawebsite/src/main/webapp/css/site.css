@@ -246,14 +246,34 @@ main,
 
 /* --------------------------------------------------------------------------
    Hero band — full-width photo header with a dark gradient overlay and
-   centered white text. Every page's banner inherits this base and adds
-   its own image/gradient/height.
+   centered white text. The base owns everything a visitor reads as "the
+   same banner": height, padding, heading type, lede, eyebrow and credit.
+   A page's id adds only its photo and overlay strength, since every image
+   has its bright spots in a different place behind the text.
+
+   The one deliberate exception is the landing hero, which is taller and
+   louder than the rest because it is the site's first impression.
+
+   Markup every hero follows (it sits outside <main> or in an unstyled one,
+   so it runs the full width of the window):
+
+     <header class="hero-band" id="...Hero">
+         <div class="hero-band__content">
+             <p class="hero-band__eyebrow">optional category label</p>
+             <h1>Title</h1>
+             <p class="hero-band__lede">Subtitle</p>
+         </div>
+         <p class="hero-band__credit">optional image credit</p>
+     </header>
 
    Base class:  .hero-band
-   Used by: registration.jsp  (#registrationHero)
-            aboutUs.jsp       (#aboutHero)
-            index.jsp         (#landingHero)
-            reservation.jsp   (#reservationHero)
+   Used by: index.jsp             (#landingHero)
+            registration.jsp      (#registrationHero)
+            aboutUs.jsp           (#aboutHero)
+            lookUpReservation.jsp (#lookUpReservationHero)
+            reservation.jsp       (#reservationHero)
+            myFleet.jsp           (#fleetHero)
+            editUserInfo.jsp      (#accountHero)
    -------------------------------------------------------------------------- */
 
 .hero-band {
@@ -262,57 +282,57 @@ main,
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 17rem;
+    padding: 3.5rem 1.5rem;
     background-color: var(--color-bg-header);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     color: var(--color-text-inverse);
     text-align: center;
-    padding: 4rem 1.5rem;
 }
 
 .hero-band h1 {
-    margin: 0 0 0.5rem;
-    font-size: 1.8rem;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    margin: 0 0 0.75rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: normal;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.15;
+    color: var(--color-text-inverse);
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 12px rgba(0, 0, 0, 0.6);
 }
 
 .hero-band p {
     margin: 0;
-    opacity: 0.9;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    color: var(--color-text-inverse);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
 
-/* Eyebrow text above the h1 (Reservation uses this today; available to
-   any hero that wants a category label above its title). */
+/* Eyebrow text above the h1 - a category label for the page. */
 .hero-band__eyebrow {
     margin: 0 0 0.5rem;
     font-size: 0.8rem;
     font-weight: bold;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-text-inverse);
     opacity: 0.9;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* Subtitle text below the h1. */
 .hero-band__lede {
-    margin: 0;
     font-size: 1.05rem;
-    color: var(--color-text-inverse);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    line-height: 1.5;
 }
 
 /* Small-print image credit, pinned to the bottom-right corner. */
-.hero-band__credit {
+.hero-band p.hero-band__credit {
     position: absolute;
     right: 0.9rem;
     bottom: 0.6rem;
-    margin: 0;
     font-size: 0.7rem;
     letter-spacing: 0.04em;
-    color: var(--color-text-inverse);
     opacity: 0.75;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
@@ -323,23 +343,49 @@ main,
 }
 
 /* --------------------------------------------------------------------------
-   Page-specific hero overrides — each page targets its hero by id.
-   The id carries only the properties that differ from the base.
+   Page-specific hero overrides — photo and overlay only.
    -------------------------------------------------------------------------- */
 
-/* Registration + About Us: Marina.png, 60% deep-marine overlay.
-   Used by: registration.jsp (#registrationHero),
-            aboutUs.jsp      (#aboutHero) */
+/* Registration, About Us, My Reservations: Marina.png, 60% overlay. */
 #registrationHero,
-#aboutHero {
+#aboutHero,
+#lookUpReservationHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
         url("../images/Marina.png");
 }
 
-/* Landing page: Marina.png, light 22-32% overlay so the photo dominates.
-   Taller than other heroes to anchor the first impression.
-   Used by: index.jsp (#landingHero) */
+/* Reservation: Slip_Closeup.png, 48-62% gradient (the sunset horizon is
+   bright orange right where the heading sits). */
+#reservationHero {
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
+        url("../images/Slip_Closeup.png");
+}
+
+/* My Fleet + Your Account: BoatYard_Sunset.png, a 58-70% gradient - heavier
+   than any other hero on the site, and measured rather than guessed. The
+   sun sits dead centre on the horizon, exactly where the heading goes, so
+   this is the hardest backdrop any of our heroes has to carry light text
+   over. At the Reservation hero's 48-62% the title only reaches 2.33:1
+   against the brightest pixel behind it; 58-70% brings it to 2.99:1, just
+   ahead of Reservation's own 2.76:1 and well ahead of the landing hero's
+   1.73:1.
+
+   Worth knowing: none of the site's heroes clear WCAG AA on that measure -
+   they all lean on .hero-band h1's text-shadow, which helps a reader but
+   earns no credit in the standard. Fixing that is a site-wide job. */
+#fleetHero,
+#accountHero {
+    background-image:
+        linear-gradient(rgba(13, 59, 77, 0.58), rgba(13, 59, 77, 0.7)),
+        url("../images/BoatYard_Sunset.png");
+}
+
+/* Landing page: the one hero allowed to break the pattern. Marina.png with
+   a light 22-32% overlay so the photo dominates, taller, and a bigger
+   heading to anchor the first impression. Its description, tagline and
+   call-to-action button are styled in index.css. */
 #landingHero {
     min-height: 400px;
     background-image:
@@ -353,62 +399,11 @@ main,
 
 #landingHero h1 {
     margin: 0 0 1.25rem;
-    font-family: Georgia, "Times New Roman", serif;
     font-size: clamp(2.4rem, 5vw, 3.8rem);
     line-height: 1.1;
     text-shadow:
         0 2px 4px rgba(0, 0, 0, 0.95),
         0 0 12px rgba(0, 0, 0, 0.75);
-}
-
-/* Reservation: Slip_Closeup.png, heavier 48-62% gradient (the sunset
-   horizon is bright orange right where the heading sits). Shorter than
-   the landing hero — people arrive here to fill a form, not admire
-   the view.
-   Used by: reservation.jsp (#reservationHero) */
-#reservationHero {
-    min-height: 17rem;
-    padding: 3.5rem 1.5rem;
-    background-image:
-        linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
-        url("../images/Slip_Closeup.png");
-}
-
-/* My Fleet: BoatYard_Sunset.png, a 58-70% gradient - heavier than any other
-   hero on the site, and measured rather than guessed. The sun sits dead
-   centre on the horizon, exactly where the heading goes, so this is the
-   hardest backdrop any of our heroes has to carry light text over. At the
-   Reservation hero's 48-62% the title only reaches 2.33:1 against the
-   brightest pixel behind it; 58-70% brings it to 2.99:1, just ahead of
-   Reservation's own 2.76:1 and well ahead of the landing hero's 1.73:1.
-
-   Worth knowing: none of the site's heroes clear WCAG AA on that measure -
-   they all lean on .hero-band h1's text-shadow, which helps a reader but
-   earns no credit in the standard. This one is now the best of them rather
-   than an exception to them. Fixing the pattern properly is a site-wide
-   job, not a My Fleet one.
-
-   Shorter than the landing hero; people arrive here to manage their boats,
-   not admire the view.
-   Used by: myFleet.jsp (#fleetHero) */
-#fleetHero {
-    min-height: 17rem;
-    padding: 3.5rem 1.5rem;
-    background-image:
-        linear-gradient(rgba(13, 59, 77, 0.58), rgba(13, 59, 77, 0.7)),
-        url("../images/BoatYard_Sunset.png");
-}
-
-#reservationHero h1 {
-    margin: 0 0 0.75rem;
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: normal;
-    font-size: clamp(2rem, 5vw, 3rem);
-    line-height: 1.15;
-    color: var(--color-text-inverse);
-    text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 12px rgba(0, 0, 0, 0.6);
 }
 
 /* --------------------------------------------------------------------------
@@ -894,7 +889,8 @@ main,
 
 /* --------------------------------------------------------------------------
    Modal — backdrop, centred box, header with a close button.
-   Used by: myFleet.jsp (Add/Edit a boat, Remove confirmation)
+   Used by: myFleet.jsp (Add/Edit a boat, Remove confirmation),
+            lookUpReservation.jsp (Cancel, 30-day notice). Open/close: js/modal.js
 
    New with My Fleet. The login modal, the change-password modal and the
    Reservation page's boat panel each hand-rolled their own before this
@@ -987,6 +983,27 @@ main,
         color-mix(in srgb, var(--color-border) 18%, transparent);
 }
 
+/* A confirmation modal: one question, not a form. */
+.modal__box--narrow {
+    width: min(28rem, 100%);
+}
+
+/* The question a confirmation modal asks, and the smaller note under it. */
+.modal__question {
+    margin: 0 0 0.625rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-body);
+}
+
+.modal__note {
+    margin: 0;
+    font-size: 0.84375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
 /* --------------------------------------------------------------------------
    Action buttons on a light surface — a filled one and its outlined pair.
    Used by: myFleet.jsp (Edit / Remove on each card, and the modal actions)
@@ -1041,4 +1058,25 @@ main,
 .btn-outline:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Destructive: add to either one above - an outlined red button that
+   offers the action, a filled red one that confirms it.
+   Used by: lookUpReservation.jsp (Cancel Reservation) */
+.btn-outline.btn-danger {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.btn-action.btn-danger {
+    border-color: var(--color-error);
+    background: var(--color-error);
+    color: var(--color-surface-neutral);
+}
+
+.btn-outline.btn-danger:hover:not(:disabled),
+.btn-action.btn-danger:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--color-error) 85%, black);
+    background: color-mix(in srgb, var(--color-error) 85%, black);
+    color: var(--color-surface-neutral);
 }

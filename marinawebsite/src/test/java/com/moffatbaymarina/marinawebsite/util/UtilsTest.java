@@ -226,4 +226,33 @@ public class UtilsTest {
         assertEquals("line1\\nline2\\r\\t", Utils.jsonEscape("line1\nline2\r\t"));
         assertEquals("bell\\u0007", Utils.jsonEscape("bell"));
     }
+
+    // --------------------------------------------------- termination notices
+
+    @Test
+    public void terminationDateNeedsThirtyDaysAndAtMostAYear() {
+        LocalDate today = LocalDate.of(2026, 9, 24);
+        assertFalse(Utils.isValidTerminationDate(null, today));
+        assertFalse(Utils.isValidTerminationDate(today.plusDays(29), today));
+        assertTrue(Utils.isValidTerminationDate(today.plusDays(30), today));
+        assertTrue(Utils.isValidTerminationDate(today.plusDays(365), today));
+        assertFalse(Utils.isValidTerminationDate(today.plusDays(366), today));
+    }
+
+    @Test
+    public void noticeCanBeWithdrawnUpToTheCutoffBeforeTheLastDay() {
+        LocalDate today = LocalDate.of(2026, 9, 24);
+        int cutoff = Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS;
+        assertTrue(Utils.isNoticeWithdrawable(today.plusDays(cutoff + 1), today));
+        assertTrue(Utils.isNoticeWithdrawable(today.plusDays(cutoff), today));
+        assertFalse(Utils.isNoticeWithdrawable(today.plusDays(cutoff - 1), today));
+        assertTrue("no last day recorded", Utils.isNoticeWithdrawable(null, today));
+    }
+
+    @Test
+    public void withdrawalDeadlineAndDatabaseBoundaryAgree() {
+        LocalDate today = LocalDate.of(2026, 9, 24);
+        LocalDate lastDay = Utils.earliestWithdrawableLastDay(today);
+        assertEquals(today, Utils.lastDayToWithdraw(lastDay));
+    }
 }

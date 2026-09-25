@@ -23,6 +23,14 @@ Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
 - [x] My Reservations only appears in the navigation when the customer is signed in.
 - [x] Results can be sorted newest or oldest.
 - [x] The filter form shows the filters currently applied, and offers "Clear filters" whenever any are.
+- [x] **Added 2026-09-24. Ending a reservation happens here.** What a card offers depends on whether its lease has started (`startDate` today or earlier):
+  - **Not started, Active:** **Cancel Reservation** (red outline). Opens a confirmation popup naming the reservation; "Yes, Cancel It" posts to `/reservations/cancel`.
+  - **Started, Active, no notice open:** **Submit 30-Day Notice**. Opens a popup asking for the lease's last day, a date picker limited to 30–365 days from today (BR-21); "Submit Notice" posts to `/reservations/notice`.
+  - **Notice open, more than 14 days before its last day:** **Withdraw Notice** (**added 2026-09-24**, BR-23). Opens a popup naming the reservation and its last day; "Yes, Withdraw It" posts to `/reservations/withdraw`. The hint under the button gives the last day to withdraw. The 14 is `Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS`, and a notice with no last day recorded can always be withdrawn.
+  - **Notice open, past that cutoff:** no button, just a hint that it can no longer be withdrawn and when the deadline was.
+  - **Not Active:** no button. A card with any notice shows a **30-Day Notice** line with its status, plus the last day while the notice is still open.
+- [x] **Added 2026-09-24.** There is no link to the Reservation Summary from here. The Summary is only the confirmation screen after a booking, cancellation or notice.
+- [x] **Added 2026-09-24.** Both popups use the shared `.modal` component (`site.css`) and `js/modal.js` for open/close; the buttons use the shared `.btn-outline` / `.btn-action` with the `.btn-danger` modifier.
 
 ### Back End
 
@@ -31,7 +39,9 @@ Module 8 / Week 6 (Sep 14 – Sep 20, 2026)
 - [x] Customers can only retrieve their own reservations.
 - [x] The DAO returns a `List<ReservationDetails>`.
 - [x] No match returns an empty list.
-- [x] The page is read-only.
+- [x] The page itself only reads. **Amended 2026-09-24:** its two popups post to `ReservationChangeServlet` (`/reservations/cancel`, `/reservations/notice`), which checks sign-in and ownership, and the DAO enforces the rules inside the write: cancel only if Active and not started; notice only if Active, started, and no open notice (a `Withdrawn` notice row is reused, since `TerminationNotice.reservationID` is UNIQUE). Success redirects to the Reservation Summary as confirmation. A refusal redirects back here with a one-time `actionError` banner.
+- [x] **Added 2026-09-24.** `/reservations/withdraw` sets the notice to `Withdrawn` in one UPDATE whose WHERE clause checks everything: the customer's, Active, notice Submitted/Pending/Approved, and last day on or after today + `NOTICE_WITHDRAWAL_CUTOFF_DAYS` (or no last day). Success lands on the Summary ("Your Lease Continues"); a refusal comes back here with the reason.
+- [x] **Added 2026-09-24.** The notice's last day is validated by `Utils.isValidTerminationDate` (30–365 days out). The servlet also hands the page `earliestTerminationDate` / `latestTerminationDate`, so the date picker's range comes from the same rule instead of a second copy in JavaScript.
 - [x] Servlet mapping is `/reservations`.
 - [x] Lookup uses `GET`.
 - [x] Visiting the page with no filters lists all of the customer's reservations, newest first.

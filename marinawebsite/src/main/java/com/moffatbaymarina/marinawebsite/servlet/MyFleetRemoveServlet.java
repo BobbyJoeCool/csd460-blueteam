@@ -99,9 +99,9 @@ public class MyFleetRemoveServlet extends HttpServlet {
 
                 request.setAttribute(
                         "formError",
-                        "This boat is reserved at "
+                        "This boat can't be removed from your account while it's part of an active reservation ("
                                 + reservationLocation
-                                + ". Cancel that reservation before removing the boat."
+                                + ")."
                 );
 
                 request.setAttribute(

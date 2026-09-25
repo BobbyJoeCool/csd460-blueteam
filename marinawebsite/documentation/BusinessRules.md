@@ -116,6 +116,8 @@ ________________________________________
 
 #### BR-23 — Termination Notice Withdrawal
     A customer can withdraw a termination notice before the termination process is completed.
+    Cutoff (added 2026-09-24): a notice can be withdrawn up to 14 days before its last day. The number of days is
+    Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS in the code - change it there. Customers withdraw on My Reservations.
 
 #### BR-24 — Termination and Slip Availability
     A valid termination notice must be considered when determining when an occupied slip may become available. 

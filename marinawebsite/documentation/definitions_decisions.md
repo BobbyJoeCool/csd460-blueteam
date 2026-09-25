@@ -129,10 +129,10 @@ Not a SQL `ENUM` (plain `VARCHAR(5)`, see `MoffatBayMarinaDB_V1-2-0_update.sql`)
 
 | Value | Meaning |
 | --- | --- |
-| `Submitted` | Customer has submitted the 30-day termination notice. |
+| `Submitted` | Customer has submitted the 30-day termination notice on My Reservations. `terminationDate` holds the last day they chose (at least 30 days after `noticeDate`, BR-21). |
 | `Pending` | Notice is under staff review. |
-| `Approved` | Notice has been approved; `terminationDate` is set. |
-| `Withdrawn` | Customer withdrew the notice before it took effect. |
+| `Approved` | Notice has been approved; `terminationDate` is confirmed. |
+| `Withdrawn` | Customer withdrew the notice before it took effect (BR-23), on My Reservations, up to 14 days (`Utils.NOTICE_WITHDRAWAL_CUTOFF_DAYS`) before its last day. The row is kept; a later notice reuses it. |
 | `Completed` | Lease has ended as scheduled. |
 
 ## Tag Line

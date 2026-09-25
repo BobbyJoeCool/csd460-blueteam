@@ -52,7 +52,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 				<a
 					class="btn-primary hero-cta"
 					href="${pageContext.request.contextPath}/reservation">
-					Reserve a Slip
+					Book a Slip
 				</a>
 			</c:when>
 			<c:otherwise>
@@ -60,11 +60,12 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 					class="btn-primary hero-cta"
 					type="button"
 					onclick="MoffatBay.loginModal.open('/reservation')">
-					Reserve a Slip
+					Book a Slip
 				</button>
 			</c:otherwise>
 		</c:choose>
 	</div>
+	<p class="hero-band__credit">Hero image created with Google Gemini</p>
 </section>
 
 		<!-- Marina benefits -->
