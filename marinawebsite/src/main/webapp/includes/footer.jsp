@@ -45,6 +45,10 @@
                     Reservations
                 </a>
 
+                <a href="${pageContext.request.contextPath}/waitList">
+                    Wait List
+                </a>
+
                 <a href="${pageContext.request.contextPath}/about#formHeading">
                     Contact
                 </a>

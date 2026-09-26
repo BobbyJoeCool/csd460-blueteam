@@ -4,19 +4,36 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.moffatbaymarina.marinawebsite.model.WaitListEntry;
 
 /**
  * Data access for the {@code WaitList} table.
  *
- * <p>Only what the reservation page's "all slips full" prompt needs - join
- * the wait list for a slip size, and check whether the customer is already
- * on it. The Wait List Lookup page (position in queue, cancelling an entry)
- * is a separate, not-yet-built page and gets its own DAO methods when that
- * work starts.
+ * <p>Two pages read this table. The Reservation page's "all slips full"
+ * prompt joins the wait list ({@link #isWaiting} and {@link #insert}); the
+ * Wait List Lookup page reads it back ({@link #countInLineBySize} and
+ * {@link #findOpenEntriesForCustomer}).
+ *
+ * <p><strong>In line</strong> means {@code Waiting} or {@code Offered}
+ * throughout. An offered customer hasn't answered yet and is still ahead of
+ * everyone behind them, so they are counted; {@code Fulfilled} and
+ * {@code Cancelled} are closed and never are.
+ *
+ * <p>Position in the queue isn't stored - see the ERD's design decisions.
+ * It is worked out from {@code timeJoined} (BR-20), which is why
+ * {@link #findOpenEntriesForCustomer} counts rather than reads it.
  *
  * @author Robert Breutzmann
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Robert Breutzmann
+ * @implNote The two Wait List Lookup methods were added by Miguel Fernandez
+ *           for Module 9, per the Wait List contract's Database Returns.
  */
 public class WaitListDAO {
 
@@ -71,5 +88,109 @@ public class WaitListDAO {
                 throw new SQLException("Wait list entry did not insert one row.");
             }
         }
+    }
+
+    /**
+     * How many customers are in line for each slip size.
+     *
+     * <p>Driven from {@code SlipSize} with a LEFT JOIN, so every size the
+     * marina has comes back whether or not anyone is waiting on it - the
+     * page's grid shows a card per size, and a missing key would silently
+     * drop one.
+     *
+     * @param conn an open connection
+     * @return slip size in feet to the number in line, smallest size first;
+     *         {@code 0} for a size nobody is waiting on
+     * @throws SQLException if the lookup fails
+     */
+    public Map<Integer, Integer> countInLineBySize(Connection conn) throws SQLException {
+        String sql = """
+                SELECT sz.sizeFt AS sizeFt,
+                       COUNT(w.waitListID) AS inLineCount
+                FROM SlipSize sz
+                LEFT JOIN WaitList w
+                       ON w.slipSizeID = sz.slipSizeID
+                      AND w.status IN ('Waiting', 'Offered')
+                GROUP BY sz.sizeFt
+                ORDER BY sz.sizeFt
+                """;
+
+        Map<Integer, Integer> counts = new LinkedHashMap<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                counts.put(rs.getInt("sizeFt"), rs.getInt("inLineCount"));
+            }
+        }
+
+        return counts;
+    }
+
+    /**
+     * One customer's open wait list entries, each already knowing how many
+     * people are ahead of it.
+     *
+     * <p>{@code peopleAhead} is counted in SQL rather than by walking the
+     * whole line in Java: the subquery counts in-line entries for the same
+     * slip size that joined earlier, with a lower {@code waitListID}
+     * breaking a tie on {@code timeJoined}. Two customers can never be
+     * handed the same position, and no other customer's row is ever read
+     * into memory.
+     *
+     * @param conn an open connection
+     * @param customerId the signed-in customer, taken from the session and
+     *        never from the request
+     * @return the customer's {@code Waiting} and {@code Offered} entries,
+     *         smallest slip size first; empty, never {@code null}, if they
+     *         are not on any list
+     * @throws SQLException if the lookup fails
+     */
+    public List<WaitListEntry> findOpenEntriesForCustomer(Connection conn, int customerId)
+            throws SQLException {
+
+        String sql = """
+                SELECT w.waitListID  AS waitListID,
+                       sz.sizeFt     AS sizeFt,
+                       w.status      AS status,
+                       w.timeJoined  AS timeJoined,
+                       (SELECT COUNT(*)
+                          FROM WaitList ahead
+                         WHERE ahead.slipSizeID = w.slipSizeID
+                           AND ahead.status IN ('Waiting', 'Offered')
+                           AND (ahead.timeJoined < w.timeJoined
+                                OR (ahead.timeJoined = w.timeJoined
+                                    AND ahead.waitListID < w.waitListID))
+                       ) AS peopleAhead
+                FROM WaitList w
+                JOIN SlipSize sz ON sz.slipSizeID = w.slipSizeID
+                WHERE w.customerID = ?
+                  AND w.status IN ('Waiting', 'Offered')
+                ORDER BY sz.sizeFt
+                """;
+
+        List<WaitListEntry> entries = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    WaitListEntry entry = new WaitListEntry();
+                    entry.setWaitListId(rs.getInt("waitListID"));
+                    entry.setSizeFt(rs.getInt("sizeFt"));
+                    entry.setStatus(rs.getString("status"));
+                    entry.setPeopleAhead(rs.getInt("peopleAhead"));
+
+                    Timestamp joined = rs.getTimestamp("timeJoined");
+                    entry.setTimeJoined(joined == null ? null : joined.toLocalDateTime());
+
+                    entries.add(entry);
+                }
+            }
+        }
+
+        return entries;
     }
 }

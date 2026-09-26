@@ -277,7 +277,7 @@ tbody.step-group {
 <h2>Test 1: My Fleet Add and Edit Boat</h2>
 <p class="test-objective"><strong>Test Objective:</strong> Verify that the My Fleet backend loads the signed-in customer's current boats, adds a new boat with an ownership record, and updates only the fields changed during Edit.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date"> Sept 24, 2026</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
@@ -286,7 +286,7 @@ tbody.step-group {
 <td>Go to <code>http://localhost:8080/marinawebsite/</code>, sign in with <code>desmond.okafor@example.com</code> and password <code>MoffatOkafor02!</code>, then open <code>/myFleet</code>.</td>
 <td>The signed-in customer's currently owned boats are displayed.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption"> Showing the signed-in customer's current boats</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption"> Showing the signed-in customer's current boats</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
 </tr>
 </tbody>
 
@@ -296,7 +296,7 @@ tbody.step-group {
 <td>Click <strong>Add a Boat</strong> button.</td>
 <td>A popup opens with a form for adding a new boat.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Add a Boat popup after Step 2, showing the blank boat information form.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The Add a Boat popup after Step 2, showing the blank boat information form.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
 </tr>
 </tbody>
 
@@ -308,7 +308,7 @@ tbody.step-group {
   Leave HIN and Boat Beam blank, then click <strong>Save</strong>.</td>
 <td>The new boat is added, the popup closes, and the boat appears in My Fleet.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The new boat displayed in My Fleet after Step 3.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The new boat displayed in My Fleet after Step 3.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
 </tr>
 </tbody>
 
@@ -318,7 +318,7 @@ tbody.step-group {
 <td>Click <strong>Edit</strong> on the new boat, change one editable field such as Boat Year or Boat Name, confirm the change, and save.</td>
 <td>A confirmation popup shows the changes that will be made. After confirming and saving, the page redirects back to My Fleet and displays the updated value.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The boat card after Step 4, showing the updated value.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The boat card after Step 4, showing the updated value.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 
@@ -339,7 +339,8 @@ I did not run into any backend issues during this test.
 
 <div class="callout callout-peer">
 <strong>Peer Tester (Miguel)</strong><br>
-&lt;filled in by the peer tester&gt;
+All four steps passed. Added TestBoat with the exact values in Step 3 and it saved first try; the card came back with HIN and Beam as dashed empty badges rather than blanks, which is the right way to show an optional field nobody filled in. Edited the Boat Year from 2020 to 2021 in Step 4 and only that value changed - length, registration and type all stayed as they were, which is the partial update this test is really about.<br>
+Two notes on my screenshots rather than on your code. My Step 4 shot is the card after saving, not the confirmation popup - the popup did appear and did list the 2020 to 2021 change, I just captured the after-state. And I ran on port 8081 rather than the 8080 in your steps, since XAMPP holds 8080 on my machine. Same build either way.
 </div>
 </section>
 
@@ -350,7 +351,7 @@ I did not run into any backend issues during this test.
   blocks removal when the boat has an active reservation</p>
 
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez<span class="badge-sep">|</span><span class="badge-date-label">Tested On:</span><span class="badge-date">Sept 24, 2026</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez<span class="badge-sep">|</span><span class="badge-date-label">Tested On:</span><span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez<span class="badge-sep">|</span><span class="badge-date-label">Tested On:</span><span class="badge-date">Sept 26, 2026</span></div>
 
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
@@ -372,7 +373,7 @@ WHERE b.boatName = 'TestBoat';</code></pre></td>
 <td>The <code>Boat</code> row and matching <code>BoatOwnership</code> row are returned, and <code>BoatOwnership.endDate</code> is <code>NULL</code>.
 </td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Database shows active ownership</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Database shows active ownership</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
 </tr>
 </tbody>
 
@@ -382,7 +383,7 @@ WHERE b.boatName = 'TestBoat';</code></pre></td>
 <td>Choose an owned boat with no Active reservation and remove it from My Fleet. </td>
 <td>The boat disappears from My Fleet</td><td>
 <strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">My Fleet after Step 2, showing the removed boat no longer appears.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>  
+<td><strong>Pass</strong><p class="cell-caption">My Fleet after Step 2, showing the removed boat no longer appears.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>  
 </tr>
 </tbody>
 
@@ -402,7 +403,7 @@ JOIN BoatOwnership bo
 WHERE b.boatName = 'TestBoat';</code></pre></td>
 <td> The <code>Boat</code> row remains in the database, while <code>BoatOwnership.endDate</code> shows the end date.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Backend database after Step 3, showing the updated ownership record.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Backend database after Step 3, showing the updated ownership record.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
 </tr>
 </tbody>
 
@@ -412,7 +413,7 @@ WHERE b.boatName = 'TestBoat';</code></pre></td>
 <td>Choose an owned boat with an active reservation and try to remove it from My Fleet. </td>
 <td>The Remove button is disabled and a message explains that the Active reservation must be cancelled before the boat can be removed.</td>
 <td></td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">My Fleet after Step 4, shows the boat with the active reservation.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">My Fleet after Step 4, shows the boat with the active reservation.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 </table>
@@ -429,7 +430,9 @@ A boat with an Active reservation was blocked from removal.
 
 <div class="callout callout-peer">
 <strong>Peer Tester (Miguel)</strong><br>
-&lt;filled in by the peer tester&gt;
+All four steps passed. Step 3 is the one that actually proves the point, and it is worth writing down what it showed: same boatID 64, same ownership row, and endDate moved from NULL to 2026-09-26. The boat was never deleted, the ownership ended - which is what BR-04 asks for, and it is not something the page on its own could ever demonstrate.<br>
+Step 4 blocked the removal as described, and the card explains why rather than just grey-ing the button out: the reservation badge names MB-00002 right above it, so a customer who hits that wall can see what to cancel.<br>
+One formatting thing to fix in your file, not a test result: in Step 4 the Pass is sitting in the Peer Test column and the Dev Test cell is empty. I have left both exactly as they are rather than move your result for you - worth shifting it over before this gets merged into the cover page.
 </div>
 
 </section>
