@@ -567,6 +567,54 @@ public class ReservationDAO {
     }
 
     /**
+     * How many slips of each size are in service, whether or not anyone is
+     * currently in them.
+     *
+     * <p>Not the same question as {@link #countAvailableForSize}, which
+     * counts the slips that are free to book right now. This is the wait
+     * list estimate's N: a slip that is occupied today still comes free
+     * eventually, so it counts towards how fast the line moves. A slip in
+     * {@code maintenance} or {@code unavailable} never turns over, so it
+     * doesn't.
+     *
+     * <p>Driven from {@code SlipSize} with a LEFT JOIN, so a size with
+     * every slip out of service comes back as {@code 0} rather than going
+     * missing from the map.
+     *
+     * @param conn an open connection
+     * @return slip size in feet to the number of operational slips,
+     *         smallest size first
+     * @throws SQLException if the lookup fails
+     * @implNote Added by Miguel Fernandez for the Module 9 Wait List
+     *           Lookup page, per that contract's Database Returns.
+     */
+    public Map<Integer, Integer> countOperationalSlipsBySize(Connection conn)
+            throws SQLException {
+        String sql = """
+                SELECT sz.sizeFt AS sizeFt,
+                       COUNT(s.slipID) AS operationalSlips
+                FROM SlipSize sz
+                LEFT JOIN Slip s
+                       ON s.slipSizeID = sz.slipSizeID
+                      AND s.slipStatus = 'operational'
+                GROUP BY sz.sizeFt
+                ORDER BY sz.sizeFt
+                """;
+
+        Map<Integer, Integer> counts = new LinkedHashMap<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                counts.put(rs.getInt("sizeFt"), rs.getInt("operationalSlips"));
+            }
+        }
+
+        return counts;
+    }
+
+    /**
      * The final confirmation number uses the generated 
      * reservation ID, but that ID doesn’t exist until after 
      * the insert. So the row is inserted with a temporary 

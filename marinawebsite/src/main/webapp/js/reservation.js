@@ -638,7 +638,11 @@ MoffatBay.reservation = (function () {
             }
 
             window.location.href = form.getAttribute("action")
-                .replace(/\/reservation$/, "/waitListLookup.jsp")
+                // The servlet, not the JSP. Going straight at
+                // waitListLookup.jsp skips WaitListServlet.doGet(), so the
+                // page renders with no summaries and tells someone who just
+                // joined that they are not on the wait list.
+                .replace(/\/reservation$/, "/waitList")
                 + "?notice=waitListJoined&size=" + encodeURIComponent(size);
 
         }).catch(function (err) {
