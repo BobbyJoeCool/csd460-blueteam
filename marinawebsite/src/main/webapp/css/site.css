@@ -81,7 +81,7 @@
 	--color-nav-text-hover: var(--color-golden-hour);
 	--color-nav-text-active: var(
 		--color-golden-hour
-	); /* pairs with the activePage highlighting from header.jsp */
+	); /*pairs with the activePage highlighting from header.jsp */
 
 	/* Forms / inputs (Registration, Login modal, Contact, Reservation, etc.) */
 	--color-input-bg: var(--color-bg-surface);

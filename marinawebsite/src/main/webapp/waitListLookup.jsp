@@ -22,13 +22,17 @@
 
     <title>Wait List Lookup - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/waitListLookup.css">
+    <jsp:include page="/includes/styles.jsp" />
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/waitListLookup.css">
 </head>
 
 <body>
 
-<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/includes/header.jsp">
+    <jsp:param name="activePage" value="waitlist" />
+</jsp:include>
 
 <header class="hero-band" id="waitListLookupHero">
     <div class="hero-band__content">
@@ -145,10 +149,7 @@
                                 ${entry.peopleAhead}
                             </p>
 
-                            <p>
-                                <strong>Date Joined:</strong>
-                                ${entry.timeJoined}
-                            </p>
+                            <p><strong>Date Joined:</strong> ${entry.timeJoinedDisplay}</p>
 
                             <p>
                                 <strong>Estimated Wait:</strong>
