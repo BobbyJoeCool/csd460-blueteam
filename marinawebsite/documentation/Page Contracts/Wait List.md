@@ -17,7 +17,7 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 
 **Not started.** `waitListLookup.jsp` is the Coming Soon stub. What already exists and this page builds on:
 
-- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-8-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
+- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-9-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
 - `TerminationNotice` table: `reservationID`, `noticeDate`, `terminationDate`, `noticeStatus` (`Submitted` / `Pending` / `Approved` / `Withdrawn` / `Completed`). Nothing on the site writes to it yet, but it is the only place the schema records **when a slip tenancy ends** — which is what the wait estimate needs.
 - `WaitListDAO.isWaiting()` / `insert()` — joining happens on the Reservation page's "all slips full" prompt (`/reservation/waitlist`). This page doesn't change that.
 - `ReservationDAO.countAvailableForSize()` — open slips right now, by size.
@@ -47,7 +47,7 @@ One page, two layers:
 - [x] **The estimate is computed in one place.** A plain Java class, `util/WaitEstimator`, with no database access — the DAOs fetch the inputs, the servlet hands them to the estimator, and the estimator returns the number and the display label. Keeps the formula unit-testable and out of both the SQL and the JSP.
 - [ ] **Default average tenure.** The formula needs to know how long a slip tenancy lasts on average. Until the database has enough finished tenancies to measure (it has none today), it falls back to a fixed value. **Proposed: 24 months**, as a named constant in `WaitEstimator`. The team (or the "marina") should confirm the number.
 - [ ] **Leave the wait list.** Recommend yes: `POST /waitList/leave` sets that entry to `Cancelled` with `timeClosed = NOW()`, only if it belongs to the session customer and is still `Waiting`. BR-20 already excludes cancelled entries from average-wait math, so this doesn't distort anything.
-- [ ] **Seed history for the estimate.** The seed data has no `Completed` termination notices, so every estimate will use the fallback. Optional V1-9-0 update: add a handful of past, completed tenancies (a reservation with an end, plus its `Completed` notice) so testers can see the measured path run.
+- [ ] **Seed history for the estimate.** The seed data has no `Completed` termination notices, so every estimate will use the fallback. Optional V1-10-0 update (1.9.0 went to the My Fleet test boats): add a handful of past, completed tenancies (a reservation with an end, plus its `Completed` notice) so testers can see the measured path run.
 - [x] **Servlet URL mapping.** `/waitList` (GET, `WaitListServlet`, forwards to `waitListLookup.jsp`) and, if approved, `/waitList/leave` (POST, `WaitListLeaveServlet`) — the same one-URL-per-servlet split as `/reservation` + `/reservation/waitlist`.
 
 ---
