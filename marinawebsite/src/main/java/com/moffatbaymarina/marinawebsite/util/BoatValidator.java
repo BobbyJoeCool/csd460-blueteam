@@ -13,9 +13,13 @@ import com.moffatbaymarina.marinawebsite.model.Boat;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Shared server-side validation for boat information.
- * Uses the validation rules already defined in Utils so
- * boat validation stays consistent across the website.
+ * @author Carolina R.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina R.
+ *
+ * Provides shared server-side validation for My Fleet boat information. It is
+ * used by the Add and Edit servlets to validate boat fields and return validation
+ * errors before any database changes are made.
  */
 public final class BoatValidator {
 

@@ -21,6 +21,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * @author Carolina R.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina R.
+ *
+ * Handles updates to a boat that belongs to the signed-in customer. The servlet
+ * verifies ownership, validates the submitted changes, and updates only the
+ * editable boat fields.
+ */
+
+
 @WebServlet("/myFleet/edit")
 public class MyFleetEditServlet extends HttpServlet {
 
@@ -37,6 +48,7 @@ public class MyFleetEditServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
+        // Only signed-in customers should be able to edit boats.
         if (session == null || !(session.getAttribute("customerId") instanceof Number)) {
             response.sendRedirect(request.getContextPath() + "/");
             return;
@@ -57,6 +69,7 @@ public class MyFleetEditServlet extends HttpServlet {
         Integer boatId =
                 Utils.parseInt(request.getParameter("boatId"));
 
+        // Stop the request if the boat ID is missing or invalid.
         if (boatId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -71,6 +84,8 @@ public class MyFleetEditServlet extends HttpServlet {
                             boatId
                     );
 
+        // If the customer does not own this boat, return to My Fleet
+            // and show an error instead of allowing the edit.
             if (current == null) {
                 request.setAttribute(
                         "formError",
@@ -88,11 +103,15 @@ public class MyFleetEditServlet extends HttpServlet {
                 return;
             }
 
+        // Boat length is locked after the boat is created.
+            // Reject the request if someone tries to submit it during Edit.
             if (request.getParameter("boatLength") != null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
+            // HIN can only be entered if the current boat does not already have one.
+            // Once a HIN exists, it is treated as locked.
             if (current.getHIN() != null
                     && !current.getHIN().isBlank()
                     && request.getParameter("hin") != null) {
@@ -101,6 +120,8 @@ public class MyFleetEditServlet extends HttpServlet {
                 return;
             }
 
+            // Stores only the fields that were actually submitted by the Edit form.
+            // LinkedHashMap keeps the submitted field order.
             Map<String, String> changed =
                     new LinkedHashMap<>();
 
@@ -111,6 +132,7 @@ public class MyFleetEditServlet extends HttpServlet {
             addIfPresent(request, changed, "hin");
             addIfPresent(request, changed, "regNumber");
 
+            //boat name required and can't be blank
             if (changed.containsKey("boatName")
                     && changed.get("boatName").isBlank()) {
 
@@ -125,6 +147,7 @@ public class MyFleetEditServlet extends HttpServlet {
                 );
             }
 
+            // Standardizes registration numbers to uppercase.
             if (changed.containsKey("regNumber")) {
                 changed.put(
                         "regNumber",
@@ -132,6 +155,8 @@ public class MyFleetEditServlet extends HttpServlet {
                 );
             }
 
+        // If the customer did not change anything, return to My Fleet
+            // without sending an unnecessary database update.
             if (changed.isEmpty()) {
                 response.sendRedirect(
                         request.getContextPath() + "/myFleet"
