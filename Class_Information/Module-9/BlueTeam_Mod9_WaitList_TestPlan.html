@@ -163,6 +163,8 @@ pre {
   line-height: 1.5;
 }
 pre code { background: none; color: inherit; padding: 0; }
+/* Code blocks inside a table cell wrap instead of being cut off at the cell edge */
+td pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11.5px; }
 code {
   background: #eef1f5;
   padding: 1px 5px;
@@ -432,13 +434,12 @@ tbody.step-group {
 <td>
     Run the SQL script provided below to reset the password for a customer
     who currently has an active waitlist entry.
-    <pre><code>
-      USE MoffatBayMarinaDB;
-      UPDATE Customer
-      SET passwordHash = SHA2('MoffatTest01!', 256),
-          failedLoginAttempts = 0,
-          accountLocked = 0
-      WHERE email = 'rosa.delgado@example.com';</code></pre>
+    <pre><code>USE MoffatBayMarinaDB;
+UPDATE Customer
+SET passwordHash = SHA2('MoffatTest01!', 256),
+    failedLoginAttempts = 0,
+    accountLocked = 0
+WHERE email = 'rosa.delgado@example.com';</code></pre>
 </td>
 
 <td>

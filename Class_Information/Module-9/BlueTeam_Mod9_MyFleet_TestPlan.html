@@ -4,11 +4,11 @@
   CSD 460 - Capstone Project - Marina Website Project
   Functional Test Plan — My Fleet
 
-  Cover page only for now. The tests are written in two separate files so testers don't conflict:
-    - BreutzmannTest.html  (Front End tests - Robert Breutzmann, peer tested by Sara White)
-    - RodriguezTest.html  (Back End tests - Carolina Rodriguez, peer tested by Miguel Fernandez)
-  Once testing is done, paste each <section> from those files below the cover page, renumber the tests in
-  order (heading, section id, screenshot folders), and add each one to the Table of Contents.
+  Combined from the two working files:
+    - Tests 1-3 (Front End): BreutzmannTest.html - Robert Breutzmann, peer tested by Sara White
+    - Tests 4-5 (Back End): RodriguezTest.html - Carolina Rodriguez, peer tested by Miguel Fernandez
+  Screenshots are linked from where they already are: Screenshots/Breutzmann/ (Tests 1-3) and Screenshots/Rodriguez/ (Tests 4-5),
+  so their file names keep each working file's original test numbers.
   Export to PDF with DevNotes/Scripts/export-html.sh <this file> - each <section> becomes one PDF page.
 -->
 <!DOCTYPE html>
@@ -163,6 +163,8 @@ pre {
   line-height: 1.5;
 }
 pre code { background: none; color: inherit; padding: 0; }
+/* Code blocks inside a table cell wrap instead of being cut off at the cell edge */
+td pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11.5px; }
 code {
   background: #eef1f5;
   padding: 1px 5px;
@@ -293,15 +295,442 @@ tbody.step-group {
 <h2>Table of Contents</h2>
 <ul>
 <li><a href="#cover-page">Cover Page</a></li>
-<!-- Add one <li> per test when the tests are combined in, e.g.
-<li><a href="#test-1-test-title">Test 1: &lt;Test Title&gt;</a></li> -->
+<li><a href="#test-1-fleet-layout-at-2-and-4-boats">Test 1: Fleet Layout at 2 and 4 Boats</a></li>
+<li><a href="#test-2-edit-a-boat">Test 2: Edit a Boat</a></li>
+<li><a href="#test-3-page-links">Test 3: Page Links</a></li>
+<li><a href="#test-4-my-fleet-add-and-edit-boat">Test 4: My Fleet Add and Edit Boat</a></li>
+<li><a href="#test-5-my-fleet-remove-and-ownership-protection">Test 5: My Fleet Removal, Ownership Protection and Database Updates</a></li>
 </ul>
 <p>For each test, the <u>developer</u> should: provide a test description, a test objective, the developer name and date tested. For each step, fill out the actions to be taken and describe the expected results, and check Pass or Fail. The <u>peer tester</u> should provide their name, date tested, check Pass or Fail for each step, and add each step's screenshot(s) in the same cell as their Pass or Fail.</p>
 </div>
 
 </section>
 
-<!-- Paste the tests from BreutzmannTest.html and RodriguezTest.html here. -->
+<section id="test-1-fleet-layout-at-2-and-4-boats">
+<h2>Test 1: Fleet Layout at 2 and 4 Boats</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that My Fleet displays correctly with a 2-boat fleet (one card per row) and a 4-boat fleet (two columns), at full width, as the browser window narrows, and in a phone simulator - including that reserved boats cannot be removed.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 27, 2026</span></div>
+<div class="callout callout-note"><strong>Before running Tests 1-3</strong><br>The database must be at version 1.9.0 (build it with <code>databasescripts/MoffatBayMarinaDB_V1-9-0.sql</code>; check with <code>currentVersion.sql</code>). That version gives two customers the fleets these tests need:<br>&bull; <strong>Desmond Okafor</strong> (<code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>) - 2 boats: Second Wind (reserved, MB-00002) and Harbor Light (not reserved).<br>&bull; <strong>Arthur Penhale</strong> (<code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code>) - 4 boats: Little Bear (reserved, MB-00005), Wandering Albatross (reserved, MB-00006, no HIN), Kestrel (not reserved), and Morning Tide (not reserved; Type, Registration, Beam and Year left blank).<br>Run the tests in order: Test 2 changes Wandering Albatross and Kestrel, so Test 1 should see them first. To run Test 2 again, use the reset query under Test 2.</div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>. Open <strong>Edit User Info</strong> and click the <strong>My Fleet</strong> button.</td>
+<td>My Fleet opens with the hero banner, a heading reading <strong>Your Boats</strong> with a <strong>2 boats</strong> badge, and two boat cards stacked one per row, centred at about 70% of the page width. An <strong>Add a Boat</strong> button sits below the cards.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Desmond's fleet at full browser width</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Look at the <strong>Second Wind</strong> card.</td>
+<td>Boat name centred in small caps. Blue status badge: <strong>Reserved &mdash; Dock A, Slip 4 (A-04)</strong>, <em>since Jul 1, 2026 &middot; MB-00002</em>. Six field badges (Type, HIN, Length, Registration, Beam, Year) three across, all filled in. <strong>Edit</strong> is clickable; <strong>Remove</strong> is greyed out and can't be clicked, with the hint <em>This boat can't be removed from your account while it's part of an active reservation.</em> A <strong>View Reservation MB-00002 &rarr;</strong> link is shown.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Second Wind card - reserved badge, disabled Remove and hint</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Look at the <strong>Harbor Light</strong> card.</td>
+<td>Grey status badge reading <strong>Open to Reserve</strong> with a <strong>Book a Slip &rarr;</strong> link. All six field badges filled in. Both <strong>Edit</strong> and <strong>Remove</strong> are clickable. No View Reservation link and no removal hint.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Harbor Light card - open badge, both buttons enabled</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Slowly drag the browser window narrower, from full width down to about 400px wide.</td>
+<td>Cards stay one per row the whole way. Below about 640px the cards widen to fill the page, the field badges drop from three across to two across, and the Add a Boat button stretches full width. At no width does text overlap, spill out of a badge or card, or cause a sideways scrollbar. Remove on Second Wind stays greyed out.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Desmond's fleet at a narrow window width</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Open Developer Tools and turn on the device toolbar (Chrome: <strong>Toggle device toolbar</strong>, Ctrl+Shift+M / Cmd+Shift+M). Select <strong>iPhone 12 Pro</strong> and reload the page.</td>
+<td>Page fits the phone width with no sideways scrolling. Cards one per row, badges two across, boat names and status badges readable (the reserved badge may wrap onto several lines). Edit and Remove share a row; the View Reservation link sits on its own line. Every button is large enough to tap. Remove on Second Wind stays greyed out.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Desmond's fleet in the iPhone 12 Pro simulator</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S5a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S5a.png" alt="Step 5"></a><a href="Screenshots/Breutzmann/Test_1/T1_S5b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S5b.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Turn the device toolbar off and restore the window to full width. Log out, then log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open <strong>My Fleet</strong> the same way as step 1.</td>
+<td>Heading badge reads <strong>4 boats</strong>. The cards are laid out in <strong>two columns</strong> (two rows of two), and each card's field badges are two across instead of three.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Arthur's fleet at full browser width - two columns</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S6a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S6a.png" alt="Step 6"></a><a href="Screenshots/Breutzmann/Test_1/T1_S6b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S6b.png" alt="Step 6"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Look at the <strong>Little Bear</strong> and <strong>Wandering Albatross</strong> cards.</td>
+<td>Both show the blue reserved badge: Little Bear <strong>Dock A, Slip 9 (A-09)</strong>, <em>since May 1, 2026 &middot; MB-00005</em>; Wandering Albatross <strong>Dock A, Slip 2 (A-02)</strong>, <em>since May 7, 2026 &middot; MB-00006</em>. On both, Remove is greyed out with the removal hint, and a View Reservation link is shown. Wandering Albatross's <strong>HIN</strong> badge is dashed and untinted, showing an em dash (&mdash;).</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Little Bear and Wandering Albatross cards</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S7a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S7a.png" alt="Step 7"></a><a href="Screenshots/Breutzmann/Test_1/T1_S7b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S7b.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Look at the <strong>Kestrel</strong> and <strong>Morning Tide</strong> cards.</td>
+<td>Both show the grey <strong>Open to Reserve</strong> badge with a Book a Slip link, and both have Edit and Remove clickable. Kestrel's badges are all filled in. Morning Tide's <strong>Type</strong>, <strong>Registration</strong>, <strong>Beam</strong> and <strong>Year</strong> badges are dashed and untinted with an em dash; only its HIN and Length are filled in.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Kestrel and Morning Tide cards - dashed blank badges on Morning Tide</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S8a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S8a.png" alt="Step 8"></a><a href="Screenshots/Breutzmann/Test_1/T1_S8b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S8b.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>9</td>
+<td>Slowly drag the browser window narrower, from full width down to about 400px wide.</td>
+<td>Below about 900px the two columns become <strong>one card per row</strong>, and the badges go back to three across. Below about 640px the cards fill the page width and the badges drop to two across. No overlapping text, spilled badges, or sideways scrollbar at any width. Remove stays greyed out on the two reserved boats.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Arthur's fleet after it collapses to one column</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S9a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S9a.png" alt="Step 9"></a><a href="Screenshots/Breutzmann/Test_1/T1_S9b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S9b.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>10</td>
+<td>Turn the device toolbar back on, select <strong>iPhone 12 Pro</strong>, and reload.</td>
+<td>Same phone layout as step 5: one card per row, badges two across, no sideways scrolling, all buttons tappable. The dashed blank badges on Morning Tide still read clearly as empty. Remove stays greyed out on Little Bear and Wandering Albatross.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Arthur's fleet in the iPhone 12 Pro simulator</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_1/T1_S10a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S10a.png" alt="Step 10"></a><a href="Screenshots/Breutzmann/Test_1/T1_S10b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_1/T1_S10b.png" alt="Step 10"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>When shrinking the browser window, the Remove button (while clickable) becomes full screen width, but doesn't when it isn't.  With the 4 boat modal, every other boat is twice as wide when reducing the size past the breakpoint.  Also on the iPhone in DevTools.<br><br><strong>Fixed after testing (Sep 24, 2026):</strong> (1) The phone-width rule that splits the button row only listed the outlined button style, so an enabled Remove stretched while Edit and a disabled Remove (the filled style) didn't; both styles are now listed, and Edit and Remove share the row evenly. (2) The 4-boat grid is told to top-align its cards; when it collapses to one column that same setting shrank each card to its own content, so reserved cards (longer badge and hint) came out wider than unreserved ones. The collapsed list now stretches every card to full width.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>Everything looks great and works as expected. The only thing I'd recommend is making a dropdown menu for the customer's login so they can separately navigate to the pages to edit either personal information or boat information (my fleet).</div>
+</section>
+
+<section id="test-2-edit-a-boat">
+<h2>Test 2: Edit a Boat</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the Edit popup fills in the boat's current details, locks the fields that can't change (Length always, HIN once set), lets the customer add a missing HIN once, shows an accurate old &rarr; new confirmation before saving, confirms a successful save with a <strong>Boat updated</strong> message, and that the server turns down a registration number another boat already has.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open <strong>My Fleet</strong>. Click <strong>Edit</strong> on <strong>Wandering Albatross</strong>.</td>
+<td>A popup titled <strong>Edit Wandering Albatross</strong> opens, with every field filled in to match the card. <strong>Boat Length</strong> is greyed out and can't be clicked into, with a note explaining that length sets the slip size and rate. <strong>HIN</strong> is empty but editable, with a <strong>Set once</strong> marker and a note that it can't be changed once saved. The clear button reads <strong>Revert Changes</strong>. <strong>Save Changes</strong> is disabled, with <em>Nothing changed yet.</em> beneath it.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Edit Wandering Albatross - Length locked, HIN marked Set once</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Type <code>WAB36C1968AL</code> into the HIN field, then click <strong>Save Changes</strong>.</td>
+<td>No error appears under the HIN field, and Save Changes becomes clickable once the HIN is typed. Clicking it replaces the form with the confirmation <strong>Save these changes?</strong>, listing exactly one row: <strong>HIN</strong>: <em>empty</em> &rarr; <code>WAB36C1968AL</code>, and reading <em>Nothing has been set yet. Only this field will be saved &mdash; everything else on Wandering Albatross stays as it is.</em> Buttons: <strong>Go back</strong> and <strong>Yes, save</strong>.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Confirmation popup for adding the HIN</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Click <strong>Go back</strong> and check the HIN field, then click <strong>Save Changes</strong> again and click <strong>Yes, save</strong>.</td>
+<td>Go back returns to the form with <code>WAB36C1968AL</code> still in the HIN field (nothing was undone or sent), and Save Changes brings the same one-row confirmation back. After Yes, save, the popup closes and My Fleet reloads. A <strong>Boat updated</strong> message pops up briefly and then fades. Wandering Albatross's HIN badge now shows <code>WAB36C1968AL</code>, filled in rather than dashed.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Boat updated message after adding the HIN, and the updated card</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S3a.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S3a.png" alt="Step 3"></a><a href="Screenshots/Breutzmann/Test_2/T2_S3b.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S3b.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Click <strong>Edit</strong> on Wandering Albatross again, look at the HIN field, and click <strong>Cancel</strong>.</td>
+<td>In the Edit popup, <strong>HIN</strong> now shows <code>WAB36C1968AL</code>, greyed out and not editable, with a note that a hull number doesn't change; the Set once marker is gone. Cancel closes the popup with nothing saved.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Wandering Albatross HIN now locked</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Click <strong>Edit</strong> on <strong>Kestrel</strong>.</td>
+<td>Popup titled <strong>Edit Kestrel</strong>, filled in to match the card. <strong>Boat Length</strong> and <strong>HIN</strong> are both greyed out and not editable (Kestrel already has a HIN). Boat Name, Registration Number, Boat Type, Boat Beam and Year are editable. Save Changes is disabled.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Edit Kestrel - Length and HIN both locked</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S5.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>6</td>
+<td>Change <strong>Boat Type</strong> to <code>Center Console</code> and <strong>Year</strong> to <code>2020</code>. Then click <strong>Revert Changes</strong>.</td>
+<td>After typing, the hint reads <em>2 fields will be saved.</em> Revert Changes puts Boat Type back to <code>Powerboat</code> and Year back to <code>2019</code> (it does not blank the form), and Save Changes is disabled again with <em>Nothing changed yet.</em></td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Kestrel after Revert Changes</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S6.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S6.png" alt="Step 6"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>7</td>
+<td>Change <strong>Boat Type</strong> to <code>Center Console</code> and <strong>Year</strong> to <code>2020</code> again, then click <strong>Save Changes</strong>.</td>
+<td>Confirmation lists exactly two rows: <strong>Boat type</strong>: <code>Powerboat</code> &rarr; <code>Center Console</code>, and <strong>Boat year</strong>: <code>2019</code> &rarr; <code>2020</code>. It reads <em>Only these 2 fields will be saved &mdash; everything else on Kestrel stays as it is.</em> No other fields are listed.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Confirmation popup for the Kestrel edit</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S7.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S7.png" alt="Step 7"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>8</td>
+<td>Click <strong>Yes, save</strong>.</td>
+<td>My Fleet reloads and a <strong>Boat updated</strong> message pops up briefly. Kestrel's card shows Type <code>Center Console</code> and Year <code>2020</code>; every other badge is unchanged.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Boat updated message after the Kestrel edit, and the updated card</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S8.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S8.png" alt="Step 8"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>9</td>
+<td>Click <strong>Edit</strong> on Kestrel. Change <strong>Registration Number</strong> to <code>WN2218OK</code> (Harbor Light's, on Desmond's account), click <strong>Save Changes</strong>, then <strong>Yes, save</strong>.</td>
+<td>The page reloads and the Edit Kestrel popup opens again by itself, with a red banner <strong>inside the popup</strong> reading <em>Please fix the highlighted boat fields.</em>, <code>WN2218OK</code> still in the Registration Number field and <em>That boat registration is already in use.</em> under it. Every field you didn't change still shows Kestrel's values (Name, Type, Beam, Year) - none are blank. The address bar reads <code>/myFleet</code>. Nothing was saved: click <strong>Cancel</strong>, and there is no red banner left on the page, and Kestrel's Registration badge still shows <code>WN5521KP</code>.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Duplicate registration turned down, popup reopened with the message</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_2/T2_S9.png" target="_blank"><img src="Screenshots/Breutzmann/Test_2/T2_S9.png" alt="Step 9"></a></div></td>
+</tr>
+</tbody>
+</table>
+<p class="query-note">To run Test 2 again, put both boats back first:</p>
+<pre><code class="sql">USE MoffatBayMarinaDB;
+
+UPDATE Boat SET HIN = NULL WHERE HIN = 'WAB36C1968AL';
+UPDATE Boat SET boatType = 'Powerboat', boatYear = 2019 WHERE HIN = 'PNH61A2B3C45';</code></pre>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>This test revealed that when the update on edit a boat fails, all the fields that weren't changed are emptied.  Also, the error message persists back to the My Fleet Page.<br><br><strong>Fixed after testing (Sep 24, 2026):</strong> (1) An edit only sends the fields that changed, so when it failed the server sent the popup back with every other field blank, and the page then copied those blanks over the boat's real values. The server now says which fields were sent, and only those are refilled from what was typed; the rest keep the boat's values. (2) The "Please fix the highlighted boat fields" message was shown on the page above the cards, so it stayed after the popup closed. It now shows inside the popup. The address bar also goes back to /myFleet, so a refresh doesn't offer to resubmit. Step 9's expected result is updated to match; Sara's peer run will be the first check of the new behaviour.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>Everything works as expected. I really aprpeciate that when a change is made, there's an extra step to verify those changes before setting them. My only suggestion is that it might be helpful to have pre-determined boat types as a drop down with an included "other" option that allows the user to type in a boat type that may not be included in the list. It could be useful for making boat type data more consistent, so we don't have six different users typing in slightly different wording for the same boat type. However, I don't know how necessary or helpful that would be if it doesn't have much effect on the operations of the marina. </div>
+</section>
+
+<section id="test-3-page-links">
+<h2>Test 3: Page Links</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that My Fleet's links and buttons take the customer to the right place: My Fleet from Edit User Info, Add a Boat, View Reservation, and Book a Slip (with the right boat already selected).</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Log in as <code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code>. Open <strong>Edit User Info</strong> and click the <strong>My Fleet</strong> button.</td>
+<td>My Fleet opens showing Desmond's two boats (Second Wind and Harbor Light) - not the empty <em>You haven't registered any boats yet.</em> message.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">My Fleet reached from Edit User Info</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S1.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Click <strong>Add a Boat</strong>.</td>
+<td>A popup titled <strong>Add a Boat</strong> opens with every field blank and editable (including Boat Length and HIN). The clear button reads <strong>Clear Boat Info</strong> and the save button reads <strong>Save Boat</strong>.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Add a Boat popup</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S2.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Click <strong>Cancel</strong> to close the popup. Then, on the Second Wind card, click <strong>View Reservation MB-00002 &rarr;</strong>.</td>
+<td>The popup closes with nothing saved. <strong>My Reservations</strong> then opens with <code>MB-00002</code> already in the Reservation Number filter and a single card: reservation <strong>MB-00002</strong> for Second Wind at Dock A, Slip 4, Lease Status <strong>Active</strong>, and a <strong>30-Day Notice</strong> line reading <strong>Pending</strong> (from the seed data). There's no Cancel Reservation or Submit 30-Day Notice button, because the lease has started and a notice is already in progress. Instead there's a <strong>Withdraw Notice</strong> button with the hint <em>Changed your mind? You may withdraw this notice until 14 days before your lease end date.</em> (the seed notice has no lease end date yet, so the card's <strong>Lease End Date</strong> reads <em>Not set yet</em>). Don't click it; that's covered by the reservation tests.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">My Reservations filtered to MB-00002</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S3.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Go back to My Fleet. On the Harbor Light card, click <strong>Book a Slip &rarr;</strong>.</td>
+<td>The Book a Slip (Reservation) page opens with <strong>Harbor Light</strong> already selected in the boat dropdown.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Reservation page with Harbor Light pre-selected</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S4.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+<tbody class="step-group">
+<tr>
+<td>5</td>
+<td>Log out, then log in as <code>arthur.penhale@example.com</code> / <code>MoffatPenhale05!</code> and open My Fleet. On the <strong>Morning Tide</strong> card, click <strong>Book a Slip &rarr;</strong>.</td>
+<td>The Reservation page opens with <strong>Morning Tide</strong> selected in the boat dropdown - the boat whose link was clicked, not simply the first boat in the list.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Reservation page with Morning Tide pre-selected</p><div class="cell-shots"><a href="Screenshots/Breutzmann/Test_3/T3_S5.png" target="_blank"><img src="Screenshots/Breutzmann/Test_3/T3_S5.png" alt="Step 5"></a></div></td>
+</tr>
+</tbody>
+</table>
+<h4>Comments</h4>
+<div class="callout callout-dev"><strong>Developer (Robert)</strong><br>Hitting the back button on the browser after using the edit a boat button, brings you back to the popup instead of the page.<br><br><strong>Fixed after testing (Sep 24, 2026):</strong> Browsers keep a snapshot of the page you leave, and Back restores that snapshot instead of reloading. The page was left from inside the popup (by clicking Yes, save), so the snapshot had the popup open. The site's shared popup code now closes any open popup when a page comes back from that snapshot. The fix covers every popup on the site, not just My Fleet's.</div>
+<div class="callout callout-peer"><strong>Peer Tester (Sara)</strong><br>Everything worked exactly as expected and looked really nice. Very readable, easy to understand. I don't have any suggestions for what to improve or how this could function better. I think the flow is really nice and intuitive.</div>
+</section>
+
+<section id="test-4-my-fleet-add-and-edit-boat">
+<h2>Test 4: My Fleet Add and Edit Boat</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the My Fleet backend loads the signed-in customer's current boats, adds a new boat with an ownership record, and updates only the fields changed during Edit.</p>
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+<tr>
+<td>1</td>
+<td>Go to <code>http://localhost:8080/marinawebsite/</code>, sign in with <code>desmond.okafor@example.com</code> and password <code>MoffatOkafor02!</code>, then open <code>/myFleet</code>.</td>
+<td>The signed-in customer's currently owned boats are displayed.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption"> Showing the signed-in customer's current boats</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Click <strong>Add a Boat</strong> button.</td>
+<td>A popup opens with a form for adding a new boat.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The Add a Boat popup after Step 2, showing the blank boat information form.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td>Enter the following boat information: 
+  Boat Name: <code>TestBoat</code>, Boat Type: <code>PowerBoat</code>, Boat Length: <code>20</code>, Registration Number: <code>WA10002QT</code>, and Boat Year: <code>2020</code>. 
+  Leave HIN and Boat Beam blank, then click <strong>Save</strong>.</td>
+<td>The new boat is added, the popup closes, and the boat appears in My Fleet.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The new boat displayed in My Fleet after Step 3.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Click <strong>Edit</strong> on the new boat, change one editable field such as Boat Year or Boat Name, confirm the change, and save.</td>
+<td>A confirmation popup shows the changes that will be made. After confirming and saving, the page redirects back to My Fleet and displays the updated value.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">The boat card after Step 4, showing the updated value.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+
+</table>
+
+<h4>Comments</h4>
+
+<div class="callout callout-dev">
+<strong>Developer (Carolina)</strong><br>
+The My Fleet backend loaded the signed-in customer's current boats correctly. I checked MySQL during testing to make sure the database was updating correctly. 
+Adding a boat created both the <code>Boat</code> and <code>BoatOwnership</code> records. 
+After editing the boat, I checked MySQL again and confirmed that only the field I changed was updated, while the locked boat length and HIN stayed the same. 
+I did not run into any backend issues during this test.
+
+<Strong>**Note for front-end:</Strong> Wording on "are you sure you want to edit/remove this boat?" needs to be adjusted. 
+<Strong>**Revised</Strong> Already fixed.
+</div>
+
+<div class="callout callout-peer">
+<strong>Peer Tester (Miguel)</strong><br>
+All four steps passed. Added TestBoat with the exact values in Step 3 and it saved first try; the card came back with HIN and Beam as dashed empty badges rather than blanks, which is the right way to show an optional field nobody filled in. Edited the Boat Year from 2020 to 2021 in Step 4 and only that value changed - length, registration and type all stayed as they were, which is the partial update this test is really about.<br>
+Two notes on my screenshots rather than on your code. My Step 4 shot is the card after saving, not the confirmation popup - the popup did appear and did list the 2020 to 2021 change, I just captured the after-state. And I ran on port 8081 rather than the 8080 in your steps, since XAMPP holds 8080 on my machine. Same build either way.
+</div>
+</section>
+
+
+<section id="test-5-my-fleet-remove-and-ownership-protection">
+<h2>Test 5: My Fleet Removal, Ownership Protection and Database Updates</h2>
+<p class="test-objective"><strong>Test Objective:</strong> Verify that the My Fleet backend removes a boat by ending ownership instead of deleting the boat and 
+  blocks removal when the boat has an active reservation</p>
+
+<div class="badge badge-dev"><span class="badge-label">Developer:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 24, 2026</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
+
+<table>
+<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<tbody class="step-group">
+
+<tr>
+<td>1</td>
+<td>Stay signed into same user, run the following SQL in MySQL:
+  <pre><code>SELECT
+    b.boatID,
+    b.boatName,
+    bo.customerID,
+    bo.startDate,
+    bo.endDate
+FROM Boat b
+JOIN BoatOwnership bo
+    ON b.boatID = bo.boatID
+WHERE b.boatName = 'TestBoat';</code></pre></td>
+<td>The <code>Boat</code> row and matching <code>BoatOwnership</code> row are returned, and <code>BoatOwnership.endDate</code> is <code>NULL</code>.
+</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Database shows active ownership</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>2</td>
+<td>Choose an owned boat with no Active reservation and remove it from My Fleet. </td>
+<td>The boat disappears from My Fleet</td><td>
+<strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">My Fleet after Step 2, showing the removed boat no longer appears.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>  
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>3</td>
+<td> Checking removal from backend- Run the following SQL in MySQL:
+  <pre><code>SELECT
+    b.boatID,
+    b.boatName,
+    bo.customerID,
+    bo.startDate,
+    bo.endDate
+FROM Boat b
+JOIN BoatOwnership bo
+    ON b.boatID = bo.boatID
+WHERE b.boatName = 'TestBoat';</code></pre></td>
+<td> The <code>Boat</code> row remains in the database, while <code>BoatOwnership.endDate</code> shows the end date.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">Backend database after Step 3, showing the updated ownership record.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
+</tr>
+</tbody>
+
+<tbody class="step-group">
+<tr>
+<td>4</td>
+<td>Choose an owned boat with an active reservation and try to remove it from My Fleet. </td>
+<td>The Remove button is disabled and a message explains that the Active reservation must be cancelled before the boat can be removed.</td>
+<td><strong>Pass</strong></td>
+<td><strong>Pass</strong><p class="cell-caption">My Fleet after Step 4, shows the boat with the active reservation.</p><div class="cell-shots"><a href="Screenshots/Rodriguez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Rodriguez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
+</tr>
+</tbody>
+</table>
+
+<h4>Comments</h4>
+
+<div class="callout callout-dev">
+<strong>Developer (Carolina)</strong><br>
+The Remove flow worked as expected. Before removing the boat, I checked MySQL and confirmed that the boat had a current <code>BoatOwnership</code> record with <code>endDate</code> set to <code>NULL</code>. 
+After removing the boat from My Fleet, I ran the query again and confirmed that the <code>Boat</code> row was still in the database while the matching <code>BoatOwnership.endDate</code> was updated with the removal date. 
+This confirmed that Remove performs a soft remove instead of deleting the boat. 
+A boat with an Active reservation was blocked from removal. 
+</div>
+
+<div class="callout callout-peer">
+<strong>Peer Tester (Miguel)</strong><br>
+All four steps passed. Step 3 is the one that actually proves the point, and it is worth writing down what it showed: same boatID 64, same ownership row, and endDate moved from NULL to 2026-09-26. The boat was never deleted, the ownership ended - which is what BR-04 asks for, and it is not something the page on its own could ever demonstrate.<br>
+Step 4 blocked the removal as described, and the card explains why rather than just grey-ing the button out: the reservation badge names MB-00002 right above it, so a customer who hits that wall can see what to cancel.<br>
+One formatting thing to fix in your file, not a test result: in Step 4 the Pass is sitting in the Peer Test column and the Dev Test cell is empty. I have left both exactly as they are rather than move your result for you - worth shifting it over before this gets merged into the cover page.
+</div>
+
+</section>
+
 
 </body>
 </html>

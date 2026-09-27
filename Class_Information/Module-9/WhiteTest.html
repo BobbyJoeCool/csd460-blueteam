@@ -402,13 +402,12 @@ tbody.step-group {
 <td>
     Run the SQL script provided below to reset the password for a customer
     who currently has an active waitlist entry.
-    <pre><code>
-      USE MoffatBayMarinaDB;
-      UPDATE Customer
-      SET passwordHash = SHA2('MoffatTest01!', 256),
-          failedLoginAttempts = 0,
-          accountLocked = 0
-      WHERE email = 'rosa.delgado@example.com';</code></pre>
+    <pre><code>USE MoffatBayMarinaDB;
+UPDATE Customer
+SET passwordHash = SHA2('MoffatTest01!', 256),
+    failedLoginAttempts = 0,
+    accountLocked = 0
+WHERE email = 'rosa.delgado@example.com';</code></pre>
 </td>
 
 <td>
