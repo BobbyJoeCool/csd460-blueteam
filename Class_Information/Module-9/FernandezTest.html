@@ -277,7 +277,7 @@ tbody.step-group {
 <h2>Test 1: Public Wait List Figures Are Correct and Need No Sign In</h2>
 <p class="test-objective"><strong>Test Objective:</strong> Verify that <code>/waitList</code> serves the per-slip-size line counts and wait estimates to a signed-out visitor, that the counts match the database, and that the estimate counts only slips that are actually in service.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
@@ -286,7 +286,7 @@ tbody.step-group {
 <td>In a private/incognito window, go to <code>http://localhost:8081/marinawebsite/waitList</code> without signing in.</td>
 <td>The page loads normally - no sign-in panel, no redirect, HTTP 200. The header shows the Log In button rather than a welcome greeting.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The full Wait List page loaded signed out, with the header showing Log In.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The full Wait List page loaded signed out, with the header showing Log In.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -295,7 +295,7 @@ tbody.step-group {
 <td>Read the three slip size cards under "Current Waitlists by Slip Size".</td>
 <td>All three sizes are shown - 26, 40 and 50 - even though only the 40 ft list has anyone on it. A size with nobody waiting still gets a card reading 0.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The three cards together, showing 26 ft and 50 ft at 0 and 40 ft at 3.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The three cards together, showing 26 ft and 50 ft at 0 and 40 ft at 3.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S2.png" alt="Step 2"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -304,7 +304,8 @@ tbody.step-group {
 <td>Read the 26 ft and 50 ft cards.</td>
 <td>Both read <code>Guests Waiting: 0</code> and <code>Availability: Slips available now</code> with a Book a Slip link, and show no wait estimate - a size with free slips is offered, not estimated.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The 26 ft card, showing 0 waiting with the Book a Slip link and no estimate.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S3.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The 26 ft card, and 50 ft cards, showing 0 waiting with the Book a Slip link and no estimate.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S3.png" alt="Step 3">
+<img src= "Screenshots/Fernandez/Test_1/T1_S3a.png" alt="Step 3"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -313,7 +314,7 @@ tbody.step-group {
 <td>Read the 40 ft card.</td>
 <td><code>Guests Waiting: 3</code> and <code>Estimated Wait: about 4&frac12; months</code>. No Book a Slip link, because every 40 ft slip is taken.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The 40 ft card, showing 3 waiting and the estimate.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The 40 ft card, showing 3 waiting and the estimate.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -322,7 +323,7 @@ tbody.step-group {
 <td>Run the first query below against the database.</td>
 <td>Exactly 3 rows come back, all at <code>sizeFt</code> 40, all <code>Waiting</code> - matching the count on the card. Desmond Okafor's <code>Fulfilled</code> row is not among them.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The query result showing the three Waiting rows at 40 ft.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S5.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The query result showing the three Waiting rows at 40 ft.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S5.png" alt="Step 5"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -331,7 +332,7 @@ tbody.step-group {
 <td>Run the second query below, which counts slips by size and status.</td>
 <td>40 ft has <strong>23</strong> operational slips and 1 in maintenance, not 24. The estimate uses 23: a slip under maintenance never comes free, so it cannot shorten anyone's wait. That is what makes the card read 4&frac12; rather than 4 - 4 &times; 24 &divide; 23 = 4.17, rounded up to the next half month.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The query result showing 23 operational and 1 maintenance at 40 ft.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S6.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S6.png" alt="Step 6"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The query result showing 23 operational and 1 maintenance at 40 ft.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_1/T1_S6.png" target="_blank"><img src="Screenshots/Fernandez/Test_1/T1_S6.png" alt="Step 6"></a></div></td>
 </tr>
 </tbody>
 </table>
@@ -354,14 +355,18 @@ GROUP BY sz.sizeFt, s.slipStatus
 ORDER BY sz.sizeFt;</code></pre>
 <h4>Comments</h4>
 <div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>All six steps passed. This page is deliberately the one page on the site that does not require a session - someone deciding whether to keep a boat here should be able to read how long the line is before they have an account - so the servlet treats a missing <code>customerId</code> as normal rather than as an error. Nothing about a particular person is public: the cards are counts only, no names, no join dates.<br>Step 6 is the one worth reading twice. I expected the 40 ft card to say "about 4 months" and it said 4&frac12;, which turned out to be right: one 40 ft slip is in maintenance in the seed data, and a slip that is out of service never turns over, so it is correctly left out of the estimate. The seed data happens to exercise that rule on all three sizes.</div>
-<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br><p>The Wait List worked as expected while signed out. 
+I confirmed that all three slip sizes were shown, including the sizes with 0 guests waiting. 
+The 40 ft count matched the database results, and the wait estimate used the 23 operational slips rather than including the slip in maintenance. 
+The 26 ft and 50 ft cards correctly showed that slips were available now instead of displaying a wait estimate.
+</p></div>
 </section>
 
 <section id="test-2-own-place-in-line">
 <h2>Test 2: A Signed-In Customer Sees Only Their Own Place in Line</h2>
 <p class="test-objective"><strong>Test Objective:</strong> Verify that the "Your Place in Line" section is built from the session customer alone, that position and people-ahead are worked out from <code>timeJoined</code> (BR-20), and that a closed entry never appears.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
@@ -370,7 +375,7 @@ ORDER BY sz.sizeFt;</code></pre>
 <td>Sign in as <code>rosa.delgado@example.com</code> / <code>MoffatDelgado04!</code> and open <code>/waitList</code>.</td>
 <td>A "Your Place in Line" section appears below the public cards: 40 FT Slip, <code>Position: 1</code>, <code>People Ahead: 0</code>, and <code>Estimated Wait: about 1&frac12; months</code>. She joined first, on 2026-06-20.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Rosa's entry card, showing position 1 with 0 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Rosa's entry card, showing position 1 with 0 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S1.png" alt="Step 1"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -379,7 +384,7 @@ ORDER BY sz.sizeFt;</code></pre>
 <td>Sign out, then sign in as <code>nadia.brennan@example.com</code> / <code>MoffatBrennan06!</code> and open <code>/waitList</code>.</td>
 <td><code>Position: 3</code>, <code>People Ahead: 2</code>, <code>Estimated Wait: about 3&frac12; months</code>. She joined last, on 2026-07-18, so Rosa and Arthur Penhale are both ahead of her.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Nadia's entry card, showing position 3 with 2 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Nadia's entry card, showing position 3 with 2 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S2.png" alt="Step 2"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -388,7 +393,7 @@ ORDER BY sz.sizeFt;</code></pre>
 <td>Compare the two positions against the third query below.</td>
 <td>The order on screen matches <code>timeJoined</code> ascending: Rosa (Jun 20) is 1, Arthur (Jul 5) is 2, Nadia (Jul 18) is 3. Position is derived, not stored - there is no position column on <code>WaitList</code>.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The query result, with the three entries in timeJoined order.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The query result, with the three entries in timeJoined order.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S3.png" alt="Step 3"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -397,7 +402,7 @@ ORDER BY sz.sizeFt;</code></pre>
 <td>Sign out, then sign in as <code>desmond.okafor@example.com</code> / <code>MoffatOkafor02!</code> and open <code>/waitList</code>.</td>
 <td>The section reads "You're not currently on the wait list." rather than showing a card. His only entry is <code>Fulfilled</code> - closed entries are never in line. The public 40 ft count still reads 3, unchanged by his closed row.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Desmond signed in, showing the not-on-the-list message with the 40 ft count still at 3.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Desmond signed in, showing the not-on-the-list message with the 40 ft count still at 3.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -406,7 +411,7 @@ ORDER BY sz.sizeFt;</code></pre>
 <td>Log out from the header, then reload <code>/waitList</code>.</td>
 <td>The page still loads. The personal section is replaced by the sign-in prompt, and the three public cards are unchanged from Test 1.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The page after logging out, back to the sign-in prompt with the public cards intact.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S5.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The page after logging out, back to the sign-in prompt with the public cards intact.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_2/T2_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_2/T2_S5.png" alt="Step 5"></a></div></td>
 </tr>
 </tbody>
 </table>
@@ -429,14 +434,20 @@ WHERE sz.sizeFt = 40
 ORDER BY w.timeJoined;</code></pre>
 <h4>Comments</h4>
 <div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>All five steps passed.<br>Two customers rather than one on purpose. Position 1 with 0 ahead is exactly what a broken query returns for everybody, so Rosa on her own proves nothing - Nadia at position 3 with 2 ahead is what actually shows the ordering works. Step 4 is the other half of it: a <code>Fulfilled</code> entry has to be invisible here and must not be counted in the public number either.<br><code>peopleAhead</code> is counted in SQL rather than by loading the line into Java, so no other customer's row is ever read into memory to work out where you stand. The customer ID comes from the session and is never read off the request, so there is no parameter to edit to see someone else's place.</div>
-<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br><p>
+The signed-in wait list information worked correctly for each customer I tested. 
+Rosa showed as first in line with nobody ahead of her, while Nadia showed as third with two people ahead. 
+The database query matched the same order based on the time each customer joined. 
+Desmond did not show as currently waiting because his entry was already fulfilled.
+After signing out, the personal section went away but the public wait list information still stayed available.
+</p></div>
 </section>
 
 <section id="test-3-joining-updates-the-page">
 <h2>Test 3: Joining From the Reservation Page Lands on the Servlet and Updates Both Sections</h2>
 <p class="test-objective"><strong>Test Objective:</strong> Verify that joining the wait list writes a <code>Waiting</code> row, redirects through <code>/waitList</code> rather than straight at the JSP, and that both the public count and the customer's own position reflect the new entry immediately.</p>
 <div class="badge badge-dev"><span class="badge-label">Developer:</span> Miguel Fernandez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Carolina Rodriguez <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">Sept 26, 2026</span></div>
 <table>
 <thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
 <tbody class="step-group">
@@ -445,7 +456,7 @@ ORDER BY w.timeJoined;</code></pre>
 <td>Signed in as <code>desmond.okafor@example.com</code>, go to Book a Slip and choose <code>Harbor Light</code> from the vessel dropdown.</td>
 <td>Harbor Light is 30 ft, so the page matches it to a 40 ft slip and the 40 ft card reads "None available". The wait list prompt appears with a Join the wait list button.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The Reservation page with Harbor Light selected and the wait list prompt showing.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S1.png" alt="Step 1"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The Reservation page with Harbor Light selected and the wait list prompt showing.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S1.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S1.png" alt="Step 1"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -454,7 +465,7 @@ ORDER BY w.timeJoined;</code></pre>
 <td>Click "Join the wait list", then read the browser address bar.</td>
 <td>The browser lands on <code>/marinawebsite/waitList</code> - the servlet - <strong>not</strong> <code>waitListLookup.jsp</code>. The "You're on the wait list for a 40 ft slip" message appears.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The address bar reading /marinawebsite/waitList, with the confirmation message showing.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S2.png" alt="Step 2"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The address bar reading /marinawebsite/waitList, with the confirmation message showing.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S2.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S2.png" alt="Step 2"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -463,7 +474,7 @@ ORDER BY w.timeJoined;</code></pre>
 <td>Read the 40 ft card on the page you just landed on.</td>
 <td><code>Guests Waiting: 4</code> and <code>Estimated Wait: about 5&frac12; months</code> - both up from 3 and 4&frac12; before joining.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The 40 ft card after joining, reading 4 waiting.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S3.png" alt="Step 3"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The 40 ft card after joining, reading 4 waiting.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S3.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S3.png" alt="Step 3"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -472,7 +483,7 @@ ORDER BY w.timeJoined;</code></pre>
 <td>Read the "Your Place in Line" section on the same page.</td>
 <td><code>Position: 4</code>, <code>People Ahead: 3</code>, and <code>Estimated Wait: about 4&frac12; months</code>. The customer's own estimate and the public one are different figures and both are correct: 5&frac12; is what somebody joining now would wait, 4&frac12; is what Desmond waits from position 4.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">Desmond's entry card, showing position 4 with 3 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S4.png" alt="Step 4"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">Desmond's entry card, showing position 4 with 3 people ahead.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S4.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S4.png" alt="Step 4"></a></div></td>
 </tr>
 </tbody>
 <tbody class="step-group">
@@ -481,7 +492,7 @@ ORDER BY w.timeJoined;</code></pre>
 <td>Run the query below.</td>
 <td>One new <code>Waiting</code> row for Desmond at 40 ft, with <code>timeJoined</code> set to the moment he joined and <code>timeClosed</code> null. His older <code>Fulfilled</code> row is untouched - joining again adds an entry rather than reopening a closed one.</td>
 <td><strong>Pass</strong></td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">The query result showing Desmond's new Waiting row alongside his older Fulfilled one.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S5.png" alt="Step 5"></a></div></td>
+<td><strong>Pass</strong><p class="cell-caption">The query result showing Desmond's new Waiting row alongside his older Fulfilled one.</p><div class="cell-shots"><a href="Screenshots/Fernandez/Test_3/T3_S5.png" target="_blank"><img src="Screenshots/Fernandez/Test_3/T3_S5.png" alt="Step 5"></a></div></td>
 </tr>
 </tbody>
 </table>
@@ -496,7 +507,11 @@ WHERE c.email = 'desmond.okafor@example.com'
 ORDER BY w.timeJoined;</code></pre>
 <h4>Comments</h4>
 <div class="callout callout-dev"><strong>Developer (Miguel)</strong><br>All five steps passed, but only after a fix. <code>reservation.js</code> sent the customer to <code>waitListLookup.jsp</code> directly after joining. That was correct while the page was a Coming Soon stub, but once <code>WaitListServlet</code> existed it skipped <code>doGet()</code>, so the page rendered with no summaries at all and told someone who had just joined the wait list that they were not on it. Changed to <code>/waitList</code>. It is Robert's file and I flagged it in Discord and in the PR rather than changing it quietly, but my half does not work without it - it is the same class of bug as the login redirect I fixed in Module 8, and the site's convention is that every link goes through a servlet.<br>Step 4 is the step I would keep if I could only keep one. Two estimates from the same query disagreeing in the right direction is what shows the estimator is using each position rather than one number for the whole page.</div>
-<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br>&lt;filled in by the peer tester&gt;</div>
+<div class="callout callout-peer"><strong>Peer Tester (Carolina)</strong><br><p>Joining the wait list from the Reservation page worked as expected. 
+After selecting Harbor Light, I was able to join the 40 ft wait list and was sent to the <code>/waitList</code> page instead of directly to the JSP. 
+The public wait list count increased right away, and Desmond's personal section showed his new position with the correct number of people ahead. 
+I also checked the database and confirmed that a new <code>Waiting</code> row was added while his older <code>Fulfilled</code> entry stayed unchanged.
+</p></div>
 </section>
 
 <!-- Paste new tests here, above the copy-paste blocks. -->

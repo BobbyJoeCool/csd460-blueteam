@@ -14,6 +14,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * @author Carolina R.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina R.
+ *
+ * Loads the signed-in customer's current fleet from the database and sends
+ * the boat information to the My Fleet page for display.
+ */
+
 @WebServlet("/myFleet")
 public class MyFleetServlet extends HttpServlet {
 
@@ -41,6 +50,8 @@ public class MyFleetServlet extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
 
+        //Loads only the boats that are owned by the signed-in customer
+        //The fleet is placed in the request attribute for use in the JSP and display it
             request.setAttribute(
                     "fleet",
                     boatDAO.findFleetByCustomerId(
@@ -49,6 +60,7 @@ public class MyFleetServlet extends HttpServlet {
                     )
             );
 
+            // Load the customer's fleet and forward to the JSP.
             request.getRequestDispatcher("/myFleet.jsp")
                     .forward(request, response);
 

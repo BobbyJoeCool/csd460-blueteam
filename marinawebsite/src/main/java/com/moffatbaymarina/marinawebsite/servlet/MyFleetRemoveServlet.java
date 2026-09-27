@@ -16,11 +16,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * @author Carolina R.
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Carolina R.
+ *
+ * Handles removing a boat from the signed-in customer's current fleet. The
+ * servlet checks ownership and active reservations, then performs a soft remove
+ * by ending the BoatOwnership record instead of deleting the boat.
+ */
+
 @WebServlet("/myFleet/remove")
 public class MyFleetRemoveServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    // DAO used for My Fleet boat and ownership database operations.
     private final BoatDAO boatDAO = new BoatDAO();
 
     @Override
