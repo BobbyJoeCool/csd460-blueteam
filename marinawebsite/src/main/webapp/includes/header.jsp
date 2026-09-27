@@ -50,12 +50,44 @@
             class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
             <a href="${pageContext.request.contextPath}/about"
             class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-            <a href="${pageContext.request.contextPath}/reservation"
-            class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Book a Slip</a>
-            <c:if test="${not empty sessionScope.customerId}">
+          <div class="nav-dropdown" data-stay-menu>
+
+            <button type="button"
+                    class="nav-dropdown__trigger
+                    ${param.activePage == 'reservation'
+                    or param.activePage == 'waitlist'
+                    or param.activePage == 'lookup'
+                    ? 'nav-active' : ''}"
+                    aria-expanded="false"
+                    aria-controls="planYourStayMenu"
+                    data-stay-menu-toggle>
+                Plan Your Stay
+                <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
+            </button>
+
+    <div class="nav-dropdown__menu"
+         id="planYourStayMenu"
+         data-stay-menu-panel>
+
+        <a href="${pageContext.request.contextPath}/reservation"
+           class="${param.activePage == 'reservation' ? 'nav-active' : ''}">
+            Book a Slip
+        </a>
+
+        <a href="${pageContext.request.contextPath}/waitList"
+           class="${param.activePage == 'waitlist' ? 'nav-active' : ''}">
+            View Wait List
+        </a>
+
+        <c:if test="${not empty sessionScope.customerId}">
             <a href="${pageContext.request.contextPath}/reservations"
-            class="${param.activePage == 'lookup' ? 'nav-active' : ''}">My Reservations</a>
-            </c:if>
+               class="${param.activePage == 'lookup' ? 'nav-active' : ''}">
+                My Reservations
+            </a>
+        </c:if>
+
+    </div>
+</div>
         </div>
 
         <%-- Signed-in state. loggedIn and displayName are both set by

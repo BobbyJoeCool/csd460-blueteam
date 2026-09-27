@@ -1,6 +1,6 @@
 <%--
     Front End:   Robert Breutzmann
-    Back End:    Sara White (not built yet - this page runs on stub data)
+    Back End:    Sara White 
     Team:        Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
     Primary Author/Owner - Robert Breutzmann
     Course:      CSD 460 - Capstone Project

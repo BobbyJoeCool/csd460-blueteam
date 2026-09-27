@@ -273,70 +273,257 @@ tbody.step-group {
 </head>
 <body>
 
-<section id="test-1-test-title">
-<h2>Test 1: &lt;Test Title&gt;</h2>
-<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
-<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
+<section id="test-1-waitlist-front-end">
+
+<h2>Test 1: Wait List Front-End Functionality</h2>
+
+<p class="test-objective">
+    <strong>Test Objective:</strong>
+    Verify that the Wait List page loads and displays correctly, navigation
+    interactions function as expected, waitlist information is presented
+    appropriately for logged-out and logged-in users and the page remains
+    usable at a reduced browser width.
+</p>
+
+<div class="badge badge-dev">
+    <span class="badge-label">Developer:</span> Sara White
+    <span class="badge-sep">|</span>
+    <span class="badge-date-label">Tested On:</span>
+    <span class="badge-date">&lt;date&gt;</span>
+</div>
+
+<div class="badge badge-peer">
+    <span class="badge-label">Peer Tester:</span> Robert Breutzmann
+    <span class="badge-sep">|</span>
+    <span class="badge-date-label">Tested On:</span>
+    <span class="badge-date">&lt;date&gt;</span>
+</div>
+
 <table>
-<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+
+<thead>
+<tr>
+    <th>Step</th>
+    <th>Action</th>
+    <th>Expected Results</th>
+    <th>Dev<br>Test</th>
+    <th>Peer<br>Test</th>
+</tr>
+</thead>
+
+
+<!-- STEP 1 -->
 <tbody class="step-group">
 <tr>
 <td>1</td>
-<td>&lt;action to take&gt;</td>
-<td>&lt;what should happen&gt;</td>
-<td>&lt;Pass/Fail&gt;</td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/White/Test_1/T1_S1.png" target="_blank"><img src="Screenshots/White/Test_1/T1_S1.png" alt="Step 1"></a></div></td>
+
+<td>
+    Navigate to <code>marinawebsite/index.jsp</code> while logged out.
+    Using the <strong>Plan Your Stay</strong> dropdown menu in the header,
+    navigate to <strong>View Wait List</strong>.
+</td>
+
+<td>
+    The <strong>Plan Your Stay</strong> dropdown should highlight with the
+    Golden Hour orange/gold color when hovered over. When selected, the
+    dropdown menu should expand and the arrow should rotate.
+    <br><br>
+    After selecting <strong>View Wait List</strong>, the page should load
+    with the shared header, hero and footer sections. The waitlist content
+    should include a card section titled
+    <strong>Current Waitlists by Slip Size</strong>.
+</td>
+
+<td>
+    &lt;Pass&gt;
+</td>
+
+<td>
+    &lt;Pass&gt;
+    <div class="cell-shots">
+        <a href="Screenshots/White/Test_1/T1_S1.png" target="_blank">
+            <img src="Screenshots/White/Test_1/T1_S1.png" alt="Step 1">
+        </a>
+    </div>
+</td>
+
 </tr>
 </tbody>
-</table>
-<h4>Comments</h4>
-<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
-<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>&lt;filled in by the peer tester&gt;</div>
-</section>
-
-<!-- Paste new tests here, above the copy-paste blocks. -->
 
 
-<!-- ======================================================================
-     COPY-PASTE BLOCKS - delete before the tests are combined.
-
-     ----- NEW TEST - START -----
-<section id="test-#-test-title">
-<h2>Test #: &lt;Test Title&gt;</h2>
-<p class="test-objective"><strong>Test Objective:</strong> &lt;what this test verifies&gt;</p>
-<div class="badge badge-dev"><span class="badge-label">Developer:</span> Sara White <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
-<div class="badge badge-peer"><span class="badge-label">Peer Tester:</span> Robert Breutzmann <span class="badge-sep">|</span> <span class="badge-date-label">Tested On:</span> <span class="badge-date">&lt;date&gt;</span></div>
-<table>
-<thead><tr><th>Step</th><th>Action</th><th>Expected Results</th><th>Dev<br>Test</th><th>Peer<br>Test</th></tr></thead>
+<!-- STEP 2 -->
 <tbody class="step-group">
 <tr>
-<td>1</td>
-<td>&lt;action to take&gt;</td>
-<td>&lt;what should happen&gt;</td>
-<td>&lt;Pass/Fail&gt;</td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/White/Test_#/T#_S1.png" target="_blank"><img src="Screenshots/White/Test_#/T#_S1.png" alt="Step 1"></a></div></td>
+<td>2</td>
+
+<td>
+    Review the content displayed on the Waitlist page.
+</td>
+
+<td>
+    Cards should display for the available slip sizes. Each card should show
+    the slip size, number of guests waiting and either an estimated wait or
+    current availability.
+    <br><br>
+    A separate card titled <strong>Your Place in Line</strong> should appear
+    below the current waitlist information. While logged out, this section
+    should display a <strong>Sign In</strong> button for the user to access
+    their personal waitlist information.
+</td>
+
+<td>
+    &lt;Pass&gt;
+</td>
+
+<td>
+    &lt;Pass&gt;
+    <div class="cell-shots">
+        <a href="Screenshots/White/Test_1/T1_S2.png" target="_blank">
+            <img src="Screenshots/White/Test_1/T1_S2.png" alt="Step 2">
+        </a>
+    </div>
+</td>
+
 </tr>
 </tbody>
-</table>
-<h4>Comments</h4>
-<div class="callout callout-dev"><strong>Developer (Sara)</strong><br>&lt;what passed, any bugs found, and any fixes made before handing off to peer testing&gt;</div>
-<div class="callout callout-peer"><strong>Peer Tester (Robert)</strong><br>&lt;filled in by the peer tester&gt;</div>
-</section>
-     ----- NEW TEST - END -----
 
-     ----- NEW STEP - START -----
+
+<!-- STEP 3 -->
 <tbody class="step-group">
 <tr>
-<td>#</td>
-<td>&lt;action to take&gt;</td>
-<td>&lt;what should happen&gt;</td>
-<td>&lt;Pass/Fail&gt;</td>
-<td>&lt;Pass/Fail&gt;<p class="cell-caption">&lt;what the screenshot should show&gt;</p><div class="cell-shots"><a href="Screenshots/White/Test_#/T#_S#.png" target="_blank"><img src="Screenshots/White/Test_#/T#_S#.png" alt="Step #"></a></div></td>
+<td>3</td>
+
+<td>
+    Run the SQL script provided below to reset the password for a customer
+    who currently has an active waitlist entry.
+    <pre><code>
+      USE MoffatBayMarinaDB;
+      UPDATE Customer
+      SET passwordHash = SHA2('MoffatTest01!', 256),
+          failedLoginAttempts = 0,
+          accountLocked = 0
+      WHERE email = 'rosa.delgado@example.com';</code></pre>
+</td>
+
+<td>
+    The customer record for
+    <code>rosa.delgado@example.com</code> should update successfully.
+    The password should be reset for testing, failed login attempts should
+    be cleared and the account should not be locked.
+</td>
+
+<td>
+    &lt;Pass&gt;
+</td>
+
+<td>
+    &lt;Pass&gt;
+    <div class="cell-shots">
+        <a href="Screenshots/White/Test_1/T1_S3.png" target="_blank">
+            <img src="Screenshots/White/Test_1/T1_S3.png" alt="Step 3">
+        </a>
+    </div>
+</td>
+
 </tr>
 </tbody>
-     ----- NEW STEP - END -----
-     ====================================================================== -->
+
+
+<!-- STEP 4 -->
+<tbody class="step-group">
+<tr>
+<td>4</td>
+
+<td>
+    Click the <strong>Sign In</strong> button in the
+    <strong>Your Place in Line</strong> section and sign in using:
+    <br><br>
+    <strong>Username:</strong> rosa.delgado@example.com
+    <br>
+    <strong>Password:</strong> MoffatTest01!
+</td>
+
+<td>
+    After a successful login, the <strong>Your Place in Line</strong>
+    section should update with the customer's waitlist information for
+    a 40 ft slip.
+    <br><br>
+    The information should display:
+    <ul>
+        <li><strong>Position:</strong> 1</li>
+        <li><strong>People Ahead:</strong> 0</li>
+        <li><strong>Date Joined:</strong> Jun 20, 2026</li>
+        <li><strong>Estimated Wait:</strong> about 1½ months</li>
+    </ul>
+</td>
+
+<td>
+    &lt;Pass&gt;
+</td>
+
+<td>
+    &lt;Pass&gt;
+    <div class="cell-shots">
+        <a href="Screenshots/White/Test_1/T1_S4.png" target="_blank">
+            <img src="Screenshots/White/Test_1/T1_S4.png" alt="Step 4">
+        </a>
+    </div>
+</td>
+
+</tr>
+</tbody>
+
+
+<!-- STEP 5 -->
+<tbody class="step-group">
+<tr>
+<td>5</td>
+
+<td>
+    Resize the browser window to approximately one-quarter of its
+    full-screen width.
+</td>
+
+<td>
+    The waitlist cards should stack appropriately for the reduced browser
+    width. Card content should remain legible and clear, with no overlapping
+    content or horizontal overflow.
+</td>
+
+<td>
+    &lt;Pass&gt;
+</td>
+
+<td>
+    &lt;Pass&gt;
+    <div class="cell-shots">
+        <a href="Screenshots/White/Test_1/T1_S5.png" target="_blank">
+            <img src="Screenshots/White/Test_1/T1_S5.png" alt="Step 5">
+        </a>
+    </div>
+</td>
+
+</tr>
+</tbody>
+
+</table>
+
+
+
+
+<h4>Comments</h4>
+
+<div class="callout callout-dev">
+    <strong>Developer (Sara)</strong><br>
+    &lt;Everything displayed correctly. I updated the <strong>Date Joined</strong> display to use the formatting getter provided in the JavaBean, making the date more legible for the user. &gt;
+</div>
+
+<div class="callout callout-peer">
+    <strong>Peer Tester (Robert)</strong><br>
+    &lt;filled in by the peer tester&gt;
+</div>
+
+</section>
 
 </body>
 </html>
