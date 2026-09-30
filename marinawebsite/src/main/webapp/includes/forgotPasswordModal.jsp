@@ -13,11 +13,12 @@
   has to work on a different device, days later, which is why the servlet
   identifies the account by email and not by anything in the session.
 
-  Reads from the request:
-    forgotPasswordError - set by ForgotPasswordServlet on any failure. Its
-                          presence renders this modal already open with the
-                          message inside, the same way loginError does for
-                          the sign-in modal.
+  Reads from the session (set by ForgotPasswordServlet on any failure, and
+  removed here as soon as they're read):
+    forgotFlashError - the message. Its presence renders this modal already
+                       open with the message inside, the same way loginError
+                       does for the sign-in modal.
+    forgotFlashEmail - what they typed, so the email field refills.
 
   The password checklist below is this modal's own, keyed on data-rule
   rather than on the element ids includes/passwordRules.jsp uses. That
@@ -33,10 +34,18 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
+<%-- The failure message from ForgotPasswordServlet, read once and cleared.
+     In the session rather than a request attribute because the failure path
+     redirects back to the page instead of forwarding (a redirect drops
+     request attributes) - the same flash approach loginModal.jsp uses. --%>
+<c:set var="forgotPasswordError" value="${sessionScope.forgotFlashError}"/>
+<c:set var="forgotEmail" value="${sessionScope.forgotFlashEmail}"/>
+<c:remove var="forgotFlashError" scope="session"/>
+<c:remove var="forgotFlashEmail" scope="session"/>
+
 <%-- Same context-relative rule as the login modal: ForgotPasswordServlet
-     prepends getContextPath() itself. On a failed attempt the request URI
-     is /forgotPassword, so a submitted redirectTo is reused rather than
-     recomputed. --%>
+     prepends getContextPath() itself. A failed attempt redirects back to
+     the origin page, so the current path is already the right target. --%>
 <%-- The original URI, not the forwarded one - a servlet that forwards to
      its own JSP leaves getRequestURI() reporting the forward's target, so
      the reset would send the customer to a raw .jsp that skips its
@@ -95,7 +104,7 @@
                 <input type="email"
                        id="forgotEmail"
                        name="email"
-                       value="${fn:escapeXml(param.email)}"
+                       value="${fn:escapeXml(forgotEmail)}"
                        maxlength="100"
                        autocomplete="email"
                        required>
