@@ -96,6 +96,7 @@
               action="${pageContext.request.contextPath}/forgotPassword"
               method="post"
               novalidate>
+            <jsp:include page="/includes/csrfField.jsp" />
 
             <input type="hidden" name="redirectTo" value="${fn:escapeXml(forgotRedirectTo)}">
 

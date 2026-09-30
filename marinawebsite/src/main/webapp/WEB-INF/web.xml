@@ -19,8 +19,43 @@
     </cookie-config>
   </session-config>
 
+  <!-- Security headers on every response, using the filter that ships with
+       Tomcat (no code of ours). X-Frame-Options: DENY stops another site
+       loading our pages in an invisible frame and tricking a click onto a
+       button like "Yes, Cancel It"; X-Content-Type-Options: nosniff stops a
+       browser second-guessing a file's type. HSTS stays off: it only
+       applies over HTTPS, and the class server runs plain HTTP.
+       Cache-Control: no-store for signed-in pages is set separately, by
+       NoStoreFilter, so shared CSS, JS and images can still be cached. -->
+  <filter>
+    <filter-name>httpHeaderSecurity</filter-name>
+    <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+    <init-param>
+      <param-name>antiClickJackingEnabled</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>antiClickJackingOption</param-name>
+      <param-value>DENY</param-value>
+    </init-param>
+    <init-param>
+      <param-name>blockContentTypeSniffingEnabled</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>hstsEnabled</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>httpHeaderSecurity</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- No error code: this is the catch-all, so a 400, 403 or 405 gets the
+       site's own error page instead of Tomcat's grey one (which also shows
+       the Tomcat version). error.jsp picks its wording from the status. -->
   <error-page>
-    <error-code>404</error-code>
     <location>/error.jsp</location>
   </error-page>
 

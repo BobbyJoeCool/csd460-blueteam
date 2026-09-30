@@ -157,7 +157,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 						<a
 							class="btn-secondary"
-							href="${pageContext.request.contextPath}/registration.jsp">
+							href="${pageContext.request.contextPath}/register">
 							Create an Account
 						</a>
 

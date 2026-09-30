@@ -1,5 +1,5 @@
 <%--
-  src/main/webapp/editUserInfo.jsp
+  src/main/webapp/WEB-INF/views/editUserInfo.jsp
 
   Edit User Info - the signed-in customer's own account page, per
   documentation/Page Contracts/Edit User Profile.md.
@@ -102,6 +102,7 @@
           action="${pageContext.request.contextPath}/editProfile"
           method="post"
           novalidate>
+        <jsp:include page="/includes/csrfField.jsp" />
 
         <%--
           The same card Registration uses, pre-filled from the session

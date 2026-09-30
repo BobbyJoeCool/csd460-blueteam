@@ -54,7 +54,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class WaitListServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String VIEW = "/waitListLookup.jsp";
+    private static final String VIEW = "/WEB-INF/views/waitListLookup.jsp";
 
     /**
      * Which average tenancy the estimate rested on, reported to the page so

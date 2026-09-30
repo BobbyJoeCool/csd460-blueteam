@@ -103,7 +103,7 @@
 
             <p>
                 No account yet?
-                <a href="${pageContext.request.contextPath}/registration.jsp">Create one</a>.
+                <a href="${pageContext.request.contextPath}/register">Create one</a>.
             </p>
         </section>
 
@@ -382,6 +382,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/cancel">
+            <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close>Keep Reservation</button>
@@ -415,6 +416,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/notice" id="noticeForm" novalidate>
+            <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
 
             <div class="form-group lookup-notice__date">
@@ -462,6 +464,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/withdraw">
+            <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close>Keep Notice</button>

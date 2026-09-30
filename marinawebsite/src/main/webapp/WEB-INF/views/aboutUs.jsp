@@ -97,7 +97,7 @@
                 <img src="${pageContext.request.contextPath}/images/Slip_Closeup.png"
                      alt="A boat tied up at a Moffat Bay Marina slip at sunset,
                           with a shore power pedestal on the dock beside it.">
-                <figcaption>Every slip has shore power and fresh water.</figcaption>
+                <figcaption>Every slip has fresh water, and shore power is available.</figcaption>
             </figure>
         </section>
 
@@ -247,6 +247,7 @@
                   action="${pageContext.request.contextPath}/contact"
                   method="post"
                   novalidate>
+                <jsp:include page="/includes/csrfField.jsp" />
 
                 <div class="contact-form__row">
                     <div class="form-group">

@@ -98,7 +98,7 @@ public class EditProfileServlet extends HttpServlet {
         // shows afterwards: the old -> new list is shown BEFORE saving, in
         // the page's confirmation popup, not after.
 
-        request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
     }
 
     /**
@@ -142,7 +142,7 @@ public class EditProfileServlet extends HttpServlet {
             if (value.isEmpty() && REQUIRED_FIELDS.contains(field)) {
                 request.setAttribute("formError",
                         "That request could not be processed. Please reload the page and try again.");
-                request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
                 return;
             }
             submitted.put(field, value);
@@ -150,7 +150,7 @@ public class EditProfileServlet extends HttpServlet {
 
         if (submitted.isEmpty()) {
             // Nothing touched - not an error, just nothing to do.
-            request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
             return;
         }
 
@@ -183,7 +183,7 @@ public class EditProfileServlet extends HttpServlet {
         if (!fieldErrors.isEmpty()) {
             request.setAttribute("fieldErrors", fieldErrors);
             request.setAttribute("formError", "Please fix the highlighted fields below.");
-            request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
             return;
         }
 
@@ -212,7 +212,7 @@ public class EditProfileServlet extends HttpServlet {
 
         if (changes.isEmpty()) {
             // Every touched field was resubmitted unchanged - nothing to write.
-            request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
             return;
         }
 
@@ -228,7 +228,7 @@ public class EditProfileServlet extends HttpServlet {
                     conn.rollback();
                     request.setAttribute("fieldErrors", Map.of("email", "An account with this email already exists."));
                     request.setAttribute("formError", "Please fix the highlighted fields below.");
-                    request.getRequestDispatcher("/editUserInfo.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
                     return;
                 }
 

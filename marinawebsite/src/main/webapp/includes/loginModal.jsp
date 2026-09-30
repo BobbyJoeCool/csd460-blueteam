@@ -159,6 +159,7 @@
                       action="${pageContext.request.contextPath}/login"
                       method="post"
                       novalidate>
+                    <jsp:include page="/includes/csrfField.jsp" />
 
                     <input type="hidden" name="redirectTo" value="${fn:escapeXml(loginRedirectTo)}">
 
@@ -189,7 +190,7 @@
 
                 <p class="login-modal__alt">
                     No account yet?
-                    <a href="${pageContext.request.contextPath}/registration.jsp">Register here</a>
+                    <a href="${pageContext.request.contextPath}/register">Register here</a>
                 </p>
 
             </c:otherwise>

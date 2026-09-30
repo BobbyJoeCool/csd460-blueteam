@@ -60,7 +60,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/reservationSummary")
 public class ReservationSummaryServlet extends HttpServlet {
 
-    private static final String VIEW = "/reservationSummary.jsp";
+    private static final String VIEW = "/WEB-INF/views/reservationSummary.jsp";
 
     private static final String PARAM_CONFIRMATION = "confirmation";
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tomcat settings for this web app.
+
+  SameSite=Lax on the session cookie: the browser won't send it with a
+  POST that starts on another website, so that site can't submit our forms
+  (cancel a reservation, remove a boat) as a signed-in customer. Normal
+  links into the site from elsewhere still arrive signed in. CsrfFilter is
+  the second layer, for browsers that ignore SameSite.
+-->
+<Context>
+    <CookieProcessor sameSiteCookies="lax" />
+</Context>

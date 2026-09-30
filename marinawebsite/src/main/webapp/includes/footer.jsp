@@ -39,7 +39,7 @@
             <h2>Quick Links</h2>
 
             <nav class="footer-nav" aria-label="Footer navigation">
-                <a href="${pageContext.request.contextPath}/index.jsp">
+                <a href="${pageContext.request.contextPath}/">
                     Home
                 </a>
 

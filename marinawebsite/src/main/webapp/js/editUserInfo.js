@@ -385,19 +385,15 @@ MoffatBay.editUserInfo = (function () {
 
     /**
      * Keeps the hidden #phone in step with whatever is typed in the visible
-     * box, and reformats as it goes.
+     * box, and reformats as it goes - the same wiring as Registration
+     * (formValidation.js), including Backspace over the area code's ")".
      */
     function bindPhone() {
         var hidden = document.getElementById("phone");
         var display = document.getElementById("phoneDisplay");
         if (!hidden || !display) { return; }
 
-        display.addEventListener("input", function () {
-            var digits = MoffatBay.form.extractPhoneDigits(display.value);
-            hidden.value = digits;
-            display.value = MoffatBay.form.formatPhoneDisplay(digits);
-            refreshFormState();
-        });
+        MoffatBay.form.bindPhoneDisplay(display, hidden, refreshFormState);
     }
 
     /**
@@ -469,6 +465,7 @@ MoffatBay.editUserInfo = (function () {
         carrier.method = "post";
         carrier.action = form.action;
         carrier.style.display = "none";
+        MoffatBay.form.addCsrfField(carrier);
 
         changed.forEach(function (field) {
             var input = document.createElement("input");

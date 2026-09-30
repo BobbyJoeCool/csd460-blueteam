@@ -42,7 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ReservationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String VIEW = "/reservation.jsp";
+    private static final String VIEW = "/WEB-INF/views/reservation.jsp";
     private static final String SLIP_RATE = "SLIP_PER_FOOT_MONTHLY";
     private static final String ELECTRIC_RATE = "ELECTRIC_MONTHLY";
 

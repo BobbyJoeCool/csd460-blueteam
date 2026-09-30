@@ -304,31 +304,12 @@
         );
     }
 
-    // Backspacing onto a formatting character (e.g. the ")" in "(319)")
-    // would otherwise be swallowed: extractPhoneDigits strips it right
-    // back out, so formatPhoneDisplay re-renders the same digits and
-    // the field looks stuck. Detect that case and remove the digit
-    // before the formatting character instead.
-    phoneDisplay.addEventListener("keydown", function (event) {
-        if (event.key !== "Backspace" || phoneDisplay.selectionStart !== phoneDisplay.selectionEnd) {
-            return;
-        }
-        var pos = phoneDisplay.selectionStart;
-        if (pos === 0 || !/\D/.test(phoneDisplay.value.charAt(pos - 1))) {
-            return;
-        }
-        event.preventDefault();
-        var beforeDigits = MoffatBay.form.extractPhoneDigits(phoneDisplay.value.slice(0, pos)).slice(0, -1);
-        var afterDigits = MoffatBay.form.extractPhoneDigits(phoneDisplay.value.slice(pos));
-        phoneDisplay.value = MoffatBay.form.formatPhoneDisplay(beforeDigits + afterDigits);
-        var newPos = MoffatBay.form.formatPhoneDisplay(beforeDigits).length;
-        phoneDisplay.setSelectionRange(newPos, newPos);
-        updateFormState();
-    });
+    // Formatting as you type, and Backspace over a bracket or dash - shared
+    // with Your Account (formValidation.js).
+    MoffatBay.form.bindPhoneDisplay(phoneDisplay, phoneHidden, updateFormState);
 
     password.addEventListener("input", updateFormState);
     confirmPassword.addEventListener("input", updateFormState);
-    phoneDisplay.addEventListener("input", updateFormState);
     countryCode.addEventListener("input", updateFormState);
     zipCode.addEventListener("input", updateFormState);
     form.addEventListener("input", updateFormState);
@@ -353,6 +334,7 @@
             boatFields[id].value = "";
             boatFields[id].setCustomValidity("");
         });
+        MoffatBay.boatFields.updateLengthNotice();
         updateFormState();
     });
 

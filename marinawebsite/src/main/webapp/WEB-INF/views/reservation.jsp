@@ -72,7 +72,7 @@
                     onclick="MoffatBay.loginModal.open()">Sign in</button>
             <p>
                 No account yet?
-                <a href="${pageContext.request.contextPath}/registration.jsp">Create one</a>.
+                <a href="${pageContext.request.contextPath}/register">Create one</a>.
             </p>
         </div>
         <script>
@@ -131,7 +131,7 @@
                         <span class="slip-card__stock" data-stock="26"></span>
                         <span class="slip-card__desc">
                             Perfect for smaller cruisers, day boats, and
-                            runabouts. Includes power and fresh water.
+                            runabouts. Fresh water included, shore power available.
                         </span>
                         <span class="slip-card__match" data-match="26" hidden>Fits your boat</span>
                     </li>
@@ -144,7 +144,7 @@
                         <span class="slip-card__stock" data-stock="40"></span>
                         <span class="slip-card__desc">
                             Ideal for mid-size vessels and sailboats up to 40 ft.
-                            Shore power and pump-out service included.
+                            Pump-out service included, shore power available.
                         </span>
                         <span class="slip-card__match" data-match="40" hidden>Fits your boat</span>
                     </li>
@@ -157,7 +157,7 @@
                         <span class="slip-card__stock" data-stock="50"></span>
                         <span class="slip-card__desc">
                             Spacious berth for large yachts. Dedicated dock
-                            attendant and full utilities.
+                            attendant, with shore power available.
                         </span>
                         <span class="slip-card__match" data-match="50" hidden>Fits your boat</span>
                     </li>
@@ -183,6 +183,7 @@
 
                 <form id="reservationForm" class="reservation-steps"
                       action="${pageContext.request.contextPath}/reservation" method="post" novalidate>
+                    <jsp:include page="/includes/csrfField.jsp" />
 
                     <%-- BACKEND: a general failure message goes here. --%>
                     <div class="form-banner" id="formError" role="alert" hidden></div>
@@ -386,6 +387,7 @@
                 <form id="boatPanelForm"
                       action="${pageContext.request.contextPath}/reservation/boat"
                       method="post" novalidate>
+                    <jsp:include page="/includes/csrfField.jsp" />
                     <%-- The card's wrapper and heading belong to the page
                          including it, not to the shared fields. Registration
                          adds an "Optional" note here as well; this panel

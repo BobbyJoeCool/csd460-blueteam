@@ -60,7 +60,7 @@ public class RegisterServlet extends HttpServlet {
 			HttpServletResponse response)
 			throws ServletException, IOException {
 
-		request.getRequestDispatcher("/registration.jsp")
+		request.getRequestDispatcher("/WEB-INF/views/registration.jsp")
 				.forward(request, response);
 	}
 
@@ -458,7 +458,7 @@ public class RegisterServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		request.setAttribute(attribute, message);
-		request.getRequestDispatcher("/registration.jsp")
+		request.getRequestDispatcher("/WEB-INF/views/registration.jsp")
 				.forward(request, response);
 	}
 

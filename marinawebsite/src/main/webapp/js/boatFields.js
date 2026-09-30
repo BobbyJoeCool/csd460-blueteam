@@ -212,6 +212,27 @@ MoffatBay.boatFields = (function () {
      * @param {string} country - "US", "CA" or "OTHER"
      * @param {Object} els - {regNumberLabel, regNumberInput, foreignBadge}
      */
+    /*
+     * Our largest slip, in feet. A longer boat can still be saved, but it
+     * can't be booked into a slip online, so the Boat Length field says so
+     * as soon as it's typed (#boatLengthTooLong in boatInfoCard.jsp) rather
+     * than at the last step of Book a Slip. Server twin: Utils.SLIP_SIZES_FT.
+     */
+    var LARGEST_SLIP_FT = 50;
+
+    /**
+     * Shows or hides the "too long for any slip" warning under Boat Length.
+     * Hidden while the field is disabled - My Fleet locks length on Edit,
+     * where the boat is already on file. Runs on its own as the customer
+     * types; a page that sets the length in script calls it afterwards.
+     */
+    function updateLengthNotice() {
+        var input = document.getElementById("boatLength");
+        var notice = document.getElementById("boatLengthTooLong");
+        if (!input || !notice) { return; }
+        notice.hidden = input.disabled || !(parseFloat(input.value) > LARGEST_SLIP_FT);
+    }
+
     function applyCountry(country, els) {
         var parts = els || {};
         var isCanada = country === "CA";
@@ -245,6 +266,28 @@ MoffatBay.boatFields = (function () {
         identificationSatisfied: identificationSatisfied,
         firstProblem: firstProblem,
         allProblems: allProblems,
-        applyCountry: applyCountry
+        applyCountry: applyCountry,
+        LARGEST_SLIP_FT: LARGEST_SLIP_FT,
+        updateLengthNotice: updateLengthNotice
     };
+}());
+
+/*
+ * The length warning looks after itself on every page with the boat card:
+ * on each keystroke, after a form reset (the reset event fires before the
+ * values change, hence the timeout), and once on load for a value the
+ * server sent back.
+ */
+(function () {
+    "use strict";
+
+    var input = document.getElementById("boatLength");
+    if (!input) { return; }
+
+    var update = MoffatBay.boatFields.updateLengthNotice;
+    input.addEventListener("input", update);
+    if (input.form) {
+        input.form.addEventListener("reset", function () { setTimeout(update, 0); });
+    }
+    update();
 }());

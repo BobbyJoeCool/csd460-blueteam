@@ -74,7 +74,7 @@
             Weigh anchor back at the homeport while we finish the map.
         </p>
 
-        <a class="coming-soon-home-link" href="${pageContext.request.contextPath}/index.jsp">
+        <a class="coming-soon-home-link" href="${pageContext.request.contextPath}/">
             Back to Home Port
         </a>
 
