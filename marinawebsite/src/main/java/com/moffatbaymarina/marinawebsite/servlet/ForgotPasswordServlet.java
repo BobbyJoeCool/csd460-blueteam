@@ -10,12 +10,12 @@ import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * The forgot-password reset flow from the Edit User Profile contract's
@@ -54,10 +54,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * those four fields; nothing about the account is identified from a
  * session, so it works the same regardless of where it's called from.
  *
- * <p>Modeled on {@code LoginServlet}'s forward-on-error / redirect-on-success
- * shape (not the JSON pattern {@link EditProfilePasswordServlet} uses),
- * since it has to interoperate with the Login modal's existing
- * forward-back-to-the-origin-page mechanism when opened from there.
+ * <p>Modeled on {@code LoginServlet}'s redirect-back-to-the-origin-page
+ * shape (not the JSON pattern {@link EditProfilePasswordServlet} uses):
+ * success and failure both redirect, and a failure's message rides in the
+ * session for exactly one read - see {@link #showError}.
  *
  * @author Robert Breutzmann
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
@@ -75,6 +75,14 @@ public class ForgotPasswordServlet extends HttpServlet {
     private static final String PARAM_REDIRECT_TO = "redirectTo";
     private static final String DEFAULT_REDIRECT = "/";
 
+    /*
+     * Session keys for the one-read failure message, read and cleared by
+     * includes/forgotPasswordModal.jsp. Prefixed the same way as
+     * LoginServlet's, so the two can't collide.
+     */
+    private static final String FLASH_ERROR = "forgotFlashError";
+    private static final String FLASH_EMAIL = "forgotFlashEmail";
+
     private final CustomerDAO customerDAO = new CustomerDAO();
 
     /**
@@ -82,9 +90,9 @@ public class ForgotPasswordServlet extends HttpServlet {
      * wrong code are deliberately indistinguishable to the caller.
      *
      * @param request the incoming POST (email, verificationCode, newPassword, redirectTo)
-     * @param response the response to redirect or forward
+     * @param response the response to redirect
      * @throws ServletException if the reset fails
-     * @throws IOException if the redirect or forward fails
+     * @throws IOException if the redirect fails
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -159,15 +167,31 @@ public class ForgotPasswordServlet extends HttpServlet {
     }
 
     /**
-     * Sets the error message and forwards back to the page the modal was
-     * opened on, so it can re-render already open with the message shown -
-     * the same mechanism {@code LoginServlet} uses for its own failures.
+     * Puts the error message in the session and redirects back to the page
+     * the modal was opened on, where includes/forgotPasswordModal.jsp reads
+     * it once, clears it, and renders already open with the message shown.
+     *
+     * <p><strong>Redirects; it does not forward.</strong> {@code redirectTo}
+     * is a servlet path such as {@code /reservation}, so forwarding this POST
+     * to it ran that servlet's {@code doPost} (or hit a 405 where there is
+     * none): a wrong code on About Us or Wait List showed an error page, and
+     * on Book a Slip it showed the booking endpoint's "Please sign in" JSON.
+     * {@code LoginServlet} had the same bug and fixed it the same way.
+     *
+     * <p>The typed email rides along so the field refills. It goes in the
+     * session, not the URL, where it would end up in history and logs.
      */
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
-            throws ServletException, IOException {
-        request.setAttribute("forgotPasswordError", message);
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Utils.safeRedirectTarget(
+            throws IOException {
+        HttpSession session = request.getSession(true);
+        session.setAttribute(FLASH_ERROR, message);
+
+        String submittedEmail = Utils.clean(request.getParameter("email"));
+        if (!submittedEmail.isEmpty()) {
+            session.setAttribute(FLASH_EMAIL, submittedEmail);
+        }
+
+        response.sendRedirect(request.getContextPath() + Utils.safeRedirectTarget(
                 request.getParameter(PARAM_REDIRECT_TO), DEFAULT_REDIRECT));
-        dispatcher.forward(request, response);
     }
 }
