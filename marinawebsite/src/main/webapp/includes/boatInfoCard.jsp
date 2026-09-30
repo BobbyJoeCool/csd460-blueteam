@@ -110,6 +110,20 @@
 </div>
 
 <%--
+  Shown by boatFields.js when Boat Length is over our largest slip (50 ft,
+  the same limit as js/boatFields.js's LARGEST_SLIP_FT and the server's
+  Utils.SLIP_SIZES_FT). A warning, not an error: the boat still saves, but
+  the customer hears now, rather than at the last step of Book a Slip, that
+  it can't be booked into a slip online.
+--%>
+<p class="callout-badge" id="boatLengthTooLong" role="status" hidden>
+    Our largest slips fit boats up to 50 ft. You can still add this boat, but
+    it can't be booked into a slip online. Call the marina at
+    <a href="${fn:escapeXml(marina.phoneLink)}"><c:out value="${marina.phone}"/></a>
+    to talk about options.
+</p>
+
+<%--
   HIN is the primary/default way to identify a boat - listed first,
   no longer marked required. Registration Number below is the
   fallback for an owner without a HIN handy. Neither is required to

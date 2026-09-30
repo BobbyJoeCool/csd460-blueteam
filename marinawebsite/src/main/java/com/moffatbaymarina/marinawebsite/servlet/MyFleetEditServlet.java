@@ -97,7 +97,7 @@ public class MyFleetEditServlet extends HttpServlet {
                         boatDAO.findFleetByCustomerId(conn, customerId)
                 );
 
-                request.getRequestDispatcher("/myFleet.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                         .forward(request, response);
 
                 return;
@@ -193,7 +193,7 @@ public class MyFleetEditServlet extends HttpServlet {
                         boatDAO.findFleetByCustomerId(conn, customerId)
                 );
 
-                request.getRequestDispatcher("/myFleet.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                         .forward(request, response);
 
                 return;

@@ -162,6 +162,7 @@ MoffatBay.myFleet = (function () {
         clearFieldErrors();
         setBanner("");
         hideConfirmation();
+        MoffatBay.boatFields.updateLengthNotice();
     }
 
     /* Open/close, the close buttons and Escape all come from modal.js. */
@@ -479,6 +480,7 @@ MoffatBay.myFleet = (function () {
         posted.method = "post";
         posted.action = editAction;
 
+        MoffatBay.form.addCsrfField(posted);
         posted.appendChild(hiddenField("boatId", boatIdInput.value));
         changed.forEach(function (field) {
             posted.appendChild(hiddenField(field, valueOf(field)));
@@ -600,6 +602,7 @@ MoffatBay.myFleet = (function () {
             el.value = typed[field] || "";
         });
 
+        MoffatBay.boatFields.updateLengthNotice();
         updateSaveState();
         setBanner(boatModal.dataset.formError || "");
         applyServerFieldErrors();

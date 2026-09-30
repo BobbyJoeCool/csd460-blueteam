@@ -93,7 +93,7 @@ public class MyFleetRemoveServlet extends HttpServlet {
                         )
                 );
 
-                request.getRequestDispatcher("/myFleet.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                         .forward(request, response);
 
                 return;
@@ -123,7 +123,7 @@ public class MyFleetRemoveServlet extends HttpServlet {
                         )
                 );
 
-                request.getRequestDispatcher("/myFleet.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                         .forward(request, response);
 
                 return;
@@ -158,7 +158,7 @@ public class MyFleetRemoveServlet extends HttpServlet {
                             )
                     );
 
-                    request.getRequestDispatcher("/myFleet.jsp")
+                    request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                             .forward(request, response);
 
                     return;

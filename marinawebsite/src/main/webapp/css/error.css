@@ -2,10 +2,10 @@
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Robert Breutzmann
  * CSD 460 - Capstone Project - Marina Website Project
- * Error page (error.jsp) styles - shown for a 404 or any uncaught
- * exception (see WEB-INF/web.xml's <error-page> entries). One page, one
- * message, plain centered text in a parchment-style card. Depends on
- * site.css being linked first.
+ * Error page (error.jsp) styles - shown for any error status or uncaught
+ * exception (see WEB-INF/web.xml's <error-page> entries). One page, its
+ * wording picked by status code, plain centered text in a parchment-style
+ * card. Depends on site.css being linked first.
  */
 
 .error-pirate {

@@ -44,6 +44,7 @@
 <main>
     <form class="registration-form" method="post"
           action="${pageContext.request.contextPath}/register" id="registrationForm" novalidate>
+        <jsp:include page="/includes/csrfField.jsp" />
 
         <!-- Left column: name & mailing info -->
         <jsp:include page="/includes/personalInfoCard.jsp" />

@@ -1,5 +1,5 @@
 <%--
-  src/main/webapp/myFleet.jsp
+  src/main/webapp/WEB-INF/views/myFleet.jsp
 
   My Fleet - every boat the signed-in customer currently owns, with what
   each one is doing right now, per documentation/Page Contracts/My Fleet.md.
@@ -355,6 +355,7 @@
              that is already set are never sent, because they render disabled;
              if one arrives anyway, reject it rather than ignoring it. --%>
         <form id="boatForm" action="${ctx}/myFleet/add" method="post" novalidate>
+            <jsp:include page="/includes/csrfField.jsp" />
 
             <%-- Disabled so it is not submitted on an Add; myFleet.js enables
                  it for an Edit. --%>
@@ -426,6 +427,7 @@
              transaction; the disabled button on a reserved card is courtesy,
              not enforcement. 404s until that servlet exists. --%>
         <form id="removeForm" action="${ctx}/myFleet/remove" method="post">
+            <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="boatId" id="removeBoatId" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close>Cancel</button>

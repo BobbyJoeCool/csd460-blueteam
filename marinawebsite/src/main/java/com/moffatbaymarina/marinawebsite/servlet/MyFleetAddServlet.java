@@ -102,7 +102,7 @@ public class MyFleetAddServlet extends HttpServlet {
                         )
                 );
 
-                request.getRequestDispatcher("/myFleet.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                         .forward(request, response);
 
                 return;

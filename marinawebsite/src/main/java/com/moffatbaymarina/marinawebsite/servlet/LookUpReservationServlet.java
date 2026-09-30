@@ -48,7 +48,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class LookUpReservationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String VIEW = "/lookUpReservation.jsp";
+    private static final String VIEW = "/WEB-INF/views/lookUpReservation.jsp";
 
     /**
      * Letters, digits and hyphens only - enough for any part of a

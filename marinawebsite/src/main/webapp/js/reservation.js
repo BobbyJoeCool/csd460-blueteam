@@ -92,7 +92,10 @@ MoffatBay.reservation = (function () {
         return fetch(url, {
             method: "POST",
             body: body,
-            headers: { "Accept": "application/json" }
+            headers: {
+                "Accept": "application/json",
+                "X-CSRF-Token": MoffatBay.form.csrfToken()
+            }
         }).then(function (response) {
             return response.json();
         });

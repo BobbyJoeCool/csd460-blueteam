@@ -69,7 +69,7 @@
                     onclick="MoffatBay.loginModal.open('${signInRedirectTo}')">Sign in</button>
             <p>
                 No account yet?
-                <a href="${pageContext.request.contextPath}/registration.jsp">Create one</a>.
+                <a href="${pageContext.request.contextPath}/register">Create one</a>.
             </p>
         </div>
     </c:when>

@@ -50,7 +50,7 @@
         </button>
 
         <div class="header-nav__links" id="headerNavLinks">
-            <a href="${pageContext.request.contextPath}/index.jsp"
+            <a href="${pageContext.request.contextPath}/"
             class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
             <a href="${pageContext.request.contextPath}/about"
             class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
@@ -143,6 +143,7 @@
                 <form class="nav-logout-form"
                       action="${pageContext.request.contextPath}/logout"
                       method="post">
+                    <jsp:include page="/includes/csrfField.jsp" />
                     <button type="submit" class="nav-cta">Log Out</button>
                 </form>
 

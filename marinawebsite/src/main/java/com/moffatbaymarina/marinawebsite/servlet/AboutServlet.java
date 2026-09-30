@@ -27,7 +27,7 @@ public class AboutServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/aboutUs.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/aboutUs.jsp")
                .forward(request, response);
     }
 }

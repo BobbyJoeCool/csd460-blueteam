@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ContactServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String VIEW = "/aboutUs.jsp";
+    private static final String VIEW = "/WEB-INF/views/aboutUs.jsp";
     private static final Set<String> VALID_REASONS = Set.of(
             "Reservation Question",
             "Waitlist Question",
@@ -94,7 +94,7 @@ public class ContactServlet extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
             contactDAO.insert(conn, contact);
-            response.sendRedirect(request.getContextPath() + "/aboutUs.jsp?notice=contactSent");
+            response.sendRedirect(request.getContextPath() + "/about?notice=contactSent");
         } catch (SQLException e) {
             throw new ServletException("Contact submission failed.", e);
         }

@@ -85,6 +85,105 @@ MoffatBay.form = (function () {
         return "(" + d.slice(0, 3) + ")-" + d.slice(3, 6) + "-" + d.slice(6);
     }
 
+    /**
+     * The session's anti-forgery token, from the <meta name="csrf-token">
+     * tag includes/styles.jsp writes into every page. Send it as an
+     * X-CSRF-Token header on any fetch() POST; CsrfFilter refuses a POST
+     * without it.
+     * @returns {string} the token, or "" if the page has none
+     */
+    function csrfToken() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.content : "";
+    }
+
+    /**
+     * Adds the anti-forgery token to a form built in script (the "send
+     * only what changed" forms), the same hidden field
+     * includes/csrfField.jsp puts in a form on the page.
+     * @param {HTMLFormElement} form - the form about to be submitted
+     */
+    function addCsrfField(form) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "csrfToken";
+        input.value = csrfToken();
+        form.appendChild(input);
+    }
+
+    /**
+     * Where the caret belongs in a formatted phone number: just after
+     * its count-th digit (0 = the very start).
+     * @param {string} formatted - the display value, e.g. "(360)-555-0100"
+     * @param {number} count - how many digits sit before the caret
+     * @returns {number} the caret position
+     */
+    function caretAfterDigits(formatted, count) {
+        if (count <= 0) { return 0; }
+        var seen = 0;
+        for (var i = 0; i < formatted.length; i++) {
+            if (/\d/.test(formatted.charAt(i)) && ++seen === count) { return i + 1; }
+        }
+        return formatted.length;
+    }
+
+    /**
+     * Wires a visible phone box to its hidden digits-only field, the one
+     * behaviour Registration and Your Account share:
+     *
+     * - Every edit is reformatted as "(###)-###-####" with the caret kept
+     *   after the same digit it was after, so editing the area code in the
+     *   middle of a full number doesn't throw the caret to the end.
+     * - Backspace onto a bracket, space or dash removes the digit before
+     *   it (Delete, the digit after it). Without this the separator is
+     *   deleted, the digits are unchanged, and reformatting puts it
+     *   straight back, so the box looks stuck and the area code can't be
+     *   backspaced over.
+     *
+     * @param {HTMLInputElement} display - the visible, formatted box
+     * @param {HTMLInputElement} hidden - the digits-only field that's submitted
+     * @param {function} [onChange] - called after every change, to re-check the form
+     */
+    function bindPhoneDisplay(display, hidden, onChange) {
+        function show(digits, digitsBeforeCaret) {
+            hidden.value = digits;
+            display.value = formatPhoneDisplay(digits);
+            if (document.activeElement === display) {
+                var pos = caretAfterDigits(display.value, digitsBeforeCaret);
+                display.setSelectionRange(pos, pos);
+            }
+            if (onChange) { onChange(); }
+        }
+
+        display.addEventListener("keydown", function (event) {
+            var backspace = event.key === "Backspace";
+            if (!(backspace || event.key === "Delete")
+                    || display.selectionStart !== display.selectionEnd) {
+                return;
+            }
+            var pos = display.selectionStart;
+            var neighbour = backspace ? display.value.charAt(pos - 1) : display.value.charAt(pos);
+            if (neighbour === "" || /\d/.test(neighbour)) {
+                return;  // a digit: the browser's own delete is right
+            }
+            event.preventDefault();
+            var before = extractPhoneDigits(display.value.slice(0, pos));
+            var after = extractPhoneDigits(display.value.slice(pos));
+            if (backspace) {
+                before = before.slice(0, -1);
+            } else {
+                after = after.slice(1);
+            }
+            show(extractPhoneDigits(before + after), before.length);
+        });
+
+        display.addEventListener("input", function () {
+            var caret = display.selectionStart === null ? display.value.length : display.selectionStart;
+            show(extractPhoneDigits(display.value),
+                 extractPhoneDigits(display.value.slice(0, caret)).length);
+        });
+    }
+
     // Requires 1 to 3 digits, the first of which can't be 0 - matches the
     // shape of a real E.164 country calling code (e.g. "1", "44", "351")
     // and the Customer.phoneCountryCode column's VARCHAR(3).
@@ -406,11 +505,14 @@ MoffatBay.form = (function () {
         isValidHIN: isValidHIN,
         extractPhoneDigits: extractPhoneDigits,
         formatPhoneDisplay: formatPhoneDisplay,
+        bindPhoneDisplay: bindPhoneDisplay,
         US_STATES: US_STATES,
         CA_PROVINCES: CA_PROVINCES,
         rebuildRegionOptions: rebuildRegionOptions,
         applyCountryToRegion: applyCountryToRegion,
         PASSWORD_RULES: PASSWORD_RULES,
-        checkPasswordRules: checkPasswordRules
+        checkPasswordRules: checkPasswordRules,
+        csrfToken: csrfToken,
+        addCsrfField: addCsrfField
     };
 })();

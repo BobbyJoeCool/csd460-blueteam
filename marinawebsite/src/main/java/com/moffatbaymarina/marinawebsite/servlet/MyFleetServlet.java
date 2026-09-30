@@ -61,7 +61,7 @@ public class MyFleetServlet extends HttpServlet {
             );
 
             // Load the customer's fleet and forward to the JSP.
-            request.getRequestDispatcher("/myFleet.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {

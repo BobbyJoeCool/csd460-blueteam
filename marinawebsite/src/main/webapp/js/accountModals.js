@@ -296,7 +296,10 @@ MoffatBay.accountModals = (function () {
 
                 fetch(changeForm.dataset.action, {
                     method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRF-Token": MoffatBay.form.csrfToken()
+                    },
                     body: body.toString()
                 }).then(function (response) {
                     return response.json();

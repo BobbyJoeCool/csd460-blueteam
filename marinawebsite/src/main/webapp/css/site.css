@@ -515,6 +515,7 @@ main,
    Callout badge — informational (non-error) notice inside a form card.
    Used by: registration.jsp (foreign-registration note),
             reservation.jsp (boat panel), includes/boatInfoCard.jsp
+            (including the over-50 ft length warning)
    -------------------------------------------------------------------------- */
 
 .callout-badge {
