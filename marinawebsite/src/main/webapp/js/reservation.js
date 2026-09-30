@@ -106,6 +106,13 @@ MoffatBay.reservation = (function () {
         return MoffatBay.form.formatMoney(cents);
     }
 
+    // The marina's phone number, from the header's data-marina-phone
+    // (MarinaInfo on the server), so it's never typed into a script.
+    function marinaPhone() {
+        var header = document.querySelector(".site-header");
+        return header ? header.dataset.marinaPhone : "";
+    }
+
     function setText(el, message) {
         if (el) { el.textContent = message || ""; }
     }
@@ -385,7 +392,7 @@ MoffatBay.reservation = (function () {
             availPanel.classList.add("is-full");
             setText(availMessage,
                 "We don't have a slip that fits a boat over 50 feet. "
-                + "Please call the marina at (360) 555-0142.");
+                + "Please call the marina at " + marinaPhone() + ".");
             setSubmitEnabled(false);
             setText(submitBlockedReason, "We don't have a slip that fits this boat.");
             return;

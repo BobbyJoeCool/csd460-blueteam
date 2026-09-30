@@ -136,7 +136,7 @@
 
 <output class="callout-badge" id="identificationNote" hidden>
     If you don't have a HIN or Boat Registration, you can call the
-    Marina at <a href="tel:+13605550142">(360) 555-0142</a> for other
+    Marina at <a href="${fn:escapeXml(marina.phoneLink)}"><c:out value="${marina.phone}"/></a> for other
     options.
 </output>
 

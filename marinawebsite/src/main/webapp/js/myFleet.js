@@ -118,6 +118,13 @@ MoffatBay.myFleet = (function () {
         return el ? el.value.trim() : "";
     }
 
+    // The marina's phone number, from the header's data-marina-phone
+    // (MarinaInfo on the server), so it's never typed into a script.
+    function marinaPhone() {
+        var header = document.querySelector(".site-header");
+        return header ? header.dataset.marinaPhone : "";
+    }
+
     function setBanner(message) {
         if (!modalError) { return; }
         modalError.textContent = message || "";
@@ -218,7 +225,7 @@ MoffatBay.myFleet = (function () {
            submitted boatLength on an edit is a structural rejection. */
         ALWAYS_LOCKED_ON_EDIT.forEach(function (field) {
             lockField(field, "Length decides the slip size and the monthly rate, so it "
-                + "can't change here. Call the Marina on (360) 555-0142 to correct it.");
+                + "can't change here. Call the Marina on " + marinaPhone() + " to correct it.");
         });
 
         if ((card.dataset.hin || "") !== "") {

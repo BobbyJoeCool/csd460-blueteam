@@ -92,7 +92,7 @@
 }
 
 /* =============================================================
-   Plan Your Stay dropdown
+   Header dropdowns - Plan Your Stay, and the signed-in Welcome menu
    ========================================================== */
 
 .nav-dropdown {
@@ -131,6 +131,14 @@
     display: flex;
 }
 
+/* The Welcome menu sits at the right edge of the header, so its panel
+   opens leftward from the button's right edge instead of running off
+   the screen. */
+.nav-dropdown--account .nav-dropdown__menu {
+    left: auto;
+    right: 0;
+}
+
 .nav-dropdown__menu a {
     width: 100%;
     white-space: nowrap;
@@ -145,8 +153,11 @@
 
 
 
-/* Standard navigation links and Plan Your Stay dropdown trigger */
+/* Standard navigation links, dropdown menu links and dropdown triggers.
+   .nav-dropdown__menu a is listed separately because the Welcome menu
+   sits outside .header-nav__links. */
 .header-nav__links a,
+.nav-dropdown__menu a,
 .nav-dropdown__trigger {
     display: inline-flex;
     position: relative;
@@ -168,12 +179,14 @@
 
 /* Highlights current page viewed */
 .header-nav__links a.nav-active,
+.nav-dropdown__menu a.nav-active,
 .nav-dropdown__trigger.nav-active {
     color: var(--color-nav-text-active);
     font-weight: 600;
 }
 
 .header-nav__links a.nav-active::after,
+.nav-dropdown__menu a.nav-active::after,
 .nav-dropdown__trigger.nav-active::after {
     content: "";
     position: absolute;
@@ -185,6 +198,8 @@
 }
 .header-nav__links a:hover,
 .header-nav__links a:focus-visible,
+.nav-dropdown__menu a:hover,
+.nav-dropdown__menu a:focus-visible,
 .nav-dropdown__trigger:hover,
 .nav-dropdown__trigger:focus-visible {
     background-color: var(--color-golden-hour);
@@ -192,6 +207,7 @@
 }
 
 .header-nav__links a:focus-visible,
+.nav-dropdown__menu a:focus-visible,
 .nav-dropdown__trigger:focus-visible {
     outline: 2px solid var(--color-sand);
     outline-offset: 2px;
@@ -214,11 +230,6 @@
     background: var(--color-cta-secondary-bg-hover);
     border-color: var(--color-cta-secondary-bg-hover);
     color: var(--color-cta-secondary-text);
-}
-
-.nav-welcome {
-    color: var(--color-nav-text);
-    font-size: 0.95rem;
 }
 
 /* The Log Out control is a form so it can POST, but a form is a block
@@ -245,7 +256,7 @@
 }
 
 @media (max-width: 600px) {
-    /* The compact row (icon, hamburger, welcome/login) stays vertically
+    /* The compact row (icon, hamburger, Welcome menu/login) stays vertically
        centered, undoing the flex-start set at the 768px step above -
        that was for the old layout, which wrapped onto multiple lines. */
     .site-header {
@@ -304,19 +315,22 @@
         width: 100%;
     }
 
-    .nav-dropdown {
+    /* Plan Your Stay opens in place inside the hamburger list. Scoped to
+       .header-nav__links so the Welcome menu, which stays in the compact
+       row, keeps its desktop popup. */
+    .header-nav__links .nav-dropdown {
         width: 100%;
         display: flex;
         flex-direction: column;
-        }
+    }
 
-    .nav-dropdown__trigger {
+    .header-nav__links .nav-dropdown__trigger {
         width: 100%;
         justify-content: space-between;
         text-align: left;
     }
 
-    .nav-dropdown__menu {
+    .header-nav__links .nav-dropdown__menu {
         position: static;
         width: 100%;
         min-width: 0;
@@ -330,7 +344,7 @@
         box-shadow: none;
     }
 
-    .nav-dropdown__menu a {
+    .header-nav__links .nav-dropdown__menu a {
         width: 100%;
     }
 }

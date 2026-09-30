@@ -15,10 +15,14 @@
                               Welcome + Log Out.
     sessionScope.displayName - "Elena M.", already formatted by the
                               Customer bean.
+    marina.phone            - MarinaInfo's phone number, put on the header
+                              as data-marina-phone so page scripts can
+                              quote it without typing it themselves.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<header class="site-header">
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<header class="site-header" data-marina-phone="${fn:escapeXml(marina.phone)}">
    <div class="header-brand">
     <a class="logo" href="${pageContext.request.contextPath}/">
         <img
@@ -50,7 +54,7 @@
             class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
             <a href="${pageContext.request.contextPath}/about"
             class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-          <div class="nav-dropdown" data-stay-menu>
+          <div class="nav-dropdown" data-dropdown>
 
             <button type="button"
                     class="nav-dropdown__trigger
@@ -60,14 +64,13 @@
                     ? 'nav-active' : ''}"
                     aria-expanded="false"
                     aria-controls="planYourStayMenu"
-                    data-stay-menu-toggle>
+                    data-dropdown-toggle>
                 Plan Your Stay
                 <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
             </button>
 
     <div class="nav-dropdown__menu"
-         id="planYourStayMenu"
-         data-stay-menu-panel>
+         id="planYourStayMenu">
 
         <a href="${pageContext.request.contextPath}/reservation"
            class="${param.activePage == 'reservation' ? 'nav-active' : ''}">
@@ -101,13 +104,38 @@
         <c:choose>
             <c:when test="${sessionScope.loggedIn}">
 
-                <%-- Added alongside the Edit User Info build - previously
-                     plain text, with no way to actually reach the page
-                     from anywhere on the site. See the implementation
-                     plan's Gap #1. --%>
-                <a class="nav-welcome" href="${pageContext.request.contextPath}/editProfile">
-                    Welcome, <c:out value="${sessionScope.displayName}"/>
-                </a>
+                <%-- The customer's own pages. Same dropdown component as
+                     Plan Your Stay; the --account modifier anchors the
+                     menu to the right edge and keeps it a popup on
+                     mobile, where it sits in the compact row. --%>
+                <div class="nav-dropdown nav-dropdown--account" data-dropdown>
+
+                    <button type="button"
+                            class="nav-dropdown__trigger
+                            ${param.activePage == 'editprofile'
+                            or param.activePage == 'myfleet'
+                            ? 'nav-active' : ''}"
+                            aria-expanded="false"
+                            aria-controls="accountMenu"
+                            data-dropdown-toggle>
+                        Welcome, <c:out value="${sessionScope.displayName}"/>
+                        <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
+                    </button>
+
+                    <div class="nav-dropdown__menu" id="accountMenu">
+
+                        <a href="${pageContext.request.contextPath}/editProfile"
+                           class="${param.activePage == 'editprofile' ? 'nav-active' : ''}">
+                            User Profile
+                        </a>
+
+                        <a href="${pageContext.request.contextPath}/myFleet"
+                           class="${param.activePage == 'myfleet' ? 'nav-active' : ''}">
+                            My Fleet
+                        </a>
+
+                    </div>
+                </div>
 
                 <%-- POST, not a link: logging out changes state, so it
                      shouldn't sit on something a browser could follow on

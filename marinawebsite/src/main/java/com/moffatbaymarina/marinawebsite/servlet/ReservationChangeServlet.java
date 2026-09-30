@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.MarinaInfo;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
@@ -66,7 +67,8 @@ public class ReservationChangeServlet extends HttpServlet {
     public static final String ERROR_FLASH = "reservationsError";
 
     private static final String NOT_FOUND_MESSAGE =
-            "We couldn't find that reservation. Contact the marina office at (360) 555-0142 if this keeps happening.";
+            "We couldn't find that reservation. Contact the marina office at "
+            + MarinaInfo.PHONE + " if this keeps happening.";
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
 

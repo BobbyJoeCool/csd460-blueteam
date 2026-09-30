@@ -5,6 +5,8 @@ This document spells out the commonly used "fake truths" about the Marina.  For 
 The purpose is to provide a source of truth to provide consistency across the entire website when working with multiple developers.
 Rather than looking to a different page to see what it has, developers can look here and get the "real" fake data.
 
+In the code, the Contact and Hours values below live in one place, `util/MarinaInfo.java`. Pages read them as `${marina.phone}`, `${marina.officeHours}` and so on, servlets use `MarinaInfo.PHONE`, and scripts read the phone number from the header's `data-marina-phone` attribute. Never type one of these values into a page, script or servlet. If a value changes, change it in `MarinaInfo.java` and here.
+
 ## Contact
 
 | | |

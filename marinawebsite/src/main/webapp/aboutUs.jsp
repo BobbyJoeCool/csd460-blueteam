@@ -153,8 +153,8 @@
                     <h3>Where we are</h3>
                     <address>
                         Moffat Bay Marina<br>
-                        1400 Harbor Loop Road<br>
-                        Joviedsa Island, WA 98250
+                        <c:out value="${marina.street}"/><br>
+                        <c:out value="${marina.cityStateZip}"/>
                     </address>
                 </div>
 
@@ -162,15 +162,15 @@
                     <h3>How to reach us</h3>
                     <p class="about-contact__line">
                         <span class="about-contact__label">Phone</span>
-                        <a href="tel:+13605550142">(360) 555-0142</a>
+                        <a href="${fn:escapeXml(marina.phoneLink)}"><c:out value="${marina.phone}"/></a>
                     </p>
                     <p class="about-contact__line">
                         <span class="about-contact__label">Email</span>
-                        <a href="mailto:office@moffatbaymarina.com">office@moffatbaymarina.com</a>
+                        <a href="mailto:${fn:escapeXml(marina.email)}"><c:out value="${marina.email}"/></a>
                     </p>
                     <p class="about-contact__line">
                         <span class="about-contact__label">VHF</span>
-                        Channel 16
+                        <c:out value="${marina.vhf}"/>
                     </p>
                 </div>
 
@@ -178,10 +178,10 @@
                     <h3>Office hours</h3>
                     <table class="about-hours">
                         <tbody>
-                            <tr><th scope="row">Mon - Fri</th><td>6:00 am - 7:00 pm</td></tr>
-                            <tr><th scope="row">Saturday</th><td>6:00 am - 7:00 pm</td></tr>
-                            <tr><th scope="row">Sunday</th><td>7:00 am - 5:00 pm</td></tr>
-                            <tr><th scope="row">Fuel dock</th><td>7:00 am - dusk, daily</td></tr>
+                            <c:forEach var="row" items="${marina.officeHours}">
+                                <tr><th scope="row"><c:out value="${row.key}"/></th><td><c:out value="${row.value}"/></td></tr>
+                            </c:forEach>
+                            <tr><th scope="row">Fuel dock</th><td><c:out value="${marina.fuelDockHours}"/></td></tr>
                         </tbody>
                     </table>
                     <p class="about-hours__note">
@@ -232,7 +232,7 @@
                 Questions about a reservation, the wait list, billing or
                 anything else - fill this in and the office will get back to
                 you. If it's urgent, call us on
-                <a href="tel:+13605550142">(360) 555-0142</a>.
+                <a href="${fn:escapeXml(marina.phoneLink)}"><c:out value="${marina.phone}"/></a>.
             </p>
 
             <%-- Set by the back end when the submission is rejected. --%>
