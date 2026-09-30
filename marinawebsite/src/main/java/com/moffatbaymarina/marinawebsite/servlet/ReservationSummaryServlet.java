@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.MarinaInfo;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
@@ -69,7 +70,7 @@ public class ReservationSummaryServlet extends HttpServlet {
     /** Same wording whether the reservation is missing or someone else's. */
     private static final String NOT_FOUND_MESSAGE =
             "We couldn't find that reservation. Check the confirmation number, "
-            + "or contact the marina office at (360) 555-0142.";
+            + "or contact the marina office at " + MarinaInfo.PHONE + ".";
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
 

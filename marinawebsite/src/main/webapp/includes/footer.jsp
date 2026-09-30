@@ -1,7 +1,12 @@
 <%--
   Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
   Primary Author/Owner - Sara White
+
+  Address, phone and office hours come from MarinaInfo (the "marina"
+  application attribute) rather than being typed here.
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <footer class="site-footer">
 
@@ -11,17 +16,18 @@
             <h2>Moffat Bay Marina</h2>
 
             <address>
-                1400 Harbor Loop Road<br>
-                Joviedsa Island, WA 98250<br>
-                <a href="tel:+13605550142">(360) 555-0142</a>
+                <c:out value="${marina.street}"/><br>
+                <c:out value="${marina.cityStateZip}"/><br>
+                <a href="${fn:escapeXml(marina.phoneLink)}"><c:out value="${marina.phone}"/></a>
             </address>
         </section>
 
         <section class="footer-office-hours">
             <h2>Office Hours</h2>
 
-            <p>Mon&ndash;Fri: 7 am &ndash; 7 pm</p>
-            <p>Sat&ndash;Sun: 6 am &ndash; 8 pm</p>
+            <c:forEach var="row" items="${marina.officeHours}">
+                <p><c:out value="${row.key}"/>: <c:out value="${row.value}"/></p>
+            </c:forEach>
 
             <h2 class="self-service-heading">
                 Self-Service Marina<br>

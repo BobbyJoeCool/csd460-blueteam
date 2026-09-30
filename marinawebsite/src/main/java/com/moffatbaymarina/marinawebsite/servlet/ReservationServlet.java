@@ -14,6 +14,7 @@ import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.DockAvailability;
 import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
+import com.moffatbaymarina.marinawebsite.util.MarinaInfo;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
@@ -154,7 +155,8 @@ public class ReservationServlet extends HttpServlet {
                 if (slipSizeFt == 0) {
                     conn.rollback();
                     writeJson(response,
-                            "{\"ok\":false,\"boatError\":\"We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142.\"}");
+                            "{\"ok\":false,\"boatError\":\"We don't have a slip that fits a boat over 50 feet. Please call the marina at "
+                            + MarinaInfo.PHONE + ".\"}");
                     return;
                 }
 
