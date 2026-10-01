@@ -66,7 +66,7 @@
                  query string, so without this the confirmation number is lost on
                  the way back. --%>
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open('${signInRedirectTo}')">Sign in</button>
+                    onclick="MoffatBay.loginModal.open('${signInRedirectTo}')">Sign In</button>
             <p>
                 No account yet?
                 <a href="${pageContext.request.contextPath}/register">Create one</a>.
@@ -151,7 +151,7 @@
         <div class="summary-wrap">
             <section class="summary-status-band" aria-label="Reservation status">
                 <div>
-                    <span class="summary-status-label">Status</span>
+                    <span class="summary-status-label">Lease Status</span>
                     <strong class="summary-status-value"><c:out value="${reservation.displayStatus}" /></strong>
                 </div>
                 <p>
@@ -170,16 +170,16 @@
                     <div class="receipt-card__body">
                         <dl class="receipt-lines">
                             <div>
-                                <dt>Vessel</dt>
+                                <dt>Boat</dt>
                                 <dd><c:out value="${reservation.boatName}" /></dd>
                             </div>
                             <div>
-                                <dt>Slip</dt>
+                                <dt>Slip Size</dt>
                                 <dd><c:out value="${reservation.slipSizeFt}" /> ft</dd>
                             </div>
                             <div>
-                                <dt>Location</dt>
-                                <dd>Dock <c:out value="${reservation.dockNumber}" />, Slip <c:out value="${reservation.slipNumber}" /></dd>
+                                <dt>Dock / Slip</dt>
+                                <dd>Dock <c:out value="${reservation.dockNumber}" />, Slip <c:out value="${reservation.slipNumber}" /> (<c:out value="${reservation.slipCode}" />)</dd>
                             </div>
                             <div>
                                 <dt>Start Date</dt>
@@ -203,7 +203,7 @@
 
                             <c:if test="${reservation.electricalHookup and not empty reservation.electricMonthlyRate}">
                                 <div>
-                                    <dt>Electric</dt>
+                                    <dt>Electric Hookup</dt>
                                     <dd><fmt:formatNumber value="${reservation.electricMonthlyRate}" type="currency" /></dd>
                                 </div>
                             </c:if>

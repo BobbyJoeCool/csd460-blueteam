@@ -36,7 +36,7 @@
 
 <header class="hero-band" id="waitListLookupHero">
     <div class="hero-band__content">
-        <h1>See the Waitlist for Your Slip Size</h1>
+        <h1>See the Wait List for Your Slip Size</h1>
     </div>
 
     <p class="hero-band__credit">
@@ -50,7 +50,7 @@
     <!-- Public Waitlist (no login required)-->
     <section class="waitlist-availability-card">
 
-        <h2>Current Waitlists by Slip Size</h2>
+        <h2>Current Wait Lists by Slip Size</h2>
 
         <div class="waitlist-summary-grid">
 
@@ -61,7 +61,7 @@
                     <h3>${summary.sizeFt} ft</h3>
 
                     <p>
-                        <strong>Guests Waiting:</strong>
+                        <strong>People in line:</strong>
                         ${summary.inLineCount}
                     </p>
 

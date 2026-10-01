@@ -470,6 +470,21 @@ public class ReservationDetails implements Serializable {
     }
 
     /**
+     * The slip's short code, dock letter and two-digit number - "A-09" for
+     * Dock A, Slip 9. Built from the two stored values, not stored itself;
+     * the same format My Fleet shows (see "Slip Naming" in
+     * documentation/definitions_decisions.md).
+     *
+     * @return the slip code, or "" if the dock isn't known
+     */
+    public String getSlipCode() {
+        if (dockNumber == null || dockNumber.isEmpty()) {
+            return "";
+        }
+        return String.format("%s-%02d", dockNumber, slipNumber);
+    }
+
+    /**
      * @param slipNumber the slip number within its dock
      */
     public void setSlipNumber(int slipNumber) {

@@ -47,7 +47,7 @@
                     Please sign in to reserve a slip.
                 </c:when>
                 <c:otherwise>
-                    Choose your vessel and dock, add power if you need it, and pick your start date.
+                    Choose your boat and dock, add power if you need it, and pick your start date.
                 </c:otherwise>
             </c:choose>
         </p>
@@ -65,7 +65,7 @@
     <c:when test="${empty sessionScope.customerId}">
         <div class="reservation-signin">
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open()">Sign in</button>
+                    onclick="MoffatBay.loginModal.open()">Sign In</button>
             <p>
                 No account yet?
                 <a href="${pageContext.request.contextPath}/register">Create one</a>.
@@ -115,7 +115,7 @@
             <section class="slip-band" aria-labelledby="slipBandHeading">
                 <h2 class="step-heading" id="slipBandHeading">Our Slips</h2>
                 <p class="step-hint" id="sizeHint">
-                    Choose your vessel below and we'll highlight the size it needs.
+                    Choose your boat below and we'll highlight the size it needs.
                 </p>
 
                 <ul class="slip-sizes">
@@ -186,7 +186,7 @@
 
                     <%-- ===== Step 1: vessel ===== --%>
                     <section class="step-card">
-                        <h2 class="step-heading">1. Choose Your Vessel</h2>
+                        <h2 class="step-heading">1. Choose Your Boat</h2>
 
                         <div class="form-group">
                             <label for="boatId">Boat <span class="required-mark">*</span></label>
@@ -240,7 +240,7 @@
                         <h2 class="step-heading">2. Choose Your Dock</h2>
 
                         <p class="step-hint" id="dockHint">
-                            Pick your vessel above and we'll show which docks have
+                            Pick your boat above and we'll show which docks have
                             room for it.
                         </p>
 
@@ -322,7 +322,7 @@
                                 <dd id="summarySlip">&mdash;</dd>
                             </div>
                             <div class="summary-line">
-                                <dt>Vessel</dt>
+                                <dt>Boat</dt>
                                 <dd id="summaryBoat">&mdash;</dd>
                             </div>
                             <div class="summary-line">
@@ -334,7 +334,7 @@
                                 <dd id="summaryDate">&mdash;</dd>
                             </div>
                             <div class="summary-line" id="summaryElectricLine" hidden>
-                                <dt>Electric hookup</dt>
+                                <dt>Electric Hookup</dt>
                                 <dd id="summaryElectric">&mdash;</dd>
                             </div>
                             <div class="summary-line summary-total">
@@ -431,7 +431,7 @@
                 <p class="modal__note" id="confirmBookingText"></p>
 
                 <div class="modal__actions">
-                    <button type="button" class="btn-outline" data-modal-close>Go Back</button>
+                    <button type="button" class="btn-outline" data-modal-close data-modal-initial>Go Back</button>
                     <button type="button" class="btn-primary" id="confirmBooking">Book Slip</button>
                 </div>
 

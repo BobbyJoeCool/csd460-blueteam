@@ -190,29 +190,6 @@
 }
 
 /* ==========================================================================
-   "Saved. Here's what changed" panel
-
-   .change-summary__* rows come from site.css; this is the box around them
-   and its dismiss button.
-   ========================================================================== */
-
-.fleet-saved {
-    width: 70%;
-    margin: 0 auto 1.25rem;
-}
-
-.fleet-saved__head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.fleet-saved__head .change-summary__title {
-    margin-bottom: 0.25rem;
-}
-
-/* ==========================================================================
    The boat modal
 
    A locked field is disabled rather than read-only: that greys it, takes it
@@ -304,7 +281,6 @@
     .fleet-header,
     .fleet-list,
     .fleet-empty,
-    .fleet-saved,
     .fleet-add-row {
         width: 100%;
     }

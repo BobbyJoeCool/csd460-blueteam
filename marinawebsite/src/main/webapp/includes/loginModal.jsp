@@ -88,7 +88,7 @@
                              fn:length(originalUri))}"/>
 <%--
   ?signIn=<path> is how a members-only page with no signed-out view of its
-  own (My Fleet, User Profile) sends a visitor here: CustomerSession
+  own (My Fleet, Your Account) sends a visitor here: CustomerSession
   .sendToSignIn() redirects to /?signIn=/myFleet. It supplies the return
   page when there's no redirectTo, and opens the modal on load - but only
   for someone signed out, so a stale or shared link does nothing once
@@ -228,7 +228,7 @@
                         </button>
                     </p>
 
-                    <button type="submit" class="btn-primary login-modal__submit">Sign in</button>
+                    <button type="submit" class="btn-primary login-modal__submit">Sign In</button>
                 </form>
 
                 <%-- Carries the same return page as the sign-in form, so
