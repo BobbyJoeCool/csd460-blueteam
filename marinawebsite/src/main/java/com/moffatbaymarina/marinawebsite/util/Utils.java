@@ -545,7 +545,9 @@ public class Utils {
      * signed in off to somebody else's site.
      *
      * <p>Rejects "//evil.example" and "/\evil.example" (browsers treat both
-     * as a different host) and anything carrying a scheme.
+     * as a different host) and anything carrying a scheme. Also rejects any
+     * space or control character: browsers strip a tab or newline from a
+     * URL, so "/\t/evil.example" would otherwise arrive as "//evil.example".
      *
      * @param redirectTo the requested target; may be {@code null}
      * @param fallback where to go instead, e.g. "/"
@@ -556,7 +558,8 @@ public class Utils {
                 && redirectTo.startsWith("/")
                 && !redirectTo.startsWith("//")
                 && !redirectTo.startsWith("/\\")
-                && !redirectTo.contains("://");
+                && !redirectTo.contains("://")
+                && redirectTo.chars().noneMatch(c -> c < 0x21 || c == 0x7f);
         return looksSafe ? redirectTo : fallback;
     }
 

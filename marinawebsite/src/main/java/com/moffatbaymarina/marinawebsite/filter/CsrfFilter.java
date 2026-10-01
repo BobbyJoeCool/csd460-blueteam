@@ -24,14 +24,14 @@ import jakarta.servlet.http.HttpSession;
  * {@code SameSite=Lax}, so browsers don't send it on a POST that starts
  * on another site. This filter is the second layer, for browsers that
  * ignore SameSite: every session gets a random token, every POST form
- * carries it back ({@code includes/csrfField.jsp} for a form on the page,
+ * carries it back ({@code WEB-INF/includes/csrfField.jsp} for a form on the page,
  * the {@code X-CSRF-Token} header for a {@code fetch}), and a POST whose
  * token is missing or doesn't match is refused with a 403 before it
  * reaches any servlet. Another site can make a browser send a POST, but
  * it can't read our pages, so it can't know the token.
  *
  * <p>The token lives in the session as {@code csrfToken}. Pages read it
- * as {@code ${sessionScope.csrfToken}}; {@code includes/styles.jsp} also
+ * as {@code ${sessionScope.csrfToken}}; {@code WEB-INF/includes/styles.jsp} also
  * puts it in a {@code <meta name="csrf-token">} tag for the scripts, via
  * {@code MoffatBay.form.csrfToken()}. Logging in starts a new session
  * (see {@code LoginServlet}), so it gets a fresh token on the next page.

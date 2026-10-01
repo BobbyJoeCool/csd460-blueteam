@@ -6,7 +6,7 @@
   before the form reaches its servlet. Goes just inside each
   <form method="post">:
 
-      <jsp:include page="/includes/csrfField.jsp" />
+      <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
   Scripts that POST with fetch() send the same token in an X-CSRF-Token
   header instead - see MoffatBay.form.csrfToken() in formValidation.js.

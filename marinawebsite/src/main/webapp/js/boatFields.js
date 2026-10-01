@@ -22,7 +22,7 @@
  *
  * The split of work here and in formValidation.js: formValidation.js owns
  * the primitives - "is this string a HIN", "is this a valid year" - and
- * is loaded on every page by includes/loginModal.jsp through the header.
+ * is loaded on every page by WEB-INF/includes/loginModal.jsp through the header.
  * This file owns everything built on top of those that is specific to a
  * boat: which combinations are allowed, what to say when they aren't, and
  * how the country changes the Registration Number field. The primitives

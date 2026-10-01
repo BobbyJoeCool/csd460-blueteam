@@ -1,11 +1,11 @@
 <%--
-  src/main/webapp/includes/forgotPasswordModal.jsp
+  src/main/webapp/WEB-INF/includes/forgotPasswordModal.jsp
 
   The password reset from the Edit User Profile contract's "Password Change
   and the Lockout Model". Posts to /forgotPassword (ForgotPasswordServlet):
   email, verification code, new password.
 
-  Included by includes/loginModal.jsp rather than by any one page, and so
+  Included by WEB-INF/includes/loginModal.jsp rather than by any one page, and so
   reaches everywhere the login modal does. That placement is the point, not
   a convenience: completing a reset is now the only way to clear a lockout,
   and a locked-out customer can't sign in - so a reset that only opened from
@@ -21,7 +21,7 @@
     forgotFlashEmail - what they typed, so the email field refills.
 
   The password checklist below is this modal's own, keyed on data-rule
-  rather than on the element ids includes/passwordRules.jsp uses. That
+  rather than on the element ids WEB-INF/includes/passwordRules.jsp uses. That
   include says "at most one per page" because passwordRules.js caches its
   rules by id, and this modal travels to every page - Registration's own
   checklist would be the second copy. See the comment on the markup.
@@ -49,7 +49,7 @@
 <%-- The original URI, not the forwarded one - a servlet that forwards to
      its own JSP leaves getRequestURI() reporting the forward's target, so
      the reset would send the customer to a raw .jsp that skips its
-     servlet's doGet. See the fuller note in includes/loginModal.jsp. --%>
+     servlet's doGet. See the fuller note in WEB-INF/includes/loginModal.jsp. --%>
 <c:set var="forgotOriginalUri"
        value="${not empty requestScope['jakarta.servlet.forward.request_uri']
                 ? requestScope['jakarta.servlet.forward.request_uri']
@@ -99,7 +99,7 @@
               action="${pageContext.request.contextPath}/forgotPassword"
               method="post"
               novalidate>
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
             <input type="hidden" name="redirectTo" value="${fn:escapeXml(forgotRedirectTo)}">
 
@@ -156,7 +156,7 @@
 
             <%--
               A checklist of its own rather than <jsp:include> of
-              includes/passwordRules.jsp, and deliberately without ids.
+              WEB-INF/includes/passwordRules.jsp, and deliberately without ids.
               passwordRules.js looks its rules up by element id and caches
               them on load, so a second copy of that markup anywhere on the
               same page gives two boxes sharing one set of ids and only the

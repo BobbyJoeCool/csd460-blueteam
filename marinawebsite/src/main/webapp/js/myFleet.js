@@ -34,7 +34,7 @@
  * the boat belongs to the customer, and reject any field that isn't
  * editable - see the Validation Rules section of the My Fleet contract.
  *
- * Requires formValidation.js (loaded on every page by includes/loginModal.jsp
+ * Requires formValidation.js (loaded on every page by WEB-INF/includes/loginModal.jsp
  * through the header), modal.js (loaded on every page by the header) and
  * boatFields.js, which myFleet.jsp loads first.
  */

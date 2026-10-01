@@ -1,5 +1,5 @@
 <%--
-  src/main/webapp/includes/changePasswordModal.jsp
+  src/main/webapp/WEB-INF/includes/changePasswordModal.jsp
 
   Changing your own password while signed in, per the Edit User Profile
   contract. Posts to /editProfile/password (EditProfilePasswordServlet),
@@ -13,7 +13,7 @@
   the opposite case and lives with the login modal instead.
 
   Carries its own password checklist, keyed on data-rule rather than on the
-  element ids includes/passwordRules.jsp uses - see the note on that markup
+  element ids WEB-INF/includes/passwordRules.jsp uses - see the note on that markup
   below, and the matching one in forgotPasswordModal.jsp.
 
   Author: Miguel Fernandez
@@ -88,7 +88,7 @@
 
             <%--
               A checklist of its own rather than <jsp:include> of
-              includes/passwordRules.jsp, and deliberately without ids.
+              WEB-INF/includes/passwordRules.jsp, and deliberately without ids.
               passwordRules.js looks its rules up by element id and caches
               them on load, so a second copy of that markup anywhere on the
               same page gives two boxes sharing one set of ids and only the

@@ -39,12 +39,12 @@
 
     <title>Reservation Summary - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservationSummary.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
@@ -66,7 +66,7 @@
                  query string, so without this the confirmation number is lost on
                  the way back. --%>
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open('${signInRedirectTo}')">Sign In</button>
+                    data-sign-in="<c:out value="${signInRedirectTo}" />">Sign In</button>
             <p>
                 No account yet?
                 <a href="${pageContext.request.contextPath}/register">Create one</a>.
@@ -243,7 +243,7 @@
 </c:choose>
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 </body>
 </html>

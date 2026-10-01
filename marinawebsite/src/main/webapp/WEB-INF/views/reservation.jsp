@@ -24,12 +24,12 @@
 
     <title>Book a Slip - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
+    <jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservation.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
@@ -64,18 +64,15 @@
          from the current path, so they land back here. --%>
     <c:when test="${empty sessionScope.customerId}">
         <div class="reservation-signin">
+            <%-- data-sign-in-now: loginModal.js opens the box as soon as the
+                 page loads, since signing in is all this view is for. --%>
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open()">Sign In</button>
+                    data-sign-in data-sign-in-now>Sign In</button>
             <p>
                 No account yet?
                 <a href="${pageContext.request.contextPath}/register">Create one</a>.
             </p>
         </div>
-        <script>
-            window.addEventListener("DOMContentLoaded", function () {
-                MoffatBay.loginModal.open();
-            });
-        </script>
     </c:when>
 
     <c:otherwise>
@@ -179,7 +176,7 @@
 
                 <form id="reservationForm" class="reservation-steps"
                       action="${pageContext.request.contextPath}/reservation" method="post" novalidate>
-                    <jsp:include page="/includes/csrfField.jsp" />
+                    <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
                     <%-- BACKEND: a general failure message goes here. --%>
                     <div class="form-banner" id="formError" role="alert" hidden></div>
@@ -387,7 +384,7 @@
                 <form id="boatPanelForm"
                       action="${pageContext.request.contextPath}/reservation/boat"
                       method="post" novalidate>
-                    <jsp:include page="/includes/csrfField.jsp" />
+                    <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
                     <%-- The card's wrapper and heading belong to the page
                          including it, not to the shared fields. Registration
                          adds an "Optional" note here as well; this panel
@@ -398,7 +395,7 @@
 
                         <h2 class="column-heading">Boat Information</h2>
 
-                        <jsp:include page="/includes/boatInfoCard.jsp">
+                        <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp">
                             <jsp:param name="country" value="${sessionScope.customer.country}" />
                         </jsp:include>
 
@@ -443,7 +440,7 @@
 
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
 <script src="${pageContext.request.contextPath}/js/reservation.js?v=${applicationScope.assetVersion}"></script>

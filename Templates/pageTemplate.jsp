@@ -10,14 +10,14 @@
     Page:        (Page Name) (yourFileName.jsp)
 
     Every page shares this same shell:
-      1. /includes/styles.jsp   - site.css, header.css, footer.css, loginModal.css
+      1. /WEB-INF/includes/styles.jsp   - site.css, header.css, footer.css, loginModal.css
       2. this page's own stylesheet (linked AFTER styles.jsp, so it can override)
-      3. /includes/header.jsp   - nav + brand; also pulls in the login modal,
+      3. /WEB-INF/includes/header.jsp   - nav + brand; also pulls in the login modal,
                                    and with it formValidation.js + loginModal.js -
                                    don't load either of those two scripts again
                                    on this page
       4. page content in <main>
-      5. /includes/footer.jsp
+      5. /WEB-INF/includes/footer.jsp
       6. this page's own scripts (if any), loaded last, after formValidation.js
          has already arrived via the header
 
@@ -65,12 +65,12 @@
 
     <title>Page Title - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
+    <jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/PAGE_NAME.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="PAGE_NAME" />
 </jsp:include>
 
@@ -90,7 +90,7 @@
 
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <%-- Page-specific scripts, if any - formValidation.js is already loaded
      by the header include above, don't add it again here.

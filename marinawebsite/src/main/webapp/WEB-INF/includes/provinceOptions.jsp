@@ -7,7 +7,7 @@
   is Canada. Same fieldName/selected pattern as stateOptions.jsp:
 
     <select id="state" name="state">
-        <jsp:include page="/includes/provinceOptions.jsp">
+        <jsp:include page="/WEB-INF/includes/provinceOptions.jsp">
             <jsp:param name="fieldName" value="state" />
         </jsp:include>
     </select>

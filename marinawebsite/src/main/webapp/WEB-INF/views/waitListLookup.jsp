@@ -22,7 +22,7 @@
 
     <title>Wait List Lookup - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/waitListLookup.css?v=${applicationScope.assetVersion}">
@@ -30,7 +30,7 @@
 
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="waitlist" />
 </jsp:include>
 
@@ -113,7 +113,7 @@
 
                 <button type="button"
                         class="btn-primary"
-                        onclick="MoffatBay.loginModal.open()">
+                        data-sign-in>
                     Sign In
                 </button>
 
@@ -170,7 +170,7 @@
 
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 </body>
 </html>

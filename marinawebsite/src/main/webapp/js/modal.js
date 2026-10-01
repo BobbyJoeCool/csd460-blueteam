@@ -21,7 +21,7 @@
  * the Sign in / Reset password / Change password popups, whose own scripts
  * (loginModal.js, accountModals.js) call open() and close() here.
  *
- * Loaded on every page by includes/header.jsp, deferred, ahead of any
+ * Loaded on every page by WEB-INF/includes/header.jsp, deferred, ahead of any
  * page's own deferred script.
  */
 var MoffatBay = window.MoffatBay || {};

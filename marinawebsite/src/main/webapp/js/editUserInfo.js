@@ -20,7 +20,7 @@
  * see the contract's Validation Rules.
  *
  * Requires formValidation.js first (MoffatBay.form.*), which
- * includes/loginModal.jsp already loads on every page.
+ * WEB-INF/includes/loginModal.jsp already loads on every page.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -529,6 +529,24 @@ MoffatBay.editUserInfo = (function () {
                (modal.js), leaving every field as it was. */
             confirmButton.disabled = true;
             submitOnlyChanged(changedFields());
+        });
+    }
+
+    /* The two password links under the form. Their popups belong to
+       accountModals.js, loaded earlier through the header. */
+    var changeLink = document.getElementById("openChangePassword");
+    if (changeLink) {
+        changeLink.addEventListener("click", MoffatBay.accountModals.openChange);
+    }
+
+    var forgotLink = document.getElementById("openForgotPassword");
+    if (forgotLink) {
+        forgotLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            /* Pre-filled from the form's own email box, which holds
+               what's on file unless it's just been edited. */
+            var email = document.getElementById("email");
+            MoffatBay.accountModals.openForgot(email ? email.value : "");
         });
     }
 
