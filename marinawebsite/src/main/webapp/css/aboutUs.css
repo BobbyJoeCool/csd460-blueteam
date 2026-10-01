@@ -114,9 +114,12 @@
    Find us and reach us
    ========================================================================== */
 
+/* minmax(0, 1fr), not 1fr: a plain 1fr column won't shrink below its
+   widest unbreakable content (the email address), which pushed the cards
+   past the edge of a 320px phone. */
 .about-contact__grid {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 1.5rem;
 }
 
@@ -145,6 +148,11 @@
 	gap: 0.6rem;
 	margin: 0 0 0.55rem;
 	line-height: 1.5;
+}
+
+/* A longer address in future wraps instead of pushing the card wider. */
+.about-contact__line a {
+	overflow-wrap: anywhere;
 }
 
 .about-contact__label {
@@ -291,7 +299,7 @@
 
 	.about-facts__grid,
 	.about-contact__grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		max-width: 520px;
 		margin: 0 auto;
 	}
@@ -300,6 +308,19 @@
 @media (max-width: 40rem) {
 	.about-page {
 		padding: 2rem 1rem 3rem;
+	}
+
+	/* Label above its value on phones, so the email address gets the
+	   card's full width and doesn't break mid-word. flex: none undoes the
+	   label's 3.6rem width, which would otherwise become its height. */
+	.about-contact__line {
+		flex-direction: column;
+		gap: 0.1rem;
+	}
+
+	.about-contact__label {
+		flex: none;
+		padding-top: 0;
 	}
 
 	.about-page section + section {
