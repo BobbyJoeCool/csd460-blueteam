@@ -12,6 +12,11 @@
     <param-value>en_US</param-value>
   </context-param>
 
+  <!-- No <secure> here on purpose: Tomcat already marks the session cookie
+       Secure whenever the request came in over HTTPS, and forcing it on
+       would break sign-in on the class server, which runs plain HTTP.
+       (Behind a proxy that handles HTTPS, set up Tomcat's RemoteIpValve so
+       requests still count as secure.) -->
   <session-config>
     <session-timeout>30</session-timeout>
     <cookie-config>
@@ -23,10 +28,13 @@
        Tomcat (no code of ours). X-Frame-Options: DENY stops another site
        loading our pages in an invisible frame and tricking a click onto a
        button like "Yes, Cancel It"; X-Content-Type-Options: nosniff stops a
-       browser second-guessing a file's type. HSTS stays off: it only
-       applies over HTTPS, and the class server runs plain HTTP.
-       Cache-Control: no-store for signed-in pages is set separately, by
-       NoStoreFilter, so shared CSS, JS and images can still be cached. -->
+       browser second-guessing a file's type. HSTS is on, but Tomcat only
+       sends it on HTTPS responses, so it does nothing on the class server
+       and switches itself on once the site is served over HTTPS.
+       Content-Security-Policy and Referrer-Policy come from
+       SecurityHeadersFilter. Cache-Control: no-store for signed-in pages is
+       set separately, by NoStoreFilter, so shared CSS, JS and images can
+       still be cached. -->
   <filter>
     <filter-name>httpHeaderSecurity</filter-name>
     <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
@@ -44,7 +52,7 @@
     </init-param>
     <init-param>
       <param-name>hstsEnabled</param-name>
-      <param-value>false</param-value>
+      <param-value>true</param-value>
     </init-param>
   </filter>
   <filter-mapping>

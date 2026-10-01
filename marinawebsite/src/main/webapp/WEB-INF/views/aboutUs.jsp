@@ -33,12 +33,12 @@
 
     <title>About Us - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/aboutUs.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="about" />
 </jsp:include>
 
@@ -236,7 +236,7 @@
                   action="${pageContext.request.contextPath}/contact"
                   method="post"
                   novalidate>
-                <jsp:include page="/includes/csrfField.jsp" />
+                <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
                 <div class="contact-form__row">
                     <div class="form-group">
@@ -365,7 +365,7 @@
     </div>
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/aboutUs.js?v=${applicationScope.assetVersion}" defer></script>
 

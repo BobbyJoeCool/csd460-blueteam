@@ -5,7 +5,7 @@
     Shared global stylesheets.
     Include this file in the <head> of each page using:
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
 
     Page-specific stylesheets should still be linked separately
     after this include.

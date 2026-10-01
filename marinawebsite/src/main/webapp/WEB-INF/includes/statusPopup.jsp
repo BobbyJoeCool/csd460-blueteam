@@ -1,5 +1,5 @@
 <%--
-  src/main/webapp/includes/statusPopup.jsp
+  src/main/webapp/WEB-INF/includes/statusPopup.jsp
 
   The shared status popup - the small "that worked" message that slides in,
   waits about five seconds, and takes itself away. Included by header.jsp,

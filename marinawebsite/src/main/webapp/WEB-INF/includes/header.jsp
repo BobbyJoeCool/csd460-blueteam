@@ -2,7 +2,7 @@
   Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
   Primary Author/Owner - Sara White
 
-  src/main/webapp/includes/header.jsp
+  src/main/webapp/WEB-INF/includes/header.jsp
 
   Shared site header. Included by every page, which is what lets it show
   the signed-in state everywhere without each page checking the session
@@ -154,7 +154,7 @@
                 <form class="nav-logout-form"
                       action="${pageContext.request.contextPath}/logout"
                       method="post">
-                    <jsp:include page="/includes/csrfField.jsp" />
+                    <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
                     <button type="submit" class="nav-cta">Log Out</button>
                 </form>
 
@@ -163,7 +163,7 @@
 
                 <button type="button"
                     class="nav-cta"
-                    onclick="MoffatBay.loginModal.open()">Log In
+                    data-sign-in>Log In
                 </button>
 
             </c:otherwise>
@@ -183,9 +183,9 @@
 <script src="${pageContext.request.contextPath}/js/passwordToggle.js?v=${applicationScope.assetVersion}" defer></script>
 
 	<!-- Reusable login modal (pulls in its own scripts) -->
-	<jsp:include page="/includes/loginModal.jsp" />
+	<jsp:include page="/WEB-INF/includes/loginModal.jsp" />
 
 	<!-- Shared status popup - the "that worked" message. Renders empty on
 	     every page; any page can fill it with
 	     MoffatBay.statusPopup.show("..."). Pulls in its own script. -->
-	<jsp:include page="/includes/statusPopup.jsp" />
+	<jsp:include page="/WEB-INF/includes/statusPopup.jsp" />

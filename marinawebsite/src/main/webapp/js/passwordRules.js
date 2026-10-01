@@ -4,7 +4,7 @@
  * src/main/webapp/js/passwordRules.js
  *
  * Behavior for the "password must contain" checklist box
- * (includes/passwordRules.jsp). Requires formValidation.js to be
+ * (WEB-INF/includes/passwordRules.jsp). Requires formValidation.js to be
  * loaded first (uses MoffatBay.form.PASSWORD_RULES / checkPasswordRules).
  *
  * Finds its own rule <li> elements by the ids passwordRules.jsp

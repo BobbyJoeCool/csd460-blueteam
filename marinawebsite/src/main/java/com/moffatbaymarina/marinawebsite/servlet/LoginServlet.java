@@ -74,7 +74,7 @@ public class LoginServlet extends HttpServlet {
     /*
      * Session keys for the one-read failure message. Prefixed rather than
      * named "loginError" outright, so they can't collide with the
-     * page-scoped variables includes/loginModal.jsp reads them into, and so
+     * page-scoped variables WEB-INF/includes/loginModal.jsp reads them into, and so
      * it is obvious in a session dump where they came from. The modal
      * clears all four with <c:remove> as it renders; nothing else reads
      * them.

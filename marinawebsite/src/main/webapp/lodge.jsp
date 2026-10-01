@@ -4,7 +4,7 @@
   Placeholder for the Moffat Bay Lodge page. Stands here now so the Lodge
   card on the landing page has somewhere real to go, per the general rule
   in the page contracts: a page that doesn't have content yet still exists
-  as a JSP using includes/comingSoon.jsp, so the link works instead of
+  as a JSP using WEB-INF/includes/comingSoon.jsp, so the link works instead of
   going nowhere.
 
   Author: Robert Breutzmann
@@ -20,20 +20,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moffat Bay Lodge - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/comingSoon.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/WEB-INF/includes/header.jsp" />
 
 <main>
-    <jsp:include page="/includes/comingSoon.jsp">
+    <jsp:include page="/WEB-INF/includes/comingSoon.jsp">
         <jsp:param name="pageName" value="Moffat Bay Lodge" />
     </jsp:include>
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 </body>
 </html>

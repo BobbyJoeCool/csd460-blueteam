@@ -9,7 +9,7 @@
   stateOptions.jsp:
 
     <select id="country" name="country">
-        <jsp:include page="/includes/countryOptions.jsp">
+        <jsp:include page="/WEB-INF/includes/countryOptions.jsp">
             <jsp:param name="fieldName" value="country" />
         </jsp:include>
     </select>

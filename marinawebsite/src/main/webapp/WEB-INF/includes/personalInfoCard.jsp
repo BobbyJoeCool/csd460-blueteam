@@ -11,7 +11,7 @@
   submitted at all. That's how a page like Edit Account can pre-populate
   the card from an existing Customer record instead of a blank form:
 
-    <jsp:include page="/includes/personalInfoCard.jsp">
+    <jsp:include page="/WEB-INF/includes/personalInfoCard.jsp">
         <jsp:param name="defaultFirstName" value="${customer.firstName}" />
         <jsp:param name="defaultLastName" value="${customer.lastName}" />
         <jsp:param name="defaultPhoneCountryCode" value="${customer.phoneCountryCode}" />
@@ -99,7 +99,7 @@
     <div class="form-group" id="countryGroup">
         <label for="country">Country <span class="required-mark">*</span></label>
         <select id="country" name="country" required>
-            <jsp:include page="/includes/countryOptions.jsp">
+            <jsp:include page="/WEB-INF/includes/countryOptions.jsp">
                 <jsp:param name="fieldName" value="country" />
                 <jsp:param name="country" value="${countryValue}" />
             </jsp:include>
@@ -142,7 +142,7 @@
             <select id="state" name="state" ${countryValue == 'OTHER' ? 'disabled' : 'required'}>
                 <c:choose>
                     <c:when test="${countryValue == 'CA'}">
-                        <jsp:include page="/includes/provinceOptions.jsp">
+                        <jsp:include page="/WEB-INF/includes/provinceOptions.jsp">
                             <jsp:param name="fieldName" value="state" />
                             <jsp:param name="state" value="${stateValue}" />
                         </jsp:include>
@@ -151,7 +151,7 @@
                         <option value="">Not applicable</option>
                     </c:when>
                     <c:otherwise>
-                        <jsp:include page="/includes/stateOptions.jsp">
+                        <jsp:include page="/WEB-INF/includes/stateOptions.jsp">
                             <jsp:param name="fieldName" value="state" />
                             <jsp:param name="state" value="${stateValue}" />
                         </jsp:include>

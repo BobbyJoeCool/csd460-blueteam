@@ -42,13 +42,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Account - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css?v=${applicationScope.assetVersion}">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/editUserInfo.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="editprofile" />
 </jsp:include>
 
@@ -95,7 +95,7 @@
           action="${pageContext.request.contextPath}/editProfile"
           method="post"
           novalidate>
-        <jsp:include page="/includes/csrfField.jsp" />
+        <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
         <%--
           The same card Registration uses, pre-filled from the session
@@ -103,7 +103,7 @@
           has never carried the email field (it lives in Registration's own
           right column), so this page renders its own below.
         --%>
-        <jsp:include page="/includes/personalInfoCard.jsp">
+        <jsp:include page="/WEB-INF/includes/personalInfoCard.jsp">
             <jsp:param name="defaultFirstName" value="${sessionScope.customer.firstName}" />
             <jsp:param name="defaultLastName" value="${sessionScope.customer.lastName}" />
             <jsp:param name="defaultPhoneCountryCode" value="${sessionScope.customer.phoneCountryCode}" />
@@ -220,34 +220,14 @@
     </div>
 </div>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <%-- Signed-in only, so it lives on this page rather than with the login
-     modal. formValidation.js isn't loaded here - includes/loginModal.jsp
+     modal. formValidation.js isn't loaded here - WEB-INF/includes/loginModal.jsp
      already pulls it in through the header, on every page. --%>
-<jsp:include page="/includes/changePasswordModal.jsp" />
+<jsp:include page="/WEB-INF/includes/changePasswordModal.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/editUserInfo.js?v=${applicationScope.assetVersion}" defer></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var change = document.getElementById("openChangePassword");
-        var forgot = document.getElementById("openForgotPassword");
-
-        if (change) {
-            change.addEventListener("click", MoffatBay.accountModals.openChange);
-        }
-
-        if (forgot) {
-            forgot.addEventListener("click", function (event) {
-                event.preventDefault();
-                /* Pre-filled from the form's own email box, which holds
-                   what's on file unless it's just been edited. */
-                var email = document.getElementById("email");
-                MoffatBay.accountModals.openForgot(email ? email.value : "");
-            });
-        }
-    });
-</script>
 
 </body>
 </html>

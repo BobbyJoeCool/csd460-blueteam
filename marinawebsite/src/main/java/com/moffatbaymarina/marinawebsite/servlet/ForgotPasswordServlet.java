@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -77,7 +78,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     /*
      * Session keys for the one-read failure message, read and cleared by
-     * includes/forgotPasswordModal.jsp. Prefixed the same way as
+     * WEB-INF/includes/forgotPasswordModal.jsp. Prefixed the same way as
      * LoginServlet's, so the two can't collide.
      */
     private static final String FLASH_ERROR = "forgotFlashError";
@@ -152,6 +153,12 @@ public class ForgotPasswordServlet extends HttpServlet {
                 }
             }
 
+            // Whoever is signed in with the old password is out. The
+            // session making this reset stays as it was: from Edit User
+            // Info that's this customer, still signed in; from the sign-in
+            // popup it isn't signed in to begin with.
+            CustomerSession.endOtherSessions(customer.getCustomerId(), request.getSession(false));
+
             // No auto-login - the customer signs in with the new password
             // from here, same as any other password change. Auto-login
             // would turn the fixed demo code into a way to take over any
@@ -168,7 +175,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     /**
      * Puts the error message in the session and redirects back to the page
-     * the modal was opened on, where includes/forgotPasswordModal.jsp reads
+     * the modal was opened on, where WEB-INF/includes/forgotPasswordModal.jsp reads
      * it once, clears it, and renders already open with the message shown.
      *
      * <p><strong>Redirects; it does not forward.</strong> {@code redirectTo}
