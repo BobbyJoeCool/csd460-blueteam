@@ -71,6 +71,10 @@ MoffatBay.reservation = (function () {
     var openPanelBtn   = document.getElementById("openBoatPanel");
     var saveBoatBtn    = document.getElementById("saveBoat");
 
+    var confirmModal   = document.getElementById("confirmBookingModal");
+    var confirmText    = document.getElementById("confirmBookingText");
+    var confirmBtn     = document.getElementById("confirmBooking");
+
     var lastFocused = null;
 
     /* Free slips per dock per size, rendered into the page at load. Stale if
@@ -705,6 +709,34 @@ MoffatBay.reservation = (function () {
         }
         if (!ok) { return; }
 
+        /* A monthly lease gets an "are you sure?", the same as a changed
+           phone number on Your Account does. No popup on the page (it
+           failed to render) means book straight away, as before. */
+        if (!confirmModal || !confirmText || !confirmBtn) {
+            sendReservation();
+            return;
+        }
+        confirmText.textContent = bookingQuestion();
+        confirmBtn.disabled = false;
+        MoffatBay.modal.open(confirmModal);
+    }
+
+    /**
+     * The confirm popup's question, e.g. "Book a 50 ft slip on Dock B,
+     * starting Oct 15, 2026, for $483.00/mo?". Read from the Reservation
+     * Summary's own text rather than worked out again, so the popup can't
+     * say something different from the card beside it.
+     */
+    function bookingQuestion() {
+        var size  = summarySlip  ? summarySlip.textContent.replace(/ Slip$/, "") : "";
+        var dock  = summaryDock  ? summaryDock.textContent : "";
+        var date  = summaryDate  ? summaryDate.textContent : "";
+        var total = summaryTotal ? summaryTotal.textContent : "";
+        return "Book a " + size + " slip on " + dock
+             + ", starting " + date + ", for " + total + "?";
+    }
+
+    function sendReservation() {
         if (submitBtn) { submitBtn.disabled = true; }
 
         // Sends the reservation form to the reservation servlet for final validation
@@ -821,6 +853,16 @@ MoffatBay.reservation = (function () {
     if (declineBtn) { declineBtn.addEventListener("click", hideWaitList); }
 
     form.addEventListener("submit", handleSubmit);
+
+    /* One click, one booking. Go Back, the x, the backdrop and Escape just
+       close the popup (modal.js) and leave the form as it was. */
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", function () {
+            confirmBtn.disabled = true;
+            MoffatBay.modal.close(confirmModal);
+            sendReservation();
+        });
+    }
 
     /* The boat card's own Clear button. registration.js owns this on the
        Registration page, but that file can't be loaded here - it wires up

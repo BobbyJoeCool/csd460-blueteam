@@ -220,8 +220,8 @@
         <dl class="change-summary__list" id="confirmChangesList"></dl>
 
         <div class="modal__actions">
-            <button type="button" class="btn-outline" id="cancelSave" data-modal-close>Go Back</button>
-            <button type="button" class="btn-primary" id="confirmSave">Yes, Save</button>
+            <button type="button" class="btn-outline" id="cancelSave" data-modal-close>Keep Editing</button>
+            <button type="button" class="btn-primary" id="confirmSave">Save Changes</button>
         </div>
 
     </div>

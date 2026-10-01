@@ -82,7 +82,7 @@ This page includes the shared header/footer and identifies itself for nav highli
 | `reservationNumber` | Text | No | All or part of a confirmation number, e.g. `MB-00001` or `00001`. Letters, digits and hyphens only, up to 20 characters. |
 | `year` | Select | No | Lists only the years the customer has reservations in, plus All Years |
 | `month` | Select | No | 1–12, or All Months |
-| `status` | Select | No | `Active`, `Cancelled`, or All Statuses |
+| `status` | Select | No | `Active`, `Cancelled`, or All Statuses. **Updated 2026-09-30 (#303, beta test):** `Active` also covers leases shown as Upcoming, since their stored status is still `Active` |
 | `sort` | Select | No | `newest` (default) or `oldest` |
 
 ## Back End Parameters
@@ -110,7 +110,7 @@ Both share `ReservationDAO`'s one `SELECT_DETAILS` query with `findDetailsByConf
 The JSP displays the following values from each `ReservationDetails` object:
 
 - `confirmationNumber`
-- `reservationStatus` (shown as Lease Status)
+- `displayStatus` (shown as Lease Status). **Updated 2026-09-30 (#303, beta test):** was `reservationStatus`. An Active lease that hasn't started reads "Upcoming"; everything else shows the stored status
 - `startDate` (formatted `MMM d, yyyy`)
 - `dockNumber` and `slipNumber`
 - `slipSizeFt`

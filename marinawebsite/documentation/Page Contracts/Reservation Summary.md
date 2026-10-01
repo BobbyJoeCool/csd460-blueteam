@@ -123,6 +123,7 @@ live across four tables and the DAO joins them once.
 | `${reservation.confirmationNumber}` | String | e.g. `MB-00061` |
 | `${reservation.startDate}` | java.util.Date | Lease start. A `java.util.Date` rather than `LocalDate` on purpose - JSTL's `<fmt:formatDate>` only accepts one, and `rs.getDate()` already returns a `java.sql.Date`, so nothing is converted |
 | `${reservation.reservationStatus}` | String | `Active` / `Cancelled` / `Completed` |
+| `${reservation.displayStatus}` | String | **Added 2026-09-30 (#303, beta test).** Shown in the status band instead of `reservationStatus`: `Upcoming` when Active and not started, otherwise the stored status |
 | `${reservation.active}` | boolean | `reservationStatus` is `Active` |
 | `${reservation.started}` | boolean | **Added 2026-09-24.** Start date is today or earlier |
 | `${reservation.cancellable}` | boolean | **Added 2026-09-24.** Active and not started |

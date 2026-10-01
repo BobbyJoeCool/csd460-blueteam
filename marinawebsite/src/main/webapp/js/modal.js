@@ -71,7 +71,7 @@ MoffatBay.modal = (function () {
     /* The Back button. Browsers keep a snapshot of the page you just left
        (the back/forward cache) and Back restores that snapshot rather than
        reloading - and a page is usually left from INSIDE a popup, by its
-       "Yes, save" / "Yes, cancel it" button. Without this, Back lands on the
+       "Save Changes" / "Yes, cancel it" button. Without this, Back lands on the
        popup still open, as if the save hadn't happened. event.persisted is
        true only for a snapshot restore, never a normal load, so a popup a
        page opens on purpose while loading (My Fleet after a failed save) is

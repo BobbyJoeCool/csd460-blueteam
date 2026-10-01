@@ -267,7 +267,7 @@
                                 <div class="reservation-details__column">
                                     <p>
                                         <strong>Lease Status</strong><br>
-                                        <c:out value="${reservation.reservationStatus}" />
+                                        <c:out value="${reservation.displayStatus}" />
                                     </p>
 
                                     <c:if test="${not empty reservation.noticeStatus}">

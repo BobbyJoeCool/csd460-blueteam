@@ -648,9 +648,14 @@ main,
 	margin: 0;
 }
 
+/* The label keeps its own column and the old → new change always sits
+   beside it, wrapping inside that column when it is long. Letting the whole
+   row wrap put short changes beside their label and long ones (phone
+   numbers) underneath, so rows in the same list didn't line up. Phones
+   stack every row instead - see the media query below. */
 .change-summary__row {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: baseline;
 	gap: 0.5rem;
 	padding: 0.3rem 0;
@@ -669,6 +674,7 @@ main,
 }
 
 .change-summary__row dd {
+	flex: 1 1 0;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
@@ -696,7 +702,12 @@ main,
 }
 
 @media (max-width: 600px) {
-	.change-summary__row dt {
+	.change-summary__row {
+		flex-wrap: wrap;
+	}
+
+	.change-summary__row dt,
+	.change-summary__row dd {
 		flex-basis: 100%;
 	}
 }

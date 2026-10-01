@@ -411,6 +411,32 @@
             </div>
         </div>
 
+        <%-- Asked before booking, the same way Your Account asks before
+             saving. reservation.js fills in the question from the Reservation
+             Summary's own text, so the two can't disagree. Names the dock and
+             size, not a slip number - the server assigns that. --%>
+        <div class="modal" id="confirmBookingModal" role="dialog" aria-modal="true"
+             aria-labelledby="confirmBookingTitle" hidden>
+
+            <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+            <div class="modal__box modal__box--narrow">
+
+                <div class="modal__header">
+                    <h2 class="modal__title" id="confirmBookingTitle">Book this slip?</h2>
+                    <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+                </div>
+
+                <p class="modal__note" id="confirmBookingText"></p>
+
+                <div class="modal__actions">
+                    <button type="button" class="btn-outline" data-modal-close>Go Back</button>
+                    <button type="button" class="btn-primary" id="confirmBooking">Book Slip</button>
+                </div>
+
+            </div>
+        </div>
+
     </c:otherwise>
 </c:choose>
 
