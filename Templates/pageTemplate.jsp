@@ -47,6 +47,9 @@
         and .btn-outline for everything else. No page-specific button
         classes.
       - Popups use the shared .modal markup and js/modal.js.
+      - Every stylesheet and script link ends in
+        ?v=${applicationScope.assetVersion}, so browsers fetch the new file
+        after a deploy instead of reusing an old copy.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
@@ -63,7 +66,7 @@
     <title>Page Title - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/PAGE_NAME.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/PAGE_NAME.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
@@ -91,7 +94,7 @@
 
 <%-- Page-specific scripts, if any - formValidation.js is already loaded
      by the header include above, don't add it again here.
-<script src="${pageContext.request.contextPath}/js/PAGE_NAME.js"></script>
+<script src="${pageContext.request.contextPath}/js/PAGE_NAME.js?v=${applicationScope.assetVersion}"></script>
 --%>
 
 </body>

@@ -47,7 +47,7 @@
     <title>My Fleet - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <link rel="stylesheet" href="${ctx}/css/myFleet.css">
+    <link rel="stylesheet" href="${ctx}/css/myFleet.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
@@ -363,8 +363,8 @@
 
 <jsp:include page="/includes/footer.jsp" />
 
-<script src="${ctx}/js/boatFields.js"></script>
-<script src="${ctx}/js/myFleet.js" defer></script>
+<script src="${ctx}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
+<script src="${ctx}/js/myFleet.js?v=${applicationScope.assetVersion}" defer></script>
 
 </body>
 </html>

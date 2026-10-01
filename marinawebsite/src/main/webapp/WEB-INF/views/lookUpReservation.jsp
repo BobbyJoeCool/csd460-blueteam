@@ -66,7 +66,7 @@
     <title>My Reservations - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lookUpReservation.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lookUpReservation.css?v=${applicationScope.assetVersion}">
 </head>
 
 <body>
@@ -480,7 +480,7 @@
 
 <jsp:include page="/includes/footer.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/lookUpReservation.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/lookUpReservation.js?v=${applicationScope.assetVersion}" defer></script>
 
 </body>
 </html>

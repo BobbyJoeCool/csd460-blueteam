@@ -171,16 +171,16 @@
     </nav>
 </header>
 
-<script src="${pageContext.request.contextPath}/js/header.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/header.js?v=${applicationScope.assetVersion}" defer></script>
 
 <!-- Open/close for the shared .modal component (My Fleet, My Reservations).
      Deferred like the pages' own scripts, and earlier in the page, so it
      is ready before any of them runs. -->
-<script src="${pageContext.request.contextPath}/js/modal.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/modal.js?v=${applicationScope.assetVersion}" defer></script>
 
 <!-- Show/hide eye on every password field on the page, the modals below
      included. Deferred, so it runs after the whole page has been parsed. -->
-<script src="${pageContext.request.contextPath}/js/passwordToggle.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/passwordToggle.js?v=${applicationScope.assetVersion}" defer></script>
 
 	<!-- Reusable login modal (pulls in its own scripts) -->
 	<jsp:include page="/includes/loginModal.jsp" />

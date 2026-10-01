@@ -40,7 +40,7 @@
     <title>Reservation Summary - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservationSummary.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservationSummary.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 

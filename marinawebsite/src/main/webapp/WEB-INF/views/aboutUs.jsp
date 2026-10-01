@@ -34,7 +34,7 @@
     <title>About Us - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/aboutUs.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/aboutUs.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
@@ -367,7 +367,7 @@
 
 <jsp:include page="/includes/footer.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/aboutUs.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/aboutUs.js?v=${applicationScope.assetVersion}" defer></script>
 
 </body>
 </html>

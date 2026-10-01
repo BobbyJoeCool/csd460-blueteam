@@ -21,7 +21,7 @@
     <title>Moffat Bay Lodge - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/comingSoon.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/comingSoon.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 

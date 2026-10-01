@@ -25,7 +25,7 @@
     <jsp:include page="/includes/styles.jsp" />
 
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/waitListLookup.css">
+          href="${pageContext.request.contextPath}/css/waitListLookup.css?v=${applicationScope.assetVersion}">
 </head>
 
 <body>

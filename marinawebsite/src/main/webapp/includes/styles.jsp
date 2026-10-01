@@ -19,19 +19,19 @@
 <meta name="csrf-token" content="${fn:escapeXml(sessionScope.csrfToken)}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/site.css">
+      href="${pageContext.request.contextPath}/css/site.css?v=${applicationScope.assetVersion}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/header.css">
+      href="${pageContext.request.contextPath}/css/header.css?v=${applicationScope.assetVersion}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/footer.css">
+      href="${pageContext.request.contextPath}/css/footer.css?v=${applicationScope.assetVersion}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/loginModal.css">
+      href="${pageContext.request.contextPath}/css/loginModal.css?v=${applicationScope.assetVersion}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/statusPopup.css">
+      href="${pageContext.request.contextPath}/css/statusPopup.css?v=${applicationScope.assetVersion}">
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/passwordToggle.css">
+      href="${pageContext.request.contextPath}/css/passwordToggle.css?v=${applicationScope.assetVersion}">
