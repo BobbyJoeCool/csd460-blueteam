@@ -25,10 +25,6 @@
     <title>Book a Slip - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
-    <%-- registration.css carries registration-specific layout (form columns,
-         password fields, etc.). Shared form classes (.form-group, .field-error,
-         .callout-badge, .btn-primary, ...) now live in site.css. --%>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/registration.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservation.css">
 </head>
 <body>
@@ -56,7 +52,7 @@
             </c:choose>
         </p>
     </div>
-    <p class="hero-band__credit">Hero image created with Google Gemini</p>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
 </header>
 
 <main>
@@ -171,8 +167,8 @@
                     <div class="waitlist-prompt" id="waitListPrompt" hidden>
                         <p id="waitListQuestion"></p>
                         <div class="waitlist-actions">
-                            <button type="button" class="btn-primary" id="joinWaitList">Join the wait list</button>
-                            <button type="button" class="btn-clear-section" id="declineWaitList">No thanks</button>
+                            <button type="button" class="btn-action" id="joinWaitList">Join the wait list</button>
+                            <button type="button" class="btn-outline" id="declineWaitList">No thanks</button>
                         </div>
                         <div class="field-error" id="waitListError"></div>
                     </div>
@@ -221,7 +217,7 @@
                             </div>
                             <div class="field-error" id="boatError"></div>
 
-                            <button type="button" class="btn-clear-section" id="openBoatPanel">
+                            <button type="button" class="btn-outline" id="openBoatPanel">
                                 <c:choose>
                                     <c:when test="${empty ownedBoats}">Register your boat</c:when>
                                     <c:otherwise>Register another boat</c:otherwise>
@@ -262,7 +258,7 @@
                             </c:forEach>
                         </fieldset>
 
-                        <button type="button" class="btn-clear-section" id="autoPickDock" disabled>
+                        <button type="button" class="btn-outline" id="autoPickDock" disabled>
                             Pick a dock for me
                         </button>
 
@@ -364,25 +360,29 @@
 
         <%-- Register a Boat panel. Saves in the background - the page never
              reloads and nothing already filled in is lost. Reuses the
-             Registration page's boat card. --%>
-        <div class="boat-panel" id="boatPanel" role="dialog" aria-modal="true"
+             Registration page's boat card. The shared .modal, like My
+             Fleet's Add a Boat - modal.js opens and closes it. --%>
+        <div class="modal boat-panel" id="boatPanel" role="dialog" aria-modal="true"
              aria-labelledby="boatPanelTitle"
              data-country="${fn:escapeXml(sessionScope.customer.country)}" hidden>
-            <div class="boat-panel__backdrop" data-boat-close></div>
 
-            <div class="boat-panel__box">
-                <div class="boat-panel__header">
-                    <button type="button" class="boat-panel__close" data-boat-close
+            <button type="button" class="modal__backdrop" data-modal-close
+                    aria-label="Close" tabindex="-1"></button>
+
+            <div class="modal__box">
+                <div class="modal__header">
+                    <div>
+                        <h2 class="modal__title" id="boatPanelTitle">Register a Boat</h2>
+
+                        <p class="modal__note boat-panel__lead" id="boatPanelLead" hidden>
+                            You'll need a registered boat before you can reserve a slip.
+                        </p>
+                    </div>
+                    <button type="button" class="modal__close" data-modal-close
                             aria-label="Close">&times;</button>
-
-                    <h2 id="boatPanelTitle">Register a Boat</h2>
-
-                    <p class="boat-panel__lead" id="boatPanelLead" hidden>
-                        You'll need a registered boat before you can reserve a slip.
-                    </p>
                 </div>
 
-                <div class="form-banner" id="boatPanelError" role="alert" hidden></div>
+                <div class="form-banner boat-panel__error" id="boatPanelError" role="alert" hidden></div>
 
                 <form id="boatPanelForm"
                       action="${pageContext.request.contextPath}/reservation/boat"
@@ -404,8 +404,9 @@
 
                     </div>
 
-                    <div class="submit-row">
-                        <button type="submit" class="btn-primary" id="saveBoat">Save boat</button>
+                    <div class="modal__actions">
+                        <button type="button" class="btn-outline" data-modal-close>Cancel</button>
+                        <button type="submit" class="btn-primary" id="saveBoat">Save Boat</button>
                     </div>
                 </form>
             </div>

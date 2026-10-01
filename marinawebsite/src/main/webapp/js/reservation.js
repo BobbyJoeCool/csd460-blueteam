@@ -75,7 +75,6 @@ MoffatBay.reservation = (function () {
     var confirmText    = document.getElementById("confirmBookingText");
     var confirmBtn     = document.getElementById("confirmBooking");
 
-    var lastFocused = null;
 
     /* Free slips per dock per size, rendered into the page at load. Stale if
        the page sits open a while - the server has the final say on Submit. */
@@ -486,23 +485,17 @@ MoffatBay.reservation = (function () {
 
     // -------------------------------------------------------- boat panel
 
+    /* The panel is the shared .modal: modal.js shows it, focuses the first
+       field (Boat Name), and closes it from the backdrop, the x, Cancel or
+       Escape, handing focus back to whatever opened it. */
     function openBoatPanel() {
         if (!boatPanel) { return; }
-        lastFocused = document.activeElement;
-        boatPanel.hidden = false;
-        document.documentElement.style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
         setBanner(boatPanelError, "");
-        var first = document.getElementById("boatName");
-        if (first) { first.focus(); }
+        MoffatBay.modal.open(boatPanel);
     }
 
     function closeBoatPanel() {
-        if (!boatPanel) { return; }
-        boatPanel.hidden = true;
-        document.documentElement.style.overflow = "";
-        document.body.style.overflow = "";
-        if (lastFocused) { lastFocused.focus(); }
+        MoffatBay.modal.close(boatPanel);
     }
 
     /**
@@ -837,15 +830,6 @@ MoffatBay.reservation = (function () {
     }
     if (openPanelBtn) { openPanelBtn.addEventListener("click", openBoatPanel); }
     if (boatPanelForm){ boatPanelForm.addEventListener("submit", handleBoatSave); }
-
-    if (boatPanel) {
-        boatPanel.querySelectorAll("[data-boat-close]").forEach(function (el) {
-            el.addEventListener("click", closeBoatPanel);
-        });
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape" && !boatPanel.hidden) { closeBoatPanel(); }
-        });
-    }
 
     var joinBtn = document.getElementById("joinWaitList");
     var declineBtn = document.getElementById("declineWaitList");

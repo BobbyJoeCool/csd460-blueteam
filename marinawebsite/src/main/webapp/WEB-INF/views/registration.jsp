@@ -34,14 +34,14 @@
         <h1>Create Your Moffat Bay Marina Account</h1>
         <p class="hero-band__lede">An account is required to reserve a slip. It only takes a minute.</p>
     </div>
-    <p class="hero-band__credit">Hero image created with Google Gemini</p>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
 </header>
 
 <c:if test="${not empty requestScope.formError}">
     <div class="form-banner" role="alert">${fn:escapeXml(requestScope.formError)}</div>
 </c:if>
 
-<main>
+<main class="page-column page-column--wide">
     <form class="registration-form" method="post"
           action="${pageContext.request.contextPath}/register" id="registrationForm" novalidate>
         <jsp:include page="/includes/csrfField.jsp" />

@@ -63,30 +63,33 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css">
 
-<div class="login-modal <c:if test='${not empty forgotPasswordError}'>is-open</c:if>"
+<%-- The site's shared .modal (site.css), opened and closed through
+     js/modal.js like every other popup. --%>
+<div class="modal login-modal"
      id="forgotPasswordModal"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="forgotPasswordTitle">
+     aria-labelledby="forgotPasswordTitle"
+     <c:if test="${empty forgotPasswordError}">hidden</c:if>>
 
-    <div class="login-modal__backdrop" data-forgot-close></div>
+    <button type="button" class="modal__backdrop" data-modal-close
+            aria-label="Close password reset" tabindex="-1"></button>
 
-    <div class="login-modal__panel">
+    <div class="modal__box modal__box--narrow">
 
-        <button type="button"
-                class="login-modal__close"
-                data-forgot-close
-                aria-label="Close password reset">&times;</button>
-
-        <h2 class="login-modal__title" id="forgotPasswordTitle">Reset your password</h2>
+        <div class="modal__header">
+            <h2 class="modal__title" id="forgotPasswordTitle">Reset your password</h2>
+            <button type="button" class="modal__close" data-modal-close
+                    aria-label="Close password reset">&times;</button>
+        </div>
 
         <c:if test="${not empty forgotPasswordError}">
-            <p class="login-modal__error" role="alert">
+            <p class="form-banner login-modal__banner" role="alert">
                 <c:out value="${forgotPasswordError}"/>
             </p>
         </c:if>
 
-        <p class="login-modal__note">
+        <p class="modal__note login-modal__note">
             Enter your email and we'll send a verification code. Resetting your
             password also unlocks an account that's been locked.
         </p>
@@ -100,7 +103,7 @@
 
             <input type="hidden" name="redirectTo" value="${fn:escapeXml(forgotRedirectTo)}">
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="forgotEmail">Email address</label>
                 <input type="email"
                        id="forgotEmail"
@@ -109,10 +112,10 @@
                        maxlength="100"
                        autocomplete="email"
                        required>
-                <p class="login-modal__field-error" id="forgotEmailError"></p>
+                <p class="field-error" id="forgotEmailError"></p>
             </div>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="verificationCode">Verification code</label>
                 <input type="text"
                        id="verificationCode"
@@ -126,20 +129,20 @@
                      would only leave a tester stuck at a box that can't be
                      filled. See the contract's note on the simulated code. --%>
                 <p class="field-hint">Demo site - the code is 12345.</p>
-                <p class="login-modal__field-error" id="verificationCodeError"></p>
+                <p class="field-error" id="verificationCodeError"></p>
             </div>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="forgotNewPassword">New password</label>
                 <input type="password"
                        id="forgotNewPassword"
                        name="newPassword"
                        autocomplete="new-password"
                        required>
-                <p class="login-modal__field-error" id="forgotNewPasswordError"></p>
+                <p class="field-error" id="forgotNewPasswordError"></p>
             </div>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="forgotConfirmPassword">Confirm new password</label>
                 <%-- No name attribute: this never reaches the server. It
                      exists to catch a typo before the password is changed to
@@ -148,7 +151,7 @@
                        id="forgotConfirmPassword"
                        autocomplete="new-password"
                        required>
-                <p class="login-modal__field-error" id="forgotConfirmPasswordError"></p>
+                <p class="field-error" id="forgotConfirmPasswordError"></p>
             </div>
 
             <%--
@@ -175,7 +178,7 @@
                 </ul>
             </div>
 
-            <button type="submit" class="login-modal__submit">Reset password</button>
+            <button type="submit" class="btn-primary login-modal__submit">Reset password</button>
         </form>
 
     </div>

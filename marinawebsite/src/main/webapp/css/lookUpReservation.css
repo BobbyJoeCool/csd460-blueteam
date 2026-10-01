@@ -23,7 +23,7 @@
 
 .lookup-page {
     width: 100%;
-    max-width: 72rem;
+    max-width: var(--content-wide);
     margin: 0 auto;
     padding: 2.5rem 1.5rem 4rem;
 }
@@ -40,12 +40,12 @@
     text-align: center;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
 }
 
 .lookup-signin h2 {
     margin: 0 0 0.75rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.35rem;
     font-weight: normal;
     color: var(--color-text-heading);
@@ -65,12 +65,12 @@
     padding: 1.5rem;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
 }
 
 .reservation-lookup h2 {
     margin: 0 0 1.25rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.35rem;
     font-weight: normal;
     color: var(--color-text-heading);
@@ -101,24 +101,19 @@
     gap: 1.25rem;
 }
 
-.lookup-clear {
-    color: var(--color-link);
-    font-weight: 600;
-}
-
-.lookup-clear:hover {
-    color: var(--color-link-hover);
-}
 
 
 /* =========================================================
    RESULTS SECTION
    ========================================================= */
 
+/* Same treatment as the filter card above it: a tinted, bordered panel
+   with white reservation cards inside (as on the Wait List page). */
 .reservation-results {
     padding: 1.5rem;
-    background: var(--color-bg-surface);
-    border-radius: 10px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
 }
 
 .results-header {
@@ -135,7 +130,7 @@
 
 .results-header h2 {
     margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.35rem;
     font-weight: normal;
     color: var(--color-text-heading);
@@ -157,8 +152,8 @@
     padding: 1.5rem;
     border: 1px solid
         color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
-    background: var(--color-bg-card);
+    border-radius: var(--radius-inner);
+    background: var(--color-bg-surface);
 }
 
 .reservation-card:last-child {
@@ -170,7 +165,7 @@
     padding-bottom: 0.75rem;
     border-bottom: 1px solid
         color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: normal;
     color: var(--color-deep-marine);
@@ -273,7 +268,7 @@
     }
 }
 
-@media (max-width: 36rem) {
+@media (max-width: 40rem) {
 
     .lookup-page {
         padding: 1.5rem 1rem 3rem;
@@ -283,7 +278,7 @@
         grid-template-columns: 1fr;
     }
 
-    .lookup-form__actions .btn-primary {
+    .lookup-form__actions .btn-action {
         width: 100%;
         text-align: center;
     }

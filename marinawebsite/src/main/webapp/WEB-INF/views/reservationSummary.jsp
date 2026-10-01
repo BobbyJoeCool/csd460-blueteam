@@ -91,7 +91,7 @@
         </header>
 
         <div class="summary-error-actions">
-            <a class="btn-primary summary-link-button"
+            <a class="btn-action"
                href="${pageContext.request.contextPath}/reservations">Go to My Reservations</a>
         </div>
     </c:when>
@@ -234,7 +234,7 @@
                 </div>
 
                 <div class="summary-actions__buttons">
-                    <a class="btn-primary summary-link-button"
+                    <a class="btn-action"
                        href="${pageContext.request.contextPath}/reservations">Go to My Reservations</a>
                 </div>
             </section>

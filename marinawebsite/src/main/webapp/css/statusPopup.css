@@ -33,7 +33,7 @@
     gap: 0.75rem;
     max-width: min(32rem, calc(100vw - 2rem));
     padding: 0.75rem 0.75rem 0.75rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     /* A left bar rather than a full color wash: color is never the only
        signal, the words carry the message, and this still reads in
        greyscale. */

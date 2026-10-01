@@ -74,11 +74,11 @@
             Weigh anchor back at the homeport while we finish the map.
         </p>
 
-        <a class="coming-soon-home-link" href="${pageContext.request.contextPath}/">
+        <a class="btn-action" href="${pageContext.request.contextPath}/">
             Back to Home Port
         </a>
 
-        <p class="coming-soon-credit">Graphics for this page were designed by Claude Code.</p>
+        <p class="coming-soon-credit">Graphics created with Claude Code</p>
 
     </div>
 

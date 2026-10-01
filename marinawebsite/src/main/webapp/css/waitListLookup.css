@@ -21,7 +21,7 @@
 
 .waitlist-lookup-page {
     width: 100%;
-    max-width: 72rem;
+    max-width: var(--content-wide);
     margin: 0 auto;
     padding: 2.5rem 1.5rem 4rem;
 }
@@ -35,13 +35,13 @@
     padding: 1.5rem;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
 }
 
 .waitlist-availability-card h2,
 .your-waitlist-status h2 {
     margin: 0 0 1.25rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.35rem;
     font-weight: normal;
     color: var(--color-text-heading);
@@ -64,7 +64,7 @@
     padding: 1.5rem;
     border: 1px solid
         color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-inner);
     background: var(--color-bg-surface);
 }
 
@@ -73,7 +73,7 @@
     padding-bottom: 0.75rem;
     border-bottom: 1px solid
         color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: normal;
     color: var(--color-deep-marine);
@@ -99,11 +99,14 @@
    CUSTOMER WAITLIST STATUS
    ========================================================= */
 
+/* Same treatment as the availability card above it: a tinted, bordered
+   panel with white cards inside. */
 .your-waitlist-status {
     margin-top: 2rem;
     padding: 1.5rem;
-    background: var(--color-bg-surface);
-    border-radius: 10px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
 }
 
 .your-waitlist-status > p {
@@ -121,8 +124,8 @@
     padding: 1.5rem;
     border: 1px solid
         color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
-    background: var(--color-bg-card);
+    border-radius: var(--radius-inner);
+    background: var(--color-bg-surface);
 }
 
 .waitlist-entry-card h3 {
@@ -130,7 +133,7 @@
     padding-bottom: 0.75rem;
     border-bottom: 1px solid
         color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: normal;
     color: var(--color-deep-marine);
@@ -154,14 +157,14 @@
    RESPONSIVE LAYOUT
    ========================================================= */
 
-@media (max-width: 48rem) {
+@media (max-width: 56rem) {
 
     .waitlist-summary-grid {
         grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 36rem) {
+@media (max-width: 40rem) {
 
     .waitlist-lookup-page {
         padding: 1.5rem 1rem 3rem;

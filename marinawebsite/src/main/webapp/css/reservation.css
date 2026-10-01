@@ -11,7 +11,7 @@
  * centred hero, month-to-month notice band, three numbered step cards down
  * the left, sticky Reservation Summary down the right.
  *
- * Loaded after registration.css (registration-specific layout). Shared
+ * Shared
  * form classes (.form-group, .field-error, .callout-badge, .btn-primary,
  * etc.) live in site.css. Colors come from the semantic variables in
  * site.css - nothing outside that file's palette section should reference a
@@ -24,16 +24,19 @@
    its photo band, gradient, and heading styles. Only the page-specific
    layout below the hero remains here. */
 
+/* Same padding as every other page's column. This page used to get its
+   top padding from registration.css's rule on bare `main`, which it no
+   longer loads. */
 .reservation-wrap {
-    max-width: 72rem;
-    margin: 0 auto 4rem;
-    padding: 0 1.5rem;
+    max-width: var(--content-wide);
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
 }
 
 .reservation-signin {
-    max-width: 46rem;
-    margin: 0 auto 4rem;
-    padding: 0 1.5rem;
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
     text-align: center;
 }
 
@@ -45,7 +48,7 @@
     gap: 0.75rem;
     margin: 0 0 1.75rem;
     padding: 1rem 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     border: 1px solid color-mix(in srgb, var(--color-ocean-blue) 25%, transparent);
     background: color-mix(in srgb, var(--color-ocean-blue) 7%, var(--color-bg-surface));
 }
@@ -70,7 +73,7 @@
 .pricing-note {
     margin: 0 0 1.75rem;
     padding: 0.9rem 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     border-left: 4px solid var(--color-golden-hour);
     background: color-mix(in srgb, var(--color-golden-hour) 10%, var(--color-bg-surface));
     line-height: 1.5;
@@ -84,7 +87,7 @@
     margin: 0 0 1.75rem;
     padding: 1.5rem;
     background: var(--color-bg-surface);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
 }
 
 /* ---------------------------------------------------------------- layout */
@@ -96,7 +99,7 @@
     align-items: start;
 }
 
-@media (max-width: 60rem) {
+@media (max-width: 56rem) {
     .reservation-layout {
         grid-template-columns: 1fr;
     }
@@ -111,13 +114,13 @@
 
 .step-card {
     background: var(--color-bg-surface);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
     padding: 1.5rem;
 }
 
 .step-heading {
     margin: 0 0 1rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-weight: normal;
     font-size: 1.35rem;
     color: var(--color-text-heading);
@@ -145,7 +148,7 @@
     gap: 1rem;
 }
 
-@media (max-width: 52rem) {
+@media (max-width: 56rem) {
     .slip-sizes {
         grid-template-columns: 1fr;
     }
@@ -157,7 +160,7 @@
     gap: 0.4rem;
     padding: 1.1rem 1.2rem;
     border: 1px solid color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-inner);
     /* Informational, not a control - no pointer, nothing to click. */
     transition: opacity 150ms ease;
 }
@@ -175,7 +178,7 @@
 
 .slip-card__tier {
     padding: 0.1rem 0.6rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--color-ocean-blue);
     color: var(--color-cta-secondary-text);
     font-size: 0.75rem;
@@ -206,7 +209,7 @@
     align-self: flex-start;
     margin-top: 0.25rem;
     padding: 0.15rem 0.6rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--color-ocean-blue);
     color: var(--color-cta-secondary-text);
     font-size: 0.75rem;
@@ -241,7 +244,7 @@
     gap: 0.75rem;
 }
 
-@media (max-width: 52rem) {
+@media (max-width: 56rem) {
     .dock-choices {
         grid-template-columns: 1fr;
     }
@@ -253,7 +256,7 @@
     gap: 0.6rem;
     padding: 0.9rem 1rem;
     border: 1px solid color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-inner);
     cursor: pointer;
 }
 
@@ -336,7 +339,7 @@
     width: 100%;
     height: auto;
     border: 1px solid color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-inner);
     background: var(--color-bg-surface);
 }
 
@@ -353,7 +356,7 @@
 .availability-panel {
     margin-top: 1.25rem;
     padding: 0.875rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     border-left: 4px solid var(--color-error);
     background: color-mix(in srgb, var(--color-error) 6%, var(--color-bg-surface));
 }
@@ -406,12 +409,12 @@
        two can't drift. */
     position: sticky;
     top: calc(var(--header-height) + 1rem);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     background: var(--color-bg-surface);
 }
 
-@media (max-width: 60rem) {
+@media (max-width: 56rem) {
     .summary-card {
         position: static;
     }
@@ -528,85 +531,24 @@
 
 /* ------------------------------------------------------------ boat panel */
 
-.boat-panel {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    overflow: hidden;
-    padding: 2rem 1rem;
-}
-
-.boat-panel[hidden] {
-    display: none;
-}
-
-.boat-panel__backdrop {
-    position: fixed;
-    inset: 0;
-    background: var(--color-overlay-backdrop);
-}
-
-.boat-panel__box {
-    position: relative;
-    width: min(38rem, 100%);
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
-    background: var(--color-bg-page);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    padding: 1.5rem;
-}
-
-.boat-panel__header {
-    position: sticky;
-    top: -1.5rem;
-    margin: -1.5rem -1.5rem 0;
-    padding: 1.5rem 1.5rem 0.75rem;
-    background: var(--color-bg-page);
-    border-radius: 10px 10px 0 0;
-    z-index: 1;
-}
-
-.boat-panel__box h2 {
-    margin: 0 0 0.5rem;
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: normal;
-    color: var(--color-text-heading);
-}
+/* The Register a Boat panel is the shared .modal (site.css); only what is
+   particular to it is here. */
 
 .boat-panel__lead {
-    margin: 0;
+    margin-top: 0.35rem;
 }
 
 .boat-panel__lead[hidden] {
     display: none;
 }
 
-.boat-panel__close {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 2rem;
-    height: 2rem;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--color-text-body);
-    font-size: 1.5rem;
-    line-height: 1;
-    cursor: pointer;
-}
-
-.boat-panel__close:hover {
-    background: color-mix(in srgb, var(--color-charcoal-navy) 10%, transparent);
+.boat-panel__error {
+    max-width: none;
+    margin: 0 0 1rem;
 }
 
 /* The boat card is a form column on Registration; in this panel it is the
-   only thing there, so let it fill the width. Only the width - the column's
-   own 1.5rem of padding stays, or the fields sit against the card's edge. */
+   only thing there, so let it fill the width. */
 .boat-panel .form-column {
     width: 100%;
 }

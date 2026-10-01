@@ -22,8 +22,31 @@
          has already arrived via the header
 
     activePage below controls the nav's current-page highlight in
-    header.jsp - set it to one of: home, about, reservation, contact,
-    register. Leave it off (or unmatched) if this page isn't one of those.
+    header.jsp - set it to one of: home, about, reservation, waitlist,
+    lookup, myfleet, editprofile. Leave it off (or unmatched) if this page
+    isn't one of those.
+
+    Telling the customer what happened - pick by what the message is about:
+      - Toast (the shared status popup, MoffatBay.statusPopup.show() or
+        ?notice=...): success only, usually right after a redirect -
+        "Boat saved", "Reservation cancelled". It goes away by itself, so
+        never use it for an error.
+      - Banner (<div class="form-banner" role="alert">): an error about the
+        whole form or page - the save failed, the session ran out, the
+        server refused. Sits above the form and stays until the next try.
+        Inside a popup, the banner goes at the top of the popup.
+      - Field message (<div class="field-error">): an error about one field
+        - "Enter a valid email". Directly under that field, and the field
+        gets .field-invalid.
+
+    Layout and buttons (site.css has the details):
+      - A photo hero goes OUTSIDE <main>, as <header class="hero-band">.
+      - <main class="page-column"> for a form or reading page, or
+        "page-column page-column--wide" for a multi-column one.
+      - One .btn-primary per view (the page, or an open popup); .btn-action
+        and .btn-outline for everything else. No page-specific button
+        classes.
+      - Popups use the shared .modal markup and js/modal.js.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
@@ -48,7 +71,17 @@
     <jsp:param name="activePage" value="PAGE_NAME" />
 </jsp:include>
 
-<main>
+<%-- Optional photo hero - delete if this page has none.
+<header class="hero-band" id="PAGE_NAMEHero">
+    <div class="hero-band__content">
+        <h1>Page Title</h1>
+        <p class="hero-band__lede">One line about the page.</p>
+    </div>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
+</header>
+--%>
+
+<main class="page-column">
 
     <!-- Page content goes here -->
 

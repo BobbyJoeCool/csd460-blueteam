@@ -13,6 +13,10 @@
  * Requires formValidation.js to be loaded first (uses
  * MoffatBay.form.isValidEmail).
  *
+ * The modal itself is the shared .modal, so showing it, hiding it, Escape,
+ * the backdrop and putting focus back all go through js/modal.js - this
+ * file only adds what is particular to signing in.
+ *
  * Any page can open the modal with:
  *     MoffatBay.loginModal.open();
  * e.g. from the nav Log In control, or from the Registration page's
@@ -25,7 +29,6 @@ MoffatBay.loginModal = (function () {
 
     var modal = document.getElementById("loginModal");
     var form = document.getElementById("loginForm");
-    var lastFocused = null;
 
     /**
      * Shows the modal and moves focus into it.
@@ -40,7 +43,6 @@ MoffatBay.loginModal = (function () {
      */
     function open(redirectTo) {
         if (!modal) { return; }
-        lastFocused = document.activeElement;
 
         if (redirectTo) {
             // Both forms carry one - the sign-in form and the unlock-account
@@ -60,18 +62,16 @@ MoffatBay.loginModal = (function () {
             }
         }
 
-        modal.classList.add("is-open");
-        var email = document.getElementById("loginEmail");
-        if (email) { email.focus(); }
+        // modal.js focuses the first field (Email) and remembers what to
+        // hand focus back to.
+        MoffatBay.modal.open(modal);
     }
 
     /**
      * Hides the modal and returns focus to whatever opened it.
      */
     function close() {
-        if (!modal) { return; }
-        modal.classList.remove("is-open");
-        if (lastFocused) { lastFocused.focus(); }
+        MoffatBay.modal.close(modal);
     }
 
     /**
@@ -97,17 +97,6 @@ MoffatBay.loginModal = (function () {
 
     if (modal) {
 
-        // Backdrop and the X both close.
-        modal.querySelectorAll("[data-login-close]").forEach(function (el) {
-            el.addEventListener("click", close);
-        });
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape" && modal.classList.contains("is-open")) {
-                close();
-            }
-        });
-
         /* Opened by ?signIn=/somePage - a members-only page sent a signed-
            out visitor here (CustomerSession.sendToSignIn), and the JSP
            rendered the modal already open with that page as the return
@@ -118,7 +107,7 @@ MoffatBay.loginModal = (function () {
         if (window.URLSearchParams) {
             var params = new URLSearchParams(window.location.search);
             if (params.has("signIn")) {
-                if (modal.classList.contains("is-open")) {
+                if (!modal.hidden) {
                     var emailField = document.getElementById("loginEmail");
                     if (emailField) { emailField.focus(); }
                 }

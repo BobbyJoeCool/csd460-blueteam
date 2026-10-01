@@ -83,7 +83,7 @@
                 Your upcoming and past slip reservations.
             </p>
         </div>
-        <p class="hero-band__credit">Hero image created with Google Gemini</p>
+        <p class="hero-band__credit">Image created with Google Gemini</p>
     </header>
 
     <main class="lookup-page">
@@ -186,10 +186,10 @@
                 </div>
 
                 <div class="lookup-form__actions">
-                    <button type="submit" class="btn-primary">Apply Filters</button>
+                    <button type="submit" class="btn-action">Apply Filters</button>
 
                     <c:if test="${filtersApplied or oldestFirst or not empty filterError}">
-                        <a class="lookup-clear"
+                        <a class="btn-outline"
                            href="${pageContext.request.contextPath}/reservations">Clear filters</a>
                     </c:if>
                 </div>
@@ -340,7 +340,7 @@
             <c:when test="${filtersApplied}">
                 <section class="reservation-results lookup-empty">
                     <p class="lookup-message">No reservations match these filters.</p>
-                    <a class="lookup-clear" href="${pageContext.request.contextPath}/reservations">Clear filters</a>
+                    <a class="btn-outline" href="${pageContext.request.contextPath}/reservations">Clear filters</a>
                 </section>
             </c:when>
 

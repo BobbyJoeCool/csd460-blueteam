@@ -171,7 +171,7 @@
         <div class="field-error" id="zipError"></div>
     </div>
 
-    <button type="button" class="btn-clear-section" id="clearPersonalInfo">
+    <button type="button" class="btn-outline" id="clearPersonalInfo">
         Clear Personal Info
     </button>
 

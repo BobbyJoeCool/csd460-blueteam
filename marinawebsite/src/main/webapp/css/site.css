@@ -157,11 +157,51 @@
      the number here is the header's height rather than a guess at it. */
 	--header-height: 4.5rem;
 
-	/* Corner radius for a content card (.detail-card and anything that wants
-     to match it). Inner elements inside one stay smaller - a nested corner
-     reads wrong when it matches the box around it. */
-	--radius-card: 12px;
+	/* Corner radii. One per kind of object, so the same kind of thing has
+     the same corners on every page:
+       --radius-card     a card or panel sitting on the page
+       --radius-inner    a card nested inside another card - one step
+                         smaller, since a nested corner reads wrong when it
+                         matches the box around it
+       --radius-control  inputs, selects, buttons, banners
+       --radius-pill     fully rounded tags and status pills
+     Modals keep their own larger 14px - they float above the page rather
+     than sitting on it. */
+	--radius-card: 10px;
+	--radius-inner: 8px;
+	--radius-control: 6px;
+	--radius-pill: 999px;
+
+	/* Content column widths. Every page's main column uses one of these,
+     so the content edges stay put as you move between pages:
+       --content-narrow  forms, reading pages and single cards
+       --content-wide    multi-column layouts (Registration's three
+                         columns, Book a Slip's form and summary, card grids)
+     The exceptions are pages that are a single card rather than a column -
+     the error page, the coming-soon page and the Reservation Summary
+     receipt - which are sized to their card. */
+	--content-narrow: 60rem;
+	--content-wide: 72rem;
+
+	/* --------------------------------------------------------------------
+     4. Typography. Georgia for headings, Segoe UI for everything else.
+     Headings are set in plain Georgia, sentence or title case - no small
+     caps, no letter-spaced capitals - so a heading looks the same on
+     every page.
+     -------------------------------------------------------------------- */
+	--font-heading: Georgia, "Times New Roman", serif;
+	--font-body: "Segoe UI", Arial, sans-serif;
 }
+
+/* ==========================================================================
+   Breakpoints. Custom properties can't be used inside @media, so these are
+   written out as numbers - use only these three, max-width, in rem so they
+   follow the reader's font size:
+     40rem (640px)   phone: columns stack, buttons go full width
+     56rem (896px)   tablet: the header collapses to its menu button and
+                     two-column layouts become one
+     72rem (1152px)  wide: only for layouts that need extra room
+   ========================================================================== */
 
 /* ==========================================================================
    Global site styles
@@ -180,9 +220,18 @@ body {
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: var(--font-body);
     background: var(--color-bg-page);
     color: var(--color-text-body);
+}
+
+/* Browsers give buttons and form fields their own system font instead of
+   the page's, which is why some buttons and fields read as unstyled. */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
 }
 
 /* Sticky footer: every page's shell is header/main/footer as direct body
@@ -251,11 +300,17 @@ main,
    A page's id adds only its photo and overlay strength, since every image
    has its bright spots in a different place behind the text.
 
-   The one deliberate exception is the landing hero, which is taller and
-   louder than the rest because it is the site's first impression.
+   Two deliberate exceptions:
+     - The landing hero is taller and louder than the rest because it is
+       the site's first impression (#landingHero below).
+     - Reservation Summary has no photo band at all. It is a receipt, so
+       it opens with a check mark and a plain heading on the page
+       (.summary-hero in reservationSummary.css) - a confirmation should
+       read as a document, not as another banner.
 
-   Markup every hero follows (it sits outside <main> or in an unstyled one,
-   so it runs the full width of the window):
+   Markup every hero follows. It always sits outside <main>, between the
+   site header and main, so it runs the full width of the window. The
+   credit always reads "Image created with Google Gemini":
 
      <header class="hero-band" id="...Hero">
          <div class="hero-band__content">
@@ -274,6 +329,7 @@ main,
             reservation.jsp       (#reservationHero)
             myFleet.jsp           (#fleetHero)
             editUserInfo.jsp      (#accountHero)
+            waitListLookup.jsp    (#waitListLookupHero)
    -------------------------------------------------------------------------- */
 
 .hero-band {
@@ -294,7 +350,7 @@ main,
 
 .hero-band h1 {
     margin: 0 0 0.75rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-weight: normal;
     font-size: clamp(2rem, 5vw, 3rem);
     line-height: 1.15;
@@ -419,6 +475,13 @@ main,
     gap: 0.35rem;
 }
 
+/* A hint or error written as a <p> under a field. The group's gap does the
+   spacing; the browser's paragraph margins would add a second, larger gap
+   under some fields and not others. */
+.form-group > p {
+    margin: 0;
+}
+
 .form-group label {
     font-size: 0.9rem;
     font-weight: 600;
@@ -430,7 +493,7 @@ main,
 .form-group select {
     padding: 0.7rem 0.8rem;
     border: 1px solid var(--color-input-border);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--color-input-bg);
     color: var(--color-input-text);
     font-size: 0.95rem;
@@ -459,6 +522,108 @@ main,
     border-color: var(--color-error);
 }
 
+/* A field that can't be changed (Member since on Your Account, a reserved
+   boat's length on My Fleet). Styled as a value rather than an empty box
+   waiting for input, so nobody tries to type in it. */
+.form-group input:disabled,
+.form-group select:disabled {
+    background: transparent;
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+    color: var(--color-text-body);
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Page column — the centred content column under a hero.
+   Used by: registration.jsp (--wide), editUserInfo.jsp
+
+   For a page whose <main> has no layout wrapper of its own. Pages that
+   already have one (.fleet-page, .reservation-wrap, .lookup-page ...) set
+   the same max-width from --content-narrow / --content-wide themselves.
+   -------------------------------------------------------------------------- */
+
+.page-column {
+    width: 100%;
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+}
+
+.page-column--wide {
+    max-width: var(--content-wide);
+}
+
+/* --------------------------------------------------------------------------
+   Form layout — a titled column of fields, and rows that split in two.
+   Used by: registration.jsp, editUserInfo.jsp, reservation.jsp (boat
+            panel), myFleet.jsp (boat modal), through
+            includes/personalInfoCard.jsp and includes/boatInfoCard.jsp
+
+   Moved from registration.css, which every one of those pages used to load
+   just for these and so also picked up Registration's page width.
+   -------------------------------------------------------------------------- */
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 1.5rem;
+}
+
+.column-heading {
+    margin: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 1.1rem;
+    color: var(--color-text-heading);
+}
+
+.form-group.field-narrow input {
+    width: 6rem;
+}
+
+.form-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Country code + number. Stays side by side on a phone: the code box is
+   narrow, and stacking it left a lone 3-character box on its own row. */
+.form-row-split.form-row-split-phone {
+    grid-template-columns: 3.5rem 1fr;
+}
+
+@media (max-width: 40rem) {
+    .form-row-split:not(.form-row-split-phone) {
+        grid-template-columns: 1fr;
+    }
+}
+
+#phoneCountryCode {
+    text-align: center;
+}
+
+.submit-row {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Keeps a label's layout space (so the country code box lines up with the
+   Phone box beside it) without showing any text - the input carries its
+   accessible name via aria-label instead, since visibility: hidden also
+   hides it from most screen readers. */
+.visually-hidden {
+    visibility: hidden;
+}
+
 /* --------------------------------------------------------------------------
    Field error — validation message beneath a form field.
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
@@ -468,7 +633,13 @@ main,
 .field-error {
     color: var(--color-error);
     font-size: 0.82rem;
-    min-height: 1.1em;
+}
+
+/* No reserved space while there's no message. Not every field has an
+   error slot, so reserving a line under the ones that do left uneven gaps
+   down a form - wider under some fields than others. */
+.field-error:empty {
+    display: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -501,10 +672,10 @@ main,
    -------------------------------------------------------------------------- */
 
 .form-banner {
-    max-width: 960px;
+    max-width: var(--content-narrow);
     margin: 1.5rem auto 0;
     padding: 0.9rem 1.2rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-neutral));
     border: 1px solid var(--color-error);
     color: var(--color-error);
@@ -532,7 +703,7 @@ main,
     display: block;
     margin: 0.25rem 0 0.5rem;
     padding: 0.75rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: color-mix(in srgb, var(--color-golden-hour) 18%, var(--color-surface-neutral));
     border: 1px solid var(--color-golden-hour);
     color: var(--color-text-body);
@@ -549,9 +720,20 @@ main,
 }
 
 /* --------------------------------------------------------------------------
-   Primary button — the one CTA per page (coral background).
-   Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
-            reservationSummary.jsp, index.jsp
+   Buttons. Four shared classes and one modifier - no page defines its own:
+
+     .btn-primary   coral. The one main action of a view - one per page,
+                    and one per open popup ("Create Account", "Reserve My
+                    Slip", "Save Changes" in a popup).
+     .btn-action    filled ocean blue. Any other action that does something
+                    or goes somewhere ("Apply Filters", "Edit", "Go to My
+                    Reservations").
+     .btn-outline   outlined ocean blue. The lesser choice beside another
+                    button, or a quiet one ("Cancel", "Keep Editing",
+                    "Clear Personal Info").
+     .btn-on-dark   outlined in light sand, for a dark background.
+     .btn-danger    add to .btn-outline (offers a destructive action) or
+                    .btn-action (confirms it).
    -------------------------------------------------------------------------- */
 
 .btn-primary {
@@ -560,7 +742,7 @@ main,
     color: var(--color-cta-primary-text);
     border: none;
     padding: 0.85rem 1.5rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     font-family: inherit;
     font-size: 1rem;
     font-weight: 600;
@@ -580,52 +762,28 @@ main,
 }
 
 /* --------------------------------------------------------------------------
-   Secondary button — every button after the one primary CTA.
-   Used by: index.jsp
+   Button on a dark background (was .btn-secondary). Not used on a page
+   today - the header's Log In / Log Out are .nav-cta - but kept so a
+   button over a hero or the footer has a shared style to reach for.
    -------------------------------------------------------------------------- */
 
-.btn-secondary {
+.btn-on-dark {
     display: inline-block;
     background: transparent;
     color: var(--color-cta-secondary-text);
     border: 1px solid var(--color-cta-secondary-text);
     padding: 0.75rem 1.4rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     font-size: 0.95rem;
     font-weight: 600;
     text-decoration: none;
 }
 
-.btn-secondary:hover {
+.btn-on-dark:hover {
     background: var(--color-cta-secondary-bg-hover);
     border-color: var(--color-cta-secondary-bg-hover);
     color: var(--color-charcoal-navy);
 }
-
-/* --------------------------------------------------------------------------
-   Clear/reset section button — quiet outlined button for lesser actions.
-   Used by: registration.jsp (personal/boat info reset),
-            reservation.jsp (boat panel, decline wait list)
-   -------------------------------------------------------------------------- */
-
-.btn-clear-section {
-    align-self: flex-start;
-    margin-top: 0.25rem;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--color-text-body);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-clear-section:hover {
-    border-color: var(--color-cta-secondary-bg);
-    color: var(--color-cta-secondary-bg);
-}
-
 
 /* --------------------------------------------------------------------------
    "What changed" summary and the confirmation step.
@@ -701,7 +859,7 @@ main,
 	font-weight: 600;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 40rem) {
 	.change-summary__row {
 		flex-wrap: wrap;
 	}
@@ -718,7 +876,7 @@ main,
 	padding: 1.25rem 1.5rem;
 	background: var(--color-bg-card);
 	border: 1px solid var(--color-ocean-blue);
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 }
 
 .confirm-changes[hidden] {
@@ -742,9 +900,8 @@ main,
    Card title — the name of the thing a card is about.
    Used by: myFleet.jsp (boat name)
 
-   Small caps rather than full capitals: capitals keep their height while
-   lowercase letters drop to x-height, so a name keeps the shape a reader
-   recognises instead of flattening into a uniform block.
+   Plain Georgia like every other heading on the site (see Typography in
+   :root). This and .modal__title were the only small-caps headings.
    -------------------------------------------------------------------------- */
 
 .card-title {
@@ -752,12 +909,9 @@ main,
     padding-bottom: 0.625rem;
     border-bottom: 1px solid
         color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.4375rem;
     font-weight: normal;
-    font-variant: small-caps;
-    font-variant-caps: small-caps;
-    letter-spacing: 0.055em;
     text-align: center;
     color: var(--color-deep-marine);
 }
@@ -766,9 +920,9 @@ main,
    Detail card — a bordered panel about one record.
    Used by: myFleet.jsp (one per boat)
 
-   The same object as .reservation-card on Look Up Reservation, which
-   predates this and keeps its own 8px corners for now. If that page ever
-   adopts --radius-card, the two become one class.
+   The same object as .reservation-card on Look Up Reservation, which sits
+   inside a results panel and so takes --radius-inner; merging the two into
+   one class is #287.
    -------------------------------------------------------------------------- */
 
 .detail-card {
@@ -806,7 +960,7 @@ main,
 .record-badge {
     padding: 0.4375rem 0.75rem;
     border: 1px solid var(--color-record-badge-border);
-    border-radius: 7px;
+    border-radius: var(--radius-control);
     background: var(--color-record-badge-bg);
     text-align: center;
 }
@@ -866,7 +1020,7 @@ main,
     justify-content: center;
     gap: 0.1875rem 0.5625rem;
     padding: 0.375rem 0.875rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-size: 0.8125rem;
     line-height: 1.4;
     text-align: center;
@@ -912,18 +1066,27 @@ main,
 
 /* --------------------------------------------------------------------------
    Modal — backdrop, centred box, header with a close button.
-   Used by: myFleet.jsp (Add/Edit a boat, Remove confirmation),
-            lookUpReservation.jsp (Cancel, 30-day notice). Open/close: js/modal.js
+   Used by: every popup on the site - myFleet.jsp (Add/Edit a boat, Remove
+            confirmation), lookUpReservation.jsp (Cancel, 30-day notice),
+            editUserInfo.jsp (Save these changes?), reservation.jsp (boat
+            panel, Book this slip?), and the account popups in
+            includes/loginModal.jsp, forgotPasswordModal.jsp and
+            changePasswordModal.jsp. Open/close: js/modal.js
 
-   New with My Fleet. The login modal, the change-password modal and the
-   Reservation page's boat panel each hand-rolled their own before this
-   existed; they are deliberately left alone this module rather than
-   migrated, since all three are finished and tested. They are the obvious
-   candidates whenever someone is next in those files.
+   One backdrop, one close button, one Escape and focus handler for all of
+   them, so a fix to how popups behave is made once.
    -------------------------------------------------------------------------- */
 
 .modal[hidden] {
     display: none;
+}
+
+/* main is z-index 1 (it sits above the salmon watermark), which makes it a
+   stacking context: a popup inside it could never rise above the sticky
+   site header (z-index 10), so a tall popup's title slid under the header.
+   While one is open, main itself goes above the header. */
+main:has(.modal:not([hidden])) {
+    z-index: 101;
 }
 
 .modal {
@@ -969,12 +1132,9 @@ main,
 
 .modal__title {
     margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.3125rem;
     font-weight: normal;
-    font-variant: small-caps;
-    font-variant-caps: small-caps;
-    letter-spacing: 0.05em;
     color: var(--color-deep-marine);
 }
 
@@ -1029,23 +1189,23 @@ main,
 
 /* --------------------------------------------------------------------------
    Action buttons on a light surface — a filled one and its outlined pair.
-   Used by: myFleet.jsp (Edit / Remove on each card, and the modal actions)
+   See the button list above .btn-primary for when to use which.
 
-   .btn-secondary is white-bordered on purpose, for the dark hero it was
-   written for; on a card it disappears. These are the same idea in the
-   secondary CTA colour, for the light backgrounds the rest of the site
-   uses. The 44px minimum is a touch target, not padding - it is what makes
+   The 44px minimum is a touch target, not padding - it is what makes
    these usable on a phone, so it stays even when the type gets smaller.
+   align-self keeps one from stretching across a column layout (the Clear
+   buttons at the foot of a .form-column).
    -------------------------------------------------------------------------- */
 
 .btn-action,
 .btn-outline {
+    align-self: flex-start;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 44px;
     padding: 0.5625rem 1.25rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 600;
@@ -1075,6 +1235,19 @@ main,
     background: var(--color-cta-secondary-bg-hover);
     border-color: var(--color-cta-secondary-bg-hover);
     color: var(--color-charcoal-navy);
+}
+
+/* Keyboard focus, the same ring on every shared button. */
+.btn-primary:focus-visible,
+.btn-action:focus-visible,
+.btn-outline:focus-visible,
+.btn-on-dark:focus-visible {
+    outline: 2px solid var(--color-input-border-focus);
+    outline-offset: 2px;
+}
+
+.btn-on-dark:focus-visible {
+    outline-color: var(--color-sand);
 }
 
 .btn-action:disabled,

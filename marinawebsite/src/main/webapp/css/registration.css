@@ -5,21 +5,17 @@
  * CSD 460 - Capstone Project - Marina Website Project
  * Registration Page styles. Depends on site.css being linked first.
  *
- * Shared classes (.hero-band, .form-group, .field-error,
- * .required-mark, .field-hint, .form-banner, .callout-badge,
- * .btn-primary, .btn-clear-section) now live in site.css so every
- * page gets them. Only registration-specific layout remains here.
+ * Only Registration's own layout lives here, and no other page loads this
+ * file. The form layout the shared cards are built on (.form-column,
+ * .column-heading, .form-row-split, .submit-row ...) is in site.css, so a
+ * change here can't move Your Account, Book a Slip or My Fleet. The page
+ * width comes from .page-column--wide in site.css, not from a rule on
+ * bare `main`.
  */
 
 /* ==========================================================================
-   Registration form layout
+   Registration form layout - three columns
    ========================================================================== */
-
-main {
-	max-width: 1140px;
-	margin: 0 auto;
-	padding: 2.5rem 1.5rem 4rem;
-}
 
 .registration-form {
 	display: grid;
@@ -27,49 +23,14 @@ main {
 	gap: 2rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 56rem) {
 	.registration-form {
 		grid-template-columns: 1fr;
 		gap: 1rem;
 	}
 }
 
-.form-column {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	background: var(--color-bg-card);
-	border: 1px solid var(--color-border);
-	border-radius: 10px;
-	padding: 1.5rem;
-}
-
-.column-heading {
-	margin: 0;
-	padding-bottom: 0.75rem;
-	border-bottom: 1px solid var(--color-border);
-	font-size: 1.1rem;
-	color: var(--color-text-heading);
-}
-
-.form-group.field-narrow input {
-	width: 6rem;
-}
-
-.year-with-note {
-	display: flex;
-	align-items: flex-start;
-	gap: 0.75rem;
-}
-
-.boat-id-note {
-	margin: 0;
-	padding-top: 1.6rem;
-	font-size: 0.8rem;
-	color: var(--color-text-muted);
-	opacity: 0.85;
-}
-
+/* "Optional" tag and note at the top of the Boat Information column. */
 .column-intro {
 	display: flex;
 	flex-direction: column;
@@ -86,7 +47,7 @@ main {
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	padding: 0.2rem 0.6rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 }
 
 .column-note {
@@ -96,54 +57,12 @@ main {
 	opacity: 0.8;
 }
 
-.form-row-split {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 1rem;
-}
-
-@media (max-width: 480px) {
-	.form-row-split {
-		grid-template-columns: 1fr;
-	}
-}
-
-.form-row-split-phone {
-	grid-template-columns: 3.5rem 1fr;
-}
-
-@media (max-width: 480px) {
-	.form-row-split-phone {
-		grid-template-columns: 1fr;
-	}
-}
-
-.visually-hidden {
-	/* Keeps the label's layout space (so the country code box still
-	   lines up with the Phone box below its label) without showing
-	   any text - the input carries its accessible name via aria-label
-	   instead, since visibility: hidden also hides it from most
-	   screen readers. */
-	visibility: hidden;
-}
-
-#phoneCountryCode {
-	text-align: center;
-}
-
 /* Password column */
 
 .password-fields {
 	display: flex;
 	flex-direction: column;
 	gap: 0.4rem;
-}
-
-.submit-row {
-	margin-top: 0.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
 }
 
 .login-link {

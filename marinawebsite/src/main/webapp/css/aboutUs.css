@@ -12,7 +12,7 @@
  */
 
 .about-page {
-	max-width: 1080px;
+	max-width: var(--content-wide);
 	margin: 0 auto;
 	padding: 3rem 1.5rem 4rem;
 }
@@ -24,7 +24,7 @@
 .about-page h2 {
 	margin: 0 0 1.25rem;
 	color: var(--color-text-heading);
-	font-family: Georgia, "Times New Roman", serif;
+	font-family: var(--font-heading);
 	font-size: 1.9rem;
 }
 
@@ -57,7 +57,7 @@
 	display: block;
 	width: 100%;
 	height: auto;
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 	box-shadow: 0 8px 20px color-mix(in srgb, var(--color-charcoal-navy) 22%, transparent);
 }
 
@@ -83,7 +83,7 @@
 .about-fact {
 	background: var(--color-bg-card);
 	border: 1px solid var(--color-border);
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 	padding: 1.5rem;
 	text-align: center;
 }
@@ -91,7 +91,7 @@
 .about-fact__figure {
 	display: block;
 	color: var(--color-cta-secondary-bg);
-	font-family: Georgia, "Times New Roman", serif;
+	font-family: var(--font-heading);
 	font-size: 2.6rem;
 	line-height: 1;
 }
@@ -99,7 +99,7 @@
 .about-fact h3 {
 	margin: 0.5rem 0 0.65rem;
 	color: var(--color-text-heading);
-	font-family: Georgia, "Times New Roman", serif;
+	font-family: var(--font-heading);
 	font-size: 1.1rem;
 }
 
@@ -123,7 +123,7 @@
 .about-contact__card {
 	background: var(--color-bg-card);
 	border: 1px solid var(--color-border);
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 	padding: 1.5rem;
 }
 
@@ -200,7 +200,7 @@
 	margin: 0;
 	background: var(--color-surface-neutral);
 	border: 1px solid var(--color-border);
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 	padding: 1.25rem;
 }
 
@@ -229,7 +229,7 @@
 	margin: 0 auto;
 	background: var(--color-bg-card);
 	border: 1px solid var(--color-border);
-	border-radius: 10px;
+	border-radius: var(--radius-card);
 	padding: 1.75rem;
 }
 
@@ -242,7 +242,7 @@
 .contact-form textarea {
 	padding: 0.7rem 0.8rem;
 	border: 1px solid var(--color-input-border);
-	border-radius: 6px;
+	border-radius: var(--radius-control);
 	background: var(--color-input-bg);
 	color: var(--color-input-text);
 	font-family: inherit;
@@ -283,7 +283,7 @@
    Responsive
    ========================================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 56rem) {
 	.about-story {
 		grid-template-columns: 1fr;
 		gap: 1.75rem;
@@ -297,7 +297,7 @@
 	}
 }
 
-@media (max-width: 600px) {
+@media (max-width: 40rem) {
 	.about-page {
 		padding: 2rem 1rem 3rem;
 	}

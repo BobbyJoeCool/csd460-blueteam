@@ -64,11 +64,6 @@
     <title>My Fleet - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <%-- registration.css owns .form-column, .column-heading and the split
-         rows that boatInfoCard.jsp's markup depends on, so any page
-         including that card has to load it too - reservation.jsp and
-         editUserInfo.jsp already do the same. --%>
-    <link rel="stylesheet" href="${ctx}/css/registration.css">
     <link rel="stylesheet" href="${ctx}/css/myFleet.css">
 </head>
 <body>
@@ -77,11 +72,8 @@
     <jsp:param name="activePage" value="myfleet" />
 </jsp:include>
 
-<%-- The hero sits OUTSIDE <main>, as reservation.jsp's does and for the same
-     reason: it is a full-bleed banner, and this page loads registration.css
-     for the boat card's .form-column, which also restyles bare `main` with a
-     max-width and padding. Keeping the banner out of main means it spans the
-     window and meets the site header with nothing between them. --%>
+<%-- The hero sits outside <main>, like every hero on the site (see
+     .hero-band in site.css), so it spans the window. --%>
 <header class="hero-band" id="fleetHero">
     <div class="hero-band__content">
         <h1>My Fleet</h1>
@@ -90,7 +82,7 @@
             details, remove one you no longer own, or register a new one.
         </p>
     </div>
-    <p class="hero-band__credit">Hero image created with Google Gemini</p>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
 </header>
 
 <main>
@@ -431,7 +423,7 @@
             <input type="hidden" name="boatId" id="removeBoatId" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn-primary" id="confirmRemove">Yes, remove it</button>
+                <button type="submit" class="btn-action btn-danger" id="confirmRemove">Yes, remove it</button>
             </div>
         </form>
 
