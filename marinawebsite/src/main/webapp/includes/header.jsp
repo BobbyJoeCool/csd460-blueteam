@@ -107,7 +107,7 @@
             <c:when test="${sessionScope.loggedIn}">
 
                 <%-- The customer's own pages: My Reservations, My Fleet and
-                     User Profile. Same dropdown component as Plan Your
+                     Your Account. Same dropdown component as Plan Your
                      Stay; the --account modifier anchors the menu to the
                      right edge and keeps it a popup on mobile, where it
                      sits in the compact row. My Reservations is in Plan
@@ -142,7 +142,7 @@
 
                         <a href="${pageContext.request.contextPath}/editProfile"
                            class="${param.activePage == 'editprofile' ? 'nav-active' : ''}">
-                            User Profile
+                            Your Account
                         </a>
 
                     </div>

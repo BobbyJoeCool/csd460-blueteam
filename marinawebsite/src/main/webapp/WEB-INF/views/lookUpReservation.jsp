@@ -224,7 +224,7 @@
                         <article class="reservation-card"
                                  data-confirmation="${fn:escapeXml(reservation.confirmationNumber)}"
                                  data-boat-name="${fn:escapeXml(reservation.boatName)}"
-                                 data-location="Dock ${fn:escapeXml(reservation.dockNumber)}, Slip ${reservation.slipNumber}"
+                                 data-location="Dock ${fn:escapeXml(reservation.dockNumber)}, Slip ${reservation.slipNumber} (${fn:escapeXml(reservation.slipCode)})"
                                  data-start="<fmt:formatDate value='${reservation.startDate}' pattern='MMM d, yyyy' />"
                                  data-last-day="<fmt:formatDate value='${reservation.terminationDate}' pattern='MMM d, yyyy' />">
 
@@ -256,6 +256,7 @@
                                         <strong>Dock / Slip</strong><br>
                                         Dock <c:out value="${reservation.dockNumber}" />,
                                         Slip <c:out value="${reservation.slipNumber}" />
+                                        (<c:out value="${reservation.slipCode}" />)
                                     </p>
 
                                     <p>
@@ -289,7 +290,7 @@
                                     </p>
 
                                     <p>
-                                        <strong>Electrical Hookup</strong><br>
+                                        <strong>Electric Hookup</strong><br>
                                         ${reservation.electricalHookup ? 'Yes' : 'No'}
                                     </p>
                                 </div>
@@ -385,7 +386,7 @@
             <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
-                <button type="button" class="btn-outline" data-modal-close>Keep Reservation</button>
+                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Keep Reservation</button>
                 <button type="submit" class="btn-action btn-danger">Yes, Cancel It</button>
             </div>
         </form>
@@ -467,7 +468,7 @@
             <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
-                <button type="button" class="btn-outline" data-modal-close>Keep Notice</button>
+                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Keep Notice</button>
                 <button type="submit" class="btn-action">Yes, Withdraw It</button>
             </div>
         </form>

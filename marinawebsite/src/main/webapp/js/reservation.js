@@ -212,7 +212,7 @@ MoffatBay.reservation = (function () {
 
         if (dockHint) {
             if (!opt) {
-                setText(dockHint, "Pick your vessel above and we'll show which "
+                setText(dockHint, "Pick your boat above and we'll show which "
                                 + "docks have room for it.");
             } else if (!size) {
                 setText(dockHint, "");
@@ -314,7 +314,7 @@ MoffatBay.reservation = (function () {
 
         if (sizeHint) {
             if (!opt) {
-                setText(sizeHint, "Choose your vessel below and we'll highlight "
+                setText(sizeHint, "Choose your boat below and we'll highlight "
                                 + "the size it needs.");
             } else if (!boatSize) {
                 setText(sizeHint, opt.dataset.boatName + " is "

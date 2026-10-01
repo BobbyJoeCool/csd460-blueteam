@@ -788,7 +788,7 @@ main,
 /* --------------------------------------------------------------------------
    "What changed" summary and the confirmation step.
    Used by: editUserInfo.jsp (inline, beneath the form),
-            myFleet.jsp (inside the Edit modal, and above the fleet after a save)
+            myFleet.jsp (inside the Edit modal)
 
    Moved here from editUserInfo.css when My Fleet became the second user of
    the same rows. What differs between the two pages is the box around them,

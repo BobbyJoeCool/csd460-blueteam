@@ -12,10 +12,7 @@
                   each carrying its Active reservation's dock, slip, start
                   date and confirmation number when it has one. Empty or
                   absent renders the empty state, which is what this page
-                  does until MyFleetServlet exists.
-    changes     - Map<String, String[]> {old, new} for the fields that just
-                  changed, promoted out of the session by MyFleetServlet.doGet
-                  for exactly one render after a successful edit.
+                  when the customer has no boats.
     formError   - a banner message above the fleet.
     fieldErrors - Map<String, String> field name -> message, moved into each
                   field's error box inside the modal by myFleet.js.
@@ -41,20 +38,6 @@
 </c:if>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-
-<%--
-  Field name -> the words a person would use for it, for the "what changed"
-  summary and the confirmation step. Kept on the page rather than in the
-  servlet: it is display text, and the page is what decides how a column is
-  named to a customer. Same pattern as editUserInfo.jsp.
---%>
-<jsp:useBean id="boatFieldLabels" class="java.util.LinkedHashMap" scope="page" />
-<c:set target="${boatFieldLabels}" property="boatName" value="Boat name" />
-<c:set target="${boatFieldLabels}" property="boatType" value="Boat type" />
-<c:set target="${boatFieldLabels}" property="boatBeam" value="Boat beam" />
-<c:set target="${boatFieldLabels}" property="boatYear" value="Boat year" />
-<c:set target="${boatFieldLabels}" property="hin" value="HIN" />
-<c:set target="${boatFieldLabels}" property="regNumber" value="Registration number" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,54 +72,8 @@
 
     <div class="fleet-page">
 
-        <%--
-          What just changed. Rendered from the session flash MyFleetServlet
-          promotes in doGet, so it survives the redirect after a save but
-          shows exactly once - a refresh does not re-announce an old edit.
-
-          TODO(Carolina): set request attribute "changes", a
-          Map<String, String[]> of {old, new} keyed by field name - the same
-          shape EditProfileServlet already builds for Edit User Info, so that
-          is the one to copy. Stash it in the session on a successful edit and
-          promote it in MyFleetServlet.doGet so it survives the redirect and
-          shows exactly once.
-        --%>
-        <c:if test="${not empty changes}">
-            <div class="form-banner form-banner--success fleet-saved" id="changeSummary" role="status">
-                <div class="fleet-saved__head">
-                    <p class="change-summary__title">Saved. Here's what changed:</p>
-                    <button type="button" class="modal__close" id="dismissChangeSummary"
-                            aria-label="Dismiss">&times;</button>
-                </div>
-                <dl class="change-summary__list">
-                    <c:forEach var="change" items="${changes}">
-                        <div class="change-summary__row">
-                            <dt>
-                                <c:choose>
-                                    <c:when test="${not empty boatFieldLabels[change.key]}"><c:out value="${boatFieldLabels[change.key]}" /></c:when>
-                                    <c:otherwise><c:out value="${change.key}" /></c:otherwise>
-                                </c:choose>
-                            </dt>
-                            <dd>
-                                <span class="change-summary__old">
-                                    <c:choose>
-                                        <c:when test="${empty change.value[0]}"><em>empty</em></c:when>
-                                        <c:otherwise><c:out value="${change.value[0]}" /></c:otherwise>
-                                    </c:choose>
-                                </span>
-                                <span class="change-summary__arrow" aria-label="changed to">&rarr;</span>
-                                <span class="change-summary__new">
-                                    <c:choose>
-                                        <c:when test="${empty change.value[1]}"><em>empty</em></c:when>
-                                        <c:otherwise><c:out value="${change.value[1]}" /></c:otherwise>
-                                    </c:choose>
-                                </span>
-                            </dd>
-                        </div>
-                    </c:forEach>
-                </dl>
-            </div>
-        </c:if>
+        <%-- A successful edit is confirmed by the "Boat updated" toast, after
+             the popup has already shown exactly what was about to change. --%>
 
         <%-- Page-level errors only (e.g. a Remove that was turned down). An
              error from a failed Add or Edit belongs to the popup that reopens
@@ -200,12 +137,10 @@
                                                      documentation/definitions_decisions.md. --%>
                                                 <span class="status-pill__code">(<c:out value="${boat.activeDockNumber}" />-<fmt:formatNumber value="${boat.activeSlipNumber}" minIntegerDigits="2" />)</span>
                                             </span>
-                                            <%-- TODO(Carolina): Boat needs a
-                                                 getActiveStartDateDisplay() returning the
-                                                 already-formatted date. fmt:formatDate cannot
-                                                 take a LocalDate, which is exactly why Customer
-                                                 has getDateJoinedDisplay() - same pattern. This
-                                                 one is NOT in the contract yet. --%>
+                                            <%-- Boat.getActiveStartDateDisplay() arrives
+                                                 already formatted: fmt:formatDate cannot take a
+                                                 LocalDate (same pattern as Customer's
+                                                 getDateJoinedDisplay()). --%>
                                             <span class="status-pill__detail">since
                                                 <c:out value="${boat.activeStartDateDisplay}" />
                                                 &middot; <c:out value="${boat.activeConfirmationNumber}" /></span>
@@ -300,11 +235,10 @@
   stack first, and escaped here rather than built into a script literal, so a
   message can never be markup. Same pattern as editUserInfo.jsp.
 
-  TODO(Carolina): on a validation failure, forward back here with
-  "fieldErrors" (Map<String, String> of field name -> message), "formError"
-  (a String for the banner above the fleet), "openForm" ("add" or "edit") and
-  "editBoatId" (the boat being edited). myFleet.js reads openForm on load and
-  reopens the right modal with the typed values still in it.
+  On a validation failure MyFleetAddServlet / MyFleetEditServlet forward
+  back here with "fieldErrors" (field name -> message), "formError",
+  "openForm" ("add" or "edit") and "editBoatId". myFleet.js reads openForm on
+  load and reopens the right modal with the typed values still in it.
 --%>
 <c:if test="${not empty fieldErrors}">
     <div id="serverFieldErrors" hidden>
@@ -337,9 +271,8 @@
 
         <div class="form-banner form-banner--error" id="boatModalError" role="alert" hidden></div>
 
-        <%-- TODO(Carolina): this form posts to /myFleet/add, and myFleet.js
-             swaps the action to /myFleet/edit in edit mode. Needs
-             MyFleetAddServlet and MyFleetEditServlet; both URLs 404 until then.
+        <%-- Posts to /myFleet/add (MyFleetAddServlet); myFleet.js swaps the
+             action to /myFleet/edit (MyFleetEditServlet) in edit mode.
 
              Add sends every field. Edit sends ONLY the changed ones plus
              boatId - a key's absence means "untouched", a key present and
@@ -411,18 +344,16 @@
             slip. Any reservation it has already had is kept.
         </p>
 
-        <%-- TODO(Carolina): posts boatId to /myFleet/remove. Needs
-             MyFleetRemoveServlet, which ENDS the BoatOwnership row
-             (endDate = CURRENT_DATE) rather than deleting the Boat - a boat
-             that has ever been reserved cannot be deleted without breaking
-             reservation history. Re-check for an Active reservation inside the
-             transaction; the disabled button on a reserved card is courtesy,
-             not enforcement. 404s until that servlet exists. --%>
+        <%-- Posts boatId to /myFleet/remove. MyFleetRemoveServlet ENDS the
+             BoatOwnership row rather than deleting the Boat - a boat that has
+             ever been reserved can't be deleted without breaking reservation
+             history - and re-checks for an Active reservation itself; the
+             disabled button on a reserved card is courtesy, not enforcement. --%>
         <form id="removeForm" action="${ctx}/myFleet/remove" method="post">
             <jsp:include page="/includes/csrfField.jsp" />
             <input type="hidden" name="boatId" id="removeBoatId" value="">
             <div class="modal__actions">
-                <button type="button" class="btn-outline" data-modal-close>Cancel</button>
+                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Cancel</button>
                 <button type="submit" class="btn-action btn-danger" id="confirmRemove">Yes, remove it</button>
             </div>
         </form>

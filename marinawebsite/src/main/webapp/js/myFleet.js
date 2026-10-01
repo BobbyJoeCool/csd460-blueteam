@@ -25,11 +25,9 @@
  * customer's typed values come back through the card - which is why this
  * file reads #boatModal's data-open-form on load.
  *
- * TODO(Carolina): every submit here goes to a URL that does not exist yet -
- * /myFleet/add, /myFleet/edit and /myFleet/remove all 404 until the three
- * servlets land. That is the expected state while building, not a bug in this
- * file. The one rule worth repeating from the contract: on an edit this sends
- * ONLY the fields that changed, plus boatId. A key's absence means
+ * Submits go to /myFleet/add, /myFleet/edit and /myFleet/remove. The one
+ * rule worth repeating from the contract: on an edit this sends ONLY the
+ * fields that changed, plus boatId. A key's absence means
  * "untouched"; a key present and empty means "clear that column to NULL".
  *
  * None of this is trusted. The servlets re-check every value, re-check that
@@ -673,14 +671,6 @@ MoffatBay.myFleet = (function () {
             setBanner("");
             clearFieldErrors();
             updateSaveState();
-        });
-    }
-
-    var dismissSummary = document.getElementById("dismissChangeSummary");
-    if (dismissSummary) {
-        dismissSummary.addEventListener("click", function () {
-            var panel = document.getElementById("changeSummary");
-            if (panel) { panel.remove(); }
         });
     }
 
