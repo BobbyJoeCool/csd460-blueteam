@@ -212,7 +212,7 @@ The boat then drops off My Fleet and out of the Reservation page's dropdown (bot
 
 **A boat with an Active reservation can't be removed.** The servlet re-checks this inside the transaction (not just trusting a disabled button) and rejects with a message pointing the customer to cancel the reservation first. Otherwise the marina would have an Active slip reservation for a boat no one owns.
 
-**Re-adding a removed boat — resolved 2026-09-21: option (a).** `HIN` and `regNumber` stay `UNIQUE` on the `Boat` row after removal, so adding the same boat again later fails with "That HIN or boat registration is already in use." We accept that for now; the customer calls the Marina. Re-linking an ownerless boat on Add, and the trading/selling flow it would start, are **out of scope for this module**.
+**Superseded 2026-10-01 by #254: a removed boat can now be added again and keeps its row (see the 2026-10-01 note under Validation Rules).** Original decision: **Re-adding a removed boat — resolved 2026-09-21: option (a).** `HIN` and `regNumber` stay `UNIQUE` on the `Boat` row after removal, so adding the same boat again later fails with "That HIN or boat registration is already in use." We accept that for now; the customer calls the Marina. Re-linking an ownerless boat on Add, and the trading/selling flow it would start, are **out of scope for this module**.
 
 ### Adding a Boat
 
@@ -312,13 +312,19 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 - **Client-side (UX only, not trusted):** the same live checks `boatInfoCard.jsp` already gets on Registration and the Reservation page (required marks, HIN pattern, registration format by country, year digits, "HIN or Registration Number"), through the shared `js/boatFields.js`. Edit also tracks touched fields and builds the old → new confirmation list.
 - **Server-side (source of truth):** exactly `ReservationBoatServlet`'s rules — but returning **every** failing field, not just the first. On Edit: ownership check first, then reject any non-editable key, then validate all changed fields, then write all or nothing. On Remove: ownership check, then Active-reservation check inside the transaction, then `endOwnership()`.
 - **Updated 2026-10-01 (#253):** `BoatValidator.validateAdd(...)` is now the one set of add-a-boat rules for all three paths. My Fleet passes `requireIdentifier = true`, Book a Slip the same, and Registration `false`. The HIN and Registration Number messages now say what a valid one looks like ("HIN should be 12 characters…", "…e.g. WN1234 AB").
+- **Re-adding a removed boat, added 2026-10-01 (#254):** removing a boat keeps its row, so a boat whose HIN or Registration Number is already on file is now handled by who owns it. If **nobody owns it now** (its owner removed it, or sold it), adding it **reuses the existing row**: `BoatDAO.addOrReclaim` updates the details and opens a new ownership, so the boat keeps one ID and its reservation history. If **this customer** already owns it: "That boat is already in your fleet." If **another customer** owns it: "This boat is registered to another account. Please contact the marina office." (never saying whose). A HIN and Registration Number that belong to two different boats, or a Registration Number whose boat on file has a different HIN, are refused with a call-the-office message. The same rules apply on Registration, Book a Slip and My Fleet. Edit still refuses any HIN or Registration Number another boat row uses.
 
 ## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
 | One or more fields fail validation (Add or Edit) | Each failing field's own message, all at once; nothing saved | Inline under each field in the reopened modal |
-| `HIN` or `regNumber` already belongs to another boat | "That HIN or boat registration is already in use." | Inline under the field (or modal banner if it only surfaces at insert) |
+| The boat is already in this customer's fleet | "That boat is already in your fleet." | Inline under the HIN or Registration Number field |
+| Another customer currently owns the boat | "This boat is registered to another account. Please contact the marina office." | Inline under the field that matched |
+| The HIN and Registration Number belong to two different boats | "That HIN and registration number belong to two different boats. Please contact the marina office." | Modal banner (`#boatSectionError`) |
+| The Registration Number is on file with a different HIN | "That registration number belongs to another boat. Please contact the marina office." | Inline under Registration Number |
+| The boat is on file but nobody owns it now (removed, or sold) | Not an error: the existing boat is reused, keeping its history (#254) | Saved normally, "Boat added" toast |
+| Edit: `HIN` or `regNumber` already belongs to another boat | "That HIN is already in use." / "That boat registration is already in use." | Inline under the field |
 | Neither HIN nor Registration Number | "Enter either a HIN or a Registration Number." | Modal banner (`#boatSectionError`) |
 | Remove on a boat with an Active reservation | "This boat can't be removed from your account while it's part of an active reservation (Dock A, Slip 2 (A-02))." (**reworded 2026-09-24**) | Status popup on `myFleet.jsp` |
 | `boatId` missing, not a number, or not owned by this customer | "That boat couldn't be found in your fleet." — same text for every case | Status popup; nothing written |

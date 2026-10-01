@@ -165,7 +165,8 @@ public class RegisterServlet extends HttpServlet {
 						boatDAO,
 						BoatValidator.cleanBoatValues(request),
 						country,
-						false);
+						false,
+						null);
 				boatError = boatErrors.isEmpty()
 						? null
 						: boatErrors.values().iterator().next();
@@ -289,12 +290,9 @@ public class RegisterServlet extends HttpServlet {
                 boat.setBoatBeam(boatBeam);
                 boat.setBoatYear(boatYear);
 
-                int boatId = boatDAO.insertBoat(conn, boat);
-
-                boatDAO.insertOwnership(
-                    conn, 
-                    boatId, 
-                    customerId);
+                // Reuses the boat's old row if it's on file and nobody
+                // owns it now, e.g. a new customer who bought it.
+                boatDAO.addOrReclaim(conn, boat, customerId);
             }
 
             conn.commit();

@@ -93,7 +93,7 @@ public class ReservationBoatServlet extends HttpServlet {
         Map<String, String> errors;
         try (Connection conn = DBConnection.getConnection()) {
             errors = BoatValidator.validateAdd(
-                    conn, boatDAO, BoatValidator.cleanBoatValues(request), country, true);
+                    conn, boatDAO, BoatValidator.cleanBoatValues(request), country, true, customerId);
         } catch (SQLException e) {
             throw new ServletException("Boat could not be checked.", e);
         }
@@ -115,8 +115,8 @@ public class ReservationBoatServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                int boatId = boatDAO.insertBoat(conn, boat);
-                boatDAO.insertOwnership(conn, boatId, customerId);
+                // Reuses the boat's old row if it's on file and nobody owns it now.
+                int boatId = boatDAO.addOrReclaim(conn, boat, customerId);
                 BigDecimal perFootRate = reservationDAO.getRate(
                         conn, "SLIP_PER_FOOT_MONTHLY");
                 conn.commit();

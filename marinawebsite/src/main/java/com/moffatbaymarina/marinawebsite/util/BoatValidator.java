@@ -93,6 +93,8 @@ public final class BoatValidator {
      * @param country the owner's country, which decides the Registration
      *        Number format
      * @param requireIdentifier whether a HIN or Registration Number is required
+     * @param customerId the customer adding the boat, or {@code null} at
+     *        Registration, where the account doesn't exist yet
      * @return field name to message, in form order; empty when valid
      * @throws SQLException if a duplicate check fails
      */
@@ -101,7 +103,8 @@ public final class BoatValidator {
             BoatDAO boatDAO,
             Map<String, String> values,
             String country,
-            boolean requireIdentifier)
+            boolean requireIdentifier,
+            Integer customerId)
             throws SQLException {
 
         Map<String, String> errors = new LinkedHashMap<>();
@@ -219,37 +222,83 @@ public final class BoatValidator {
             );
         }
 
-        // Duplicate HIN
-        if (!hin.isBlank()
-                && !errors.containsKey("hin")
-                && boatDAO.hinInUseByAnotherBoat(
-                        conn,
-                        hin,
-                        0
-                )) {
-
-            errors.put(
-                    "hin",
-                    "That HIN is already in use."
-            );
-        }
-
-        // Duplicate Registration Number
-        if (!regNumber.isBlank()
-                && !errors.containsKey("regNumber")
-                && boatDAO.regNumberInUseByAnotherBoat(
-                        conn,
-                        regNumber,
-                        0
-                )) {
-
-            errors.put(
-                    "regNumber",
-                    "That boat registration is already in use."
-            );
+        // Already on file? Only checked once both identifiers are well-formed.
+        if (!errors.containsKey("hin") && !errors.containsKey("regNumber")) {
+            checkBoatOnFile(conn, boatDAO, hin, regNumber, customerId, errors);
         }
 
         return errors;
+    }
+
+    /**
+     * What to do when a boat being added is already on file (#254).
+     * Removing a boat ends its ownership but keeps its row, so the same boat
+     * can come back - re-added by its owner, or added by whoever bought it.
+     * Only a boat someone currently owns is refused; one nobody owns passes
+     * here and is reclaimed by {@code BoatDAO.addOrReclaim}, keeping its ID
+     * and history.
+     */
+    private static void checkBoatOnFile(
+            Connection conn,
+            BoatDAO boatDAO,
+            String hin,
+            String regNumber,
+            Integer customerId,
+            Map<String, String> errors)
+            throws SQLException {
+
+        BoatDAO.IdentifierMatch hinMatch = null;
+        BoatDAO.IdentifierMatch regMatch = null;
+
+        for (BoatDAO.IdentifierMatch match
+                : boatDAO.findIdentifierMatches(conn, hin, regNumber)) {
+
+            if (!hin.isBlank() && hin.equals(match.hin())) {
+                hinMatch = match;
+            }
+            if (!regNumber.isBlank() && regNumber.equals(match.regNumber())) {
+                regMatch = match;
+            }
+        }
+
+        if (hinMatch == null && regMatch == null) {
+            return;
+        }
+
+        // The HIN names one boat and the registration number another.
+        if (hinMatch != null && regMatch != null
+                && hinMatch.boatId() != regMatch.boatId()) {
+            errors.put("boatSection",
+                    "That HIN and registration number belong to two different boats. "
+                            + "Please contact the marina office.");
+            return;
+        }
+
+        // Matched on registration number alone, but the boat on file has a
+        // different HIN: a HIN is the hull's permanent ID, so it's another boat.
+        if (hinMatch == null && !hin.isBlank()
+                && regMatch.hin() != null && !regMatch.hin().equals(hin)) {
+            errors.put("regNumber",
+                    "That registration number belongs to another boat. "
+                            + "Please contact the marina office.");
+            return;
+        }
+
+        BoatDAO.IdentifierMatch match = hinMatch != null ? hinMatch : regMatch;
+        String field = hinMatch != null ? "hin" : "regNumber";
+
+        if (match.ownerId() == null) {
+            return; // nobody owns it now: reclaimed on save
+        }
+
+        if (match.ownerId().equals(customerId)) {
+            errors.put(field, "That boat is already in your fleet.");
+        } else {
+            // Never say whose it is.
+            errors.put(field,
+                    "This boat is registered to another account. "
+                            + "Please contact the marina office.");
+        }
     }
 
     /**

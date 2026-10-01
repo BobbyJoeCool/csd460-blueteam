@@ -425,6 +425,162 @@ private boolean identifierInUse(
 }
 
 /**
+ * A boat on file whose HIN or Registration Number matches one being added,
+ * with whoever owns it now.
+ *
+ * @param boatId the matching boat
+ * @param hin its stored HIN, or null
+ * @param regNumber its stored Registration Number, or null
+ * @param ownerId the customer with an open ownership, or null if nobody
+ *        owns it now (it was removed from a fleet)
+ */
+public record IdentifierMatch(int boatId, String hin, String regNumber, Integer ownerId) {
+}
+
+/**
+ * Every boat whose HIN or Registration Number matches the given values,
+ * with its current owner. At most two rows: one matching the HIN and one
+ * matching the Registration Number, or one boat matching both. A blank
+ * value matches nothing.
+ *
+ * @param conn an open connection
+ * @param hin the HIN being added, uppercase; may be blank
+ * @param regNumber the Registration Number being added, uppercase; may be blank
+ * @return the matching boats, empty if neither value is on file
+ * @throws SQLException if the lookup fails
+ */
+public List<IdentifierMatch> findIdentifierMatches(
+        Connection conn,
+        String hin,
+        String regNumber)
+        throws SQLException {
+
+    String sql = """
+            SELECT b.boatID, b.HIN, b.regNumber, o.customerID
+            FROM Boat b
+            LEFT JOIN BoatOwnership o
+                   ON o.boatID = b.boatID
+                  AND o.endDate IS NULL
+            WHERE (? <> '' AND b.HIN = ?)
+               OR (? <> '' AND b.regNumber = ?)
+            """;
+
+    String h = hin == null ? "" : hin;
+    String r = regNumber == null ? "" : regNumber;
+
+    List<IdentifierMatch> matches = new ArrayList<>();
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, h);
+        stmt.setString(2, h);
+        stmt.setString(3, r);
+        stmt.setString(4, r);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int boatId = rs.getInt("boatID");
+                String storedHin = rs.getString("HIN");
+                String storedReg = rs.getString("regNumber");
+                // Read last, so wasNull() reports on this column.
+                int owner = rs.getInt("customerID");
+                Integer ownerId = rs.wasNull() ? null : owner;
+                matches.add(new IdentifierMatch(boatId, storedHin, storedReg, ownerId));
+            }
+        }
+    }
+
+    return matches;
+}
+
+/**
+ * Adds a boat to a customer's fleet. If the boat is already on file and
+ * nobody owns it now - its owner removed it, or sold it and the buyer is
+ * adding it - its existing row is reused, so the boat keeps one ID and its
+ * history (past reservations, earlier owners). Otherwise a new row is
+ * inserted. Either way a new open ownership is created.
+ *
+ * <p>Call only after {@code BoatValidator.validateAdd} has passed: it has
+ * already refused a boat someone else owns, a HIN and Registration Number
+ * that belong to two different boats, and a HIN that contradicts the one on
+ * file. Run inside the caller's transaction.
+ *
+ * @param conn active transaction connection
+ * @param boat the boat as entered on the form
+ * @param customerId the customer adding it
+ * @return the boat's ID, existing or new
+ * @throws SQLException if a write fails
+ */
+public int addOrReclaim(
+        Connection conn,
+        Boat boat,
+        int customerId)
+        throws SQLException {
+
+    Integer reclaimId = null;
+
+    for (IdentifierMatch match : findIdentifierMatches(
+            conn, boat.getHIN(), boat.getRegNumber())) {
+
+        if (match.ownerId() == null) {
+            reclaimId = match.boatId();
+            break;
+        }
+    }
+
+    int boatId;
+
+    if (reclaimId == null) {
+        boatId = insertBoat(conn, boat);
+    } else {
+        reclaimBoat(conn, reclaimId, boat);
+        boatId = reclaimId;
+    }
+
+    insertOwnership(conn, boatId, customerId);
+    return boatId;
+}
+
+/**
+ * Updates a reclaimed boat with the details just entered. The HIN is the
+ * permanent ID of the hull, so it's only filled in if none was stored; the
+ * Registration Number takes the new value when one is given (a new owner
+ * may register it in a different state).
+ */
+private void reclaimBoat(
+        Connection conn,
+        int boatId,
+        Boat boat)
+        throws SQLException {
+
+    String sql = """
+            UPDATE Boat
+            SET boatName = ?,
+                boatLength = ?,
+                boatType = ?,
+                boatBeam = ?,
+                boatYear = ?,
+                HIN = COALESCE(HIN, ?),
+                regNumber = COALESCE(?, regNumber)
+            WHERE boatID = ?
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, boat.getBoatName());
+        stmt.setBigDecimal(2, boat.getBoatLength());
+        setNullableString(stmt, 3, boat.getBoatType());
+        setNullableDecimal(stmt, 4, boat.getBoatBeam());
+        setNullableInteger(stmt, 5, boat.getBoatYear());
+        setNullableString(stmt, 6, boat.getHIN());
+        setNullableString(stmt, 7, boat.getRegNumber());
+        stmt.setInt(8, boatId);
+
+        if (stmt.executeUpdate() != 1) {
+            throw new SQLException("Reclaiming boat " + boatId + " did not update one row.");
+        }
+    }
+}
+
+/**
  * Soft remove.
  */
 public int endOwnership(
