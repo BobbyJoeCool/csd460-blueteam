@@ -31,7 +31,7 @@ MoffatBay.loginModal = (function () {
      * Shows the modal and moves focus into it.
      *
      * @param {string} [redirectTo] - where to land after a successful sign
-     *   in, as a context-relative path like "/reservation.jsp" (LoginServlet
+     *   in, as a context-relative path like "/reservation" (LoginServlet
      *   prepends the context path itself, so never "/marinawebsite/...").
      *   Optional: leave it out and the modal falls back to the page the user
      *   is already on, which is right for a plain "Log In" control but wrong
@@ -47,6 +47,17 @@ MoffatBay.loginModal = (function () {
             // form - so unlocking lands in the same place signing in would.
             modal.querySelectorAll('input[name="redirectTo"]').forEach(
                 function (field) { field.value = redirectTo; });
+
+            // And Register here, so a new customer who registers instead
+            // of signing in still lands on the page this control named -
+            // e.g. the home page's Book a Slip button, which is set here
+            // in the browser, after the server rendered the link.
+            var registerLink = document.getElementById("loginRegisterLink");
+            if (registerLink) {
+                var url = new URL(registerLink.href);
+                url.searchParams.set("redirectTo", redirectTo);
+                registerLink.href = url.toString();
+            }
         }
 
         modal.classList.add("is-open");
@@ -96,6 +107,32 @@ MoffatBay.loginModal = (function () {
                 close();
             }
         });
+
+        /* Opened by ?signIn=/somePage - a members-only page sent a signed-
+           out visitor here (CustomerSession.sendToSignIn), and the JSP
+           rendered the modal already open with that page as the return
+           address. Put focus in the email field, then take signIn back
+           out of the address bar so a refresh or a copied link doesn't
+           pop the box open again. The return page is already in the
+           form's hidden field, so nothing is lost. */
+        if (window.URLSearchParams) {
+            var params = new URLSearchParams(window.location.search);
+            if (params.has("signIn")) {
+                if (modal.classList.contains("is-open")) {
+                    var emailField = document.getElementById("loginEmail");
+                    if (emailField) { emailField.focus(); }
+                }
+                if (window.history && window.history.replaceState) {
+                    params.delete("signIn");
+                    var query = params.toString();
+                    window.history.replaceState(
+                        {},
+                        "",
+                        window.location.pathname + (query ? "?" + query : "") + window.location.hash
+                    );
+                }
+            }
+        }
     }
 
     if (form) {

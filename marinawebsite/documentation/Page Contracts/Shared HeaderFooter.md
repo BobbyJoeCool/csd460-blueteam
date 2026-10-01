@@ -65,10 +65,11 @@ Every page must use its assigned string exactly. Update this table as pages are 
 | Reservation (Book a Slip) | `reservation` — the nav link reads **Book a Slip** (**renamed from "Reservations" 2026-09-24**, so it can't be confused with My Reservations). Planned: once Wait List ships, a **Reservations** dropdown holding My Reservations, Book a Slip and Wait List. |
 | Reservation Summary | *(none — not a nav link)* |
 | Contact Us | *(retired — `contact.jsp` deleted 2026-09-14, see the update note below)* |
-| My Reservations (Look Up Reservation) | `lookup` — nav link shown only when signed in |
-| Wait List Lookup | *(none — not a nav link)* |
-| Edit User Info | *(none — not a nav link)* |
-| My Fleet | `myfleet` — reserved, not a nav link today; reached from the **My Fleet** button on Edit User Info |
+| My Reservations (Look Up Reservation) | `lookup` — shown only when signed in, and in **both** menus: Plan Your Stay and the Welcome menu (**updated 2026-09-30**, beta test #292). On this page both menu triggers show as active. |
+| Wait List Lookup | `waitlist` — **View Wait List** in Plan Your Stay |
+| Edit User Info | `editprofile` — **User Profile** in the Welcome menu |
+| My Fleet | `myfleet` — **My Fleet** in the Welcome menu |
+| Registration | `register` — not a nav link, so nothing is highlighted |
 
 > Login is a modal, not a nav destination — it doesn't set `activePage`.
 
@@ -158,7 +159,9 @@ Pages with their own signed-in/signed-out controls handle those themselves —
 The header checks `sessionScope.loggedIn` (set by `LoginServlet`) to swap between two states:
 
 - **Logged out:** a "Log In" button that opens the login modal.
-- **Logged in:** a "Welcome, {displayName}" greeting, now a link to `/editProfile` (see the 2026-09-14 update above), plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
+- **Logged in:** a "Welcome, {displayName}" menu holding **My Reservations**, **My Fleet** and **User Profile**, in that order (**updated 2026-09-30**; it was a plain link to `/editProfile` as of the 2026-09-14 update above), plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
+
+Both header menus (Plan Your Stay and Welcome) are the same dropdown component (`js/header.js`, `MoffatBay.dropdowns`). Each closes on Escape, on a click outside it, or when keyboard focus tabs out of it (#260), so an open menu never sits over content a keyboard user has moved on to.
 
 The footer has no login-state behavior.
 
@@ -166,5 +169,6 @@ The footer has no login-state behavior.
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Header account control | Shows "Welcome, {displayName}" plus Log Out button | Shows Log In button |
+| Header account control | Shows the "Welcome, {displayName}" menu (My Reservations, My Fleet, User Profile) plus Log Out button | Shows Log In button |
+| Plan Your Stay menu | Book a Slip, View Wait List, My Reservations | Book a Slip, View Wait List |
 | Login modal include | Still included (available for any page that needs it) | Still included |

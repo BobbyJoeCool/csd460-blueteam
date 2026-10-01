@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
@@ -155,16 +156,10 @@ public class LoginServlet extends HttpServlet {
     }
 
     /**
-     * Stores the four session attributes from the Login contract's
-     * "What the Session Remembers" (loggedIn, customer, customerId,
-     * displayName), then redirects to wherever
-     * {@link Utils#safeRedirectTarget(String, String)} says is safe.
-     *
-     * <p>Invalidates any pre-existing session and starts a fresh one first,
-     * per OWASP's Session Management Cheat Sheet guidance to regenerate the
-     * session ID on authentication - otherwise a session ID an attacker
-     * fixed before login (session fixation) would carry straight through
-     * into an authenticated session.
+     * Signs the customer in through {@link CustomerSession#start} (which
+     * also regenerates the session ID against session fixation), then
+     * redirects to wherever {@link Utils#safeRedirectTarget(String, String)}
+     * says is safe.
      *
      * @param request the login request, used to obtain the session and redirect target
      * @param response the response to redirect
@@ -173,15 +168,7 @@ public class LoginServlet extends HttpServlet {
      */
     private void logInAndRedirect(HttpServletRequest request, HttpServletResponse response, Customer customer)
             throws IOException {
-        HttpSession oldSession = request.getSession(false);
-        if (oldSession != null) {
-            oldSession.invalidate();
-        }
-        HttpSession session = request.getSession(true);
-        session.setAttribute("loggedIn", Boolean.TRUE);
-        session.setAttribute("customer", customer);
-        session.setAttribute("customerId", customer.getCustomerId());
-        session.setAttribute("displayName", customer.getDisplayName());
+        CustomerSession.start(request, customer);
 
         /*
          * Tell the shared status popup to say "Logged in successfully" on

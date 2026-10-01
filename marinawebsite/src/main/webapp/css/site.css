@@ -437,6 +437,16 @@ main,
     width: 100%;
 }
 
+/* Every form's example text. Lighter than typed text so an example can't
+   be mistaken for an answer, but still about 4.9:1 on the white field -
+   WCAG counts placeholder text as text, so it has to clear 4.5:1. Don't
+   go below 65%: a 60% mix measures about 4.2:1. opacity: 1 because
+   Firefox dims placeholders on top of whatever colour is set. */
+::placeholder {
+    color: color-mix(in srgb, var(--color-input-text) 65%, var(--color-input-bg));
+    opacity: 1;
+}
+
 .form-group input:focus,
 .form-group select:focus {
     outline: none;

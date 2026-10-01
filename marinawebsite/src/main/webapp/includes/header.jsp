@@ -82,6 +82,8 @@
             View Wait List
         </a>
 
+        <%-- Also in the Welcome menu below, on purpose: testers looked
+             for their bookings in both places, so both lead there. --%>
         <c:if test="${not empty sessionScope.customerId}">
             <a href="${pageContext.request.contextPath}/reservations"
                class="${param.activePage == 'lookup' ? 'nav-active' : ''}">
@@ -104,16 +106,20 @@
         <c:choose>
             <c:when test="${sessionScope.loggedIn}">
 
-                <%-- The customer's own pages. Same dropdown component as
-                     Plan Your Stay; the --account modifier anchors the
-                     menu to the right edge and keeps it a popup on
-                     mobile, where it sits in the compact row. --%>
+                <%-- The customer's own pages: My Reservations, My Fleet and
+                     User Profile. Same dropdown component as Plan Your
+                     Stay; the --account modifier anchors the menu to the
+                     right edge and keeps it a popup on mobile, where it
+                     sits in the compact row. My Reservations is in Plan
+                     Your Stay as well, so on that page both triggers show
+                     as active. --%>
                 <div class="nav-dropdown nav-dropdown--account" data-dropdown>
 
                     <button type="button"
                             class="nav-dropdown__trigger
                             ${param.activePage == 'editprofile'
                             or param.activePage == 'myfleet'
+                            or param.activePage == 'lookup'
                             ? 'nav-active' : ''}"
                             aria-expanded="false"
                             aria-controls="accountMenu"
@@ -124,14 +130,19 @@
 
                     <div class="nav-dropdown__menu" id="accountMenu">
 
-                        <a href="${pageContext.request.contextPath}/editProfile"
-                           class="${param.activePage == 'editprofile' ? 'nav-active' : ''}">
-                            User Profile
+                        <a href="${pageContext.request.contextPath}/reservations"
+                           class="${param.activePage == 'lookup' ? 'nav-active' : ''}">
+                            My Reservations
                         </a>
 
                         <a href="${pageContext.request.contextPath}/myFleet"
                            class="${param.activePage == 'myfleet' ? 'nav-active' : ''}">
                             My Fleet
+                        </a>
+
+                        <a href="${pageContext.request.contextPath}/editProfile"
+                           class="${param.activePage == 'editprofile' ? 'nav-active' : ''}">
+                            User Profile
                         </a>
 
                     </div>

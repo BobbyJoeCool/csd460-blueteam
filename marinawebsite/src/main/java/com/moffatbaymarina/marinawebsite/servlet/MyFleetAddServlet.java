@@ -11,6 +11,7 @@ import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.BoatValidator;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -19,7 +20,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * @author Carolina R.
@@ -45,23 +45,16 @@ public class MyFleetAddServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
-
-        // Only signed-in customers should be able to add boats.
-        // If there is no valid customerId in the session, return to the home page.
-        if (session == null
-                || !(session.getAttribute("customerId") instanceof Number)) {
-
-            response.sendRedirect(request.getContextPath() + "/");
+        // Only signed-in customers should be able to add boats. The
+        // customer ID comes from the session, never from the submitted form.
+        Integer customerId = Utils.signedInCustomerId(request);
+        if (customerId == null) {
+            CustomerSession.sendToSignIn(request, response, "/myFleet");
             return;
         }
 
-        // Customer ID comes from the session instead of from the submitted form.
-        int customerId =
-                ((Number) session.getAttribute("customerId")).intValue();
-
         Customer customer =
-                (Customer) session.getAttribute("customer");
+                (Customer) request.getSession(false).getAttribute("customer");
 
         String country = "US";
 
@@ -86,25 +79,10 @@ public class MyFleetAddServlet extends HttpServlet {
             // with the field errors and reopen the Add Boat form.
             if (!errors.isEmpty()) {
                 request.setAttribute("fieldErrors", errors);
-                request.setAttribute(
-                        "formError",
-                        "Please fix the highlighted boat fields."
-                );
                 request.setAttribute("openForm", "add");
 
-                // Reloads the customer's fleet so the page still has
-                // the data it needs when the request is forwarded.
-                request.setAttribute(
-                        "fleet",
-                        boatDAO.findFleetByCustomerId(
-                                conn,
-                                customerId
-                        )
-                );
-
-                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                        .forward(request, response);
-
+                MyFleetServlet.showFleet(request, response, conn, customerId,
+                        "Please fix the highlighted boat fields.");
                 return;
             }
 

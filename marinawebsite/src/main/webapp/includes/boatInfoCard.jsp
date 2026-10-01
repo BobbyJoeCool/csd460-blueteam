@@ -79,14 +79,13 @@
 <div class="form-group" id="boatNameGroup">
     <label for="boatName">Boat Name <span class="required-mark">*</span></label>
     <input type="text" id="boatName" name="boatName" maxlength="50"
-           placeholder="Black Pearl"
            value="${fn:escapeXml(boatNameValue)}">
 </div>
 
 <div class="form-group" id="boatTypeGroup">
     <label for="boatType">Boat Type</label>
     <input type="text" id="boatType" name="boatType" maxlength="30"
-           placeholder="Sailboat, powerboat, etc. (e.g. Galleon)"
+           placeholder="Sailboat, powerboat, etc."
            value="${fn:escapeXml(boatTypeValue)}">
 </div>
 
@@ -95,7 +94,7 @@
         <label for="boatLength">Boat Length (ft) <span class="required-mark">*</span></label>
         <input type="number" id="boatLength" name="boatLength"
                min="1" max="999.9" step="0.1"
-               placeholder="45"
+               placeholder="e.g. 45"
                value="${fn:escapeXml(boatLengthValue)}">
         <div class="field-error" id="boatLengthError"></div>
     </div>
@@ -103,7 +102,7 @@
         <label for="boatBeam">Boat Beam (ft)</label>
         <input type="number" id="boatBeam" name="boatBeam"
                min="1" max="999.9" step="0.1"
-               placeholder="12"
+               placeholder="e.g. 12"
                value="${fn:escapeXml(boatBeamValue)}">
         <div class="field-error" id="boatBeamError"></div>
     </div>
@@ -158,7 +157,7 @@
     <label for="boatYear">Boat Year</label>
     <input type="text" id="boatYear" name="boatYear"
            inputmode="numeric" maxlength="4"
-           placeholder="2003"
+           placeholder="e.g. 2003"
            value="${fn:escapeXml(boatYearValue)}">
     <div class="field-error" id="boatYearError"></div>
 </div>

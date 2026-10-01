@@ -190,7 +190,7 @@ Same flow as Edit User Info's profile form, applied to one boat:
 
 1. Customer clicks **Edit** on a card → the modal opens, filled from that card's `data-*` attributes, with `boatLength` (and `HIN`, if set) `disabled`. Save starts **disabled** with the hint "Nothing changed yet.", the same rule `editUserInfo.js` uses.
 2. JavaScript tracks which fields the customer actually changed. Only those are submitted, plus `boatId`.
-3. A touched **optional** field the customer blanked is submitted as an explicit empty value, meaning "clear it to `NULL`." A touched **required** field (`boatName`) arriving empty is rejected outright as a structural error, not a normal field message.
+3. A touched **optional** field the customer blanked is submitted as an explicit empty value, meaning "clear it to `NULL`." A touched **required** field (`boatName`) arriving empty gets the normal field message, "Enter a name for the boat.", under Boat Name in the reopened modal (**changed 2026-09-30, #255**: it used to be rejected outright with a raw 400 page before `BoatValidator` could run).
 4. Before submit, the modal shows the "Field: old → new" list; the customer confirms. Nothing is sent until they do.
 5. Server: ownership check → reject any submitted key that isn't an editable column (`boatLength`, or `hin` when already set, is rejected the same way — never silently ignored) → validate every changed field and collect every failure → only if all pass, `BoatDAO.updateBoat()` in a transaction.
 6. Success → redirect, and the page shows the old → new summary (Amendment 4) or the `boatUpdated` toast.
@@ -321,7 +321,8 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 | Neither HIN nor Registration Number | "Enter either a HIN or a Registration Number." | Modal banner (`#boatSectionError`) |
 | Remove on a boat with an Active reservation | "This boat can't be removed from your account while it's part of an active reservation (Dock A, Slip 2 (A-02))." (**reworded 2026-09-24**) | Status popup on `myFleet.jsp` |
 | `boatId` missing, not a number, or not owned by this customer | "That boat couldn't be found in your fleet." — same text for every case | Status popup; nothing written |
-| Non-editable field (`boatLength`, a set `HIN`) or blank `boatName` submitted on Edit | Not a user-facing message — a Front End bug or tampering. Rejected outright. | N/A |
+| Blank `boatName` submitted on Edit (JavaScript off, or a stale page) | "Enter a name for the boat." (**changed 2026-09-30, #255**; was a raw 400 page) | Inline under Boat Name in the reopened Edit modal |
+| Non-editable field (`boatLength`, a set `HIN`) submitted on Edit | Not a user-facing message — a Front End bug or tampering. Rejected outright. | N/A |
 | Add succeeds | "Boat added" | `MoffatBay.statusPopup` toast after redirect |
 | Remove succeeds | "Boat removed from your fleet" | `MoffatBay.statusPopup` toast after redirect |
 | Edit succeeds | "Boat updated" | `MoffatBay.statusPopup` toast after redirect |
@@ -331,7 +332,7 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| `/myFleet` page | Shows the customer's own boats | Redirected to the landing page (`/`), same guard as `EditProfileServlet` |
-| Add / Edit / Remove | Available, for the customer's own boats only | Not reachable; a direct POST is rejected with no write |
+| `/myFleet` page | Shows the customer's own boats | Sent to the landing page with the sign-in box already open and "Please sign in, or register, to continue." Signing in, or registering from the box, lands on My Fleet (**changed 2026-09-30, #299**; it was a silent redirect home). `CustomerSession.sendToSignIn(request, response, "/myFleet")`, same as `EditProfileServlet`. |
+| Add / Edit / Remove | Available, for the customer's own boats only | Not reachable. A POST (usually a session that timed out mid-edit) writes nothing and gets the same sign-in redirect back to My Fleet. |
 | My Fleet button (on Edit User Info) | Shown | Not reachable — Edit User Info itself requires sign-in |
 | Reserve a Slip / View Reservation links | Shown on the relevant cards | Not reachable — the page itself requires sign-in |

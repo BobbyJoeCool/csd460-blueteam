@@ -66,7 +66,6 @@
     <div class="form-group" id="firstNameGroup">
         <label for="firstName">First Name <span class="required-mark">*</span></label>
         <input type="text" id="firstName" name="firstName" required
-               placeholder="Jack"
                value="${fn:escapeXml(firstNameValue)}">
         <div class="field-error" id="firstNameError"></div>
     </div>
@@ -74,7 +73,6 @@
     <div class="form-group" id="lastNameGroup">
         <label for="lastName">Last Name <span class="required-mark">*</span></label>
         <input type="text" id="lastName" name="lastName" required
-               placeholder="Sparrow"
                value="${fn:escapeXml(lastNameValue)}">
         <div class="field-error" id="lastNameError"></div>
     </div>
@@ -92,7 +90,7 @@
             <label for="phoneDisplay">Phone <span class="required-mark">*</span></label>
             <input type="text" id="phoneDisplay" required
                    inputmode="numeric" maxlength="14"
-                   placeholder="(360)-555-0100" autocomplete="tel-national">
+                   placeholder="e.g. (360)-555-0100" autocomplete="tel-national">
             <input type="hidden" id="phone" name="phone" value="${fn:escapeXml(phoneValue)}">
             <div class="field-error" id="phoneError"></div>
         </div>
@@ -112,7 +110,7 @@
     <div class="form-group" id="streetAddressGroup">
         <label for="streetAddress">Street Address <span class="required-mark">*</span></label>
         <input type="text" id="streetAddress" name="streetAddress" required
-               placeholder="1 Shipwreck Cove"
+               placeholder="e.g. 123 Harbor Rd"
                value="${fn:escapeXml(streetAddressValue)}">
         <div class="field-error" id="streetAddressError"></div>
     </div>
@@ -120,7 +118,7 @@
     <div class="form-group" id="streetAddress2Group">
         <label for="streetAddress2">Address Line 2</label>
         <input type="text" id="streetAddress2" name="streetAddress2"
-               placeholder="Apt, suite, PO box, etc. (e.g. Cabin 13)"
+               placeholder="Apt, suite, PO box, etc."
                value="${fn:escapeXml(streetAddress2Value)}">
         <div class="field-error" id="streetAddress2Error"></div>
     </div>
@@ -129,7 +127,6 @@
         <div class="form-group" id="cityGroup">
             <label for="city">City <span class="required-mark">*</span></label>
             <input type="text" id="city" name="city" required
-                   placeholder="Tortuga"
                    value="${fn:escapeXml(cityValue)}">
             <div class="field-error" id="cityError"></div>
         </div>
@@ -169,7 +166,7 @@
         <label for="zipCode">Zip Code <span class="required-mark">*</span></label>
         <input type="text" id="zipCode" name="zipCode" required
                pattern="^\d{5}(-\d{4})?$" maxlength="10"
-               placeholder="33040"
+               placeholder="e.g. 98250"
                value="${fn:escapeXml(zipCodeValue)}">
         <div class="field-error" id="zipError"></div>
     </div>

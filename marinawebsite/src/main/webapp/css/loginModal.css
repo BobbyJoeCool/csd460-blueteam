@@ -173,6 +173,38 @@
 	background: var(--color-cta-secondary-bg-hover);
 }
 
+/* "Forgot password?" - sits right under the Password field, pulled up
+   against the form's 1rem gap so it reads as belonging to that field.
+   Quieter than the Sign in button: a plain text link look. */
+.login-modal__forgot {
+	margin: -0.5rem 0 0;
+	text-align: right;
+	font-size: 0.85rem;
+}
+
+.login-modal__link {
+	padding: 0;
+	border: none;
+	background: none;
+	font: inherit;
+	color: var(--color-link);
+	cursor: pointer;
+}
+
+.login-modal__link:hover {
+	color: var(--color-link-hover);
+	text-decoration: underline;
+}
+
+/* Keyboard focus keeps the link colour: the hover colour is too light on
+   white to be the only thing showing where focus is. */
+.login-modal__link:focus-visible {
+	text-decoration: underline;
+	outline: 2px solid var(--color-input-border-focus);
+	outline-offset: 2px;
+	border-radius: 3px;
+}
+
 .login-modal__alt {
 	margin: 1.25rem 0 0;
 	font-size: 0.9rem;

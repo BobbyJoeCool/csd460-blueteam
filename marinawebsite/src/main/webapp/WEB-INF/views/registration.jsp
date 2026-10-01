@@ -46,6 +46,14 @@
           action="${pageContext.request.contextPath}/register" id="registrationForm" novalidate>
         <jsp:include page="/includes/csrfField.jsp" />
 
+        <%-- Where to go once the account exists: set by the Login modal's
+             Register here link (?redirectTo=/reservation, /myFleet, ...).
+             RegisterServlet signs the new customer in and redirects there,
+             after checking it with Utils.safeRedirectTarget. A failed
+             attempt forwards back here, and a forward keeps the request
+             parameters, so this survives any number of retries. --%>
+        <input type="hidden" name="redirectTo" value="${fn:escapeXml(param.redirectTo)}">
+
         <!-- Left column: name & mailing info -->
         <jsp:include page="/includes/personalInfoCard.jsp" />
 
@@ -60,7 +68,7 @@
 
             <div class="column-intro">
                 <p class="optional-mark">Optional</p>
-                <p class="column-note">(you may add a boat later, or do it now)</p>
+                <p class="column-note">You can add a boat now or later. If you add one, the starred fields are required.</p>
             </div>
 
             <jsp:include page="/includes/boatInfoCard.jsp" />
@@ -75,7 +83,7 @@
             <div class="form-group">
                 <label for="email">Email <span class="required-mark">*</span></label>
                 <input type="email" id="email" name="email" required
-                       placeholder="jack.sparrow@blackpearl.sea"
+                       placeholder="you@example.com"
                        value="${fn:escapeXml(param.email)}">
                 <div class="field-error" id="emailError">
                     <c:if test="${not empty requestScope.emailError}">${fn:escapeXml(requestScope.emailError)}</c:if>

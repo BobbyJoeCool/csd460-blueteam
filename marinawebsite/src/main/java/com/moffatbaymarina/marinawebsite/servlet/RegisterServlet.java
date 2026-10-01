@@ -10,6 +10,7 @@ import java.util.Locale;
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -211,8 +212,7 @@ public class RegisterServlet extends HttpServlet {
                 boatBeam,
                 boatYear);
 
-            response.sendRedirect(
-                    request.getContextPath() + "/?registered=true");
+            signInAndRedirect(request, response, email);
 
 		} catch (SQLException exception) {
 			getServletContext().log(
@@ -446,6 +446,67 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		return null;
+	}
+
+    //After a successful registration---------------------------------------------------------------------------------
+
+	/**
+	 * Signs the new customer in and sends them to the page they were
+	 * heading for, with {@code registered=true} so the status popup says
+	 * "Account created - welcome aboard" when they get there.
+	 *
+	 * <p>Where "the page they were heading for" comes from: the Login
+	 * modal's Register here link carries its {@code redirectTo} (for
+	 * example {@code /reservation} after Book a Slip, or {@code /myFleet}
+	 * after a signed-out visit there), and registration.jsp keeps it in a
+	 * hidden field through any failed attempts. With none, it's the home
+	 * page, as before. {@code /register} itself also falls back to the
+	 * home page, so a signed-in customer never lands on a blank form.
+	 *
+	 * <p>The customer is loaded back by email, the same lookup
+	 * LoginServlet does, so the session holds exactly what a normal sign-in
+	 * would. If that lookup fails, the account still exists (it's already
+	 * committed), so this logs it and falls back to the old behaviour -
+	 * home page, signed out - rather than showing an error page for an
+	 * account that was created.
+	 *
+	 * @param request the registration POST
+	 * @param response the response to redirect
+	 * @param email the email the account was created with
+	 * @throws IOException if the redirect fails
+	 */
+	private void signInAndRedirect(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			String email)
+			throws IOException {
+
+		Customer registered;
+		try {
+			registered = customerDAO.findByEmail(email);
+		} catch (SQLException exception) {
+			getServletContext().log(
+					"Registered, but loading the new customer to sign them in failed.",
+					exception);
+			registered = null;
+		}
+
+		if (registered == null) {
+			response.sendRedirect(
+					request.getContextPath() + "/?registered=true");
+			return;
+		}
+
+		CustomerSession.start(request, registered);
+
+		String target = Utils.safeRedirectTarget(
+				request.getParameter("redirectTo"), "/");
+		if (target.startsWith("/register")) {
+			target = "/";
+		}
+		target += (target.contains("?") ? "&" : "?") + "registered=true";
+
+		response.sendRedirect(request.getContextPath() + target);
 	}
 
     //Error handling and utility methods--------------------------------------------------------------------------------

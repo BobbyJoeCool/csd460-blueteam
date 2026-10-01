@@ -11,6 +11,7 @@ import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.BoatValidator;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -19,7 +20,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * @author Carolina R.
@@ -46,19 +46,15 @@ public class MyFleetEditServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
-
         // Only signed-in customers should be able to edit boats.
-        if (session == null || !(session.getAttribute("customerId") instanceof Number)) {
-            response.sendRedirect(request.getContextPath() + "/");
+        Integer customerId = Utils.signedInCustomerId(request);
+        if (customerId == null) {
+            CustomerSession.sendToSignIn(request, response, "/myFleet");
             return;
         }
 
-        int customerId =
-                ((Number) session.getAttribute("customerId")).intValue();
-
         Customer customer =
-                (Customer) session.getAttribute("customer");
+                (Customer) request.getSession(false).getAttribute("customer");
 
         String country = "US";
 
@@ -87,19 +83,8 @@ public class MyFleetEditServlet extends HttpServlet {
         // If the customer does not own this boat, return to My Fleet
             // and show an error instead of allowing the edit.
             if (current == null) {
-                request.setAttribute(
-                        "formError",
-                        "That boat couldn't be found in your fleet."
-                );
-
-                request.setAttribute(
-                        "fleet",
-                        boatDAO.findFleetByCustomerId(conn, customerId)
-                );
-
-                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                        .forward(request, response);
-
+                MyFleetServlet.showFleet(request, response, conn, customerId,
+                        "That boat couldn't be found in your fleet.");
                 return;
             }
 
@@ -132,13 +117,9 @@ public class MyFleetEditServlet extends HttpServlet {
             addIfPresent(request, changed, "hin");
             addIfPresent(request, changed, "regNumber");
 
-            //boat name required and can't be blank
-            if (changed.containsKey("boatName")
-                    && changed.get("boatName").isBlank()) {
-
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+            // A blank boat name isn't refused here: BoatValidator.validateEdit()
+            // reports it as "Enter a name for the boat." under the field,
+            // like any other field error, instead of a raw 400 page.
 
             if (changed.containsKey("hin")) {
                 changed.put(
@@ -175,10 +156,6 @@ public class MyFleetEditServlet extends HttpServlet {
 
             if (!errors.isEmpty()) {
                 request.setAttribute("fieldErrors", errors);
-                request.setAttribute(
-                        "formError",
-                        "Please fix the highlighted boat fields."
-                );
                 request.setAttribute("openForm", "edit");
                 request.setAttribute("editBoatId", boatId);
 
@@ -188,14 +165,8 @@ public class MyFleetEditServlet extends HttpServlet {
                 // file, not from the (absent) submitted values.
                 request.setAttribute("postedFields", String.join(",", changed.keySet()));
 
-                request.setAttribute(
-                        "fleet",
-                        boatDAO.findFleetByCustomerId(conn, customerId)
-                );
-
-                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                        .forward(request, response);
-
+                MyFleetServlet.showFleet(request, response, conn, customerId,
+                        "Please fix the highlighted boat fields.");
                 return;
             }
 
