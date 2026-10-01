@@ -19,11 +19,13 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
+import java.util.Map;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.BoatValidator;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -86,12 +88,18 @@ public class ReservationBoatServlet extends HttpServlet {
         BigDecimal boatBeam = Utils.parseDecimal(boatBeamText);
         Integer boatYear = Utils.parseInt(boatYearText);
 
-        String error = validate(
-                boatName, regNumber, boatLengthText, boatLength,
-                hin, boatType, boatBeamText, boatBeam,
-                boatYearText, boatYear, country);
-        if (error != null) {
-            writeError(response, error);
+        // The shared rules every add-a-boat path uses. Book a Slip requires a
+        // HIN or Registration Number, since this boat is about to be booked.
+        Map<String, String> errors;
+        try (Connection conn = DBConnection.getConnection()) {
+            errors = BoatValidator.validateAdd(
+                    conn, boatDAO, BoatValidator.cleanBoatValues(request), country, true);
+        } catch (SQLException e) {
+            throw new ServletException("Boat could not be checked.", e);
+        }
+        if (!errors.isEmpty()) {
+            // The panel shows one message, so send the first, in form order.
+            writeError(response, errors.values().iterator().next());
             return;
         }
 
@@ -138,51 +146,6 @@ public class ReservationBoatServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Boat could not be saved.", e);
         }
-    }
-
-    private String validate(
-            String boatName,
-            String regNumber,
-            String boatLengthText,
-            BigDecimal boatLength,
-            String hin,
-            String boatType,
-            String boatBeamText,
-            BigDecimal boatBeam,
-            String boatYearText,
-            Integer boatYear,
-            String country) {
-
-        if (boatName.isBlank() || boatLengthText.isBlank()) {
-            return "Boat Name and Boat Length are required when adding a boat.";
-        }
-        if (boatName.length() > 50 || !Utils.isValidBoatDimension(boatLength)) {
-            return "Enter a boat length between 1 and 999.9 feet.";
-        }
-        if (boatType.length() > 30) {
-            return "Boat Type cannot exceed 30 characters.";
-        }
-        if (hin.isBlank() && regNumber.isBlank()) {
-            return "Enter either a HIN or a Registration Number.";
-        }
-        if (!hin.isBlank() && !Utils.isValidHin(hin)) {
-            return "HIN should be 12 characters: 3 letters, then 9 more letters or numbers.";
-        }
-        if (!regNumber.isBlank()) {
-            if ("CA".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
-                return "Enter a valid Canadian Registration Number, e.g. C1234 AB.";
-            }
-            if ("US".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
-                return "Enter a valid Registration Number, including the state prefix, e.g. WN1234 AB.";
-            }
-        }
-        if (!boatBeamText.isBlank() && !Utils.isValidBoatDimension(boatBeam)) {
-            return "Boat Beam must be a valid number.";
-        }
-        if (!boatYearText.isBlank() && !Utils.isValidBoatYear(boatYear)) {
-            return "Enter a valid four-digit boat year.";
-        }
-        return null;
     }
 
     private void writeError(HttpServletResponse response, String message) throws IOException {

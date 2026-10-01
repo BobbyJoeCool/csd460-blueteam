@@ -17,9 +17,12 @@ import jakarta.servlet.http.HttpServletRequest;
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Carolina R.
  *
- * Provides shared server-side validation for My Fleet boat information. It is
- * used by the Add and Edit servlets to validate boat fields and return validation
- * errors before any database changes are made.
+ * Provides shared server-side validation for boat information. Every
+ * add-a-boat path uses {@link #validateAdd} - Registration, Book a Slip's
+ * Register a Boat panel and My Fleet - and My Fleet's Edit uses
+ * {@link #validateEdit}, so the same boat can't be accepted on one page and
+ * refused on another. Each returns every failing field before any database
+ * changes are made.
  */
 public final class BoatValidator {
 
@@ -76,12 +79,29 @@ public final class BoatValidator {
 
     /**
      * Validates all fields when adding a new boat.
+     *
+     * <p>{@code requireIdentifier} is the one rule the add paths differ on,
+     * on purpose. Registration passes {@code false}: a boat with neither a
+     * HIN nor a Registration Number is saved, and the page suggests calling
+     * the marina (Registration contract; BR-08, Boats Without a HIN). Book a
+     * Slip and My Fleet pass {@code true}, because a boat with no identifier
+     * shouldn't be reservable (Reservation contract).
+     *
+     * @param conn an open connection, for the duplicate checks
+     * @param boatDAO the DAO the duplicate checks use
+     * @param values the cleaned form values, see {@link #cleanBoatValues}
+     * @param country the owner's country, which decides the Registration
+     *        Number format
+     * @param requireIdentifier whether a HIN or Registration Number is required
+     * @return field name to message, in form order; empty when valid
+     * @throws SQLException if a duplicate check fails
      */
     public static Map<String, String> validateAdd(
             Connection conn,
             BoatDAO boatDAO,
             Map<String, String> values,
-            String country)
+            String country,
+            boolean requireIdentifier)
             throws SQLException {
 
         Map<String, String> errors = new LinkedHashMap<>();
@@ -168,8 +188,8 @@ public final class BoatValidator {
             }
         }
 
-        // Customer needs either a HIN or Registration Number
-        if (hin.isBlank() && regNumber.isBlank()) {
+        // Book a Slip and My Fleet need either a HIN or Registration Number
+        if (requireIdentifier && hin.isBlank() && regNumber.isBlank()) {
             errors.put(
                     "boatSection",
                     "Enter either a HIN or a Registration Number."
@@ -182,7 +202,7 @@ public final class BoatValidator {
 
             errors.put(
                     "hin",
-                    "Enter a valid HIN."
+                    HIN_MESSAGE
             );
         }
 
@@ -335,7 +355,7 @@ public final class BoatValidator {
 
                 errors.put(
                         "hin",
-                        "Enter a valid HIN."
+                        HIN_MESSAGE
                 );
 
             } else if (hin != null
@@ -414,15 +434,19 @@ public final class BoatValidator {
         return errors;
     }
 
+    /** Says what a HIN looks like, rather than only that this one is wrong. */
+    private static final String HIN_MESSAGE =
+            "HIN should be 12 characters: 3 letters, then 9 more letters or numbers.";
+
     private static String registrationMessage(
             String country) {
 
         if ("CA".equalsIgnoreCase(country)) {
-            return "Enter a valid Canadian Registration Number.";
+            return "Enter a valid Canadian Registration Number, e.g. C1234 AB.";
         }
 
         if ("US".equalsIgnoreCase(country)) {
-            return "Enter a valid Registration Number.";
+            return "Enter a valid Registration Number, including the state prefix, e.g. WN1234 AB.";
         }
 
         return "Enter a valid Registration Number.";

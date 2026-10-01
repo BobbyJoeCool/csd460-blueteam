@@ -311,6 +311,7 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 
 - **Client-side (UX only, not trusted):** the same live checks `boatInfoCard.jsp` already gets on Registration and the Reservation page (required marks, HIN pattern, registration format by country, year digits, "HIN or Registration Number"), through the shared `js/boatFields.js`. Edit also tracks touched fields and builds the old → new confirmation list.
 - **Server-side (source of truth):** exactly `ReservationBoatServlet`'s rules — but returning **every** failing field, not just the first. On Edit: ownership check first, then reject any non-editable key, then validate all changed fields, then write all or nothing. On Remove: ownership check, then Active-reservation check inside the transaction, then `endOwnership()`.
+- **Updated 2026-10-01 (#253):** `BoatValidator.validateAdd(...)` is now the one set of add-a-boat rules for all three paths. My Fleet passes `requireIdentifier = true`, Book a Slip the same, and Registration `false`. The HIN and Registration Number messages now say what a valid one looks like ("HIN should be 12 characters…", "…e.g. WN1234 AB").
 
 ## Error Handling
 

@@ -72,7 +72,8 @@ public class MyFleetAddServlet extends HttpServlet {
                             conn,
                             boatDAO,
                             values,
-                            country
+                            country,
+                            true
                     );
 
         // If validation fails, send the user back to My Fleet
