@@ -396,7 +396,7 @@ MoffatBay.myFleet = (function () {
 
     /**
      * Puts the form back and hides the confirmation, leaving every field
-     * exactly as it was - "Go back" returns to editing, it does not undo.
+     * exactly as it was - "Keep Editing" returns to editing, it does not undo.
      */
     function hideConfirmation() {
         if (confirmPanel) { confirmPanel.hidden = true; }

@@ -524,7 +524,7 @@ MoffatBay.editUserInfo = (function () {
         confirmButton.addEventListener("click", function () {
             /* One click, one save. Re-read rather than trusting the list
                that was drawn: nothing can change behind the popup, but the
-               submitted set should come from the form either way. Go Back,
+               submitted set should come from the form either way. Keep Editing,
                the x, the backdrop and Escape all just close the popup
                (modal.js), leaving every field as it was. */
             confirmButton.disabled = true;

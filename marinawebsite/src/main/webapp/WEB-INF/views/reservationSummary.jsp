@@ -152,7 +152,7 @@
             <section class="summary-status-band" aria-label="Reservation status">
                 <div>
                     <span class="summary-status-label">Status</span>
-                    <strong class="summary-status-value"><c:out value="${reservation.reservationStatus}" /></strong>
+                    <strong class="summary-status-value"><c:out value="${reservation.displayStatus}" /></strong>
                 </div>
                 <p>
                     Month-to-month lease &bull; 30 days' notice is required to terminate your lease.

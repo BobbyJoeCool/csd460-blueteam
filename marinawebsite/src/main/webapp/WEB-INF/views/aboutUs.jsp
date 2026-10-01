@@ -113,29 +113,21 @@
                     <span class="about-fact__figure">3</span>
                     <h3>Docks</h3>
                     <p>
-                        Docks A, B and C - the Eastern, Central and Western
-                        docks. A is closest to the Ship Store, B is closest to
-                        the Office &amp; Restaurant, and C is closest to the
-                        Fueling Station.
+                        A (East) by the Ship Store, B (Central) by the
+                        Office &amp; Restaurant, C (West) by the Fuel Dock.
                     </p>
                 </div>
 
                 <div class="about-fact">
                     <span class="about-fact__figure">72</span>
                     <h3>Slips</h3>
-                    <p>
-                        Twenty-four on every dock, in three sizes, so a slip is
-                        matched to the boat rather than the other way round.
-                    </p>
+                    <p>24 on each dock.</p>
                 </div>
 
                 <div class="about-fact">
                     <span class="about-fact__figure">3</span>
                     <h3>Slip sizes</h3>
-                    <p>
-                        26 ft, 40 ft and 50 ft. Thirty 26 ft slips, twenty-four
-                        40 ft, and eighteen 50 ft across the marina.
-                    </p>
+                    <p>26 ft (30 slips), 40 ft (24 slips), 50 ft (18 slips).</p>
                 </div>
             </div>
         </section>
@@ -184,10 +176,7 @@
                             <tr><th scope="row">Fuel dock</th><td><c:out value="${marina.fuelDockHours}"/></td></tr>
                         </tbody>
                     </table>
-                    <p class="about-hours__note">
-                        The marina itself is self-service and open 24 hours to
-                        slip holders.
-                    </p>
+                    <p class="about-hours__note"><c:out value="${marina.slipHolderAccess}"/></p>
                 </div>
 
             </div>

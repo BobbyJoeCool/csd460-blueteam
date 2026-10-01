@@ -122,6 +122,22 @@ public class ReservationDetails implements Serializable {
     }
 
     /**
+     * The status as the customer sees it. An Active lease that hasn't
+     * started yet reads "Upcoming" - "Active" made testers think it had
+     * already begun. Only the label changes; the stored status is still
+     * Active. Uses {@link #isStarted()}, the same check that decides between
+     * Cancel and 30 days' notice, so the label and the button agree.
+     *
+     * @return "Upcoming", or the stored status
+     */
+    public String getDisplayStatus() {
+        if (isActive() && !isStarted()) {
+            return "Upcoming";
+        }
+        return reservationStatus;
+    }
+
+    /**
      * Whether the customer may withdraw their termination notice and keep
      * the lease (BR-23): Active, a notice open, and today no later than
      * {@link Utils#NOTICE_WITHDRAWAL_CUTOFF_DAYS} days before its last day.

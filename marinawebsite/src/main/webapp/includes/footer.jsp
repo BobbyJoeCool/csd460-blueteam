@@ -29,10 +29,7 @@
                 <p><c:out value="${row.key}"/>: <c:out value="${row.value}"/></p>
             </c:forEach>
 
-            <h2 class="self-service-heading">
-                Self-Service Marina<br>
-                Open 24 Hrs.
-            </h2>
+            <h2 class="self-service-heading"><c:out value="${marina.slipHolderAccess}"/></h2>
         </section>
 
         <section class="footer-quick-links">

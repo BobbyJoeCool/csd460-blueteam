@@ -391,8 +391,8 @@
             <p class="fleet-confirm__lede" id="confirmChangesLede"></p>
             <dl class="change-summary__list" id="confirmChangesList"></dl>
             <div class="confirm-changes__actions">
-                <button type="button" class="btn-outline" id="cancelSaveBoat">Go back</button>
-                <button type="button" class="btn-primary" id="confirmSaveBoat">Yes, save</button>
+                <button type="button" class="btn-outline" id="cancelSaveBoat">Keep Editing</button>
+                <button type="button" class="btn-primary" id="confirmSaveBoat">Save Changes</button>
             </div>
         </div>
 

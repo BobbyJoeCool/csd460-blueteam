@@ -43,6 +43,9 @@ public final class MarinaInfo {
 
     public static final String FUEL_DOCK_HOURS = "7:00 am – dusk, daily";
 
+    /** The self-service line, shown under the hours on About Us and in the footer. */
+    public static final String SLIP_HOLDER_ACCESS = "Slip holders have 24/7 access to the marina.";
+
     private MarinaInfo() {
     }
 
@@ -68,6 +71,7 @@ public final class MarinaInfo {
                 "email", EMAIL,
                 "vhf", VHF,
                 "officeHours", OFFICE_HOURS,
-                "fuelDockHours", FUEL_DOCK_HOURS);
+                "fuelDockHours", FUEL_DOCK_HOURS,
+                "slipHolderAccess", SLIP_HOLDER_ACCESS);
     }
 }
