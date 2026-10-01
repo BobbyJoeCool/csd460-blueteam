@@ -10,7 +10,7 @@
   Include wherever a page collects a new password. In <head>, after
   site.css (passwordRules.css uses its color variables):
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css?v=${applicationScope.assetVersion}">
 
   In the body:
 
@@ -18,8 +18,8 @@
 
   and load its script after formValidation.js:
 
-    <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
-    <script src="${pageContext.request.contextPath}/js/passwordRules.js"></script>
+    <script src="${pageContext.request.contextPath}/js/formValidation.js?v=${applicationScope.assetVersion}"></script>
+    <script src="${pageContext.request.contextPath}/js/passwordRules.js?v=${applicationScope.assetVersion}"></script>
 
   Then call MoffatBay.passwordRules.check(passwordValue) wherever the
   page validates the password field - it toggles each rule's checkmark

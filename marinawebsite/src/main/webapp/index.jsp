@@ -20,7 +20,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 	<title>Moffat Bay Marina</title>
 
 	<jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 

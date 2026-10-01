@@ -55,7 +55,7 @@
     <title>${errorTitle} - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/error.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/error.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 

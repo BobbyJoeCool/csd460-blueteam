@@ -43,8 +43,8 @@
     <title>Your Account - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/editUserInfo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css?v=${applicationScope.assetVersion}">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/editUserInfo.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
@@ -227,7 +227,7 @@
      already pulls it in through the header, on every page. --%>
 <jsp:include page="/includes/changePasswordModal.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/editUserInfo.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/editUserInfo.js?v=${applicationScope.assetVersion}" defer></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var change = document.getElementById("openChangePassword");

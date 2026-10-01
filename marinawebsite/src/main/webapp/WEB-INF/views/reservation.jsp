@@ -25,7 +25,7 @@
     <title>Book a Slip - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" /> <!-- site, header, footer, loginModal, statusPopup -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservation.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservation.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
@@ -445,8 +445,8 @@
 
 <jsp:include page="/includes/footer.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/boatFields.js"></script>
-<script src="${pageContext.request.contextPath}/js/reservation.js"></script>
+<script src="${pageContext.request.contextPath}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
+<script src="${pageContext.request.contextPath}/js/reservation.js?v=${applicationScope.assetVersion}"></script>
 
 </body>
 </html>

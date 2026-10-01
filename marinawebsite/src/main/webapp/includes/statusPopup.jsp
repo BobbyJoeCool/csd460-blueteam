@@ -25,4 +25,4 @@
 
 <div id="statusPopupRegion" class="status-popup-region" role="status"></div>
 
-<script src="${pageContext.request.contextPath}/js/statusPopup.js"></script>
+<script src="${pageContext.request.contextPath}/js/statusPopup.js?v=${applicationScope.assetVersion}"></script>

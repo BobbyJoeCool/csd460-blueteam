@@ -61,7 +61,7 @@
 <c:set var="forgotRedirectTo"
        value="${not empty param.redirectTo ? param.redirectTo : forgotCurrentPath}"/>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css?v=${applicationScope.assetVersion}">
 
 <%-- The site's shared .modal (site.css), opened and closed through
      js/modal.js like every other popup. --%>

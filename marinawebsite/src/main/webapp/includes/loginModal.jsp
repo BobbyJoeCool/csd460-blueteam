@@ -254,9 +254,9 @@
 <jsp:include page="/includes/forgotPasswordModal.jsp" />
 
 
-<script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
-<script src="${pageContext.request.contextPath}/js/loginModal.js" defer></script>
-<script src="${pageContext.request.contextPath}/js/accountModals.js" defer></script>
+<script src="${pageContext.request.contextPath}/js/formValidation.js?v=${applicationScope.assetVersion}"></script>
+<script src="${pageContext.request.contextPath}/js/loginModal.js?v=${applicationScope.assetVersion}" defer></script>
+<script src="${pageContext.request.contextPath}/js/accountModals.js?v=${applicationScope.assetVersion}" defer></script>
 <script>
     /* Both ways into the password reset: "Forgot password?" under the
        sign-in form, and "Reset your password" in the locked-out state.
