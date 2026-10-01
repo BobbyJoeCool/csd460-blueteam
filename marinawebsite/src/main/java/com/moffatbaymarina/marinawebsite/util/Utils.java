@@ -134,6 +134,15 @@ public class Utils {
     public static final int MAX_TERMINATION_NOTICE_DAYS = 365;
 
     /**
+     * BR-26: a lease may start no more than this many months from today, so
+     * one customer can't hold a slip years ahead. The one copy of the rule -
+     * Book a Slip's date picker gets its max from
+     * {@link #latestLeaseStartDate} through the page, rather than keeping a
+     * second 12 in JavaScript.
+     */
+    public static final int MAX_LEASE_START_MONTHS_AHEAD = 12;
+
+    /**
      * BR-23: a customer may withdraw a termination notice - and keep the
      * lease - up to this many days before the notice's last day. Change it
      * here; My Reservations, ReservationChangeServlet and the DAO all read
@@ -311,6 +320,16 @@ public class Utils {
      */
     public static LocalDate earliestTerminationDate(LocalDate today) {
         return today.plusDays(MIN_TERMINATION_NOTICE_DAYS);
+    }
+
+    /**
+     * The latest day a lease booked on {@code today} may start (BR-26).
+     *
+     * @param today the day of booking
+     * @return {@code today} plus {@link #MAX_LEASE_START_MONTHS_AHEAD} months
+     */
+    public static LocalDate latestLeaseStartDate(LocalDate today) {
+        return today.plusMonths(MAX_LEASE_START_MONTHS_AHEAD);
     }
 
     /**

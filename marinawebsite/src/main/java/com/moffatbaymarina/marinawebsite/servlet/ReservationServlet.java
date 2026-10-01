@@ -74,6 +74,8 @@ public class ReservationServlet extends HttpServlet {
             request.setAttribute("docks", docks);
             request.setAttribute("perFootCents", Utils.toCents(perFootRate));
             request.setAttribute("electricCents", Utils.toCents(electricRate));
+            // BR-26: the date picker's max, so the page never types its own 12.
+            request.setAttribute("latestStartDate", Utils.latestLeaseStartDate(LocalDate.now()));
             request.getRequestDispatcher(VIEW).forward(request, response);
 
         } catch (SQLException e) {
@@ -122,6 +124,11 @@ public class ReservationServlet extends HttpServlet {
         // Same wording reservation.js shows under the field for a past date.
         if (startDate.isBefore(LocalDate.now())) {
             writeJson(response, "{\"ok\":false,\"dateError\":\"Start date can't be in the past. Choose today or later.\"}");
+            return;
+        }
+        // BR-26, same wording reservation.js shows under the field.
+        if (startDate.isAfter(Utils.latestLeaseStartDate(LocalDate.now()))) {
+            writeJson(response, "{\"ok\":false,\"dateError\":\"Start date must be within 12 months of today.\"}");
             return;
         }
 

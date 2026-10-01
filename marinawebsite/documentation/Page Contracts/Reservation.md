@@ -215,6 +215,7 @@ No boat name, no boat length, no slip number, no customer ID, no price. Name and
 | No dock picked | "Choose which dock you'd like to be on." | Under the dock cards (from the page, or from the server's `dockError`) |
 | Date missing | "Choose a start date to continue." under the button; "Choose a start date." under the field on submit | Under the Reserve button / under the date field |
 | Date in the past | "Start date can't be in the past." under the button; "Start date can't be in the past. Choose today or later." under the field, as soon as it's entered. The server sends the same full message as `dateError`. | Under the Reserve button and under the date field |
+| Date more than 12 months ahead (BR-26, added 2026-10-01, #325) | "Start date must be within 12 months." under the button; "Start date must be within 12 months of today." under the field, as soon as it's entered. The date picker's `max` is the same day, set by `ReservationServlet` from `Utils.latestLeaseStartDate`, and the server sends the same message as `dateError`. | Under the Reserve button and under the date field |
 | Size is full, however it's caught | "All of our 40 ft slips are currently reserved." plus the wait list question | The availability panel under the cards, button off |
 | Boat over 50 ft | "We don't have a slip that fits a boat over 50 feet. Please call the marina at (360) 555-0142." | The availability panel, button off, no wait list offered |
 | Boat already has a reservation | "Gullwing already has an active reservation." | Under the dropdown |

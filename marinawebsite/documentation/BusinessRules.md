@@ -131,3 +131,9 @@ ________________________________________
     Any business record that uses a status must use a predefined set of valid status values. 
     If the same status term is used in multiple areas of the system, 
     it must have the same meaning everywhere it appears.
+________________________________________
+
+#### BR-26 — Lease Start Window
+    A new lease may start on any day from today through 12 months from today.
+    A start date further ahead is refused, so one customer can't hold a slip
+    for years before the lease begins. Added 2026-10-01 (#325).

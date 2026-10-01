@@ -300,9 +300,12 @@
 
                         <div class="form-group">
                             <label for="checkInDate">Start Date <span class="required-mark">*</span></label>
-                            <%-- min is set to today by reservation.js, so nothing
-                                 has to be rendered server-side. --%>
-                            <input type="date" id="checkInDate" name="checkInDate">
+                            <%-- min is set to today by reservation.js. max is the
+                                 latest allowed start (BR-26), worked out by
+                                 ReservationServlet so the 12 months is only
+                                 written down once, in Utils. --%>
+                            <input type="date" id="checkInDate" name="checkInDate"
+                                   max="${latestStartDate}">
                             <div class="field-error" id="dateError"></div>
                         </div>
                     </section>
