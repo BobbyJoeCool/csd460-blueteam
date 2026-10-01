@@ -22,28 +22,31 @@
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<div class="login-modal"
+<%-- The site's shared .modal (site.css), opened and closed through
+     js/modal.js like every other popup. --%>
+<div class="modal login-modal"
      id="changePasswordModal"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="changePasswordTitle">
+     aria-labelledby="changePasswordTitle"
+     hidden>
 
-    <div class="login-modal__backdrop" data-change-close></div>
+    <button type="button" class="modal__backdrop" data-modal-close
+            aria-label="Close change password" tabindex="-1"></button>
 
-    <div class="login-modal__panel">
+    <div class="modal__box modal__box--narrow">
 
-        <button type="button"
-                class="login-modal__close"
-                data-change-close
-                aria-label="Close change password">&times;</button>
-
-        <h2 class="login-modal__title" id="changePasswordTitle">Change your password</h2>
+        <div class="modal__header">
+            <h2 class="modal__title" id="changePasswordTitle">Change your password</h2>
+            <button type="button" class="modal__close" data-modal-close
+                    aria-label="Close change password">&times;</button>
+        </div>
 
         <%-- Errors from the servlet land here rather than beside a field.
              It answers with one message at a time, and the one it sends most
              often - the current password being wrong - belongs to the form
              as a whole as much as to any single box. --%>
-        <p class="login-modal__error" id="changePasswordError" role="alert" hidden></p>
+        <p class="form-banner login-modal__banner" id="changePasswordError" role="alert" hidden></p>
 
         <%-- The endpoint lives on the form rather than in the JS, so the
              context path is written once, by the container that knows it. --%>
@@ -52,27 +55,27 @@
               data-action="${pageContext.request.contextPath}/editProfile/password"
               novalidate>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="currentPassword">Current password</label>
                 <input type="password"
                        id="currentPassword"
                        name="currentPassword"
                        autocomplete="current-password"
                        required>
-                <p class="login-modal__field-error" id="currentPasswordError"></p>
+                <p class="field-error" id="currentPasswordError"></p>
             </div>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="newPassword">New password</label>
                 <input type="password"
                        id="newPassword"
                        name="newPassword"
                        autocomplete="new-password"
                        required>
-                <p class="login-modal__field-error" id="newPasswordError"></p>
+                <p class="field-error" id="newPasswordError"></p>
             </div>
 
-            <div class="login-modal__field">
+            <div class="form-group">
                 <label for="confirmNewPassword">Confirm new password</label>
                 <%-- Never submitted - checked here only, so a typo can't
                      become the password. --%>
@@ -80,7 +83,7 @@
                        id="confirmNewPassword"
                        autocomplete="new-password"
                        required>
-                <p class="login-modal__field-error" id="confirmNewPasswordError"></p>
+                <p class="field-error" id="confirmNewPasswordError"></p>
             </div>
 
             <%--
@@ -107,7 +110,7 @@
                 </ul>
             </div>
 
-            <button type="submit" class="login-modal__submit" id="changePasswordSubmit">
+            <button type="submit" class="btn-primary login-modal__submit" id="changePasswordSubmit">
                 Update password
             </button>
         </form>

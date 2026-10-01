@@ -122,7 +122,7 @@
     background: var(--color-deep-marine);
     border: 1px solid
         color-mix(in srgb, var(--color-sand) 30%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-inner);
     box-shadow: 0 8px 18px
         color-mix(in srgb, var(--color-charcoal-navy) 30%, transparent);
 }
@@ -169,7 +169,7 @@
     font-size: 0.95rem;
     padding: 0.5rem 0.75rem;
     border: 0;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: transparent;
     cursor: pointer;
     transition:
@@ -219,7 +219,7 @@
     color: var(--color-nav-text);
     border: 1px solid var(--color-nav-text);
     padding: 0.5rem 1.1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: 600;
@@ -244,7 +244,7 @@
    Responsive header
    ========================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 56rem) {
     .site-header {
         align-items: flex-start;
     }
@@ -255,12 +255,29 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 40rem) {
     /* The compact row (icon, hamburger, Welcome menu/login) stays vertically
-       centered, undoing the flex-start set at the 768px step above -
-       that was for the old layout, which wrapped onto multiple lines. */
+       centered, undoing the flex-start set at the tablet step above. The
+       logo and nav share one row and never wrap apart - before, opening
+       the menu pushed the whole nav onto a second row under a lone logo. */
     .site-header {
         align-items: center;
+        flex-wrap: nowrap;
+        /* The logo's width and the gap after it, so the open menu can
+           reach back under the logo (see .header-nav__links below). */
+        --header-logo-span: calc(36px + 1rem);
+    }
+
+    /* While the menu is open the header grows to fit it, so the logo
+       stays at the top with the hamburger instead of floating halfway
+       down the left side. */
+    .site-header:has(.header-nav.is-open) {
+        align-items: flex-start;
+    }
+
+    .header-nav {
+        flex: 1 1 0;
+        min-width: 0;
     }
 
     /* Brand text goes away on mobile - just the icon stays, next to the
@@ -299,11 +316,18 @@
         display: flex;
     }
 
+    /* The open list and Log Out run the full width of the header: the nav
+       starts to the right of the logo, so they reach back under it. */
+    .header-nav__links,
+    .nav-logout-form {
+        width: calc(100% + var(--header-logo-span));
+        margin-left: calc(-1 * var(--header-logo-span));
+    }
+
     /* Log Out stays out of the compact row on mobile - it only shows up
        inside the open dropdown, under the links. */
     .nav-logout-form {
         display: none;
-        width: 100%;
         order: 5;
     }
 

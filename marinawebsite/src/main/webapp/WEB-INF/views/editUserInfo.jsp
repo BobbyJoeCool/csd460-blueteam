@@ -43,11 +43,6 @@
     <title>Your Account - Moffat Bay Marina</title>
 
     <jsp:include page="/includes/styles.jsp" />
-    <%-- registration.css owns .form-column, .column-heading and the
-         split rows that personalInfoCard.jsp's markup depends on, so any
-         page including that card has to load it too - reservation.css
-         already does the same for the boat card. --%>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/registration.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/editUserInfo.css">
 </head>
@@ -57,10 +52,8 @@
     <jsp:param name="activePage" value="editprofile" />
 </jsp:include>
 
-<%-- The hero sits OUTSIDE <main>, as myFleet.jsp's does and for the same
-     reason: registration.css restyles bare `main` with a max-width and
-     padding, so a banner inside it would be boxed in rather than spanning
-     the window and meeting the site header. --%>
+<%-- The hero sits outside <main>, like every hero on the site (see
+     .hero-band in site.css), so it spans the window. --%>
 <header class="hero-band" id="accountHero">
     <div class="hero-band__content">
         <h1>Your Account</h1>
@@ -69,10 +62,10 @@
             what you actually change.
         </p>
     </div>
-    <p class="hero-band__credit">Hero image created with Google Gemini</p>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
 </header>
 
-<main>
+<main class="page-column">
 
     <c:if test="${not empty formError}">
         <div class="form-banner form-banner--error" id="formError" role="alert">
@@ -154,7 +147,7 @@
             </div>
 
             <div class="account-actions">
-                <button type="button" class="btn-secondary" id="openChangePassword">
+                <button type="button" class="btn-outline" id="openChangePassword">
                     Change password
                 </button>
                 <p class="field-hint">
@@ -168,7 +161,7 @@
                     Registering, editing and selling boats all live together on
                     My Fleet.
                 </p>
-                <a class="btn-secondary account-fleet-link"
+                <a class="btn-outline account-fleet-link"
                    href="${pageContext.request.contextPath}/myFleet">My Fleet</a>
             </div>
 

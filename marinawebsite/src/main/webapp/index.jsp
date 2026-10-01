@@ -28,10 +28,9 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
     <jsp:param name="activePage" value="home" />
 </jsp:include>
 
-	<main class="landing-main">
-
-<!-- Hero section -->
-<section class="hero-band" id="landingHero">
+<%-- Hero. Outside <main>, like every page's hero (see .hero-band in
+     site.css), so it spans the window. --%>
+<header class="hero-band" id="landingHero">
 
 	<div class="hero-band__content">
 		<h1>Your Harbor Between Horizons</h1>
@@ -65,8 +64,11 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 			</c:otherwise>
 		</c:choose>
 	</div>
-	<p class="hero-band__credit">Hero image created with Google Gemini</p>
-</section>
+	<p class="hero-band__credit">Image created with Google Gemini</p>
+</header>
+
+	<main class="landing-main">
+
 
 		<!-- Marina benefits -->
 		<section class="benefits-section" aria-labelledby="benefitsHeading">
@@ -142,7 +144,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 						</p>
 
 						<a
-							class="btn-secondary"
+							class="btn-action"
 							href="${pageContext.request.contextPath}/reservation">
 							Book a Slip
 						</a>
@@ -156,7 +158,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 						</p>
 
 						<a
-							class="btn-secondary"
+							class="btn-action"
 							href="${pageContext.request.contextPath}/register">
 							Create an Account
 						</a>
@@ -176,7 +178,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 							src="${pageContext.request.contextPath}/images/MoffatBayLodge.png"
 							alt="Moffat Bay Lodge at dusk: a timber lodge with lit windows and balconies, stone paths and gardens, set against tall evergreens">
 						<figcaption class="lodge-card__caption">
-							Image generated with Gemini AI.
+							Image created with Google Gemini
 						</figcaption>
 					</figure>
 
@@ -193,7 +195,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 						</p>
 
 						<a
-							class="btn-secondary"
+							class="btn-action"
 							href="${pageContext.request.contextPath}/lodge.jsp">
 							Visit Moffat Bay Lodge
 						</a>

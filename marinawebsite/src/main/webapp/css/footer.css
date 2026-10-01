@@ -29,7 +29,7 @@
 
 
 .footer-address h2 {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.25rem;
     letter-spacing: normal;
     text-transform: none;
@@ -58,9 +58,13 @@
 }
 
 
-.self-service-heading {
-    margin-top: 1.5rem !important;
-    line-height: 1.25;
+/* The 24/7 line under the hours. A sentence, so it's set as text rather
+   than in the letter-spaced capitals of the column headings - just a
+   little stronger than the hours above it. */
+.site-footer .self-service-note {
+    margin-top: 1.25rem;
+    font-weight: 600;
+    opacity: 0.9;
 }
 
 /* quick-links navigation */
@@ -99,7 +103,7 @@
    Responsive footer
    ========================================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 56rem) {
     .footer-columns {
         padding: 3rem 1.5rem;
         grid-template-columns: 1fr;

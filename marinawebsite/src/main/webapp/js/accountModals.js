@@ -34,8 +34,6 @@ MoffatBay.accountModals = (function () {
     var forgotModal = document.getElementById("forgotPasswordModal");
     var changeModal = document.getElementById("changePasswordModal");
 
-    var lastFocused = null;
-
     /**
      * Puts a message under one field and marks the input invalid.
      * @param {string} inputId - id of the input
@@ -55,7 +53,7 @@ MoffatBay.accountModals = (function () {
      */
     function clearErrors(modal) {
         if (!modal) { return; }
-        modal.querySelectorAll(".login-modal__field-error").forEach(function (el) {
+        modal.querySelectorAll(".field-error").forEach(function (el) {
             el.textContent = "";
         });
         modal.querySelectorAll(".field-invalid").forEach(function (el) {
@@ -109,17 +107,21 @@ MoffatBay.accountModals = (function () {
     }
 
     /**
-     * Shows a modal and moves focus into it.
+     * Shows a modal with a clean slate. Both are the shared .modal, so
+     * modal.js does the showing, the focus (the first field) and the
+     * closing - the backdrop, the x and Escape. The last attempt's
+     * messages and ticks are cleared here, on the way in, so it doesn't
+     * matter which of those closed it.
      * @param {Element} modal - the modal to open
-     * @param {string} firstFieldId - id of the field to focus
      */
-    function open(modal, firstFieldId) {
+    function open(modal) {
         if (!modal) { return; }
-        lastFocused = document.activeElement;
+        clearErrors(modal);
         clearRules(modal);
-        modal.classList.add("is-open");
-        var first = document.getElementById(firstFieldId);
-        if (first) { first.focus(); }
+        modal.querySelectorAll(".form-banner").forEach(function (banner) {
+            banner.hidden = true;
+        });
+        MoffatBay.modal.open(modal);
     }
 
     /**
@@ -127,11 +129,7 @@ MoffatBay.accountModals = (function () {
      * @param {Element} modal - the modal to close
      */
     function close(modal) {
-        if (!modal) { return; }
-        modal.classList.remove("is-open");
-        clearErrors(modal);
-        clearRules(modal);
-        if (lastFocused) { lastFocused.focus(); }
+        MoffatBay.modal.close(modal);
     }
 
     /**
@@ -142,14 +140,14 @@ MoffatBay.accountModals = (function () {
     function openForgot(email) {
         var field = document.getElementById("forgotEmail");
         if (email && field && field.value === "") { field.value = email; }
-        open(forgotModal, "forgotEmail");
+        open(forgotModal);
     }
 
     /**
      * Opens the change-password modal.
      */
     function openChange() {
-        open(changeModal, "currentPassword");
+        open(changeModal);
     }
 
     /**
@@ -185,10 +183,6 @@ MoffatBay.accountModals = (function () {
        ================================================================== */
 
     if (forgotModal) {
-
-        forgotModal.querySelectorAll("[data-forgot-close]").forEach(function (el) {
-            el.addEventListener("click", function () { close(forgotModal); });
-        });
 
         var forgotNew = document.getElementById("forgotNewPassword");
         if (forgotNew) {
@@ -245,10 +239,6 @@ MoffatBay.accountModals = (function () {
        ================================================================== */
 
     if (changeModal) {
-
-        changeModal.querySelectorAll("[data-change-close]").forEach(function (el) {
-            el.addEventListener("click", function () { close(changeModal); });
-        });
 
         var changeNew = document.getElementById("newPassword");
         if (changeNew) {
@@ -325,14 +315,6 @@ MoffatBay.accountModals = (function () {
             });
         }
     }
-
-    /* Escape closes whichever is open. Bound once rather than per modal, so
-       there's one place that decides what Escape does. */
-    document.addEventListener("keydown", function (event) {
-        if (event.key !== "Escape") { return; }
-        if (forgotModal && forgotModal.classList.contains("is-open")) { close(forgotModal); }
-        if (changeModal && changeModal.classList.contains("is-open")) { close(changeModal); }
-    });
 
     return {
         openForgot: openForgot,

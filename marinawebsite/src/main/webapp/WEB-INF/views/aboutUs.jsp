@@ -42,22 +42,22 @@
     <jsp:param name="activePage" value="about" />
 </jsp:include>
 
-<main>
+<%-- ================================================================
+     Hero. Outside <main>, like every page's hero (see .hero-band in
+     site.css), so it spans the window.
+     ================================================================ --%>
+<header class="hero-band" id="aboutHero">
+    <%-- .hero-band is a flex container that centres one child, so the
+         heading and lede go inside .hero-band__content. As direct
+         children they lay out side by side in a row. --%>
+    <div class="hero-band__content">
+        <h1>About Moffat Bay Marina</h1>
+        <p class="hero-band__lede">Your Harbor Between Horizons</p>
+    </div>
+    <p class="hero-band__credit">Image created with Google Gemini</p>
+</header>
 
-    <%-- ================================================================
-         Intro band. Same treatment as the Registration page's, so the
-         two secondary pages open the same way.
-         ================================================================ --%>
-    <section class="hero-band" id="aboutHero">
-        <%-- .hero-band is a flex container that centres one child, so the
-             heading and lede go inside .hero-band__content. As direct
-             children they lay out side by side in a row. --%>
-        <div class="hero-band__content">
-            <h1>About Moffat Bay Marina</h1>
-            <p class="hero-band__lede">Your Harbor Between Horizons</p>
-        </div>
-        <p class="hero-band__credit">Hero image created with Google Gemini</p>
-    </section>
+<main>
 
     <div class="about-page">
 

@@ -14,27 +14,11 @@
  */
 
 /* ==========================================================================
-   Page frame
-
-   This page loads registration.css for the boat card's .form-column, and
-   that stylesheet restyles bare `main` - a max-width and page padding meant
-   for the Registration form. It leaks onto every page that borrows those
-   classes (Edit User Info and Reservation too). Undone here rather than
-   there, because changing registration.css would move three finished pages;
-   myFleet.css loads after it, so this wins for this page alone.
-
-   .fleet-page then owns its own width, and the hero above it - which sits
-   outside main - spans the window.
+   Page frame - the site's wide content column (--content-wide in site.css).
    ========================================================================== */
 
-main {
-    max-width: none;
-    margin: 0;
-    padding: 0;
-}
-
 .fleet-page {
-    max-width: 68rem;
+    max-width: var(--content-wide);
     margin: 0 auto;
     padding: 2rem 1.5rem 3rem;
 }
@@ -66,7 +50,7 @@ main {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.75rem;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading);
     font-size: 1.875rem;
     font-weight: normal;
     color: var(--color-text-heading);
@@ -74,9 +58,9 @@ main {
 
 .fleet-count-badge {
     padding: 0.25rem 0.75rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: color-mix(in srgb, var(--color-ocean-blue) 12%, transparent);
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -157,7 +141,7 @@ main {
     gap: 0.375rem;
     min-height: 44px;
     padding: 0.5625rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: color-mix(in srgb, var(--color-ocean-blue) 10%, transparent);
     font-size: 0.875rem;
     font-weight: 600;
@@ -253,7 +237,7 @@ main {
     letter-spacing: 0.07em;
     text-transform: uppercase;
     padding: 0.1875rem 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: color-mix(in srgb, var(--color-golden-hour) 28%, transparent);
     color: var(--color-record-badge-label);
 }
@@ -282,7 +266,7 @@ main {
 }
 
 /* The modal's own Clear/Revert button, which boatInfoCard.jsp renders. */
-#boatModal .btn-clear-section {
+#boatModal .btn-outline {
     margin-top: 0.5rem;
 }
 

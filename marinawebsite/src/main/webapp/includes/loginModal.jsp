@@ -103,32 +103,40 @@
 <c:set var="signInRequested"
        value="${not empty param.signIn and not sessionScope.loggedIn}"/>
 
-<div class="login-modal <c:if test='${not empty loginError or signInRequested}'>is-open</c:if>"
+<%-- The site's shared .modal (site.css), opened and closed through
+     js/modal.js like every other popup - the backdrop, the x and Escape all
+     close it there. Rendered without `hidden` when the server wants it open
+     on arrival (a failed attempt, or ?signIn=). --%>
+<div class="modal login-modal"
      id="loginModal"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="loginModalTitle">
+     aria-labelledby="loginModalTitle"
+     <c:if test="${empty loginError and not signInRequested}">hidden</c:if>>
 
-    <div class="login-modal__backdrop" data-login-close></div>
+    <button type="button" class="modal__backdrop" data-modal-close
+            aria-label="Close sign in" tabindex="-1"></button>
 
-    <div class="login-modal__panel">
+    <div class="modal__box modal__box--narrow">
 
-        <button type="button"
-                class="login-modal__close"
-                data-login-close
-                aria-label="Close sign in">&times;</button>
-
-        <h2 class="login-modal__title" id="loginModalTitle">Sign in</h2>
+        <div class="modal__header">
+            <h2 class="modal__title" id="loginModalTitle">Sign in</h2>
+            <button type="button" class="modal__close" data-modal-close
+                    aria-label="Close sign in">&times;</button>
+        </div>
 
         <%-- Why the box opened by itself: they asked for a page that needs
              an account. Not shown once a failed attempt has its own
              message to show. --%>
         <c:if test="${signInRequested and empty loginError}">
-            <p class="login-modal__note">Please sign in, or register, to continue.</p>
+            <p class="modal__note login-modal__note">Please sign in, or register, to continue.</p>
         </c:if>
 
+        <%-- A banner, not a field message: a failed sign-in is about the
+             whole form (see "Telling the customer what happened" in
+             Templates/pageTemplate.jsp). --%>
         <c:if test="${not empty loginError}">
-            <p class="login-modal__error" role="alert">
+            <p class="form-banner login-modal__banner" role="alert">
                 <c:out value="${loginError}"/>
             </p>
         </c:if>
@@ -139,7 +147,7 @@
              attacker which addresses are registered, which is the exact thing
              the generic error above is there to prevent. --%>
         <c:if test="${not empty lockoutThreshold}">
-            <p class="login-modal__warning" role="status">
+            <p class="callout-badge login-modal__banner" role="status">
                 Accounts are locked after <c:out value="${lockoutThreshold}"/>
                 unsuccessful attempts.
             </p>
@@ -162,13 +170,13 @@
                  they can't complete. --%>
             <c:when test="${accountLocked}">
 
-                <p class="login-modal__note">
+                <p class="modal__note login-modal__note">
                     Unlocking an account means setting a new password. We'll
                     send a verification code to the email on the account.
                 </p>
 
                 <button type="button"
-                        class="login-modal__submit"
+                        class="btn-primary login-modal__submit"
                         id="lockedResetTrigger"
                         data-forgot-trigger
                         data-email="${fn:escapeXml(loginEmail)}">
@@ -188,7 +196,7 @@
 
                     <input type="hidden" name="redirectTo" value="${fn:escapeXml(loginRedirectTo)}">
 
-                    <div class="login-modal__field">
+                    <div class="form-group">
                         <label for="loginEmail">Email address</label>
                         <input type="email"
                                id="loginEmail"
@@ -197,17 +205,17 @@
                                maxlength="100"
                                autocomplete="email"
                                required>
-                        <p class="login-modal__field-error" id="loginEmailError"></p>
+                        <p class="field-error" id="loginEmailError"></p>
                     </div>
 
-                    <div class="login-modal__field">
+                    <div class="form-group">
                         <label for="loginPassword">Password</label>
                         <input type="password"
                                id="loginPassword"
                                name="password"
                                autocomplete="current-password"
                                required>
-                        <p class="login-modal__field-error" id="loginPasswordError"></p>
+                        <p class="field-error" id="loginPasswordError"></p>
                     </div>
 
                     <%-- A button, not a link: it opens the reset popup rather
@@ -220,7 +228,7 @@
                         </button>
                     </p>
 
-                    <button type="submit" class="login-modal__submit">Sign in</button>
+                    <button type="submit" class="btn-primary login-modal__submit">Sign in</button>
                 </form>
 
                 <%-- Carries the same return page as the sign-in form, so
@@ -244,6 +252,7 @@
 </div>
 
 <jsp:include page="/includes/forgotPasswordModal.jsp" />
+
 
 <script src="${pageContext.request.contextPath}/js/formValidation.js"></script>
 <script src="${pageContext.request.contextPath}/js/loginModal.js" defer></script>

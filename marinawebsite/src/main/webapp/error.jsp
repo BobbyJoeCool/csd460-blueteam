@@ -69,7 +69,7 @@
 
             <p class="error-pirate-message">${errorMessage}</p>
 
-            <a class="error-pirate-home-link" href="${pageContext.request.contextPath}/">
+            <a class="btn-action" href="${pageContext.request.contextPath}/">
                 Back to Home Port
             </a>
 

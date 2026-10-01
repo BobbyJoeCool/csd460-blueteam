@@ -16,9 +16,10 @@
  * top when two are open. Coming back to a page with the browser's Back
  * button closes any popup that was open when the page was left.
  *
- * Used by My Fleet, My Reservations and Your Account. The login and password modals use
- * their own older .is-open pattern (accountModals.js, loginModal.js) and
- * don't go through this.
+ * Every popup on the site uses this: My Fleet, My Reservations, Your
+ * Account, Book a Slip (the boat panel and the booking confirmation), and
+ * the Sign in / Reset password / Change password popups, whose own scripts
+ * (loginModal.js, accountModals.js) call open() and close() here.
  *
  * Loaded on every page by includes/header.jsp, deferred, ahead of any
  * page's own deferred script.

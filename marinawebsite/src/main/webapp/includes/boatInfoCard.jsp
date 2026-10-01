@@ -164,6 +164,6 @@
 
 <div class="field-error" id="boatSectionError"></div>
 
-<button type="button" class="btn-clear-section" id="clearBoatInfo">
+<button type="button" class="btn-outline" id="clearBoatInfo">
     Clear Boat Info
 </button>

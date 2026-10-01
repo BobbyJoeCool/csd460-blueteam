@@ -40,7 +40,7 @@
     </div>
 
     <p class="hero-band__credit">
-        Hero image created with Google Gemini
+        Image created with Google Gemini
     </p>
 </header>
 
@@ -58,7 +58,7 @@
 
                 <article class="waitlist-summary-card">
 
-                    <h3>${summary.sizeFt} FT</h3>
+                    <h3>${summary.sizeFt} ft</h3>
 
                     <p>
                         <strong>Guests Waiting:</strong>
@@ -137,7 +137,7 @@
 
                         <article class="waitlist-entry-card">
 
-                            <h3>${entry.sizeFt} FT Slip</h3>
+                            <h3>${entry.sizeFt} ft Slip</h3>
 
                             <p>
                                 <strong>Position:</strong>

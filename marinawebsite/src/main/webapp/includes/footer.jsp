@@ -29,7 +29,7 @@
                 <p><c:out value="${row.key}"/>: <c:out value="${row.value}"/></p>
             </c:forEach>
 
-            <h2 class="self-service-heading"><c:out value="${marina.slipHolderAccess}"/></h2>
+            <p class="self-service-note"><c:out value="${marina.slipHolderAccess}"/></p>
         </section>
 
         <section class="footer-quick-links">
