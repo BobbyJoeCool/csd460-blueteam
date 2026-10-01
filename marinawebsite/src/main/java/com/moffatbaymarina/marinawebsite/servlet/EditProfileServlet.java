@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -83,10 +84,9 @@ public class EditProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || !Boolean.TRUE.equals(session.getAttribute("loggedIn"))) {
-            // Exact target for a logged-out hit isn't specified anywhere in
-            // the contract (see the implementation plan's Gaps #7) - the
-            // landing page is the same default LoginServlet falls back to.
-            response.sendRedirect(request.getContextPath() + "/");
+            // Signed out: home page with the sign-in box open, coming back
+            // here afterwards (Beta Priority 1 plan, decision D3).
+            CustomerSession.sendToSignIn(request, response, "/editProfile");
             return;
         }
 
@@ -124,7 +124,9 @@ public class EditProfileServlet extends HttpServlet {
         Object customerIdAttr = session == null ? null : session.getAttribute("customerId");
         Object customerAttr = session == null ? null : session.getAttribute("customer");
         if (!(customerIdAttr instanceof Integer customerId) || !(customerAttr instanceof Customer current)) {
-            response.sendRedirect(request.getContextPath() + "/");
+            // Usually a session that timed out mid-edit. Back to this page
+            // after signing in, not a replay of the form.
+            CustomerSession.sendToSignIn(request, response, "/editProfile");
             return;
         }
 

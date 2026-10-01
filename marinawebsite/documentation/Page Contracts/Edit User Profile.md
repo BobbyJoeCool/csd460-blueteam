@@ -256,4 +256,4 @@ Every user-facing error condition this page can hit, and exactly what the user s
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Edit user information | Available to the signed-in user | Not reachable while logged out |
+| Edit user information | Available to the signed-in user | Not reachable while logged out. A GET, or a save after the session timed out, is sent to the landing page with the sign-in box already open; signing in, or registering from the box, lands back on `/editProfile` (**changed 2026-09-30, #299**; it was a silent redirect home). `CustomerSession.sendToSignIn(request, response, "/editProfile")`. |

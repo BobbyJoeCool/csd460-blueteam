@@ -115,8 +115,13 @@ public class ReservationServlet extends HttpServlet {
             writeJson(response, "{\"ok\":false,\"dockError\":\"Choose which dock you'd like to be on.\"}");
             return;
         }
-        if (startDate == null || startDate.isBefore(LocalDate.now())) {
-            writeJson(response, "{\"ok\":false,\"dateError\":\"Choose a check-in date of today or later.\"}");
+        if (startDate == null) {
+            writeJson(response, "{\"ok\":false,\"dateError\":\"Choose a start date.\"}");
+            return;
+        }
+        // Same wording reservation.js shows under the field for a past date.
+        if (startDate.isBefore(LocalDate.now())) {
+            writeJson(response, "{\"ok\":false,\"dateError\":\"Start date can't be in the past. Choose today or later.\"}");
             return;
         }
 

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -14,7 +15,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * @author Carolina R.
@@ -43,17 +43,11 @@ public class MyFleetRemoveServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         // Make sure the customer is signed in.
-        HttpSession session = request.getSession(false);
-
-        if (session == null
-                || !(session.getAttribute("customerId") instanceof Number)) {
-
-            response.sendRedirect(request.getContextPath() + "/");
+        Integer customerId = Utils.signedInCustomerId(request);
+        if (customerId == null) {
+            CustomerSession.sendToSignIn(request, response, "/myFleet");
             return;
         }
-
-        int customerId =
-                ((Number) session.getAttribute("customerId")).intValue();
 
         // Get the boat that the customer wants to remove.
         Integer boatId =
@@ -80,22 +74,8 @@ public class MyFleetRemoveServlet extends HttpServlet {
 
             if (boat == null) {
 
-                request.setAttribute(
-                        "formError",
-                        "That boat couldn't be found in your fleet."
-                );
-
-                request.setAttribute(
-                        "fleet",
-                        boatDAO.findFleetByCustomerId(
-                                conn,
-                                customerId
-                        )
-                );
-
-                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                        .forward(request, response);
-
+                MyFleetServlet.showFleet(request, response, conn, customerId,
+                        "That boat couldn't be found in your fleet.");
                 return;
             }
 
@@ -108,24 +88,10 @@ public class MyFleetRemoveServlet extends HttpServlet {
 
             if (reservationLocation != null) {
 
-                request.setAttribute(
-                        "formError",
+                MyFleetServlet.showFleet(request, response, conn, customerId,
                         "This boat can't be removed from your account while it's part of an active reservation ("
-                                + reservationLocation
-                                + ")."
-                );
-
-                request.setAttribute(
-                        "fleet",
-                        boatDAO.findFleetByCustomerId(
-                                conn,
-                                customerId
-                        )
-                );
-
-                request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                        .forward(request, response);
-
+                        + reservationLocation
+                        + ").");
                 return;
             }
 
@@ -145,22 +111,8 @@ public class MyFleetRemoveServlet extends HttpServlet {
 
                     conn.rollback();
 
-                    request.setAttribute(
-                            "formError",
-                            "That boat couldn't be found in your fleet."
-                    );
-
-                    request.setAttribute(
-                            "fleet",
-                            boatDAO.findFleetByCustomerId(
-                                    conn,
-                                    customerId
-                            )
-                    );
-
-                    request.getRequestDispatcher("/WEB-INF/views/myFleet.jsp")
-                            .forward(request, response);
-
+                    MyFleetServlet.showFleet(request, response, conn, customerId,
+                            "That boat couldn't be found in your fleet.");
                     return;
                 }
 

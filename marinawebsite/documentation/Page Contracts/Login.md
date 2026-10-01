@@ -53,7 +53,10 @@ That means each customer's record needs to track two things it doesn't right now
 
 That placeholder is retired, along with `CustomerDAO.unlockAccount()`. Per the Edit User Profile contract's "Password Change and the Lockout Model," a locked account is meant to unlock itself only by successfully completing a simulated forgot-password reset: the account's email, a fake verification code (`12345`, standing in for the email-a-code step this project can't actually do), and a new password. `ForgotPasswordServlet` (`/forgotPassword`) is built and working - it looks the account up by email, verifies the code, then calls `CustomerDAO.resetPasswordAndUnlock()`, which changes the password *and* clears both `accountLocked` and `failedLoginAttempts` in one transaction. No auto-login happens - the customer signs back in with the new password same as after any other password change.
 
-The actual front-end trigger and modal (a "Reset Password" button here opening some UI that collects those three fields and posts them to `/forgotPassword`) are **not built yet** - that's Front End's to design and build, not something Back End should be putting together as a stand-in. Until it exists, the locked-out state here just shows the lockout message with no recovery action in the UI.
+**Built (updated 2026-09-30):** the reset UI is `includes/forgotPasswordModal.jsp`, included at the foot of the login modal so it's on every page. Two controls open it, sharing one script (`[data-forgot-trigger]` in `loginModal.jsp`):
+
+- **Forgot password?** under the Password field of the normal sign-in form (#300, beta test). It pre-fills the reset's email with whatever is typed in the sign-in Email field. Before this, a customer who had only forgotten their password had to fail three times and lock the account to reach the reset.
+- **Reset your password** in the locked-out state, pre-filled with the address that was just locked.
 
 Identifying the account by email, not a session, is deliberate: a locked-out visitor has no logged-in session to identify them any other way, and this flow has to work regardless of whether it's used right after the lockout or from a different device entirely later on. An unrecognized email and a correct-email-wrong-code submission produce the identical message - the same anti-enumeration handling this page already uses for its own generic "username or password is incorrect" error - so a submission here can never be used to check which emails are registered.
 
@@ -69,6 +72,8 @@ Once someone logs in, the rest of the site needs an easy way to know they're log
 | A short greeting name | `"Robert B."` | First name plus last initial, ready to drop into a nav bar greeting without every page having to build it itself |
 
 Logging out clears all of it at once.
+
+**Updated 2026-09-30:** these four are set in one place, `CustomerSession.start()` (`util/CustomerSession.java`), which also starts a fresh session first so the session ID changes on sign-in. `LoginServlet` calls it on a successful login, and `RegisterServlet` calls it right after a new account is created, so signing in and registering can't drift apart.
 
 **Added 2026-09-06.** "Logging out" is now an actual endpoint: `LogoutServlet`
 at `/logout`, POST only, which invalidates the session and redirects to the
@@ -109,7 +114,7 @@ Two different failure messages, so the user knows what's going on. Neither one e
 - **Lockout rule notice:** every failed sign-in also sets `lockoutThreshold` (an int, always 3) so the modal can add "Accounts are locked after 3 unsuccessful attempts." under the error. It is the same message on every failure, whether or not the email belongs to a real account.
 
   **Changed 2026-09-04.** This started out as a per-account countdown — `attemptsRemaining`, rendering "2 more failed attempts will lock this account." That was a mistake. A countdown can only appear for an address that actually exists, so watching for it confirmed which emails were registered, which is precisely what the single generic error message exists to prevent. The fixed notice gives the user the same useful warning and tells an attacker nothing.
-- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal. **Updated 2026-09-14:** the demo "Unlock Account" button described here originally is retired and not yet replaced with a real one in the UI - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures) above. `ForgotPasswordServlet` (`/forgotPassword`) is ready for Front End to build a trigger against.
+- **Account locked (3 failed attempts in a row):** "This account has been locked after multiple failed login attempts." Shown the same way, inline in the modal, with a **Reset your password** button in place of the sign-in form that opens the Forgot Password modal - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures) above.
 
 ### Where the User Lands After Login
 
@@ -119,6 +124,11 @@ The front end tells the back end where to send the user afterward, by including 
 - If the user just clicked "Log In" on their own, this points to whatever page they were already on.
 
 The back end doesn't need to know which case it is, it just sends the user wherever `redirectTo` points once login succeeds, and falls back to the homepage if that value is missing or looks like it points off the site.
+
+**Added 2026-09-30 (#299, beta test):**
+
+- **Register here carries the same return page.** The modal's Register here link is `/register?redirectTo=<the same value>`, and `loginModal.js`'s `open(redirectTo)` rewrites it along with the hidden fields. A visitor who registers instead of signing in is signed in automatically and lands in the same place (see the Registration contract).
+- **`?signIn=<path>` opens the modal on load.** Members-only pages with no signed-out view of their own (My Fleet, User Profile) send a signed-out visitor to `/?signIn=/myFleet` (`CustomerSession.sendToSignIn`). The modal renders already open, only for someone signed out, with a "Please sign in, or register, to continue." note and that path as `redirectTo` (when no `redirectTo` was given). `loginModal.js` then removes `signIn` from the address bar so a refresh doesn't reopen it.
 
 ### Email Format Check on the Back End
 
@@ -134,7 +144,7 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | --- | --- | --- | --- |
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`. Trimmed before submit and checked with `MoffatBay.form.isValidEmail` |
 | `password` | password | Yes | No `maxlength` — the stored value is a hash, and Registration's rule is a *minimum* of 10 characters, not a maximum |
-| `redirectTo` | hidden | Yes | Context-relative path (`/index.jsp`, never `/marinawebsite/index.jsp`), since the servlet prepends `getContextPath()`. Defaults to the current page; reuses the submitted value on a retry so a failed attempt doesn't reset the target to `/login` |
+| `redirectTo` | hidden | Yes | Context-relative path (`/reservation`, never `/marinawebsite/reservation`), since the servlet prepends `getContextPath()`. Defaults to `param.redirectTo`, then `param.signIn`, then the current page; reuses the submitted value on a retry so a failed attempt doesn't reset the target to `/login` |
 
 **Retired 2026-09-14:** the `action=reset` hidden field and the Unlock Account
 form that sent it no longer exist - see [Locking an Account After Repeated

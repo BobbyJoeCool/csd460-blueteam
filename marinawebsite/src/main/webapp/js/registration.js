@@ -374,9 +374,13 @@
         }
     });
 
+    // Signing in from here goes where registering would have: the page
+    // the customer came to register from, or the home page - never back
+    // to this form, which is no use to someone who's signed in.
     document.getElementById("loginLinkTrigger").addEventListener("click", function (event) {
         event.preventDefault();
-        MoffatBay.loginModal.open();
+        var back = form.elements.redirectTo && form.elements.redirectTo.value;
+        MoffatBay.loginModal.open(back || "/");
     });
 
     applyCountryToBoatSection();

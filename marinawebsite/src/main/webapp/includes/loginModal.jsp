@@ -4,13 +4,16 @@
   The Login modal from the Login contract. Included by any page that offers
   a Log In control; it renders hidden until something opens it.
 
-  Two ways it opens:
+  Three ways it opens:
     1. A user clicks a Log In control - MoffatBay.loginModal.open() in
        loginModal.js.
     2. LoginServlet forwarded back here after a failed attempt, which sets
        the loginError request attribute. In that case the modal renders
        already open with the message inside, so from the user's side it
        just never closed.
+    3. A members-only page sent a signed-out visitor here with
+       ?signIn=<page> (CustomerSession.sendToSignIn). The modal renders
+       already open, with that page as where to go afterwards.
 
   Reads from the request (all set by LoginServlet):
     loginError        - the message to show. Its presence is what opens the modal.
@@ -83,10 +86,24 @@
        value="${fn:substring(originalUri,
                              fn:length(pageContext.request.contextPath),
                              fn:length(originalUri))}"/>
+<%--
+  ?signIn=<path> is how a members-only page with no signed-out view of its
+  own (My Fleet, User Profile) sends a visitor here: CustomerSession
+  .sendToSignIn() redirects to /?signIn=/myFleet. It supplies the return
+  page when there's no redirectTo, and opens the modal on load - but only
+  for someone signed out, so a stale or shared link does nothing once
+  they're in. Like redirectTo, it's only ever written into the page escaped,
+  and LoginServlet and RegisterServlet both check it with
+  Utils.safeRedirectTarget before redirecting anywhere.
+--%>
 <c:set var="loginRedirectTo"
-       value="${not empty param.redirectTo ? param.redirectTo : currentPath}"/>
+       value="${not empty param.redirectTo ? param.redirectTo
+              : not empty param.signIn ? param.signIn
+              : currentPath}"/>
+<c:set var="signInRequested"
+       value="${not empty param.signIn and not sessionScope.loggedIn}"/>
 
-<div class="login-modal <c:if test='${not empty loginError}'>is-open</c:if>"
+<div class="login-modal <c:if test='${not empty loginError or signInRequested}'>is-open</c:if>"
      id="loginModal"
      role="dialog"
      aria-modal="true"
@@ -102,6 +119,13 @@
                 aria-label="Close sign in">&times;</button>
 
         <h2 class="login-modal__title" id="loginModalTitle">Sign in</h2>
+
+        <%-- Why the box opened by itself: they asked for a page that needs
+             an account. Not shown once a failed attempt has its own
+             message to show. --%>
+        <c:if test="${signInRequested and empty loginError}">
+            <p class="login-modal__note">Please sign in, or register, to continue.</p>
+        </c:if>
 
         <c:if test="${not empty loginError}">
             <p class="login-modal__error" role="alert">
@@ -146,6 +170,7 @@
                 <button type="button"
                         class="login-modal__submit"
                         id="lockedResetTrigger"
+                        data-forgot-trigger
                         data-email="${fn:escapeXml(loginEmail)}">
                     Reset your password
                 </button>
@@ -185,12 +210,31 @@
                         <p class="login-modal__field-error" id="loginPasswordError"></p>
                     </div>
 
+                    <%-- A button, not a link: it opens the reset popup rather
+                         than going anywhere. type="button" so it can't submit
+                         the sign-in form. Wired by the script at the foot of
+                         this file, together with the locked-out button. --%>
+                    <p class="login-modal__forgot">
+                        <button type="button" class="login-modal__link" data-forgot-trigger>
+                            Forgot password?
+                        </button>
+                    </p>
+
                     <button type="submit" class="login-modal__submit">Sign in</button>
                 </form>
 
+                <%-- Carries the same return page as the sign-in form, so
+                     registering lands where signing in would have (Book a
+                     Slip, My Reservations, ...). <c:url> adds the context
+                     path and URL-encodes the value. loginModal.js's open()
+                     rewrites it along with the hidden fields when a
+                     control opens the modal for somewhere else. --%>
+                <c:url var="registerUrl" value="/register">
+                    <c:param name="redirectTo" value="${loginRedirectTo}"/>
+                </c:url>
                 <p class="login-modal__alt">
                     No account yet?
-                    <a href="${pageContext.request.contextPath}/register">Register here</a>
+                    <a href="${fn:escapeXml(registerUrl)}" id="loginRegisterLink">Register here</a>
                 </p>
 
             </c:otherwise>
@@ -205,16 +249,25 @@
 <script src="${pageContext.request.contextPath}/js/loginModal.js" defer></script>
 <script src="${pageContext.request.contextPath}/js/accountModals.js" defer></script>
 <script>
-    /* The locked-out state's only control. Wired here rather than in
-       accountModals.js because the button only exists on the render where
-       LoginServlet set accountLocked, and the email it carries is the one
-       just typed - so the reset opens with the address already in it. */
+    /* Both ways into the password reset: "Forgot password?" under the
+       sign-in form, and "Reset your password" in the locked-out state.
+       Wired here rather than in accountModals.js because they are this
+       modal's controls, and only one of them is on any given render.
+
+       The email to pre-fill: the locked-out button carries the address
+       that was just locked (data-email); otherwise, whatever is typed in
+       the sign-in form's Email field. openForgot() only fills the reset's
+       field if it's empty, so it never overwrites one that came back
+       after a failed reset. */
     document.addEventListener("DOMContentLoaded", function () {
-        var trigger = document.getElementById("lockedResetTrigger");
-        if (!trigger) { return; }
-        trigger.addEventListener("click", function () {
-            MoffatBay.loginModal.close();
-            MoffatBay.accountModals.openForgot(trigger.dataset.email);
+        document.querySelectorAll("[data-forgot-trigger]").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                var typed = document.getElementById("loginEmail");
+                var email = trigger.dataset.email
+                        || (typed ? typed.value.trim() : "");
+                MoffatBay.loginModal.close();
+                MoffatBay.accountModals.openForgot(email);
+            });
         });
     });
 </script>

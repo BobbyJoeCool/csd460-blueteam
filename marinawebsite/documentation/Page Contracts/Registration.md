@@ -137,8 +137,8 @@ So the concrete answer to "what attribute name and message does Back End set" (s
 - [x] **Duplicate email response:** `CustomerDAO.findByEmail()` checks for an existing account. On a match, Back End sets `emailError` to `"An account with this email already exists."` and forwards to `registration.jsp`.
 - [x] **Optional boat registration:** When any boat information is entered, `RegisterServlet` validates the boat and uses `BoatDAO.insertBoat()` to return the generated `boatID`.
 - [x] **Boat ownership:** After inserting a boat, `BoatDAO.insertOwnership()` connects its `boatID` to the new `customerID` through the `BoatOwnership` table.
-- [x] **Auto-login after registration:** The customer is not automatically logged in. Registration redirects to the landing page after success.
-- [x] **Post-registration redirect/forward:** Success redirects to `/?registered=true`. Validation or database failures forward to `/registration.jsp` so request parameters and error attributes remain available.
+- [x] **Auto-login after registration:** **Changed 2026-09-30 (#299, beta test):** the customer **is** signed in automatically. `RegisterServlet` loads the new account back by email and calls `CustomerSession.start()`, the same method `LoginServlet` uses. It was originally "not automatically logged in", but in beta testing a tester who clicked Book a Slip, registered, and landed on the home page signed out said it lost their place. If loading the account back fails, the account still exists, so registration falls back to the old behaviour (home page, signed out) rather than an error page.
+- [x] **Post-registration redirect/forward:** Success redirects to the `redirectTo` the customer arrived with (see the field table), checked with `Utils.safeRedirectTarget`, plus `registered=true` so the status popup says "Account created — welcome aboard" there. No `redirectTo`, an unsafe one, or one pointing back at `/register` goes to `/`. Validation or database failures forward to `registration.jsp` so request parameters and error attributes remain available.
 - [ ] **Input length limits:** Most database limits are enforced server-side. Validation still needs to confirm `streetAddress2` does not exceed 100 characters and `boatType` does not exceed 30 characters.
 - [x] **Servlet URL mapping:** `/register`.
 
@@ -168,6 +168,9 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | `boatYear` | number | **No, Optional** | Matches `Boat.boatYear`, a whole number model year |
 | `password` | password | Yes | 10+ characters, needs an uppercase letter, a lowercase letter, a number, and one of `! $ % * #`. Checked live as the user types |
 | `confirmPassword` | password | Yes, client-side only | Never submitted, see [Confirm Password](#confirm-password) above |
+| `redirectTo` | hidden | No | **Added 2026-09-30 (#299).** Where to land after registering, as a context-relative path. Set by the Login modal's Register here link (`/register?redirectTo=/reservation`, or `/myFleet` after a signed-out visit there) and kept through failed attempts, because those forward. The page's own "Log in" link opens the Login modal with this value too, falling back to `/`, so signing in from here doesn't land back on this form. |
+
+**Boat column note and placeholders (updated 2026-09-30, #304, beta test):** the boat column's note reads "You can add a boat now or later. If you add one, the starred fields are required.", so the red stars on Boat Name and Boat Length make sense in an optional section. The pirate-themed placeholders (Jack, Sparrow, Tortuga, Black Pearl, `jack.sparrow@blackpearl.sea`) are gone: name and city fields have none, email shows `you@example.com`, and the rest read as examples (`e.g. 45`). A site-wide `::placeholder` colour in `site.css` keeps example text lighter than typed text at 4.9:1 contrast. The placeholders live in the shared `personalInfoCard.jsp` and `boatInfoCard.jsp`, so Your Account, Book a Slip and My Fleet show the same ones.
 
 ## Back End Parameters
 

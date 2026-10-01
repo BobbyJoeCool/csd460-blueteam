@@ -35,6 +35,12 @@ MoffatBay.reservation = (function () {
     var dateError      = document.getElementById("dateError");
     var formError      = document.getElementById("formError");
 
+    /* One wording for a start date in the past, wherever it's reported:
+       the short one under the Reserve button, the full one under the
+       field. ReservationServlet sends the full one too. */
+    var DATE_PAST_SHORT = "Start date can't be in the past.";
+    var DATE_PAST_FULL  = "Start date can't be in the past. Choose today or later.";
+
     var availPanel     = document.getElementById("availabilityPanel");
     var availMessage   = document.getElementById("availabilityMessage");
     var waitPrompt     = document.getElementById("waitListPrompt");
@@ -429,15 +435,20 @@ MoffatBay.reservation = (function () {
         /* There is room somewhere, but they still have to say where, and
            when. Dock first, since it's the earlier step on the page. */
         var dockChosen = !!selectedDock();
-        var dateChosen = !!(checkInDate && checkInDate.value
-                && checkInDate.value >= todayIso());
+        var hasDate    = !!(checkInDate && checkInDate.value);
+        var datePast   = hasDate && checkInDate.value < todayIso();
 
-        setSubmitEnabled(dockChosen && dateChosen);
+        setSubmitEnabled(dockChosen && hasDate && !datePast);
 
+        /* A past date gets its own reason. It used to fall under "Choose a
+           start date", which reads as if the date they picked hadn't
+           registered at all. */
         if (!dockChosen) {
             setText(submitBlockedReason, "Choose a dock to continue.");
-        } else if (!dateChosen) {
+        } else if (!hasDate) {
             setText(submitBlockedReason, "Choose a start date to continue.");
+        } else if (datePast) {
+            setText(submitBlockedReason, DATE_PAST_SHORT);
         } else {
             setText(submitBlockedReason, "");
         }
@@ -686,10 +697,10 @@ MoffatBay.reservation = (function () {
             ok = false;
         }
         if (!checkInDate || !checkInDate.value) {
-            setText(dateError, "Choose a check-in date of today or later.");
+            setText(dateError, "Choose a start date.");
             ok = false;
         } else if (checkInDate.value < todayIso()) {
-            setText(dateError, "Choose a check-in date of today or later.");
+            setText(dateError, DATE_PAST_FULL);
             ok = false;
         }
         if (!ok) { return; }
@@ -723,6 +734,15 @@ MoffatBay.reservation = (function () {
                     }
                 });
                 refresh();
+                return;
+            }
+
+            /* The server's field-level refusals go under their own field,
+               the same place the page's own checks put them, rather than
+               becoming the generic banner. */
+            if (!result.ok && (result.dateError || result.dockError)) {
+                if (result.dateError) { setText(dateError, result.dateError); }
+                if (result.dockError) { setText(dockError, result.dockError); }
                 return;
             }
 
@@ -773,7 +793,12 @@ MoffatBay.reservation = (function () {
     if (electric)     { electric.addEventListener("change", updateSummary); }
     if (checkInDate)  {
         checkInDate.addEventListener("change", function () {
-            setText(dateError, "");
+            /* Flag a past date the moment it's entered. min stops the
+               picker offering one, but not a date typed in by hand, and
+               the submit-time check never runs for one because the
+               button is already disabled. */
+            setText(dateError, checkInDate.value && checkInDate.value < todayIso()
+                    ? DATE_PAST_FULL : "");
             updateAvailability();
             updateSummary();
         });

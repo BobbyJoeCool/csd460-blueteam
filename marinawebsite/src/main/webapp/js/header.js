@@ -67,7 +67,8 @@ MoffatBay.dropdowns = (function () {
     "use strict";
 
     // Wires one [data-dropdown]: its [data-dropdown-toggle] button opens
-    // and closes it, and Escape or a click outside closes it.
+    // and closes it, and Escape, a click outside, or tabbing out of it
+    // closes it.
     function init(dropdown) {
         var toggle = dropdown.querySelector("[data-dropdown-toggle]");
 
@@ -99,6 +100,16 @@ MoffatBay.dropdowns = (function () {
         // the other dropdown's button, so only one is ever open.
         document.addEventListener("click", function (event) {
             if (isOpen() && !dropdown.contains(event.target)) {
+                setOpen(false);
+            }
+        });
+
+        // Tabbing out of the menu closes it too, so it can't sit open over
+        // the content a keyboard user has moved on to (WCAG 2.2 "Focus Not
+        // Obscured"). relatedTarget is null when focus leaves the page,
+        // which contains() treats as outside, so that closes it as well.
+        dropdown.addEventListener("focusout", function (event) {
+            if (isOpen() && !dropdown.contains(event.relatedTarget)) {
                 setOpen(false);
             }
         });
