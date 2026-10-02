@@ -292,7 +292,7 @@ main,
 /* ==========================================================================
    Shared component styles
    Classes used by more than one page, kept here so every page that loads
-   site.css (via includes/styles.jsp) gets them without importing another
+   site.css (via WEB-INF/includes/styles.jsp) gets them without importing another
    page's stylesheet.
    ========================================================================== */
 
@@ -469,7 +469,7 @@ main,
 /* --------------------------------------------------------------------------
    Form groups — label + input/select + error stacks.
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp (boat panel),
-            includes/boatInfoCard.jsp, includes/personalInfoCard.jsp
+            WEB-INF/includes/boatInfoCard.jsp, WEB-INF/includes/personalInfoCard.jsp
    -------------------------------------------------------------------------- */
 
 .form-group {
@@ -562,7 +562,7 @@ main,
    Form layout — a titled column of fields, and rows that split in two.
    Used by: registration.jsp, editUserInfo.jsp, reservation.jsp (boat
             panel), myFleet.jsp (boat modal), through
-            includes/personalInfoCard.jsp and includes/boatInfoCard.jsp
+            WEB-INF/includes/personalInfoCard.jsp and WEB-INF/includes/boatInfoCard.jsp
 
    Moved from registration.css, which every one of those pages used to load
    just for these and so also picked up Registration's page width.
@@ -630,7 +630,7 @@ main,
 /* --------------------------------------------------------------------------
    Field error — validation message beneath a form field.
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
-            includes/boatInfoCard.jsp
+            WEB-INF/includes/boatInfoCard.jsp
    -------------------------------------------------------------------------- */
 
 .field-error {
@@ -648,7 +648,7 @@ main,
 /* --------------------------------------------------------------------------
    Required mark — the red asterisk after a label.
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
-            includes/boatInfoCard.jsp
+            WEB-INF/includes/boatInfoCard.jsp
    -------------------------------------------------------------------------- */
 
 .required-mark {
@@ -658,7 +658,7 @@ main,
 /* --------------------------------------------------------------------------
    Field hint — secondary label text (e.g. "(optional)", "(recommended)").
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
-            includes/boatInfoCard.jsp
+            WEB-INF/includes/boatInfoCard.jsp
    -------------------------------------------------------------------------- */
 
 .field-hint {
@@ -698,7 +698,7 @@ main,
 /* --------------------------------------------------------------------------
    Callout badge — informational (non-error) notice inside a form card.
    Used by: registration.jsp (foreign-registration note),
-            reservation.jsp (boat panel), includes/boatInfoCard.jsp
+            reservation.jsp (boat panel), WEB-INF/includes/boatInfoCard.jsp
             (including the over-50 ft length warning)
    -------------------------------------------------------------------------- */
 
@@ -1073,7 +1073,7 @@ main,
             confirmation), lookUpReservation.jsp (Cancel, 30-day notice),
             editUserInfo.jsp (Save these changes?), reservation.jsp (boat
             panel, Book this slip?), and the account popups in
-            includes/loginModal.jsp, forgotPasswordModal.jsp and
+            WEB-INF/includes/loginModal.jsp, forgotPasswordModal.jsp and
             changePasswordModal.jsp. Open/close: js/modal.js
 
    One backdrop, one close button, one Escape and focus handler for all of

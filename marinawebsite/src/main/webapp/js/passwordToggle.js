@@ -4,7 +4,7 @@
  * src/main/webapp/js/passwordToggle.js
  *
  * Show/hide "eye" button for every password field on the site. Loaded
- * once, from includes/header.jsp, so every page that carries the header
+ * once, from WEB-INF/includes/header.jsp, so every page that carries the header
  * (and the login, forgot-password and change-password modals that ride
  * along with it) gets the toggle without any per-page markup.
  *
@@ -15,7 +15,7 @@
  *         <button type="button" class="password-toggle__btn">(eye)</button>
  *     </div>
  *
- * Styling lives in css/passwordToggle.css (linked by includes/styles.jsp),
+ * Styling lives in css/passwordToggle.css (linked by WEB-INF/includes/styles.jsp),
  * so a new password field anywhere needs no extra CSS or JS - it just
  * needs to be type="password" and on a page that includes the header.
  *

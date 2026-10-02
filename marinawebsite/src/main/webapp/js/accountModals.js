@@ -7,13 +7,13 @@
  *
  * Open/close and client-side checks for the two password modals:
  *
- *   Forgot password  (includes/forgotPasswordModal.jsp) - on every page,
- *     since includes/loginModal.jsp pulls it in. A real form POST to
+ *   Forgot password  (WEB-INF/includes/forgotPasswordModal.jsp) - on every page,
+ *     since WEB-INF/includes/loginModal.jsp pulls it in. A real form POST to
  *     /forgotPassword that navigates, because a locked-out visitor has no
  *     session and the servlet answers with a page, forwarding back here on
  *     failure exactly like LoginServlet does.
  *
- *   Change password  (includes/changePasswordModal.jsp) - Edit User Info
+ *   Change password  (WEB-INF/includes/changePasswordModal.jsp) - Edit User Info
  *     only. Sent with fetch, because EditProfilePasswordServlet answers
  *     with JSON and the page is not supposed to move.
  *
@@ -23,7 +23,7 @@
  * Neither is a security boundary - both servlets re-check everything.
  *
  * Requires formValidation.js (MoffatBay.form.*), loaded by
- * includes/loginModal.jsp. Deliberately does NOT use passwordRules.js -
+ * WEB-INF/includes/loginModal.jsp. Deliberately does NOT use passwordRules.js -
  * see checkRules below for why.
  */
 var MoffatBay = window.MoffatBay || {};

@@ -12,7 +12,7 @@
   Usage - pass the page's display name so the message can reference it:
 
     <main>
-        <jsp:include page="/includes/comingSoon.jsp">
+        <jsp:include page="/WEB-INF/includes/comingSoon.jsp">
             <jsp:param name="pageName" value="About Us" />
         </jsp:include>
     </main>

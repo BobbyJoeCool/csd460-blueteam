@@ -211,6 +211,15 @@ public class UtilsTest {
     }
 
     @Test
+    public void safeRedirectTargetRejectsSpacesAndControlCharacters() {
+        assertEquals("/", Utils.safeRedirectTarget("/\t/evil.example", "/"));
+        assertEquals("/", Utils.safeRedirectTarget("/\r\nSet-Cookie: x=1", "/"));
+        assertEquals("/", Utils.safeRedirectTarget("/ /evil.example", "/"));
+        assertEquals("/", Utils.safeRedirectTarget("/myFleet\u007f", "/"));
+        assertEquals("/myFleet", Utils.safeRedirectTarget("/myFleet", "/"));
+    }
+
+    @Test
     public void isDuplicateKey() {
         assertTrue(Utils.isDuplicateKey(new SQLException("dup", "23000", 1062)));
         assertTrue(Utils.isDuplicateKey(new SQLException("fk", "23000", 1452)));

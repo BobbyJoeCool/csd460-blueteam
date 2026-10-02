@@ -17,10 +17,13 @@
  * the backdrop and putting focus back all go through js/modal.js - this
  * file only adds what is particular to signing in.
  *
- * Any page can open the modal with:
+ * A button opens the modal by carrying data-sign-in, optionally with the
+ * page to land on after (data-sign-in="/reservation"); add
+ * data-sign-in-now to open it as soon as the page loads. Markup never uses
+ * onclick="...": the Content-Security-Policy (SecurityHeadersFilter)
+ * blocks inline script. Scripts can still call:
  *     MoffatBay.loginModal.open();
- * e.g. from the nav Log In control, or from the Registration page's
- * duplicate-email popup.
+ * e.g. the Registration page's duplicate-email popup.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -123,6 +126,39 @@ MoffatBay.loginModal = (function () {
             }
         }
     }
+
+    /* Every Sign In / Log In button: the nav, the home page's Book a Slip,
+       and the signed-out views of the members-only pages. An empty
+       data-sign-in means "come back to this page". */
+    document.querySelectorAll("[data-sign-in]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            open(button.dataset.signIn);
+        });
+    });
+
+    if (document.querySelector("[data-sign-in-now]")) {
+        open();
+    }
+
+    /* Both ways into the password reset: "Forgot password?" under the
+       sign-in form, and "Reset your password" in the locked-out state.
+       Only one of them is on any given render.
+
+       The email to pre-fill: the locked-out button carries the address
+       that was just locked (data-email); otherwise, whatever is typed in
+       the sign-in form's Email field. openForgot() only fills the reset's
+       field if it's empty, so it never overwrites one that came back
+       after a failed reset. accountModals.js loads after this file, so
+       it's looked up at click time. */
+    document.querySelectorAll("[data-forgot-trigger]").forEach(function (trigger) {
+        trigger.addEventListener("click", function () {
+            var typed = document.getElementById("loginEmail");
+            var email = trigger.dataset.email
+                    || (typed ? typed.value.trim() : "");
+            close();
+            MoffatBay.accountModals.openForgot(email);
+        });
+    });
 
     if (form) {
 

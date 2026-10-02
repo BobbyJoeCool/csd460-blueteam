@@ -49,8 +49,8 @@
      * Registration State/Province's option list swaps with Country
      * without a page reload - boatInfoCard.jsp renders the right list
      * server-side on first load/round-trip, this just mirrors the same
-     * two option sets (see includes/stateOptions.jsp and
-     * includes/provinceOptions.jsp) so the swap can happen client-side.
+     * two option sets (see WEB-INF/includes/stateOptions.jsp and
+     * WEB-INF/includes/provinceOptions.jsp) so the swap can happen client-side.
      */
     var US_STATES = [
         ["AL", "Alabama"], ["AK", "Alaska"], ["AZ", "Arizona"], ["AR", "Arkansas"],

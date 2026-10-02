@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -105,6 +106,9 @@ public class EditProfilePasswordServlet extends HttpServlet {
                     conn.setAutoCommit(true);
                 }
             }
+
+            // Anyone still signed in with the old password, elsewhere, is out.
+            CustomerSession.endOtherSessions(customerId, request.getSession(false));
 
             response.getWriter().write("{\"ok\":true}");
 

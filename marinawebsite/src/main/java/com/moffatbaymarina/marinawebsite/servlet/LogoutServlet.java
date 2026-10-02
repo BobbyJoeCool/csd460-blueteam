@@ -34,7 +34,7 @@ public class LogoutServlet extends HttpServlet {
 
     // The ?notice= keyword is read by js/statusPopup.js, which maps it to
     // wording and shows the shared status popup. Keyword, never the
-    // message itself - see includes/statusPopup.jsp.
+    // message itself - see WEB-INF/includes/statusPopup.jsp.
     private static final String AFTER_LOGOUT_REDIRECT = "/?notice=loggedOut";
 
     /**

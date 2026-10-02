@@ -10,7 +10,7 @@
  * meant for Login / Edit User Info / anywhere else that repeats these
  * same checks instead of copy-pasting the logic per page.
  *
- * In practice it's already on every page: includes/loginModal.jsp loads it,
+ * In practice it's already on every page: WEB-INF/includes/loginModal.jsp loads it,
  * and the header includes the login modal.
  *
  * Server-side twin: util/Utils.java. Every limit or pattern that lives in
@@ -87,7 +87,7 @@ MoffatBay.form = (function () {
 
     /**
      * The session's anti-forgery token, from the <meta name="csrf-token">
-     * tag includes/styles.jsp writes into every page. Send it as an
+     * tag WEB-INF/includes/styles.jsp writes into every page. Send it as an
      * X-CSRF-Token header on any fetch() POST; CsrfFilter refuses a POST
      * without it.
      * @returns {string} the token, or "" if the page has none
@@ -100,7 +100,7 @@ MoffatBay.form = (function () {
     /**
      * Adds the anti-forgery token to a form built in script (the "send
      * only what changed" forms), the same hidden field
-     * includes/csrfField.jsp puts in a form on the page.
+     * WEB-INF/includes/csrfField.jsp puts in a form on the page.
      * @param {HTMLFormElement} form - the form about to be submitted
      */
     function addCsrfField(form) {

@@ -1,5 +1,5 @@
 <%--
-  src/main/webapp/includes/loginModal.jsp
+  src/main/webapp/WEB-INF/includes/loginModal.jsp
 
   The Login modal from the Login contract. Included by any page that offers
   a Log In control; it renders hidden until something opens it.
@@ -163,7 +163,7 @@
                  already built and working - see its class comment and the
                  Edit User Profile contract's "Password Change and the
                  Lockout Model"). The reset UI is
-                 includes/forgotPasswordModal.jsp, included at the foot of
+                 WEB-INF/includes/forgotPasswordModal.jsp, included at the foot of
                  this file so it travels with the login modal to every page -
                  a locked-out visitor has no session, so a reset reachable
                  only from an account page would be behind the very sign-in
@@ -192,7 +192,7 @@
                       action="${pageContext.request.contextPath}/login"
                       method="post"
                       novalidate>
-                    <jsp:include page="/includes/csrfField.jsp" />
+                    <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
                     <input type="hidden" name="redirectTo" value="${fn:escapeXml(loginRedirectTo)}">
 
@@ -251,32 +251,9 @@
     </div>
 </div>
 
-<jsp:include page="/includes/forgotPasswordModal.jsp" />
+<jsp:include page="/WEB-INF/includes/forgotPasswordModal.jsp" />
 
 
 <script src="${pageContext.request.contextPath}/js/formValidation.js?v=${applicationScope.assetVersion}"></script>
 <script src="${pageContext.request.contextPath}/js/loginModal.js?v=${applicationScope.assetVersion}" defer></script>
 <script src="${pageContext.request.contextPath}/js/accountModals.js?v=${applicationScope.assetVersion}" defer></script>
-<script>
-    /* Both ways into the password reset: "Forgot password?" under the
-       sign-in form, and "Reset your password" in the locked-out state.
-       Wired here rather than in accountModals.js because they are this
-       modal's controls, and only one of them is on any given render.
-
-       The email to pre-fill: the locked-out button carries the address
-       that was just locked (data-email); otherwise, whatever is typed in
-       the sign-in form's Email field. openForgot() only fills the reset's
-       field if it's empty, so it never overwrites one that came back
-       after a failed reset. */
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll("[data-forgot-trigger]").forEach(function (trigger) {
-            trigger.addEventListener("click", function () {
-                var typed = document.getElementById("loginEmail");
-                var email = trigger.dataset.email
-                        || (typed ? typed.value.trim() : "");
-                MoffatBay.loginModal.close();
-                MoffatBay.accountModals.openForgot(email);
-            });
-        });
-    });
-</script>

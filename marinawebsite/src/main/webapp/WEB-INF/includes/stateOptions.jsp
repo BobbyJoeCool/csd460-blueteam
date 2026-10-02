@@ -8,7 +8,7 @@
   selected on a validation round-trip:
 
     <select id="state" name="state" required>
-        <jsp:include page="/includes/stateOptions.jsp">
+        <jsp:include page="/WEB-INF/includes/stateOptions.jsp">
             <jsp:param name="fieldName" value="state" />
         </jsp:include>
     </select>

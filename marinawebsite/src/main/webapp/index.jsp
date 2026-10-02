@@ -19,12 +19,12 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	<title>Moffat Bay Marina</title>
 
-	<jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
+	<jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-	<jsp:include page="/includes/header.jsp">
+	<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="home" />
 </jsp:include>
 
@@ -58,7 +58,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 				<button
 					class="btn-primary hero-cta"
 					type="button"
-					onclick="MoffatBay.loginModal.open('/reservation')">
+					data-sign-in="/reservation">
 					Book a Slip
 				</button>
 			</c:otherwise>
@@ -206,7 +206,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 	</main>
 
-	<jsp:include page="/includes/footer.jsp" />
+	<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 </body>
 </html>

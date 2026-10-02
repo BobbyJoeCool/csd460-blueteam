@@ -5,7 +5,7 @@
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Robert Breutzmann
  *
- * The shared status popup. Loaded by includes/statusPopup.jsp, which is
+ * The shared status popup. Loaded by WEB-INF/includes/statusPopup.jsp, which is
  * itself pulled in by header.jsp, so this is available on every page.
  *
  * Any page can say:

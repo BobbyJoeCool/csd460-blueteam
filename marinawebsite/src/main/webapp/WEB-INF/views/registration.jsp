@@ -19,13 +19,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create an Account - Moffat Bay Marina</title>
 
-	<jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
+	<jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/passwordRules.css?v=${applicationScope.assetVersion}">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/registration.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="register" />
 </jsp:include>
 
@@ -44,7 +44,7 @@
 <main class="page-column page-column--wide">
     <form class="registration-form" method="post"
           action="${pageContext.request.contextPath}/register" id="registrationForm" novalidate>
-        <jsp:include page="/includes/csrfField.jsp" />
+        <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
         <%-- Where to go once the account exists: set by the Login modal's
              Register here link (?redirectTo=/reservation, /myFleet, ...).
@@ -55,7 +55,7 @@
         <input type="hidden" name="redirectTo" value="${fn:escapeXml(param.redirectTo)}">
 
         <!-- Left column: name & mailing info -->
-        <jsp:include page="/includes/personalInfoCard.jsp" />
+        <jsp:include page="/WEB-INF/includes/personalInfoCard.jsp" />
 
         <!-- Middle column: boat info, entirely optional. The wrapper and
              the "Optional" note live here rather than in the shared card:
@@ -71,7 +71,7 @@
                 <p class="column-note">You can add a boat now or later. If you add one, the starred fields are required.</p>
             </div>
 
-            <jsp:include page="/includes/boatInfoCard.jsp" />
+            <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp" />
 
         </div>
 
@@ -106,7 +106,7 @@
                 </div>
             </div>
 
-            <jsp:include page="/includes/passwordRules.jsp" />
+            <jsp:include page="/WEB-INF/includes/passwordRules.jsp" />
 
             <div class="submit-row">
                 <button type="submit" class="btn-primary" id="submitBtn" disabled>Create Account</button>
@@ -118,7 +118,7 @@
     </form>
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/passwordRules.js?v=${applicationScope.assetVersion}"></script>
 <script src="${pageContext.request.contextPath}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>

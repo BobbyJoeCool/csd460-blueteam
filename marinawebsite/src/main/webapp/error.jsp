@@ -14,7 +14,8 @@
     The heading and message are picked from the status code, so a 400 or
     405 doesn't claim the page was lost. 403 is what CsrfFilter sends for a
     form with a missing or stale token, so its wording says to reload and
-    try again. Anything unrecognised (including a 404, or opening this page
+    try again; 429 is what PostRateLimitFilter sends when one visitor posts
+    a form too often. Anything unrecognised (including a 404, or opening this page
     directly) gets the original "Lost At Sea" wording. Plain centered text
     in a parchment-style card - see css/error.css. Kept inline here rather
     than pulled into its own include since this is the only page that uses
@@ -37,6 +38,10 @@
         <c:set var="errorTitle" value="Wrong Way Round" />
         <c:set var="errorMessage" value="That address only works from a button on the site, not by opening it directly." />
     </c:when>
+    <c:when test="${status == 429}">
+        <c:set var="errorTitle" value="Easy Does It" />
+        <c:set var="errorMessage" value="That form has been sent a lot in the last minute, so we've paused it. Wait a minute, then go back and try again." />
+    </c:when>
     <c:when test="${status == 500}">
         <c:set var="errorTitle" value="Rough Seas" />
         <c:set var="errorMessage" value="Something went wrong on our end. Please try again in a moment." />
@@ -54,12 +59,12 @@
 
     <title>${errorTitle} - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
+    <jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/error.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp" />
+<jsp:include page="/WEB-INF/includes/header.jsp" />
 
 <main>
     <div class="error-pirate">
@@ -77,7 +82,7 @@
     </div>
 </main>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 </body>
 </html>

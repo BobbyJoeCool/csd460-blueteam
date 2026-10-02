@@ -46,12 +46,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Fleet - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" />
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
     <link rel="stylesheet" href="${ctx}/css/myFleet.css?v=${applicationScope.assetVersion}">
 </head>
 <body>
 
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="myfleet" />
 </jsp:include>
 
@@ -280,7 +280,7 @@
              that is already set are never sent, because they render disabled;
              if one arrives anyway, reject it rather than ignoring it. --%>
         <form id="boatForm" action="${ctx}/myFleet/add" method="post" novalidate>
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
 
             <%-- Disabled so it is not submitted on an Add; myFleet.js enables
                  it for an Edit. --%>
@@ -291,7 +291,7 @@
                      card, which reads param.country. It has to be passed
                      explicitly: on a validation-failure forward it is not in
                      the request, and the card would silently fall back to US. --%>
-                <jsp:include page="/includes/boatInfoCard.jsp">
+                <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp">
                     <jsp:param name="country" value="${sessionScope.customer.country}" />
                 </jsp:include>
             </div>
@@ -350,7 +350,7 @@
              history - and re-checks for an Active reservation itself; the
              disabled button on a reserved card is courtesy, not enforcement. --%>
         <form id="removeForm" action="${ctx}/myFleet/remove" method="post">
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
             <input type="hidden" name="boatId" id="removeBoatId" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close data-modal-initial>Cancel</button>
@@ -361,7 +361,7 @@
     </div>
 </div>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${ctx}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
 <script src="${ctx}/js/myFleet.js?v=${applicationScope.assetVersion}" defer></script>

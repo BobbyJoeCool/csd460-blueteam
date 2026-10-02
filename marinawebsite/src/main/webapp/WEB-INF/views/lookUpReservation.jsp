@@ -65,13 +65,13 @@
 
     <title>My Reservations - Moffat Bay Marina</title>
 
-    <jsp:include page="/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
+    <jsp:include page="/WEB-INF/includes/styles.jsp" /> <!-- Adds site.css, header.css, footer.css, loginModal.css -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lookUpReservation.css?v=${applicationScope.assetVersion}">
 </head>
 
 <body>
 
-    <jsp:include page="/includes/header.jsp">
+    <jsp:include page="/WEB-INF/includes/header.jsp">
         <jsp:param name="activePage" value="lookup" />
     </jsp:include>
 
@@ -99,7 +99,7 @@
             <p>Your reservations are available after you sign in.</p>
 
             <button type="button" class="btn-primary"
-                    onclick="MoffatBay.loginModal.open('${fn:escapeXml(signInRedirectTo)}')">Sign In</button>
+                    data-sign-in="${fn:escapeXml(signInRedirectTo)}">Sign In</button>
 
             <p>
                 No account yet?
@@ -383,7 +383,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/cancel">
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close data-modal-initial>Keep Reservation</button>
@@ -417,7 +417,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/notice" id="noticeForm" novalidate>
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
 
             <div class="form-group lookup-notice__date">
@@ -465,7 +465,7 @@
         </p>
 
         <form method="post" action="${pageContext.request.contextPath}/reservations/withdraw">
-            <jsp:include page="/includes/csrfField.jsp" />
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
             <input type="hidden" name="confirmation" class="js-modal-confirmation" value="">
             <div class="modal__actions">
                 <button type="button" class="btn-outline" data-modal-close data-modal-initial>Keep Notice</button>
@@ -478,7 +478,7 @@
 
 </c:if>
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/lookUpReservation.js?v=${applicationScope.assetVersion}" defer></script>
 

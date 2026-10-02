@@ -5,7 +5,7 @@
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
  * Primary Author/Owner - Robert Breutzmann
  *
- * The shared status popup (includes/statusPopup.jsp). Colors come from the
+ * The shared status popup (WEB-INF/includes/statusPopup.jsp). Colors come from the
  * semantic variables in site.css - site.css is explicit that nothing
  * outside its palette section should reference a hex value directly.
  */

@@ -14,7 +14,7 @@
 
   In the body:
 
-    <jsp:include page="/includes/passwordRules.jsp" />
+    <jsp:include page="/WEB-INF/includes/passwordRules.jsp" />
 
   and load its script after formValidation.js:
 

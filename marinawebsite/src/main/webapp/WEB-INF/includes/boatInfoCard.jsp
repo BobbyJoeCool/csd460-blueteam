@@ -19,7 +19,7 @@
   optional "default*" param if that's empty. That's how a future Edit
   Boat page can pre-populate the card from an existing Boat record:
 
-    <jsp:include page="/includes/boatInfoCard.jsp">
+    <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp">
         <jsp:param name="defaultBoatName" value="${boat.boatName}" />
         <jsp:param name="defaultBoatType" value="${boat.boatType}" />
         <jsp:param name="defaultBoatLength" value="${boat.boatLength}" />
@@ -48,7 +48,7 @@
 
     <div class="form-column">
         <h2 class="column-heading">Boat Information</h2>
-        <jsp:include page="/includes/boatInfoCard.jsp" />
+        <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp" />
     </div>
 --%>
 <%@ page isELIgnored="false" %>
