@@ -96,12 +96,10 @@
 .footer-bottom p {
     margin: 0;
     font-size: 0.9rem;
-    opacity: 0.5;
 }
 
-/* Privacy Policy and Accessibility, above the copyright line. Full
-   strength and underlined rather than faded like the copyright, since
-   they're links someone may need to find. */
+/* Privacy Policy and Accessibility, above the copyright line. Underlined,
+   since they're links someone may need to find. */
 .footer-legal {
     display: flex;
     flex-wrap: wrap;

@@ -98,10 +98,7 @@ MoffatBay.editUserInfo = (function () {
      * @param {string} message - text to show; "" clears it
      */
     function setFieldError(field, message) {
-        var el = control(field);
-        var box = errorElement(field);
-        if (el) { el.classList.toggle("field-invalid", message !== ""); }
-        if (box) { box.textContent = message; }
+        MoffatBay.form.setFieldError(control(field), errorElement(field), message);
     }
 
     /**

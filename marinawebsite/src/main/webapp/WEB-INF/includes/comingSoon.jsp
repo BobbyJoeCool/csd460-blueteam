@@ -11,7 +11,7 @@
 
   Usage - pass the page's display name so the message can reference it:
 
-    <main>
+    <main id="main" tabindex="-1">
         <jsp:include page="/WEB-INF/includes/comingSoon.jsp">
             <jsp:param name="pageName" value="About Us" />
         </jsp:include>

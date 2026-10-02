@@ -22,6 +22,11 @@
     <cookie-config>
       <http-only>true</http-only>
     </cookie-config>
+    <!-- Cookie only. Otherwise, on a visitor's first page (before Tomcat
+         knows the browser takes cookies), every encoded link carries
+         ";jsessionid=..." in its address, which leaks the session id into
+         copied links, history and Referer headers. -->
+    <tracking-mode>COOKIE</tracking-mode>
   </session-config>
 
   <!-- Security headers on every response, using the filter that ships with

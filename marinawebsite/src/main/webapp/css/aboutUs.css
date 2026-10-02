@@ -273,14 +273,12 @@
 .contact-form__counter {
 	margin: 0.2rem 0 0;
 	color: var(--color-text-muted);
-	opacity: 0.6;
 	font-size: 0.78rem;
 	text-align: right;
 }
 
 .contact-form__counter.is-near-limit {
 	color: var(--color-error);
-	opacity: 1;
 }
 
 .contact-form__actions {

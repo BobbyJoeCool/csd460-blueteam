@@ -130,7 +130,6 @@
 .coming-soon-credit {
 	margin: 1.5rem 0 0;
 	color: var(--color-text-muted);
-	opacity: 0.6;
 	font-size: 0.75rem;
 	font-style: italic;
 }

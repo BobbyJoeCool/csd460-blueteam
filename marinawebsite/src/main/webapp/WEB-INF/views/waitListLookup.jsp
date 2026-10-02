@@ -34,18 +34,18 @@
     <jsp:param name="activePage" value="waitlist" />
 </jsp:include>
 
-<header class="hero-band" id="waitListLookupHero">
+<section class="hero-band" id="waitListLookupHero" aria-labelledby="waitListLookupHeroTitle">
     <div class="hero-band__content">
-        <h1>See the Wait List for Your Slip Size</h1>
+        <h1 id="waitListLookupHeroTitle">See the Wait List for Your Slip Size</h1>
     </div>
 
     <p class="hero-band__credit">
         Image created with Google Gemini
     </p>
-</header>
+</section>
 
 
-<main class="waitlist-lookup-page">
+<main id="main" tabindex="-1" class="waitlist-lookup-page">
 
     <!-- Public Waitlist (no login required)-->
     <section class="waitlist-availability-card">

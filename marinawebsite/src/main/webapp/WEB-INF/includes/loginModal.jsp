@@ -4,16 +4,14 @@
   The Login modal from the Login contract. Included by any page that offers
   a Log In control; it renders hidden until something opens it.
 
-  Three ways it opens:
+  Two ways it opens:
     1. A user clicks a Log In control - MoffatBay.loginModal.open() in
-       loginModal.js.
+       loginModal.js. That includes the Sign In button on a customer-only
+       page's signed-out view (WEB-INF/includes/signInPanel.jsp).
     2. LoginServlet forwarded back here after a failed attempt, which sets
        the loginError request attribute. In that case the modal renders
        already open with the message inside, so from the user's side it
        just never closed.
-    3. A members-only page sent a signed-out visitor here with
-       ?signIn=<page> (CustomerSession.sendToSignIn). The modal renders
-       already open, with that page as where to go afterwards.
 
   Reads from the request (all set by LoginServlet):
     loginError        - the message to show. Its presence is what opens the modal.
@@ -86,33 +84,19 @@
        value="${fn:substring(originalUri,
                              fn:length(pageContext.request.contextPath),
                              fn:length(originalUri))}"/>
-<%--
-  ?signIn=<path> is how a members-only page with no signed-out view of its
-  own (My Fleet, Your Account) sends a visitor here: CustomerSession
-  .sendToSignIn() redirects to /?signIn=/myFleet. It supplies the return
-  page when there's no redirectTo, and opens the modal on load - but only
-  for someone signed out, so a stale or shared link does nothing once
-  they're in. Like redirectTo, it's only ever written into the page escaped,
-  and LoginServlet and RegisterServlet both check it with
-  Utils.safeRedirectTarget before redirecting anywhere.
---%>
 <c:set var="loginRedirectTo"
-       value="${not empty param.redirectTo ? param.redirectTo
-              : not empty param.signIn ? param.signIn
-              : currentPath}"/>
-<c:set var="signInRequested"
-       value="${not empty param.signIn and not sessionScope.loggedIn}"/>
+       value="${not empty param.redirectTo ? param.redirectTo : currentPath}"/>
 
 <%-- The site's shared .modal (site.css), opened and closed through
      js/modal.js like every other popup - the backdrop, the x and Escape all
      close it there. Rendered without `hidden` when the server wants it open
-     on arrival (a failed attempt, or ?signIn=). --%>
+     on arrival (a failed attempt). --%>
 <div class="modal login-modal"
      id="loginModal"
      role="dialog"
      aria-modal="true"
      aria-labelledby="loginModalTitle"
-     <c:if test="${empty loginError and not signInRequested}">hidden</c:if>>
+     <c:if test="${empty loginError}">hidden</c:if>>
 
     <button type="button" class="modal__backdrop" data-modal-close
             aria-label="Close sign in" tabindex="-1"></button>
@@ -124,13 +108,6 @@
             <button type="button" class="modal__close" data-modal-close
                     aria-label="Close sign in">&times;</button>
         </div>
-
-        <%-- Why the box opened by itself: they asked for a page that needs
-             an account. Not shown once a failed attempt has its own
-             message to show. --%>
-        <c:if test="${signInRequested and empty loginError}">
-            <p class="modal__note login-modal__note">Please sign in, or register, to continue.</p>
-        </c:if>
 
         <%-- A banner, not a field message: a failed sign-in is about the
              whole form (see "Telling the customer what happened" in

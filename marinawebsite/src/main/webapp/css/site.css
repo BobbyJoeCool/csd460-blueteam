@@ -59,10 +59,13 @@
 		--color-charcoal-navy
 	); /* apply opacity in-context, e.g. color: var(--color-text-muted); opacity: 0.7; */
 
-	/* Links (body copy, not nav — see Navigation below) */
-	--color-link: var(--color-ocean-blue);
+	/* Links (body copy, not nav — see Navigation below). Ocean blue taken a
+	   fifth of the way toward deep marine: plain ocean blue is only 4.1:1 on
+	   the sand page background, below WCAG AA's 4.5:1; this is 4.8:1 on
+	   sand and better on every card. */
+	--color-link: color-mix(in srgb, var(--color-ocean-blue) 80%, var(--color-deep-marine));
 	--color-link-hover: var(--color-golden-hour);
-	--color-link-visited: var(--color-ocean-blue);
+	--color-link-visited: var(--color-link);
 
 	/* Primary CTA — per the wireframe rules, only ONE per page.
 	   Navy text, not white: white on coral is 2.74:1, below WCAG AA's 4.5:1
@@ -313,16 +316,19 @@ main,
 
    Markup every hero follows. It always sits outside <main>, between the
    site header and main, so it runs the full width of the window. The
-   credit always reads "Image created with Google Gemini":
+   credit always reads "Image created with Google Gemini".
+   It is a <section>, not a <header>: a <header> outside <main> is a
+   second "banner" landmark next to the site header, and screen readers
+   list both. aria-labelledby names the section after its own h1:
 
-     <header class="hero-band" id="...Hero">
+     <section class="hero-band" id="...Hero" aria-labelledby="...HeroTitle">
          <div class="hero-band__content">
              <p class="hero-band__eyebrow">optional category label</p>
-             <h1>Title</h1>
+             <h1 id="...HeroTitle">Title</h1>
              <p class="hero-band__lede">Subtitle</p>
          </div>
          <p class="hero-band__credit">optional image credit</p>
-     </header>
+     </section>
 
    Base class:  .hero-band
    Used by: index.jsp             (#landingHero)
@@ -633,6 +639,75 @@ main,
 }
 
 /* --------------------------------------------------------------------------
+   Skip link — "Skip to main content", the first thing Tab reaches on every
+   page (WEB-INF/includes/header.jsp). Off-screen until it has focus, then
+   drops in over the top-left of the header. Above the sticky header and
+   the modals so it's never hidden behind them.
+   -------------------------------------------------------------------------- */
+
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 1000;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-control);
+    background: var(--color-surface-neutral);
+    color: var(--color-deep-marine);
+    font-weight: bold;
+    text-decoration: underline;
+    transform: translateY(-200%);
+}
+
+.skip-link:focus {
+    transform: none;
+    outline: 2px solid var(--color-golden-hour);
+    outline-offset: 2px;
+}
+
+/* <main> takes focus from the skip link (tabindex="-1"), but it isn't a
+   control, so it shouldn't wear a focus ring. */
+main:focus {
+    outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   Sign-in panel — the signed-out view of every customer-only page.
+   Used by: WEB-INF/includes/signInPanel.jsp, on reservation.jsp,
+            lookUpReservation.jsp, reservationSummary.jsp, myFleet.jsp and
+            editUserInfo.jsp
+   -------------------------------------------------------------------------- */
+
+.signin-panel {
+    max-width: min(36rem, calc(100% - 2rem));
+    margin: 2.5rem auto 4rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+}
+
+.signin-panel h1,
+.signin-panel h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: var(--color-text-heading);
+}
+
+/* Reservation Summary has no hero, so its panel heading is the page's h1
+   and is sized like one. */
+.signin-panel h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.signin-panel .btn-primary {
+    margin: 0.5rem 0 1rem;
+}
+
+/* --------------------------------------------------------------------------
    Field error — validation message beneath a form field.
    Used by: registration.jsp, aboutUs.jsp, reservation.jsp,
             WEB-INF/includes/boatInfoCard.jsp
@@ -669,8 +744,10 @@ main,
 .field-hint {
     font-weight: 400;
     font-size: 0.8rem;
-    color: var(--color-text-muted);
-    opacity: 0.75;
+    /* Faded through the colour, not opacity: opacity would fade a link
+       inside the hint too (Your Account's "Forgot your current
+       password?"), taking it below WCAG AA's 4.5:1. */
+    color: color-mix(in srgb, var(--color-text-muted) 75%, transparent);
     white-space: normal;
 }
 

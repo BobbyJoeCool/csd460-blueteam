@@ -75,37 +75,29 @@
         <jsp:param name="activePage" value="lookup" />
     </jsp:include>
 
-    <header class="hero-band" id="lookUpReservationHero">
+    <section class="hero-band" id="lookUpReservationHero" aria-labelledby="lookUpReservationHeroTitle">
         <div class="hero-band__content">
-            <h1>My Reservations</h1>
+            <h1 id="lookUpReservationHeroTitle">My Reservations</h1>
 
             <p class="hero-band__lede">
                 Your upcoming and past slip reservations.
             </p>
         </div>
         <p class="hero-band__credit">Image created with Google Gemini</p>
-    </header>
+    </section>
 
-    <main class="lookup-page">
+    <main id="main" tabindex="-1" class="lookup-page">
 
 <c:choose>
 
-    <%-- Signed out: same panel and flow as reservationSummary.jsp. The
-         servlet also answers 401 here. --%>
+    <%-- Signed out: the shared sign-in panel, like every customer-only
+         page. The servlet also answers 401 here. --%>
     <c:when test="${signInRequired}">
 
-        <section class="lookup-signin">
-            <h2>Sign In to View Your Reservations</h2>
-            <p>Your reservations are available after you sign in.</p>
-
-            <button type="button" class="btn-primary"
-                    data-sign-in="${fn:escapeXml(signInRedirectTo)}">Sign In</button>
-
-            <p>
-                No account yet?
-                <a href="${pageContext.request.contextPath}/register">Create one</a>.
-            </p>
-        </section>
+        <jsp:include page="/WEB-INF/includes/signInPanel.jsp">
+            <jsp:param name="heading" value="Sign In to View Your Reservations" />
+            <jsp:param name="message" value="Your reservations are listed here after you sign in." />
+        </jsp:include>
 
     </c:when>
 

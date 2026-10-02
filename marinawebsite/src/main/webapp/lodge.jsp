@@ -27,7 +27,7 @@
 
 <jsp:include page="/WEB-INF/includes/header.jsp" />
 
-<main>
+<main id="main" tabindex="-1">
     <jsp:include page="/WEB-INF/includes/comingSoon.jsp">
         <jsp:param name="pageName" value="Moffat Bay Lodge" />
     </jsp:include>

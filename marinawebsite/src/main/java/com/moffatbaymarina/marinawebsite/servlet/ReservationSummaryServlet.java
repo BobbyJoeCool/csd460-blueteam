@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.MarinaInfo;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -163,10 +164,9 @@ public class ReservationSummaryServlet extends HttpServlet {
      * Shows the page's own signed-out state rather than bouncing the visitor
      * to the landing page.
      *
-     * <p>The JSP already handles this: it checks for
-     * {@code sessionScope.customerId} itself and renders a "Sign in to view
-     * your reservation" panel with a button that opens the login modal,
-     * which then sends them to My Reservations.
+     * <p>The JSP renders the shared sign-in panel
+     * (WEB-INF/includes/signInPanel.jsp), whose button opens the login
+     * modal, which then sends them to My Reservations.
      *
      * @param request the incoming request
      * @param response the response to forward
@@ -181,11 +181,7 @@ public class ReservationSummaryServlet extends HttpServlet {
          * session, which has no grant to show any summary, so this page would
          * only bounce them there anyway.
          */
-        String returnTo = "/reservations";
-
-        request.setAttribute("signInRedirectTo", returnTo);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        request.getRequestDispatcher(VIEW).forward(request, response);
+        CustomerSession.showSignInPanel(request, response, VIEW, "/reservations");
     }
 
     /**

@@ -18,8 +18,7 @@
  * file only adds what is particular to signing in.
  *
  * A button opens the modal by carrying data-sign-in, optionally with the
- * page to land on after (data-sign-in="/reservation"); add
- * data-sign-in-now to open it as soon as the page loads. Markup never uses
+ * page to land on after (data-sign-in="/reservation"). Markup never uses
  * onclick="...": the Content-Security-Policy (SecurityHeadersFilter)
  * blocks inline script. Scripts can still call:
  *     MoffatBay.loginModal.open();
@@ -84,10 +83,7 @@ MoffatBay.loginModal = (function () {
      * @param {string} message - text to show; "" clears it
      */
     function setFieldError(inputId, errorId, message) {
-        var input = document.getElementById(inputId);
-        var error = document.getElementById(errorId);
-        if (input) { input.classList.toggle("field-invalid", message !== ""); }
-        if (error) { error.textContent = message; }
+        MoffatBay.form.setFieldError(inputId, errorId, message);
     }
 
     /**
@@ -98,34 +94,6 @@ MoffatBay.loginModal = (function () {
         setFieldError("loginPassword", "loginPasswordError", "");
     }
 
-    if (modal) {
-
-        /* Opened by ?signIn=/somePage - a members-only page sent a signed-
-           out visitor here (CustomerSession.sendToSignIn), and the JSP
-           rendered the modal already open with that page as the return
-           address. Put focus in the email field, then take signIn back
-           out of the address bar so a refresh or a copied link doesn't
-           pop the box open again. The return page is already in the
-           form's hidden field, so nothing is lost. */
-        if (window.URLSearchParams) {
-            var params = new URLSearchParams(window.location.search);
-            if (params.has("signIn")) {
-                if (!modal.hidden) {
-                    var emailField = document.getElementById("loginEmail");
-                    if (emailField) { emailField.focus(); }
-                }
-                if (window.history && window.history.replaceState) {
-                    params.delete("signIn");
-                    var query = params.toString();
-                    window.history.replaceState(
-                        {},
-                        "",
-                        window.location.pathname + (query ? "?" + query : "") + window.location.hash
-                    );
-                }
-            }
-        }
-    }
 
     /* Every Sign In / Log In button: the nav, the home page's Book a Slip,
        and the signed-out views of the members-only pages. An empty
@@ -135,10 +103,6 @@ MoffatBay.loginModal = (function () {
             open(button.dataset.signIn);
         });
     });
-
-    if (document.querySelector("[data-sign-in-now]")) {
-        open();
-    }
 
     /* Both ways into the password reset: "Forgot password?" under the
        sign-in form, and "Reset your password" in the locked-out state.

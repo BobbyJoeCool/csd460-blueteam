@@ -128,7 +128,7 @@ The back end doesn't need to know which case it is, it just sends the user where
 **Added 2026-09-30 (#299, beta test):**
 
 - **Register here carries the same return page.** The modal's Register here link is `/register?redirectTo=<the same value>`, and `loginModal.js`'s `open(redirectTo)` rewrites it along with the hidden fields. A visitor who registers instead of signing in is signed in automatically and lands in the same place (see the Registration contract).
-- **`?signIn=<path>` opens the modal on load.** Members-only pages with no signed-out view of their own (My Fleet, User Profile) send a signed-out visitor to `/?signIn=/myFleet` (`CustomerSession.sendToSignIn`). The modal renders already open, only for someone signed out, with a "Please sign in, or register, to continue." note and that path as `redirectTo` (when no `redirectTo` was given). `loginModal.js` then removes `signIn` from the address bar so a refresh doesn't reopen it.
+- **Customer-only pages show a sign-in panel when signed out** (`WEB-INF/includes/signInPanel.jsp`, **#257, 2026-10-02**). Its Sign In button opens this modal with that page as `redirectTo`. This replaced `/?signIn=<path>`, which opened the modal on the landing page; that parameter is no longer read.
 
 ### Email Format Check on the Back End
 

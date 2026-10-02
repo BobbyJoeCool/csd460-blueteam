@@ -22,6 +22,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%-- The first thing Tab reaches on every page, hidden until it has focus.
+     Lets a keyboard user jump past the header to the page's own content
+     (WCAG 2.4.1). Every page's <main> carries id="main" and tabindex="-1",
+     so focus actually moves there rather than only the scroll position. --%>
+<a class="skip-link" href="#main">Skip to main content</a>
 <header class="site-header" data-marina-phone="${fn:escapeXml(marina.phone)}">
    <div class="header-brand">
     <a class="logo" href="${pageContext.request.contextPath}/">

@@ -18,10 +18,6 @@
     text-align: center;
 }
 
-.summary-hero--signin {
-    padding-bottom: 1.25rem;
-}
-
 .summary-success-mark,
 .summary-cancelled-mark {
     display: inline-flex;
@@ -321,10 +317,9 @@
    ========================= */
 
 /* =========================
-   SIGN-IN / ERROR STATE
+   ERROR STATE
    ========================= */
 
-.summary-signin,
 .summary-error-actions {
     max-width: 46rem;
     margin: 0 auto 4rem;
