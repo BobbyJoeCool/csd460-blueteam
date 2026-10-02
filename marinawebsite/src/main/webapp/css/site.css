@@ -333,6 +333,8 @@ main,
             myFleet.jsp           (#fleetHero)
             editUserInfo.jsp      (#accountHero)
             waitListLookup.jsp    (#waitListLookupHero)
+            privacy.jsp           (#privacyHero)
+            accessibility.jsp     (#accessibilityHero)
    -------------------------------------------------------------------------- */
 
 .hero-band {
@@ -405,11 +407,14 @@ main,
    Page-specific hero overrides — photo and overlay only.
    -------------------------------------------------------------------------- */
 
-/* Registration, About Us, My Reservations, Waitlist Lookup: Marina.png, 60% overlay. */
+/* Registration, About Us, My Reservations, Waitlist Lookup, Privacy,
+   Accessibility: Marina.png, 60% overlay. */
 #registrationHero,
 #aboutHero,
 #lookUpReservationHero,
-#waitListLookupHero {
+#waitListLookupHero,
+#privacyHero,
+#accessibilityHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
         url("../images/Marina.png");

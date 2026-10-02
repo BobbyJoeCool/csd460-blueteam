@@ -550,6 +550,24 @@ MoffatBay.editUserInfo = (function () {
         });
     }
 
+    /* Delete my account (issue #337). The popup's form is a plain POST to
+       AccountDeleteServlet; all this does is open it. When the servlet
+       refuses (wrong password, a lease still running) it renders this
+       page again with the popup marked data-open-on-load and the reason
+       inside, so the customer lands back where they were. */
+    var deleteModal = document.getElementById("deleteAccountModal");
+    var deleteButton = document.getElementById("openDeleteAccount");
+    if (deleteModal && deleteButton) {
+        deleteButton.addEventListener("click", function () {
+            var banner = document.getElementById("deleteAccountError");
+            if (banner) { banner.hidden = true; }
+            MoffatBay.modal.open(deleteModal);
+        });
+        if (deleteModal.hasAttribute("data-open-on-load")) {
+            MoffatBay.modal.open(deleteModal);
+        }
+    }
+
     return {
         changedFields: changedFields,
         refreshFormState: refreshFormState

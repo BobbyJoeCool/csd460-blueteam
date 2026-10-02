@@ -134,7 +134,9 @@ public class ForgotPasswordServlet extends HttpServlet {
             Customer customer = customerDAO.findByEmail(email);
 
             // Same message either way - see the class-level anti-enumeration note.
-            if (customer == null || !FAKE_VERIFICATION_CODE.equals(code)) {
+            // A deleted account counts as no account (see CustomerDAO.isDeleted).
+            if (customer == null || CustomerDAO.isDeleted(customer)
+                    || !FAKE_VERIFICATION_CODE.equals(code)) {
                 showError(request, response, "That code doesn't match - check your email and try again.");
                 return;
             }

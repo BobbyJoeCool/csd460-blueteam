@@ -54,6 +54,12 @@ MoffatBay.statusPopup = (function () {
             return "Profile updated";
         },
 
+        /* AccountDeleteServlet, after emptying the account and signing
+           the customer out. */
+        accountDeleted: function () {
+            return "Your account has been deleted";
+        },
+
         reservationCancelled: function () {
             return "Reservation cancelled";
         },
