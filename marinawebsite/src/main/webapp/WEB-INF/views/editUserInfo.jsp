@@ -165,6 +165,24 @@
                    href="${pageContext.request.contextPath}/myFleet">My Fleet</a>
             </div>
 
+            <%-- Issue #337. The download is a plain link (AccountDataServlet
+                 answers with a file, so the page stays put). Delete opens
+                 #deleteAccountModal below, outside this form. --%>
+            <div class="account-actions account-actions--data">
+                <h3 class="account-subheading">Your data</h3>
+                <p class="field-hint">
+                    Get a copy of everything we hold about you, or close your
+                    account. Our <a href="${pageContext.request.contextPath}/privacy">Privacy Policy</a>
+                    explains what's kept.
+                </p>
+                <a class="btn-outline account-fleet-link"
+                   href="${pageContext.request.contextPath}/editProfile/data"
+                   download>Download my data</a>
+                <button type="button" class="btn-outline btn-danger" id="openDeleteAccount">
+                    Delete my account
+                </button>
+            </div>
+
         </div>
 
         <div class="submit-row" id="accountSubmitRow">
@@ -216,6 +234,60 @@
             <button type="button" class="btn-outline" id="cancelSave" data-modal-close>Keep Editing</button>
             <button type="button" class="btn-primary" id="confirmSave">Save Changes</button>
         </div>
+
+    </div>
+</div>
+
+<%--
+  Delete my account (issue #337). Posts to /editProfile/delete
+  (AccountDeleteServlet), which checks the password and that no lease is
+  still running, then empties the account and signs the customer out.
+  On a refusal it renders this page again with deleteError set, and the
+  popup opens itself (data-open-on-load, read by editUserInfo.js) with the
+  reason in the banner.
+
+  Focus starts on the password box rather than on Cancel, unlike the
+  site's other confirmations: typing the password is the confirmation,
+  so Enter can't delete anything by accident.
+--%>
+<div class="modal" id="deleteAccountModal" role="dialog" aria-modal="true"
+     aria-labelledby="deleteAccountTitle" hidden
+     <c:if test="${not empty deleteError}">data-open-on-load</c:if>>
+
+    <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+    <div class="modal__box modal__box--narrow">
+
+        <div class="modal__header">
+            <h2 class="modal__title" id="deleteAccountTitle">Delete your account?</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="form-banner form-banner--error login-modal__banner" id="deleteAccountError"
+           role="alert" ${empty deleteError ? 'hidden' : ''}><c:out value="${deleteError}" /></p>
+
+        <p class="modal__question">This can't be undone.</p>
+        <ul class="modal__note delete-account-list">
+            <li>Your name, email, phone number and address are removed.</li>
+            <li>Your boats leave your fleet and you come off the wait list.</li>
+            <li>Past reservations are kept for the marina's records, without your name.</li>
+            <li>You can't do this while you have a current or upcoming reservation.</li>
+        </ul>
+
+        <form id="deleteAccountForm" action="${pageContext.request.contextPath}/editProfile/delete" method="post">
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
+
+            <div class="form-group">
+                <label for="deletePassword">Enter your password to confirm</label>
+                <input type="password" id="deletePassword" name="currentPassword"
+                       autocomplete="current-password" required data-modal-initial>
+            </div>
+
+            <div class="modal__actions">
+                <button type="button" class="btn-outline" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-action btn-danger">Yes, delete my account</button>
+            </div>
+        </form>
 
     </div>
 </div>

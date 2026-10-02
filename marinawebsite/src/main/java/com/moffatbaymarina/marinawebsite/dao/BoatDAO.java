@@ -605,6 +605,31 @@ public int endOwnership(
     }
 }
 
+/**
+ * Soft remove of every boat in a customer's fleet at once, for account
+ * deletion (issue #337). Same as endOwnership, so the boats and their
+ * ownership history stay for the reservations that reference them.
+ * GREATEST keeps a boat added today within chkOwnershipDates.
+ */
+public int endAllOwnerships(
+        Connection conn,
+        int customerId)
+        throws SQLException {
+
+    String sql = """
+            UPDATE BoatOwnership
+            SET endDate = GREATEST(startDate, CURRENT_DATE)
+            WHERE customerID = ?
+              AND endDate IS NULL
+            """;
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, customerId);
+
+        return stmt.executeUpdate();
+    }
+}
+
 public boolean hasActiveReservation(
         Connection conn,
         int boatId)

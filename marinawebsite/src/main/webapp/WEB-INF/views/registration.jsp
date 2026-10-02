@@ -110,6 +110,7 @@
 
             <div class="submit-row">
                 <button type="submit" class="btn-primary" id="submitBtn" disabled>Create Account</button>
+                <p class="login-link" id="privacyConsent">By creating an account you agree to our <a href="${pageContext.request.contextPath}/privacy">Privacy Policy</a>.</p>
                 <p class="login-link">Already have an account? <a href="#" id="loginLinkTrigger">Log in</a></p>
             </div>
 

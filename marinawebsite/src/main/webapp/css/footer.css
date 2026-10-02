@@ -99,6 +99,22 @@
     opacity: 0.5;
 }
 
+/* Privacy Policy and Accessibility, above the copyright line. Full
+   strength and underlined rather than faded like the copyright, since
+   they're links someone may need to find. */
+.footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.footer-legal a {
+    font-size: 0.9rem;
+    text-decoration: underline;
+}
+
 /* ==========================================================================
    Responsive footer
    ========================================================================== */

@@ -65,6 +65,10 @@
     </div>
 
     <div class="footer-bottom">
+        <nav class="footer-legal" aria-label="Legal">
+            <a href="${pageContext.request.contextPath}/privacy">Privacy Policy</a>
+            <a href="${pageContext.request.contextPath}/accessibility">Accessibility</a>
+        </nav>
         <p>
             &copy; 2026 Moffat Bay Marina. All rights reserved.
         </p>

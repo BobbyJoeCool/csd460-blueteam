@@ -1,0 +1,69 @@
+/*
+ * src/main/webapp/css/policy.css
+ * Author: Miguel Fernandez
+ * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
+ * Primary Author/Owner - Miguel Fernandez
+ * CSD 460 - Capstone Project - Marina Website Project
+ *
+ * The reading pages: Privacy Policy (privacy.jsp) and Accessibility
+ * (accessibility.jsp). Depends on site.css (.page-column, .hero-band,
+ * palette, fonts). Every color comes from a semantic variable - no hex
+ * values.
+ */
+
+/* Long text reads best at around 70 characters a line, narrower than
+   --content-narrow, which is sized for forms. */
+.policy-page {
+	max-width: 46rem;
+}
+
+.policy-updated {
+	margin: 0 0 2rem;
+	color: var(--color-text-muted);
+	font-size: 0.9rem;
+}
+
+.policy-page section + section {
+	margin-top: 2.5rem;
+}
+
+.policy-page h2 {
+	margin: 0 0 0.75rem;
+	color: var(--color-text-heading);
+	font-family: var(--font-heading);
+	font-size: 1.6rem;
+}
+
+.policy-page h3 {
+	margin: 1.25rem 0 0.35rem;
+	color: var(--color-text-heading);
+	font-size: 1.05rem;
+}
+
+.policy-page p,
+.policy-page li {
+	font-size: 1.02rem;
+	line-height: 1.65;
+}
+
+.policy-page p {
+	margin: 0 0 1rem;
+}
+
+.policy-page ul {
+	margin: 0 0 1rem;
+	padding-left: 1.25rem;
+}
+
+.policy-page li + li {
+	margin-top: 0.5rem;
+}
+
+.policy-page code {
+	font-size: 0.95em;
+}
+
+.policy-contact {
+	font-style: normal;
+	line-height: 1.8;
+}

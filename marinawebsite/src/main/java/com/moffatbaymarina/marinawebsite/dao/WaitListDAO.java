@@ -193,4 +193,28 @@ public class WaitListDAO {
 
         return entries;
     }
+
+    /**
+     * Takes a customer off every list they're still in line on, for account
+     * deletion (issue #337). Entries become {@code Cancelled} rather than
+     * being deleted, so the order the list was in can still be checked.
+     *
+     * @param conn an open connection, in the deletion's transaction
+     * @param customerId the customer whose account is being deleted
+     * @return how many entries were closed
+     * @throws SQLException if the update fails
+     */
+    public int cancelOpenEntriesForCustomer(Connection conn, int customerId) throws SQLException {
+        String sql = """
+                UPDATE WaitList
+                SET status = 'Cancelled', timeClosed = CURRENT_TIMESTAMP
+                WHERE customerID = ?
+                  AND status IN ('Waiting', 'Offered')
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            return stmt.executeUpdate();
+        }
+    }
 }

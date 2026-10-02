@@ -272,6 +272,44 @@ public class ReservationDAO {
     }
 
     /**
+     * Whether the customer still has a lease that isn't over: one that's
+     * running, one that hasn't started yet, or one serving out its 30 days'
+     * notice. Account deletion (issue #337) is refused while this is true -
+     * the marina still needs to know who is in that slip and how to reach
+     * them.
+     *
+     * <p>Nothing moves a reservation to {@code Completed} when its notice
+     * runs out, so an {@code Active} one whose last day has passed (and
+     * whose notice wasn't withdrawn) counts as over here. A notice with no
+     * last day recorded yet counts as not over.
+     *
+     * @param conn an open connection
+     * @param customerId the customer to check
+     * @return {@code true} if any of their leases isn't over yet
+     * @throws SQLException if the lookup fails
+     */
+    public boolean hasLeaseNotOver(Connection conn, int customerId) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM Reservation r
+                LEFT JOIN TerminationNotice tn ON tn.reservationID = r.reservationID
+                WHERE r.customerID = ?
+                  AND r.reservationStatus = 'Active'
+                  AND NOT (tn.noticeStatus IS NOT NULL
+                           AND tn.noticeStatus <> 'Withdrawn'
+                           AND COALESCE(tn.terminationDate, '9999-12-31') < CURDATE())
+                LIMIT 1
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    /**
      * Withdraws a customer's open termination notice (BR-23), so the lease
      * carries on month to month. The row is kept with status
      * {@code Withdrawn} - the history stays, and a later notice reuses it

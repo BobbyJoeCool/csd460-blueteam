@@ -27,6 +27,12 @@ import com.moffatbaymarina.marinawebsite.util.DBConnection;
 public class CustomerDAO {
 
     /**
+     * What a deleted account's email ends with - see {@link #anonymise}.
+     * {@code .invalid} is reserved (RFC 2606), so no real address can.
+     */
+    private static final String DELETED_EMAIL_DOMAIN = "@deleted.invalid";
+
+    /**
      * Looks up a customer by email (the login identifier, see the Login
      * contract's "How the Username Works"). Never selects {@code passwordHash}
      * - see {@link #verifyPassword(String, String)} for the credential check.
@@ -310,6 +316,68 @@ public class CustomerDAO {
                 throw new SQLException("Password reset did not affect exactly one row.");
             }
         }
+    }
+
+    /**
+     * Account deletion (issue #337): strips everything that identifies the
+     * customer from their row, but keeps the row itself. Reservations,
+     * notices, wait list entries and boat ownerships all point at it, and
+     * the reservation history stays for the books (see the Privacy Policy),
+     * so deleting it outright would either fail on those foreign keys or
+     * take the history with it.
+     *
+     * <p>Afterwards nobody can sign in as this customer. The email becomes
+     * {@code deleted-<id>@deleted.invalid} - still unique, as the column
+     * requires, and the {@code .invalid} domain can never be a real
+     * address, so the old email is free to register again. The password
+     * hash becomes a value no SHA-256 hex digest can equal, and the account
+     * is locked as well. {@code dateJoined} stays, as a fact about the
+     * books rather than the person.
+     *
+     * @param conn active transaction connection
+     * @param customerId the customer being deleted
+     * @throws SQLException if the update fails or doesn't affect exactly one row
+     */
+    public void anonymise(Connection conn, int customerId) throws SQLException {
+        String sql = """
+                UPDATE Customer
+                SET firstName = 'Deleted',
+                    lastName = 'Customer',
+                    email = CONCAT('deleted-', customerID, ?),
+                    passwordHash = 'ACCOUNT DELETED',
+                    phone = NULL,
+                    phoneCountryCode = '1',
+                    streetAddress = NULL,
+                    streetAddress2 = NULL,
+                    city = NULL,
+                    state = NULL,
+                    zipCode = NULL,
+                    country = 'OTHER',
+                    failedLoginAttempts = 0,
+                    accountLocked = 1
+                WHERE customerID = ?
+                """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, DELETED_EMAIL_DOMAIN);
+            stmt.setInt(2, customerId);
+            if (stmt.executeUpdate() != 1) {
+                throw new SQLException("Account deletion did not affect exactly one row.");
+            }
+        }
+    }
+
+    /**
+     * Whether a customer is a deleted account - one {@link #anonymise}
+     * has emptied. Forgot Password checks this, since the demo
+     * verification code is public and would otherwise let anyone who
+     * guessed a {@code deleted-<id>} address reset its password and sign
+     * in to the reservation history left behind.
+     *
+     * @param customer a customer as loaded by {@link #findByEmail}
+     * @return {@code true} if the account has been deleted
+     */
+    public static boolean isDeleted(Customer customer) {
+        return customer.getEmail() != null && customer.getEmail().endsWith(DELETED_EMAIL_DOMAIN);
     }
 
     /**
