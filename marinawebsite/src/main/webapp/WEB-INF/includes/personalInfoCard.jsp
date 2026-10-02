@@ -65,14 +65,14 @@
 
     <div class="form-group" id="firstNameGroup">
         <label for="firstName">First Name <span class="required-mark">*</span></label>
-        <input type="text" id="firstName" name="firstName" required
+        <input type="text" id="firstName" name="firstName" required autocomplete="given-name"
                value="${fn:escapeXml(firstNameValue)}">
         <div class="field-error" id="firstNameError"></div>
     </div>
 
     <div class="form-group" id="lastNameGroup">
         <label for="lastName">Last Name <span class="required-mark">*</span></label>
-        <input type="text" id="lastName" name="lastName" required
+        <input type="text" id="lastName" name="lastName" required autocomplete="family-name"
                value="${fn:escapeXml(lastNameValue)}">
         <div class="field-error" id="lastNameError"></div>
     </div>
@@ -80,7 +80,7 @@
     <div class="form-row-split form-row-split-phone">
         <div class="form-group" id="phoneCountryCodeGroup">
             <label for="phoneCountryCode" class="visually-hidden">Country Code</label>
-            <input type="text" id="phoneCountryCode" name="phoneCountryCode" required
+            <input type="text" id="phoneCountryCode" name="phoneCountryCode" required autocomplete="tel-country-code"
                    inputmode="numeric" maxlength="3"
                    value="${fn:escapeXml(phoneCountryCodeValue)}"
                    aria-label="Country Code">
@@ -98,7 +98,7 @@
 
     <div class="form-group" id="countryGroup">
         <label for="country">Country <span class="required-mark">*</span></label>
-        <select id="country" name="country" required>
+        <select id="country" name="country" required autocomplete="country-name">
             <jsp:include page="/WEB-INF/includes/countryOptions.jsp">
                 <jsp:param name="fieldName" value="country" />
                 <jsp:param name="country" value="${countryValue}" />
@@ -109,7 +109,7 @@
 
     <div class="form-group" id="streetAddressGroup">
         <label for="streetAddress">Street Address <span class="required-mark">*</span></label>
-        <input type="text" id="streetAddress" name="streetAddress" required
+        <input type="text" id="streetAddress" name="streetAddress" required autocomplete="address-line1"
                placeholder="e.g. 123 Harbor Rd"
                value="${fn:escapeXml(streetAddressValue)}">
         <div class="field-error" id="streetAddressError"></div>
@@ -117,7 +117,7 @@
 
     <div class="form-group" id="streetAddress2Group">
         <label for="streetAddress2">Address Line 2</label>
-        <input type="text" id="streetAddress2" name="streetAddress2"
+        <input type="text" id="streetAddress2" name="streetAddress2" autocomplete="address-line2"
                placeholder="Apt, suite, PO box, etc."
                value="${fn:escapeXml(streetAddress2Value)}">
         <div class="field-error" id="streetAddress2Error"></div>
@@ -126,7 +126,7 @@
     <div class="form-row-split">
         <div class="form-group" id="cityGroup">
             <label for="city">City <span class="required-mark">*</span></label>
-            <input type="text" id="city" name="city" required
+            <input type="text" id="city" name="city" required autocomplete="address-level2"
                    value="${fn:escapeXml(cityValue)}">
             <div class="field-error" id="cityError"></div>
         </div>
@@ -139,7 +139,7 @@
         --%>
         <div class="form-group" id="stateGroup">
             <label for="state" id="stateLabel">${countryValue == 'CA' ? 'Province' : 'State'}</label>
-            <select id="state" name="state" ${countryValue == 'OTHER' ? 'disabled' : 'required'}>
+            <select id="state" name="state" autocomplete="address-level1" ${countryValue == 'OTHER' ? 'disabled' : 'required'}>
                 <c:choose>
                     <c:when test="${countryValue == 'CA'}">
                         <jsp:include page="/WEB-INF/includes/provinceOptions.jsp">
@@ -164,7 +164,7 @@
 
     <div class="form-group" id="zipCodeGroup">
         <label for="zipCode">Zip Code <span class="required-mark">*</span></label>
-        <input type="text" id="zipCode" name="zipCode" required
+        <input type="text" id="zipCode" name="zipCode" required autocomplete="postal-code"
                pattern="^\d{5}(-\d{4})?$" maxlength="10"
                placeholder="e.g. 98250"
                value="${fn:escapeXml(zipCodeValue)}">

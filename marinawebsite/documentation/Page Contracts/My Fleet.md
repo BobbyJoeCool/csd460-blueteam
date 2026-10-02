@@ -339,7 +339,7 @@ The slip code (`A-02`) is **composed in the JSP** from `activeDockNumber` and `a
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| `/myFleet` page | Shows the customer's own boats | Sent to the landing page with the sign-in box already open and "Please sign in, or register, to continue." Signing in, or registering from the box, lands on My Fleet (**changed 2026-09-30, #299**; it was a silent redirect home). `CustomerSession.sendToSignIn(request, response, "/myFleet")`, same as `EditProfileServlet`. |
+| `/myFleet` page | Shows the customer's own boats | Signed out, the page shows the shared sign-in panel (`WEB-INF/includes/signInPanel.jsp`, 401) in place of the fleet; an add, edit or remove after the session timed out redirects back to `/myFleet`, which shows the same panel. Signing in lands on My Fleet (**changed 2026-10-02, #257**; before that it went to the landing page with the sign-in box open, #299). `CustomerSession.showSignInPanel` / `sendToSignIn`, same as `EditProfileServlet`. |
 | Add / Edit / Remove | Available, for the customer's own boats only | Not reachable. A POST (usually a session that timed out mid-edit) writes nothing and gets the same sign-in redirect back to My Fleet. |
 | My Fleet button (on Edit User Info) | Shown | Not reachable — Edit User Info itself requires sign-in |
 | Reserve a Slip / View Reservation links | Shown on the relevant cards | Not reachable — the page itself requires sign-in |

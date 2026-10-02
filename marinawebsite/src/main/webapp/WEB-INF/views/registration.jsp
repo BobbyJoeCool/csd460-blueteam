@@ -29,19 +29,19 @@
     <jsp:param name="activePage" value="register" />
 </jsp:include>
 
-<header class="hero-band" id="registrationHero">
+<section class="hero-band" id="registrationHero" aria-labelledby="registrationHeroTitle">
     <div class="hero-band__content">
-        <h1>Create Your Moffat Bay Marina Account</h1>
+        <h1 id="registrationHeroTitle">Create Your Moffat Bay Marina Account</h1>
         <p class="hero-band__lede">An account is required to reserve a slip. It only takes a minute.</p>
     </div>
     <p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
 <c:if test="${not empty requestScope.formError}">
     <div class="form-banner" role="alert">${fn:escapeXml(requestScope.formError)}</div>
 </c:if>
 
-<main class="page-column page-column--wide">
+<main id="main" tabindex="-1" class="page-column page-column--wide">
     <form class="registration-form" method="post"
           action="${pageContext.request.contextPath}/register" id="registrationForm" novalidate>
         <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
@@ -82,7 +82,7 @@
 
             <div class="form-group">
                 <label for="email">Email <span class="required-mark">*</span></label>
-                <input type="email" id="email" name="email" required
+                <input type="email" id="email" name="email" required autocomplete="email"
                        placeholder="you@example.com"
                        value="${fn:escapeXml(param.email)}">
                 <div class="field-error" id="emailError">

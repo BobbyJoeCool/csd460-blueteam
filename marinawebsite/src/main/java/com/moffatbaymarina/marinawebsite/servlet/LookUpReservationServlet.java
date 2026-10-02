@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
 import jakarta.servlet.ServletException;
@@ -69,12 +70,9 @@ public class LookUpReservationServlet extends HttpServlet {
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
-            // Same pattern as ReservationSummaryServlet: stay on this page,
-            // show a sign-in panel, and send them back here afterwards.
-            request.setAttribute("signInRequired", true);
-            request.setAttribute("signInRedirectTo", "/reservations");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            request.getRequestDispatcher(VIEW).forward(request, response);
+            // Stay on this page, show the sign-in panel, and send them
+            // back here afterwards.
+            CustomerSession.showSignInPanel(request, response, VIEW, "/reservations");
             return;
         }
 

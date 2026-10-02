@@ -48,30 +48,17 @@
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
-<main>
+<main id="main" tabindex="-1">
 <c:choose>
     <%-- Contract: reservation summary is not available while signed out. --%>
+    <%-- The shared sign-in panel, like every customer-only page. This page
+         has no photo hero, so the panel's heading is the page's h1. --%>
     <c:when test="${empty sessionScope.customerId}">
-        <header class="summary-hero summary-hero--signin">
-            <p class="summary-eyebrow">Reservation Details</p>
-            <h1>Sign In to View Your Reservation</h1>
-            <p class="summary-lede">
-                Your reservation details are available after you sign in.
-            </p>
-        </header>
-
-        <div class="summary-signin">
-            <%-- signInRedirectTo is set by ReservationSummaryServlet. The modal
-                 builds its own redirectTo from the request URI, which carries no
-                 query string, so without this the confirmation number is lost on
-                 the way back. --%>
-            <button type="button" class="btn-primary"
-                    data-sign-in="<c:out value="${signInRedirectTo}" />">Sign In</button>
-            <p>
-                No account yet?
-                <a href="${pageContext.request.contextPath}/register">Create one</a>.
-            </p>
-        </div>
+        <jsp:include page="/WEB-INF/includes/signInPanel.jsp">
+            <jsp:param name="heading" value="Sign In to View Your Reservation" />
+            <jsp:param name="message" value="Your reservation details are available after you sign in." />
+            <jsp:param name="headingLevel" value="1" />
+        </jsp:include>
     </c:when>
 
     <c:when test="${not empty reservationSummaryError or empty reservation}">

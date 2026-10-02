@@ -41,10 +41,7 @@ MoffatBay.accountModals = (function () {
      * @param {string} message - text to show; "" clears it
      */
     function setFieldError(inputId, errorId, message) {
-        var input = document.getElementById(inputId);
-        var error = document.getElementById(errorId);
-        if (input) { input.classList.toggle("field-invalid", message !== ""); }
-        if (error) { error.textContent = message; }
+        MoffatBay.form.setFieldError(inputId, errorId, message);
     }
 
     /**

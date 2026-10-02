@@ -30,10 +30,10 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 
 <%-- Hero. Outside <main>, like every page's hero (see .hero-band in
      site.css), so it spans the window. --%>
-<header class="hero-band" id="landingHero">
+<section class="hero-band" id="landingHero" aria-labelledby="landingHeroTitle">
 
 	<div class="hero-band__content">
-		<h1>Your Harbor Between Horizons</h1>
+		<h1 id="landingHeroTitle">Your Harbor Between Horizons</h1>
 
 		<p class="hero-description">
 			Premier slip reservations at Moffat Bay.<br>
@@ -65,9 +65,9 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 		</c:choose>
 	</div>
 	<p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
-	<main class="landing-main">
+	<main id="main" tabindex="-1" class="landing-main">
 
 
 		<!-- Marina benefits -->

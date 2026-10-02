@@ -37,10 +37,10 @@
      width of the window - registration.jsp puts its intro band in the same
      place, and for the same reason. Only the lede changes between signed in
      and signed out, so that's the only part the branch covers. --%>
-<header class="hero-band" id="reservationHero">
+<section class="hero-band" id="reservationHero" aria-labelledby="reservationHeroTitle">
     <div class="hero-band__content">
         <p class="hero-band__eyebrow">Month-to-Month Marina Lease</p>
-        <h1>Reserve Your Slip</h1>
+        <h1 id="reservationHeroTitle">Reserve Your Slip</h1>
         <p class="hero-band__lede">
             <c:choose>
                 <c:when test="${empty sessionScope.customerId}">
@@ -53,26 +53,19 @@
         </p>
     </div>
     <p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
-<main>
+<main id="main" tabindex="-1">
 
 <c:choose>
 
-    <%-- Signed out: the page can't know whose boats to list, so it becomes
-         the sign-in prompt. The login modal works out its own redirectTo
-         from the current path, so they land back here. --%>
+    <%-- Signed out: the page can't know whose boats to list, so it shows
+         the shared sign-in panel, like every customer-only page. --%>
     <c:when test="${empty sessionScope.customerId}">
-        <div class="reservation-signin">
-            <%-- data-sign-in-now: loginModal.js opens the box as soon as the
-                 page loads, since signing in is all this view is for. --%>
-            <button type="button" class="btn-primary"
-                    data-sign-in data-sign-in-now>Sign In</button>
-            <p>
-                No account yet?
-                <a href="${pageContext.request.contextPath}/register">Create one</a>.
-            </p>
-        </div>
+        <jsp:include page="/WEB-INF/includes/signInPanel.jsp">
+            <jsp:param name="heading" value="Sign In to Reserve a Slip" />
+            <jsp:param name="message" value="Your boats and the slips that fit them are shown here after you sign in." />
+        </jsp:include>
     </c:when>
 
     <c:otherwise>
@@ -241,7 +234,7 @@
                             room for it.
                         </p>
 
-                        <fieldset class="dock-choices">
+                        <fieldset class="dock-choices" id="dockChoices">
                             <legend class="visually-hidden">Dock</legend>
                             <c:forEach var="d" items="${docks}">
                                 <label class="dock-card" data-dock="${d.dockId}">
@@ -259,7 +252,7 @@
                             Pick a dock for me
                         </button>
 
-                        <div class="field-error" id="dockError"></div>
+                        <div class="field-error" id="dockError" data-error-for="dockChoices"></div>
 
                         <figure class="marina-map">
                             <img src="${pageContext.request.contextPath}/images/marina_a.png"
@@ -446,7 +439,9 @@
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
-<script src="${pageContext.request.contextPath}/js/reservation.js?v=${applicationScope.assetVersion}"></script>
+<%-- defer, so it runs after header.jsp's deferred modal.js: with no boats it
+     opens the Register a Boat popup straight away, through MoffatBay.modal. --%>
+<script src="${pageContext.request.contextPath}/js/reservation.js?v=${applicationScope.assetVersion}" defer></script>
 
 </body>
 </html>

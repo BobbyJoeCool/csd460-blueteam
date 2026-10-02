@@ -47,7 +47,7 @@ public class MyFleetServlet extends HttpServlet {
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
-            CustomerSession.sendToSignIn(request, response, "/myFleet");
+            CustomerSession.showSignInPanel(request, response, VIEW, "/myFleet");
             return;
         }
 

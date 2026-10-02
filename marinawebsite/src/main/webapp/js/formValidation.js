@@ -488,7 +488,114 @@ MoffatBay.form = (function () {
         return allMet;
     }
 
+    // ------------------------------------------------------------------
+    // Field errors. A .field-error box sits under its control; these keep
+    // the two linked for screen readers (WCAG 3.3.1, 4.1.2): while the box
+    // holds a message the control has aria-invalid="true" and names the box
+    // in aria-describedby, so the message is read when focus lands on it.
+    // ------------------------------------------------------------------
+
+    /**
+     * The control a .field-error box belongs to: the one its
+     * data-error-for names, or else the visible input, select or textarea
+     * in the same .form-group.
+     * @param {Element} errorEl - the .field-error box
+     * @returns {Element|null} the control, or null for a box that isn't about one field
+     */
+    function fieldForError(errorEl) {
+        if (errorEl.dataset.errorFor) {
+            return document.getElementById(errorEl.dataset.errorFor);
+        }
+        var group = errorEl.closest(".form-group");
+        return group
+            ? group.querySelector("input:not([type=hidden]), select, textarea")
+            : null;
+    }
+
+    /**
+     * Brings one control's aria-invalid / aria-describedby in line with
+     * whether its error box has a message. Leaves any other ids in
+     * aria-describedby (a hint, say) where they are.
+     * @param {Element} errorEl - the .field-error box
+     */
+    function linkFieldError(errorEl) {
+        var field = fieldForError(errorEl);
+        if (!field || !errorEl.id) { return; }
+
+        var hasMessage = errorEl.textContent.trim() !== "";
+        var ids = (field.getAttribute("aria-describedby") || "").split(/\s+/)
+            .filter(function (id) { return id !== "" && id !== errorEl.id; });
+
+        if (hasMessage) {
+            ids.push(errorEl.id);
+            field.setAttribute("aria-invalid", "true");
+        } else {
+            field.removeAttribute("aria-invalid");
+        }
+
+        if (ids.length > 0) {
+            field.setAttribute("aria-describedby", ids.join(" "));
+        } else {
+            field.removeAttribute("aria-describedby");
+        }
+    }
+
+    /**
+     * Shows a message under one field and marks the control invalid -
+     * the one place a field error is put on the page.
+     * @param {Element|string} field - the control, or its id
+     * @param {Element|string} error - its .field-error box, or that box's id
+     * @param {string} message - text to show; "" clears it
+     */
+    function setFieldError(field, error, message) {
+        if (typeof field === "string") { field = document.getElementById(field); }
+        if (typeof error === "string") { error = document.getElementById(error); }
+        if (field) { field.classList.toggle("field-invalid", !!message); }
+        if (error) {
+            error.textContent = message || "";
+            linkFieldError(error);
+        }
+    }
+
+    /**
+     * Clears one field's message and its invalid marking.
+     * @param {Element|string} field - the control, or its id
+     * @param {Element|string} error - its .field-error box, or that box's id
+     */
+    function clearFieldError(field, error) {
+        setFieldError(field, error, "");
+    }
+
+    /*
+     * Plenty of scripts write an error box's text directly (registration.js,
+     * reservation.js, myFleet.js), and the server renders some messages
+     * into the page. Rather than every one of them remembering the ARIA,
+     * link every box once the page has loaded, then again whenever its
+     * text changes.
+     */
+    function watchFieldErrors() {
+        document.querySelectorAll(".field-error").forEach(linkFieldError);
+
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                var node = mutation.target.nodeType === 1
+                    ? mutation.target
+                    : mutation.target.parentElement;
+                var box = node ? node.closest(".field-error") : null;
+                if (box) { linkFieldError(box); }
+            });
+        }).observe(document.body, { childList: true, characterData: true, subtree: true });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", watchFieldErrors);
+    } else {
+        watchFieldErrors();
+    }
+
     return {
+        setFieldError: setFieldError,
+        clearFieldError: clearFieldError,
         isValidEmail: isValidEmail,
         isValidZip: isValidZip,
         isValidCountryCode: isValidCountryCode,

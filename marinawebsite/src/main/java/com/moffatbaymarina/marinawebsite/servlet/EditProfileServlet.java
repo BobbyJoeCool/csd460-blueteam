@@ -84,9 +84,10 @@ public class EditProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || !Boolean.TRUE.equals(session.getAttribute("loggedIn"))) {
-            // Signed out: home page with the sign-in box open, coming back
-            // here afterwards (Beta Priority 1 plan, decision D3).
-            CustomerSession.sendToSignIn(request, response, "/editProfile");
+            // Signed out: this page with the shared sign-in panel, coming
+            // back here afterwards (issue #257).
+            CustomerSession.showSignInPanel(request, response,
+                    "/WEB-INF/views/editUserInfo.jsp", "/editProfile");
             return;
         }
 

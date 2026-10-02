@@ -116,13 +116,12 @@
 	box-shadow: inset 0 0 0 1px var(--color-ocean-blue);
 }
 
-/* The forgot-password link sits inside a .field-hint, which is muted and
-   part-transparent - fine for hint text, wrong for the only control in
-   that block. Given back full contrast and an underline, so it reads as a
-   link rather than as more hint. */
+/* Links inside a .field-hint (Forgot your current password?, Privacy
+   Policy) get the full link colour and an underline, so they read as links
+   rather than as more hint. The hint fades its own text colour rather than
+   its opacity, so this colour isn't faded along with it. */
 #accountColumn .field-hint a {
 	color: var(--color-link);
-	opacity: 1;
 	text-decoration: underline;
 }
 

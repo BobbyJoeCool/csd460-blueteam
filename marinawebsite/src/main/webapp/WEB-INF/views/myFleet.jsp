@@ -29,12 +29,15 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <%--
-  Defence in depth. MyFleetServlet already bounces a logged-out request, but
-  this page is reachable by its own path too, and it renders a customer's
-  boats - it should never render for nobody. Same guard as editUserInfo.jsp.
+  Signed out, MyFleetServlet forwards here with signInRequired set, and the
+  page shows the shared sign-in panel instead of a fleet (issue #257).
+
+  Defence in depth. Reached signed out any other way, hand it to the servlet
+  rather than render a customer's boats for nobody. Same guard as
+  editUserInfo.jsp.
 --%>
-<c:if test="${empty sessionScope.customer}">
-    <c:redirect url="/" />
+<c:if test="${empty sessionScope.customer and not requestScope.signInRequired}">
+    <c:redirect url="/myFleet" />
 </c:if>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
@@ -57,18 +60,29 @@
 
 <%-- The hero sits outside <main>, like every hero on the site (see
      .hero-band in site.css), so it spans the window. --%>
-<header class="hero-band" id="fleetHero">
+<section class="hero-band" id="fleetHero" aria-labelledby="fleetHeroTitle">
     <div class="hero-band__content">
-        <h1>My Fleet</h1>
+        <h1 id="fleetHeroTitle">My Fleet</h1>
         <p class="hero-band__lede">
             Every boat you own, and where it's berthed. Edit a boat's
             details, remove one you no longer own, or register a new one.
         </p>
     </div>
     <p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
-<main>
+<main id="main" tabindex="-1">
+
+<c:choose>
+<c:when test="${requestScope.signInRequired}">
+
+    <jsp:include page="/WEB-INF/includes/signInPanel.jsp">
+        <jsp:param name="heading" value="Sign In to View Your Fleet" />
+        <jsp:param name="message" value="Your boats are listed here after you sign in." />
+    </jsp:include>
+
+</c:when>
+<c:otherwise>
 
     <div class="fleet-page">
 
@@ -225,7 +239,13 @@
 
     </div>
 
+</c:otherwise>
+</c:choose>
+
 </main>
+
+<%-- Everything from here to the footer is the signed-in page's popups. --%>
+<c:if test="${not requestScope.signInRequired}">
 
 <%--
   Server-set field messages, parked here rather than written straight into
@@ -361,10 +381,14 @@
     </div>
 </div>
 
+</c:if>
+
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
 
-<script src="${ctx}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
-<script src="${ctx}/js/myFleet.js?v=${applicationScope.assetVersion}" defer></script>
+<c:if test="${not requestScope.signInRequired}">
+    <script src="${ctx}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
+    <script src="${ctx}/js/myFleet.js?v=${applicationScope.assetVersion}" defer></script>
+</c:if>
 
 </body>
 </html>

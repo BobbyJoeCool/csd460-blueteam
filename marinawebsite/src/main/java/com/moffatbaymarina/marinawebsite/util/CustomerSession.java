@@ -2,14 +2,13 @@ package com.moffatbaymarina.marinawebsite.util;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.moffatbaymarina.marinawebsite.model.Customer;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -20,7 +19,7 @@ import jakarta.servlet.http.HttpSessionEvent;
 
 /**
  * The one place a customer's signed-in session is started, and the one way
- * a members-only page sends a signed-out visitor to sign in.
+ * a customer-only page asks a signed-out visitor to sign in.
  *
  * <p>Signing in used to live only in {@code LoginServlet}. Registration now
  * signs the new customer in too, so both call {@link #start} rather than
@@ -155,19 +154,50 @@ public final class CustomerSession {
     }
 
     /**
-     * Sends a signed-out visitor to the home page with the sign-in box
-     * already open, remembering the page they wanted. Signing in - or
-     * registering through the box's Register here link - then lands them
-     * on {@code returnTo} (WEB-INF/includes/loginModal.jsp reads {@code signIn}).
+     * Shows a customer-only page's signed-out view: the page itself, with
+     * the shared sign-in panel (WEB-INF/includes/signInPanel.jsp) in place
+     * of its content. The visitor stays on the address they asked for and
+     * is told why it's empty, and signing in brings them back to it.
      *
-     * <p>Used by pages with no signed-out view of their own (My Fleet and
-     * User Profile, and their form actions, whose usual cause is a session
-     * that timed out mid-edit). Before this they redirected home silently,
-     * and the page the visitor wanted was forgotten.
+     * <p>Every customer-only page's GET goes through this (Book a Slip, My
+     * Reservations, Reservation Summary, My Fleet, Your Account), so they
+     * all look and behave the same signed out (issue #257).
+     *
+     * @param request the request that needed a signed-in customer
+     * @param response the response to forward; answered 401
+     * @param view the page's JSP, which renders the panel when
+     *        {@code signInRequired} is set
+     * @param returnTo the page to come back to after signing in, as a fixed
+     *        context-relative path chosen by the caller (e.g.
+     *        {@code "/myFleet"}) - never something taken from the request
+     * @throws ServletException if the forward fails
+     * @throws IOException if the forward fails
+     */
+    public static void showSignInPanel(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String view,
+            String returnTo)
+            throws ServletException, IOException {
+        request.setAttribute("signInRequired", true);
+        request.setAttribute("signInRedirectTo", returnTo);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        request.getRequestDispatcher(view).forward(request, response);
+    }
+
+    /**
+     * Sends a signed-out visitor back to a customer-only page, whose GET
+     * then shows its sign-in panel (see {@link #showSignInPanel}).
+     *
+     * <p>For the form actions and downloads behind those pages (My Fleet's
+     * add, edit and remove, Your Account's save, download and delete),
+     * whose usual cause is a session that timed out mid-edit. A redirect
+     * rather than showing the panel straight away, so signing in reloads
+     * the page instead of replaying the form.
      *
      * @param request the request that needed a signed-in customer
      * @param response the response to redirect
-     * @param returnTo the page to come back to, as a fixed context-relative
+     * @param page the page to send them to, as a fixed context-relative
      *        path chosen by the caller (e.g. {@code "/myFleet"}) - never
      *        something taken from the request
      * @throws IOException if the redirect fails
@@ -175,9 +205,8 @@ public final class CustomerSession {
     public static void sendToSignIn(
             HttpServletRequest request,
             HttpServletResponse response,
-            String returnTo)
+            String page)
             throws IOException {
-        response.sendRedirect(request.getContextPath() + "/?signIn="
-                + URLEncoder.encode(returnTo, StandardCharsets.UTF_8));
+        response.sendRedirect(request.getContextPath() + page);
     }
 }

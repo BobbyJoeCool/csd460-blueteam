@@ -30,33 +30,6 @@
 
 
 /* =========================================================
-   SIGNED-OUT PANEL
-   ========================================================= */
-
-.lookup-signin {
-    max-width: 36rem;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-card);
-}
-
-.lookup-signin h2 {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-heading);
-    font-size: 1.35rem;
-    font-weight: normal;
-    color: var(--color-text-heading);
-}
-
-.lookup-signin .btn-primary {
-    margin: 0.5rem 0 1rem;
-}
-
-
-/* =========================================================
    FILTER CARD
    ========================================================= */
 

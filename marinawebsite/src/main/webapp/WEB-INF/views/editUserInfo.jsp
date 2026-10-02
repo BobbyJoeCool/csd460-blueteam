@@ -27,12 +27,15 @@
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <%--
-  Defence in depth. EditProfileServlet already bounces a logged-out request,
-  but this page is reachable by its own path too, and it renders a customer's
-  name, address and email - it should never render for nobody.
+  Signed out, EditProfileServlet forwards here with signInRequired set, and
+  the page shows the shared sign-in panel instead of the form (issue #257).
+
+  Defence in depth. Reached signed out any other way, hand it to the
+  servlet rather than render a customer's name, address and email for
+  nobody.
 --%>
-<c:if test="${empty sessionScope.customer}">
-    <c:redirect url="/" />
+<c:if test="${empty sessionScope.customer and not requestScope.signInRequired}">
+    <c:redirect url="/editProfile" />
 </c:if>
 
 <!DOCTYPE html>
@@ -54,18 +57,29 @@
 
 <%-- The hero sits outside <main>, like every hero on the site (see
      .hero-band in site.css), so it spans the window. --%>
-<header class="hero-band" id="accountHero">
+<section class="hero-band" id="accountHero" aria-labelledby="accountHeroTitle">
     <div class="hero-band__content">
-        <h1>Your Account</h1>
+        <h1 id="accountHeroTitle">Your Account</h1>
         <p class="hero-band__lede">
             Update your contact details and mailing address. We only save
             what you actually change.
         </p>
     </div>
     <p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
-<main class="page-column">
+<main id="main" tabindex="-1" class="page-column">
+
+<c:choose>
+<c:when test="${requestScope.signInRequired}">
+
+    <jsp:include page="/WEB-INF/includes/signInPanel.jsp">
+        <jsp:param name="heading" value="Sign In to View Your Account" />
+        <jsp:param name="message" value="Your contact details and mailing address are shown here after you sign in." />
+    </jsp:include>
+
+</c:when>
+<c:otherwise>
 
     <c:if test="${not empty formError}">
         <div class="form-banner form-banner--error" id="formError" role="alert">
@@ -204,7 +218,13 @@
 
     </form>
 
+</c:otherwise>
+</c:choose>
+
 </main>
+
+<%-- Everything from here to the footer is the signed-in page's popups. --%>
+<c:if test="${not requestScope.signInRequired}">
 
 <%--
   The confirmation step from the contract's "Partial Update" section: the
@@ -292,14 +312,18 @@
     </div>
 </div>
 
+</c:if>
+
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <%-- Signed-in only, so it lives on this page rather than with the login
      modal. formValidation.js isn't loaded here - WEB-INF/includes/loginModal.jsp
      already pulls it in through the header, on every page. --%>
+<c:if test="${not requestScope.signInRequired}">
 <jsp:include page="/WEB-INF/includes/changePasswordModal.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/editUserInfo.js?v=${applicationScope.assetVersion}" defer></script>
+</c:if>
 
 </body>
 </html>

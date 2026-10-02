@@ -13,6 +13,7 @@ import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.Boat;
 import com.moffatbaymarina.marinawebsite.model.DockAvailability;
 import com.moffatbaymarina.marinawebsite.model.Reservation;
+import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.MarinaInfo;
 import com.moffatbaymarina.marinawebsite.util.Utils;
@@ -55,7 +56,7 @@ public class ReservationServlet extends HttpServlet {
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
-            request.getRequestDispatcher(VIEW).forward(request, response);
+            CustomerSession.showSignInPanel(request, response, VIEW, "/reservation");
             return;
         }
 

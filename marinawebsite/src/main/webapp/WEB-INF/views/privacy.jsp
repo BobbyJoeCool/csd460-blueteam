@@ -38,15 +38,15 @@
 
 <jsp:include page="/WEB-INF/includes/header.jsp" />
 
-<header class="hero-band" id="privacyHero">
+<section class="hero-band" id="privacyHero" aria-labelledby="privacyHeroTitle">
     <div class="hero-band__content">
-        <h1>Privacy Policy</h1>
+        <h1 id="privacyHeroTitle">Privacy Policy</h1>
         <p class="hero-band__lede">What we keep about you, why, and how to get it back or have it removed.</p>
     </div>
     <p class="hero-band__credit">Image created with Google Gemini</p>
-</header>
+</section>
 
-<main class="page-column policy-page">
+<main id="main" tabindex="-1" class="page-column policy-page">
 
     <p class="policy-updated">Last updated October 2, 2026</p>
 

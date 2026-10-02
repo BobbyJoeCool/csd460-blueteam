@@ -66,7 +66,7 @@
 
 <jsp:include page="/WEB-INF/includes/header.jsp" />
 
-<main>
+<main id="main" tabindex="-1">
     <div class="error-pirate">
         <div class="error-pirate-parchment">
 

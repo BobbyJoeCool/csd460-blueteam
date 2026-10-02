@@ -33,13 +33,6 @@
     padding: 2.5rem 1.5rem 4rem;
 }
 
-.reservation-signin {
-    max-width: var(--content-narrow);
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 4rem;
-    text-align: center;
-}
-
 /* ---------------------------------------------------------- lease notice */
 
 .lease-notice {

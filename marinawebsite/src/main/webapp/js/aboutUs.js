@@ -35,10 +35,7 @@ MoffatBay.aboutUs = (function () {
      * @param {string} message - text to show; "" clears it
      */
     function setFieldError(fieldId, message) {
-        var field = document.getElementById(fieldId);
-        var error = document.getElementById(fieldId + "Error");
-        if (field) { field.classList.toggle("field-invalid", message !== ""); }
-        if (error) { error.textContent = message; }
+        MoffatBay.form.setFieldError(fieldId, fieldId + "Error", message);
     }
 
     /**

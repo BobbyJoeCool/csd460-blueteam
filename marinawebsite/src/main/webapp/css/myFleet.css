@@ -145,13 +145,13 @@
     background: color-mix(in srgb, var(--color-ocean-blue) 10%, transparent);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--color-link);
+    color: var(--color-deep-marine);
     text-decoration: none;
 }
 
 .fleet-card__reservation:hover {
     background: color-mix(in srgb, var(--color-ocean-blue) 18%, transparent);
-    color: var(--color-link);
+    color: var(--color-deep-marine);
 }
 
 .fleet-card__hint {
@@ -164,7 +164,7 @@
 /* The "Book a Slip" link inside an idle status pill. */
 .status-pill__link {
     font-weight: 600;
-    color: var(--color-link);
+    color: var(--color-deep-marine);
 }
 
 /* ==========================================================================
