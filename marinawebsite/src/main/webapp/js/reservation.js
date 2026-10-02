@@ -40,6 +40,8 @@ MoffatBay.reservation = (function () {
        field. ReservationServlet sends the full one too. */
     var DATE_PAST_SHORT = "Start date can't be in the past.";
     var DATE_PAST_FULL  = "Start date can't be in the past. Choose today or later.";
+    var DATE_FAR_SHORT  = "Start date must be within 12 months.";
+    var DATE_FAR_FULL   = "Start date must be within 12 months of today.";
 
     var availPanel     = document.getElementById("availabilityPanel");
     var availMessage   = document.getElementById("availabilityMessage");
@@ -439,9 +441,9 @@ MoffatBay.reservation = (function () {
            when. Dock first, since it's the earlier step on the page. */
         var dockChosen = !!selectedDock();
         var hasDate    = !!(checkInDate && checkInDate.value);
-        var datePast   = hasDate && checkInDate.value < todayIso();
+        var problem    = dateProblem();
 
-        setSubmitEnabled(dockChosen && hasDate && !datePast);
+        setSubmitEnabled(dockChosen && hasDate && !problem);
 
         /* A past date gets its own reason. It used to fall under "Choose a
            start date", which reads as if the date they picked hadn't
@@ -450,8 +452,8 @@ MoffatBay.reservation = (function () {
             setText(submitBlockedReason, "Choose a dock to continue.");
         } else if (!hasDate) {
             setText(submitBlockedReason, "Choose a start date to continue.");
-        } else if (datePast) {
-            setText(submitBlockedReason, DATE_PAST_SHORT);
+        } else if (problem) {
+            setText(submitBlockedReason, problem === "past" ? DATE_PAST_SHORT : DATE_FAR_SHORT);
         } else {
             setText(submitBlockedReason, "");
         }
@@ -696,8 +698,8 @@ MoffatBay.reservation = (function () {
         if (!checkInDate || !checkInDate.value) {
             setText(dateError, "Choose a start date.");
             ok = false;
-        } else if (checkInDate.value < todayIso()) {
-            setText(dateError, DATE_PAST_FULL);
+        } else if (dateProblem()) {
+            setText(dateError, dateProblemMessage());
             ok = false;
         }
         if (!ok) { return; }
@@ -795,6 +797,28 @@ MoffatBay.reservation = (function () {
         return MoffatBay.form.todayIso();
     }
 
+    /**
+     * What's wrong with the chosen start date, if anything: "past" (before
+     * today) or "far" (after the field's max, which ReservationServlet sets
+     * from BR-26), or null when it's fine or empty. min and max stop the
+     * picker offering those days, but not a date typed in by hand.
+     */
+    function dateProblem() {
+        var value = checkInDate && checkInDate.value;
+        if (!value) { return null; }
+        if (value < todayIso()) { return "past"; }
+        if (checkInDate.max && value > checkInDate.max) { return "far"; }
+        return null;
+    }
+
+    /** The message under the date field for dateProblem(), or "". */
+    function dateProblemMessage() {
+        var problem = dateProblem();
+        if (problem === "past") { return DATE_PAST_FULL; }
+        if (problem === "far")  { return DATE_FAR_FULL; }
+        return "";
+    }
+
 
     // ================================================================
     // Wiring
@@ -822,8 +846,7 @@ MoffatBay.reservation = (function () {
                picker offering one, but not a date typed in by hand, and
                the submit-time check never runs for one because the
                button is already disabled. */
-            setText(dateError, checkInDate.value && checkInDate.value < todayIso()
-                    ? DATE_PAST_FULL : "");
+            setText(dateError, dateProblemMessage());
             updateAvailability();
             updateSummary();
         });

@@ -45,7 +45,7 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/reservation">
-                    Reservations
+                    Book a Slip
                 </a>
 
                 <a href="${pageContext.request.contextPath}/waitList">

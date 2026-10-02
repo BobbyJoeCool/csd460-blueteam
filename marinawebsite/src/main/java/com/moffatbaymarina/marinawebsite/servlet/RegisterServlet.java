@@ -6,10 +6,12 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
+import java.util.Map;
 
 import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
+import com.moffatbaymarina.marinawebsite.util.BoatValidator;
 import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
@@ -149,17 +151,29 @@ public class RegisterServlet extends HttpServlet {
 				boatYearText);
 
 		if (boatEntered) {
-			String boatError = validateBoat(
-					boatName,
-					regNumber,
-					boatLengthText,
-					boatLength,
-					hin,
-					boatBeamText,
-					boatBeam,
-					boatYearText,
-					boatYear,
-					country);
+			/*
+			 * The shared rules every add-a-boat path uses. Registration
+			 * passes requireIdentifier = false: a boat with neither a HIN
+			 * nor a Registration Number is saved, and the page suggests
+			 * calling the marina instead (BR-08). The form shows one banner
+			 * message, so the first failure, in form order, is the one shown.
+			 */
+			String boatError;
+			try (Connection conn = DBConnection.getConnection()) {
+				Map<String, String> boatErrors = BoatValidator.validateAdd(
+						conn,
+						boatDAO,
+						BoatValidator.cleanBoatValues(request),
+						country,
+						false,
+						null);
+				boatError = boatErrors.isEmpty()
+						? null
+						: boatErrors.values().iterator().next();
+			} catch (SQLException exception) {
+				getServletContext().log("Boat validation failed.", exception);
+				boatError = "Registration could not be completed. Please try again.";
+			}
 
 			if (boatError != null) {
 				forwardWithError(
@@ -276,12 +290,9 @@ public class RegisterServlet extends HttpServlet {
                 boat.setBoatBeam(boatBeam);
                 boat.setBoatYear(boatYear);
 
-                int boatId = boatDAO.insertBoat(conn, boat);
-
-                boatDAO.insertOwnership(
-                    conn, 
-                    boatId, 
-                    customerId);
+                // Reuses the boat's old row if it's on file and nobody
+                // owns it now, e.g. a new customer who bought it.
+                boatDAO.addOrReclaim(conn, boat, customerId);
             }
 
             conn.commit();
@@ -332,7 +343,7 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		// State/Province follows Country, the same way Registration
-		// State/Province does for a boat (see validateBoat below): OTHER
+		// State/Province does for a boat (see BoatValidator): OTHER
 		// has no state/province concept, so the field is disabled
 		// client-side and not required here - see the Registration
 		// contract's "Country" section.
@@ -373,76 +384,6 @@ public class RegisterServlet extends HttpServlet {
 
 		if (!password.equals(confirmPassword)) {
 			return "Passwords do not match.";
-		}
-
-		return null;
-	}
-
-    //Boat Validation------------------------------------------------------------------------------------------------
-
-	private String validateBoat(
-			String boatName,
-			String regNumber,
-			String boatLengthText,
-			BigDecimal boatLength,
-			String hin,
-			String boatBeamText,
-			BigDecimal boatBeam,
-			String boatYearText,
-			Integer boatYear,
-			String country) {
-
-        if (Utils.isBlank(boatName) || Utils.isBlank(boatLengthText)) {
-            return "Boat Name and Boat Length are required when adding a boat.";
-        }
-
-        if (boatLength == null) {
-            return "Boat Length must be a valid number.";
-        }
-
-        if (boatName.length() > 50 || !Utils.isValidBoatDimension(boatLength)) {
-            return "Enter a boat length between 1 and 999.9 feet.";
-        }
-
-		if (!Utils.isBlank(boatBeamText) && !Utils.isValidBoatDimension(boatBeam)) {
-			return "Boat Beam must be a valid number.";
-		}
-
-		if (!Utils.isBlank(boatYearText) && !Utils.isValidBoatYear(boatYear)) {
-			return "Enter a valid four-digit boat year.";
-		}
-
-		/*
-		 * HIN is the primary identifier and Registration Number is the
-		 * fallback (Registration contract's "Boat Fields"), but as of
-		 * this rework neither is ever required to submit - a boat with
-		 * neither is still saved, and the front end shows a note directing
-		 * the owner to call the Marina instead of blocking submission.
-		 * Each one, if actually provided, still has to be well-formed.
-		 */
-		if (!Utils.isBlank(hin) && !Utils.isValidHin(hin)) {
-			return "HIN should be 12 characters: 3 letters, then 9 more "
-					+ "letters or numbers.";
-		}
-
-		/*
-		 * Registration Number carries its own state/province prefix now -
-		 * there's no separate Registration State field to pair it with.
-		 */
-		if (!Utils.isBlank(regNumber)) {
-			if ("CA".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
-				return "Enter a valid Canadian Registration Number, "
-						+ "e.g. C1234 AB.";
-			}
-
-			if ("US".equals(country) && !Utils.isValidRegNumber(regNumber, country)) {
-				return "Enter a valid Registration Number, including the "
-						+ "state prefix, e.g. WN1234 AB.";
-			}
-
-			// OTHER has no defined Registration Number format - accepted
-			// as entered, since the field is province/state-system
-			// specific and Registration is disabled client-side for it.
 		}
 
 		return null;

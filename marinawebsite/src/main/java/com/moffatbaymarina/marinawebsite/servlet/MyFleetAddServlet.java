@@ -72,7 +72,9 @@ public class MyFleetAddServlet extends HttpServlet {
                             conn,
                             boatDAO,
                             values,
-                            country
+                            country,
+                            true,
+                            customerId
                     );
 
         // If validation fails, send the user back to My Fleet
@@ -134,15 +136,12 @@ public class MyFleetAddServlet extends HttpServlet {
             conn.setAutoCommit(false);
 
             try {
-                int boatId =
-                        boatDAO.insertBoat(
-                                conn,
-                                boat
-                        );
-
-                boatDAO.insertOwnership(
+                // Adds the boat and its ownership, reusing the boat's old row
+                // if it's on file and nobody owns it now (a boat removed
+                // earlier, or one bought from another customer).
+                boatDAO.addOrReclaim(
                         conn,
-                        boatId,
+                        boat,
                         customerId
                 );
 

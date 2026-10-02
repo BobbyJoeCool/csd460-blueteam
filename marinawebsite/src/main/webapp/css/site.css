@@ -64,9 +64,12 @@
 	--color-link-hover: var(--color-golden-hour);
 	--color-link-visited: var(--color-ocean-blue);
 
-	/* Primary CTA — per the wireframe rules, only ONE per page */
+	/* Primary CTA — per the wireframe rules, only ONE per page.
+	   Navy text, not white: white on coral is 2.74:1, below WCAG AA's 4.5:1
+	   for button-size text. Navy is 5.68:1 on the coral and 7.54:1 on the
+	   gold hover colour, so one value passes in both states. */
 	--color-cta-primary-bg: var(--color-sunset-coral);
-	--color-cta-primary-text: var(--color-surface-neutral);
+	--color-cta-primary-text: var(--color-charcoal-navy);
 	--color-cta-primary-bg-hover: var(--color-golden-hour);
 
 	/* Secondary buttons — every button on a page after the one primary CTA */
