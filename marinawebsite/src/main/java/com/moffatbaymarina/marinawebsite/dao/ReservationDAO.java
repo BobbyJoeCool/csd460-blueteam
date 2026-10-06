@@ -19,6 +19,7 @@ import com.moffatbaymarina.marinawebsite.model.DockAvailability;
 import com.moffatbaymarina.marinawebsite.model.Reservation;
 import com.moffatbaymarina.marinawebsite.model.ReservationDetails;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
+import com.moffatbaymarina.marinawebsite.util.Utils;
 
 /**
  * Data access for the {@code Reservation} table.
@@ -84,6 +85,47 @@ public class ReservationDAO {
             LEFT JOIN Rate e ON e.rateCode   = 'ELECTRIC_MONTHLY'
             LEFT JOIN TerminationNotice tn ON tn.reservationID = r.reservationID
             """;
+
+    /*
+     * The last day a lease runs, for a reservation LEFT JOINed to its live
+     * notice as tn: the notice's terminationDate, or, for an older notice
+     * filed without one, the earliest day BR-21 allows (notice date plus the
+     * minimum notice). NULL when there is no live notice - the lease is
+     * month to month and has no end.
+     *
+     * Live means Submitted, Pending, Approved or Completed. A Withdrawn
+     * notice never frees a slip (BR-24).
+     */
+    private static final String LIVE_NOTICE_JOIN = """
+            LEFT JOIN TerminationNotice tn
+                   ON tn.reservationID = r.reservationID
+                  AND tn.noticeStatus IN ('Submitted', 'Pending', 'Approved', 'Completed')
+            """;
+
+    private static final String LEASE_LAST_DAY =
+            "COALESCE(tn.terminationDate, DATE_ADD(tn.noticeDate, INTERVAL "
+            + Utils.MIN_TERMINATION_NOTICE_DAYS + " DAY))";
+
+    /*
+     * Whether slip s is taken on the date bound to the one ? (issue #324,
+     * BR-15). Taken means some Active lease on it either has no live notice,
+     * or its last day falls on or after that date.
+     *
+     * No start-date condition: a new lease has no end date either, so a
+     * lease that starts after the requested date still blocks it. A lease
+     * whose last day has passed no longer counts, even though nothing marks
+     * it Completed yet.
+     *
+     * Every availability question - the booking check, the Book a Slip
+     * counts, the Wait List's "available now" - goes through this one
+     * fragment, so they can't disagree about what free means.
+     */
+    private static final String SLIP_TAKEN_ON =
+            " EXISTS (SELECT 1 FROM Reservation r "
+            + LIVE_NOTICE_JOIN
+            + " WHERE r.slipID = s.slipID"
+            + " AND r.reservationStatus = 'Active'"
+            + " AND (tn.reservationID IS NULL OR " + LEASE_LAST_DAY + " >= ?)) ";
 
     /**
      * Looks a reservation up by its customer-facing confirmation number, with
@@ -483,10 +525,14 @@ public class ReservationDAO {
         }
         throw new SQLException("Required rate not found: " + rateCode);
     }
- /**
-     * Returns every dock with a 26/40/50 count, including explicit zeroes.
+    /**
+     * Returns every dock with a 26/40/50 count, including explicit zeroes:
+     * the slips free for a lease starting on {@code onDate}.
+     *
+     * @param conn an open connection
+     * @param onDate the lease start date to count for; today on first load
      */
-    public List<DockAvailability> findDockAvailability(Connection conn)
+    public List<DockAvailability> findDockAvailability(Connection conn, LocalDate onDate)
             throws SQLException {
         String sql = """
                 SELECT d.dockID,
@@ -496,12 +542,7 @@ public class ReservationDAO {
                        SUM(CASE
                            WHEN s.slipID IS NOT NULL
                             AND s.slipStatus = 'operational'
-                            AND NOT EXISTS (
-                                SELECT 1
-                                FROM Reservation r
-                                WHERE r.slipID = s.slipID
-                                  AND r.reservationStatus = 'Active'
-                            )
+                            AND NOT""" + SLIP_TAKEN_ON + """
                            THEN 1 ELSE 0
                        END) AS availableCount
                 FROM Dock d
@@ -514,21 +555,23 @@ public class ReservationDAO {
                 """;
 
         Map<Integer, DockAvailability> docks = new LinkedHashMap<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                int dockId = rs.getInt("dockID");
-                DockAvailability dock = docks.get(dockId);
-                if (dock == null) {
-                    dock = new DockAvailability();
-                    dock.setDockId(dockId);
-                    dock.setDockNumber(rs.getString("dockNumber"));
-                    dock.setDockDescription(rs.getString("dockDescription"));
-                    docks.put(dockId, dock);
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(onDate));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int dockId = rs.getInt("dockID");
+                    DockAvailability dock = docks.get(dockId);
+                    if (dock == null) {
+                        dock = new DockAvailability();
+                        dock.setDockId(dockId);
+                        dock.setDockNumber(rs.getString("dockNumber"));
+                        dock.setDockDescription(rs.getString("dockDescription"));
+                        docks.put(dockId, dock);
+                    }
+                    dock.setAvailableCount(
+                            rs.getInt("sizeFt"),
+                            rs.getInt("availableCount"));
                 }
-                dock.setAvailableCount(
-                        rs.getInt("sizeFt"),
-                        rs.getInt("availableCount"));
             }
         }
         return new ArrayList<>(docks.values());
@@ -578,10 +621,14 @@ public class ReservationDAO {
      * commits or rolls back. That alone doesn't stop two customers getting
      * the same slip, because the {@code NOT EXISTS} check is a plain read.
      * Call {@link #lockSlipSize} first.
+     *
+     * <p>Free means free for a lease starting on {@code startDate}: a slip
+     * whose tenant has given notice can be booked from the day after their
+     * last day (issue #324).
      */
     public Integer findAvailableSlip(
         Connection conn, int dockId,
-        int slipSizeFt) throws SQLException {
+        int slipSizeFt, LocalDate startDate) throws SQLException {
 
     String sql = """
             SELECT s.slipID FROM Slip s
@@ -590,12 +637,7 @@ public class ReservationDAO {
             WHERE s.dockID = ?
               AND sz.sizeFt = ?
               AND s.slipStatus = 'operational'
-              AND NOT EXISTS (
-                  SELECT 1
-                  FROM Reservation r
-                  WHERE r.slipID = s.slipID
-                    AND r.reservationStatus = 'Active'
-              )
+              AND NOT""" + SLIP_TAKEN_ON + """
             ORDER BY s.slipNumber
             LIMIT 1
             FOR UPDATE
@@ -604,6 +646,7 @@ public class ReservationDAO {
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setInt(1, dockId);
         stmt.setInt(2, slipSizeFt);
+        stmt.setDate(3, Date.valueOf(startDate));
 
         try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
@@ -615,8 +658,11 @@ public class ReservationDAO {
     return null;
 }
 
-    /** Counts free operational slips of a specific size across the marina */
-    public int countAvailableForSize(Connection conn, int slipSizeFt)
+    /**
+     * Counts operational slips of a specific size across the marina that
+     * are free for a lease starting on {@code onDate}.
+     */
+    public int countAvailableForSize(Connection conn, int slipSizeFt, LocalDate onDate)
             throws SQLException {
         String sql = """
                 SELECT COUNT(*) AS availableCount
@@ -624,21 +670,59 @@ public class ReservationDAO {
                 JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID
                 WHERE sz.sizeFt = ?
                   AND s.slipStatus = 'operational'
-                  AND NOT EXISTS (
-                      SELECT 1
-                      FROM Reservation r
-                      WHERE r.slipID = s.slipID
-                        AND r.reservationStatus = 'Active'
-                  )
-                """;
+                  AND NOT""" + SLIP_TAKEN_ON;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, slipSizeFt);
+            stmt.setDate(2, Date.valueOf(onDate));
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();
                 return rs.getInt("availableCount");
             }
         }
+    }
+
+    /**
+     * The days slips of each size are already known to come free, soonest
+     * first - the wait list estimate's known openings (BR-24, issue #324).
+     *
+     * <p>A slip opens the day after its last lease ends, and only when every
+     * Active lease on it has a live notice: one open-ended lease, including
+     * one booked to start later, keeps it taken. A last day already behind
+     * us isn't upcoming - that slip is free now and counted as available
+     * instead.
+     *
+     * @param conn an open connection
+     * @param today the date to measure from
+     * @return slip size in feet to its opening dates, soonest first; a size
+     *         with none is missing from the map
+     * @throws SQLException if the lookup fails
+     */
+    public Map<Integer, List<LocalDate>> findUpcomingOpenings(Connection conn, LocalDate today)
+            throws SQLException {
+        String sql = "SELECT sz.sizeFt AS sizeFt, MAX(" + LEASE_LAST_DAY + ") AS lastDay"
+                + " FROM Slip s"
+                + " JOIN SlipSize sz ON sz.slipSizeID = s.slipSizeID"
+                + " JOIN Reservation r ON r.slipID = s.slipID AND r.reservationStatus = 'Active' "
+                + LIVE_NOTICE_JOIN
+                + " WHERE s.slipStatus = 'operational'"
+                + " GROUP BY sz.sizeFt, s.slipID"
+                + " HAVING SUM(tn.reservationID IS NULL) = 0 AND lastDay >= ?"
+                + " ORDER BY lastDay, sz.sizeFt";
+
+        Map<Integer, List<LocalDate>> openings = new LinkedHashMap<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(today));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    openings.computeIfAbsent(rs.getInt("sizeFt"), size -> new ArrayList<>())
+                            .add(rs.getDate("lastDay").toLocalDate().plusDays(1));
+                }
+            }
+        }
+
+        return openings;
     }
 
     /**

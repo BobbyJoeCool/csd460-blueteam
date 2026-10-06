@@ -17,7 +17,7 @@ That single file produces the same schema and seed data these two produce in seq
 | File | What it did |
 | --- | --- |
 | `MoffatBayMarinaDB_V1-9-0.sql` | From-scratch build at 1.9.0 - the file that used to be the maintained one (see [`../Week7/README.md`](../Week7/README.md) for the two-step history folded into it). |
-| `MoffatBayMarinaDB_V1-10-0_update.sql` | Adds `Contact.submittedAt`, the date and time each Contact Us message arrived (issue #326), so staff can see how long a message has waited and answer the oldest first. It defaults to the current time, so the site's insert needs no change. The ten seeded messages get dates before their replies. |
+| `MoffatBayMarinaDB_V1-10-0_update.sql` | Adds `Contact.submittedAt`, the date and time each Contact Us message arrived (issue #326), so staff can see how long a message has waited and answer the oldest first. It defaults to the current time, so the site's insert needs no change. The ten seeded messages get dates before their replies. It also moves the three seeded 30-day notices (MB-00001 to MB-00003) to last days that haven't passed (issue #324): slip availability now follows notice dates, and the old dates had all passed, which would have freed the 40 ft slip the wait list demo needs full. |
 
 ## Why the files were consolidated
 

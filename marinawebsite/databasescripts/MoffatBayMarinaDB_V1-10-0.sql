@@ -41,7 +41,9 @@
 --                   INSERTs below.
 --            1.10.0 Contact.submittedAt - when each message arrived, so
 --                   staff can answer the oldest first. The ten seeded
---                   messages get dates before their replies.
+--                   messages get dates before their replies. The three
+--                   seeded termination notices move to last days that
+--                   haven't passed, now that availability follows them.
 --
 --          Seed account passwords all follow one pattern, so nobody needs
 --          this file open to log in:
@@ -123,7 +125,7 @@ INSERT INTO DatabaseVersion (version, appliedDate, description) VALUES
     ('1.7.0', '2026-09-11', 'Rewrites Dock.dockDescription as a three-line name/compass-label/landmark stat block; Dock B now closest to Office & Restaurant, Dock C closest to Fueling Station only.'),
     ('1.8.0', '2026-09-17', 'Data-only: resets every seeded Employee and Customer password to Moffat<LastName><NN>! so each meets the site password rules (10+ chars, upper, lower, number, one of ! $ % * #).'),
     ('1.9.0', '2026-09-23', 'Data-only: adds three unreserved boats for My Fleet testing - Desmond Okafor now owns 2 boats (1 reserved), Arthur Penhale 4 (2 reserved, 1 with blank optional fields).'),
-    ('1.10.0', '2026-10-06', 'Contact: adds submittedAt (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) so staff can see how long each message has waited.');
+    ('1.10.0', '2026-10-06', 'Contact: adds submittedAt (TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) so staff can see how long each message has waited. Moves the three seeded termination notices to future last days, now that slip availability follows them.');
 
 -- =============================================================================
 -- Table 1: Dock | Owner: Breutzmann, R. |
@@ -854,10 +856,21 @@ CREATE TABLE TerminationNotice (
     CONSTRAINT fk_terminationNotice_reservation FOREIGN KEY (reservationID) REFERENCES Reservation (reservationID)
 );
 
+-- Changed in 1.10.0. Slip availability now follows these dates (issue
+-- #324): a slip comes free the day after its lease's last day. The old seed
+-- dates (August notices, last days in September) had all passed, which would
+-- have freed a slip of every size - including a 40 ft one, when 40 ft has to
+-- be full for the wait list demo. Each now ends in the future, one per size:
+--   MB-00001  26 ft  last day 2026-11-15
+--   MB-00002  40 ft  last day 2026-11-30 - 40 ft stays full now, opens Dec 1,
+--                    and the first customer on the 40 ft list sees that date
+--   MB-00003  50 ft  last day 2026-12-31
+-- These are fixed dates, so they age: after a last day passes, that slip
+-- reads as free.
 INSERT INTO TerminationNotice
     (terminationNoticeID, reservationID, noticeDate, terminationDate, noticeStatus)
 VALUES
-    (1, 1, '2026-08-01', NULL, 'Submitted'),
-    (2, 2, '2026-08-10', NULL, 'Pending'),
-    (3, 3, '2026-08-15', '2026-09-14', 'Approved');
+    (1, 1, '2026-10-01', '2026-11-15', 'Submitted'),
+    (2, 2, '2026-09-28', '2026-11-30', 'Pending'),
+    (3, 3, '2026-10-01', '2026-12-31', 'Approved');
 

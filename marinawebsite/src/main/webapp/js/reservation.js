@@ -78,9 +78,15 @@ MoffatBay.reservation = (function () {
     var confirmBtn     = document.getElementById("confirmBooking");
 
 
-    /* Free slips per dock per size, rendered into the page at load. Stale if
-       the page sits open a while - the server has the final say on Submit. */
+    /* Free slips per dock per size. Rendered into the page at load for a
+       lease starting today, then swapped for the chosen start date's counts
+       once there is one (loadAvailabilityFor). Stale if the page sits open a
+       while - the server has the final say on Submit. */
     var docks = readJson("dockAvailability", []);
+
+    /* Which availability request is the latest, so an older answer that
+       arrives late can't overwrite a newer date's counts. */
+    var availabilityTicket = 0;
 
     /* Both from the Rate table, rendered into the page. perFootCents is used
        ONLY for the wording of the pricing note - the page still never prices
@@ -426,9 +432,9 @@ MoffatBay.reservation = (function () {
         if (free === 0) {
             availPanel.hidden = false;
             availPanel.classList.add("is-full");
-            setText(availMessage, "All of our " + size + " ft slips are currently reserved.");
+            setText(availMessage, "All of our " + size + " ft slips are " + reservedWhen() + ".");
             setSubmitEnabled(false);
-            setText(submitBlockedReason, "All " + size + " ft slips are currently reserved.");
+            setText(submitBlockedReason, "All " + size + " ft slips are " + reservedWhen() + ".");
             showWaitList(size);
             return;
         }
@@ -457,6 +463,49 @@ MoffatBay.reservation = (function () {
         } else {
             setText(submitBlockedReason, "");
         }
+    }
+
+    /**
+     * How the full-size message ends: "currently reserved" for today's
+     * counts, or naming the start date once the counts are for that date.
+     */
+    function reservedWhen() {
+        if (checkInDate && checkInDate.value && !dateProblem()) {
+            return "reserved for a lease starting "
+                + MoffatBay.form.formatDisplayDate(checkInDate.value);
+        }
+        return "currently reserved";
+    }
+
+    /**
+     * Swaps in the free-slip counts for a lease starting on the chosen date
+     * (issue #324), so a size that is full today but opens before then can
+     * be booked, and redraws. With no usable date it goes back to the
+     * counts the page loaded with. If the request fails, the counts already
+     * shown stay; the server checks again on Submit either way.
+     * @param {string} dateIso - the start date field's value, yyyy-MM-dd
+     */
+    function loadAvailabilityFor(dateIso) {
+        var ticket = ++availabilityTicket;
+
+        if (!dateIso || dateProblem()) {
+            docks = readJson("dockAvailability", []);
+            refresh();
+            return;
+        }
+
+        fetch("reservation/availability?start=" + encodeURIComponent(dateIso), {
+            headers: { "Accept": "application/json" }
+        }).then(function (response) {
+            if (!response.ok) { throw new Error("availability " + response.status); }
+            return response.json();
+        }).then(function (fresh) {
+            if (ticket !== availabilityTicket || !Array.isArray(fresh)) { return; }
+            docks = fresh;
+            refresh();
+        }).catch(function (err) {
+            if (window.console) { window.console.error(err); }
+        });
     }
 
     /** Redraws every part of the page that depends on the chosen boat. */
@@ -849,6 +898,7 @@ MoffatBay.reservation = (function () {
             setText(dateError, dateProblemMessage());
             updateAvailability();
             updateSummary();
+            loadAvailabilityFor(checkInDate.value);
         });
     }
     if (openPanelBtn) { openPanelBtn.addEventListener("click", openBoatPanel); }
@@ -916,6 +966,10 @@ MoffatBay.reservation = (function () {
     preselectBoatFromQuery();
 
     refresh();
+
+    /* A date the browser kept from an earlier visit (Back, or a reload)
+       needs that date's counts, not today's. */
+    if (checkInDate && checkInDate.value) { loadAvailabilityFor(checkInDate.value); }
 
     return {
         show: openBoatPanel,

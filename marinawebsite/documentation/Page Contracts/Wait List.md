@@ -67,11 +67,7 @@ Example: 24 slips of 40 ft, average tenancy 24 months → about **1 slip opens p
 
 Some openings aren't guesses: a tenant who has filed a termination notice is leaving on a known date. BR-24 says a valid notice must be counted when predicting availability, and a withdrawn one must not. So before falling back to the average, the estimate uses those known dates first:
 
-1. List the **known upcoming openings** for that slip size, soonest first — every `TerminationNotice` on a slip of that size whose reservation is still `Active` and whose status is:
-   - `Approved` → opens on `terminationDate`.
-   - `Submitted` or `Pending` → no date set yet, so assume the earliest date BR-21 allows: `noticeDate + 30 days`.
-   - `Withdrawn` / `Completed` → ignored.
-   - Any date already in the past counts as today.
+1. List the **known upcoming openings** for that slip size, soonest first. **As built (2026-10-06, #324):** a slip opens the day after its lease's last day, counted only when every `Active` reservation on the slip has a live notice (`Submitted`, `Pending`, `Approved` or `Completed`). One open-ended lease, including one booked to start later, keeps the slip taken. The last day is the notice's `terminationDate`; the site always records one, and an older notice without one uses the earliest date BR-21 allows, `noticeDate + 30 days`. `Withdrawn` never counts. A last day already passed means the slip is free now, so it shows as available rather than as an opening. `ReservationDAO.findUpcomingOpenings()` builds the list; it uses the same last-day rule as every availability count on the site.
 2. Let **K** = how many known openings there are, and **P** = your position.
 3. **If P ≤ K**, your wait ends on the **P-th known opening date**. Wait = that date − today.
 4. **If P > K**, the known openings cover the first K people. The rest wait on the average rate, starting from the last known opening (or today, if K = 0):
@@ -151,8 +147,8 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 | `WaitListDAO.cancelEntryForCustomer()` | `Connection`, `int waitListId`, `int customerId` | `boolean` | `true` if one row changed. `false` = not theirs, no longer in line, or doesn't exist — all treated the same |
 | *(new)* `ReservationDAO.countOperationalSlipsBySize()` | `Connection` | `Map<Integer, Integer>` (sizeFt → N) | `slipStatus = 'operational'` only |
 | *(new)* `ReservationDAO.findTenureStats()` | `Connection` | `Map<Integer, TenureStats>` (sizeFt → average months + sample size) | From `Completed` termination notices joined to their reservations and slips. A size with no history is absent from the map. The estimator pools them for the whole-marina fallback |
-| *(new)* `ReservationDAO.findUpcomingOpenings()` | `Connection` | `Map<Integer, List<LocalDate>>` (sizeFt → dates, soonest first) | Rules in [Using the openings we already know about](#using-the-openings-we-already-know-about-br-24). Empty list for a size with none |
-| `ReservationDAO.countAvailableForSize()` | `Connection`, `int slipSizeFt` | `int` | Already exists |
+| `ReservationDAO.findUpcomingOpenings()` | `Connection`, `LocalDate today` | `Map<Integer, List<LocalDate>>` (sizeFt → dates, soonest first) | Built 2026-10-06 (#324). Rules in [Using the openings we already know about](#using-the-openings-we-already-know-about-br-24). A size with none is missing from the map |
+| `ReservationDAO.countAvailableForSize()` | `Connection`, `int slipSizeFt`, `LocalDate onDate` | `int` | Passed today. A slip whose tenant's last day has passed counts as free (#324) |
 
 ### Beans Used by the JSP
 

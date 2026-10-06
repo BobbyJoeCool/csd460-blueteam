@@ -69,7 +69,10 @@ public class ReservationServlet extends HttpServlet {
                 fillReservationValues(boat, perFootRate);
             }
 
-            List<DockAvailability> docks = reservationDAO.findDockAvailability(conn);
+            // Free today. reservation.js asks /reservation/availability for
+            // another date once the customer picks a start date (#324).
+            List<DockAvailability> docks =
+                    reservationDAO.findDockAvailability(conn, LocalDate.now());
 
             request.setAttribute("ownedBoats", ownedBoats);
             request.setAttribute("docks", docks);
@@ -188,11 +191,11 @@ public class ReservationServlet extends HttpServlet {
                 reservationDAO.lockSlipSize(conn, slipSizeFt);
 
                 Integer slipId = reservationDAO.findAvailableSlip(
-                        conn, dockId, slipSizeFt);
+                        conn, dockId, slipSizeFt, startDate);
 
                 if (slipId == null) {
                     int marinaWide =
-                            reservationDAO.countAvailableForSize(conn, slipSizeFt);
+                            reservationDAO.countAvailableForSize(conn, slipSizeFt, startDate);
 
                     conn.rollback();
 
