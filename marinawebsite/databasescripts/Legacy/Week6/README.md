@@ -8,7 +8,7 @@ to where it is. Don't run them to stand up a database.**
 To build the database, run the consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../MoffatBayMarinaDB_V1-9-0.sql
+mysql -u root -p < ../../MoffatBayMarinaDB_V1-10-0.sql
 ```
 
 That single file produces the same schema and seed data these two produce in sequence, plus everything added since - see [`../Week7/README.md`](../Week7/README.md) for what came after V1-8-0. These two stopped being the maintained path once V1-8-0.sql (itself later superseded - see Week7) was written; they are kept only as history.

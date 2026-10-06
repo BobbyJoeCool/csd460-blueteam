@@ -54,12 +54,27 @@ public class ReservationWaitlistServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            if (waitListDAO.isWaiting(conn, customerId, slipSizeFt)) {
-                writeJson(response, "{\"ok\":false,\"alreadyWaiting\":true}");
-                return;
+            // One entry per size per customer. The lock makes a second
+            // join from the same customer wait for the first, so the check
+            // and the insert can't interleave (a double-click, two tabs).
+            conn.setAutoCommit(false);
+
+            try {
+                waitListDAO.lockForCustomer(conn, customerId);
+
+                if (waitListDAO.isWaiting(conn, customerId, slipSizeFt)) {
+                    conn.rollback();
+                    writeJson(response, "{\"ok\":false,\"alreadyWaiting\":true}");
+                    return;
+                }
+
+                waitListDAO.insert(conn, customerId, slipSizeFt);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
 
-            waitListDAO.insert(conn, customerId, slipSizeFt);
             writeJson(response, "{\"ok\":true}");
 
         } catch (SQLException e) {

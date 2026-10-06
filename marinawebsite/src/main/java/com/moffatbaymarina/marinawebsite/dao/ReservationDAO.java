@@ -537,10 +537,47 @@ public class ReservationDAO {
 
 
     /**
-     * {@code FOR UPDATE} locks the returned slip row so a second, concurrent
-     * call can't also see it as free before this transaction commits or
-     * rolls back - without it, two requests racing for the same last-open
-     * slip could both pass this check and both book it.
+     * Makes bookings for one slip size take turns: locks that size's
+     * {@code SlipSize} row until the caller's transaction ends. Call it
+     * just before {@link #findAvailableSlip}, inside the booking
+     * transaction.
+     *
+     * <p>Locking the slip row alone (the {@code FOR UPDATE} in
+     * {@code findAvailableSlip}) doesn't stop two customers getting the
+     * same slip (issue #323). Its {@code NOT EXISTS} check on Reservation
+     * is a plain read, so a booking that commits while the second request
+     * waits for the slip lock can go unseen. With this lock taken first,
+     * the second request only starts its check after the first has
+     * committed. The booking transaction runs at READ COMMITTED, so that
+     * check reads the latest data rather than an earlier snapshot.
+     *
+     * <p>A database rule (one Active reservation per slip) would also stop
+     * the race, but it can't work once leases have dates, because a slip
+     * can then hold one lease that is ending and another that starts after
+     * it (issue #324).
+     *
+     * @param conn an open connection with auto-commit off
+     * @param slipSizeFt 26, 40 or 50
+     * @throws SQLException if the lock fails
+     */
+    public void lockSlipSize(Connection conn, int slipSizeFt) throws SQLException {
+        String sql = "SELECT slipSizeID FROM SlipSize WHERE sizeFt = ? FOR UPDATE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, slipSizeFt);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+            }
+        }
+    }
+
+    /**
+     * The first free slip of a size on a dock, or {@code null}.
+     *
+     * <p>{@code FOR UPDATE} locks the returned slip row until the booking
+     * commits or rolls back. That alone doesn't stop two customers getting
+     * the same slip, because the {@code NOT EXISTS} check is a plain read.
+     * Call {@link #lockSlipSize} first.
      */
     public Integer findAvailableSlip(
         Connection conn, int dockId,

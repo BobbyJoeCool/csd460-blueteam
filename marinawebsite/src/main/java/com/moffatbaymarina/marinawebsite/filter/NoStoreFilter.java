@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
         "/reservation", "/reservation/*",
         "/reservations", "/reservations/*",
         "/reservationSummary",
-        "/waitList",
+        "/waitList", "/waitList/*",
         "/myFleet", "/myFleet/*",
         "/editProfile", "/editProfile/*"
 })

@@ -136,7 +136,7 @@ A signed-in customer lands on My Fleet and sees **one card per boat they current
 
 ### Which Fields Are Editable
 
-Every column on the `Boat` table (`databasescripts/MoffatBayMarinaDB_V1-9-0.sql`), whether the customer can change it on this page, and why.
+Every column on the `Boat` table (`databasescripts/MoffatBayMarinaDB_V1-10-0.sql`), whether the customer can change it on this page, and why.
 
 | Column | Editable? | Notes |
 | --- | --- | --- |

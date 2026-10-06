@@ -134,6 +134,16 @@ public class ReservationServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
+            /*
+             * READ COMMITTED gives each statement a fresh view of the data.
+             * Under MySQL's default (REPEATABLE READ) the whole transaction
+             * reads from the snapshot its first query took, so the slip
+             * check below could miss a booking another customer committed
+             * a moment ago (issue #323). Set before the transaction starts;
+             * the connection isn't pooled, so it doesn't leak to the next
+             * request.
+             */
+            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             conn.setAutoCommit(false);
 
             try {
@@ -172,6 +182,10 @@ public class ReservationServlet extends HttpServlet {
                             + MarinaInfo.PHONE + ".\"}");
                     return;
                 }
+
+                // Bookings for one size now run one at a time, so the check
+                // below sees any booking of that size committed just before.
+                reservationDAO.lockSlipSize(conn, slipSizeFt);
 
                 Integer slipId = reservationDAO.findAvailableSlip(
                         conn, dockId, slipSizeFt);

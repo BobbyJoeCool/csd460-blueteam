@@ -135,7 +135,9 @@
 
                     <c:forEach var="entry" items="${myWaitListEntries}">
 
-                        <article class="waitlist-entry-card">
+                        <article class="waitlist-entry-card"
+                                 data-wait-list-id="${entry.waitListId}"
+                                 data-size="${entry.sizeFt}">
 
                             <h3>${entry.sizeFt} ft Slip</h3>
 
@@ -156,6 +158,10 @@
                                 ${entry.estimateLabel}
                             </p>
 
+                            <button type="button" class="btn-outline btn-danger js-open-leave">
+                                Leave Wait List
+                            </button>
+
                         </article>
 
                     </c:forEach>
@@ -169,6 +175,43 @@
     </section>
 
 </main>
+
+<%-- Leave a wait list (issue #346). waitListLookup.js fills in which entry
+     and its size from the card that was clicked. WaitListLeaveServlet
+     closes the entry only if it is the signed-in customer's own and still
+     in line; the popup is courtesy, not enforcement. --%>
+<c:if test="${not empty myWaitListEntries}">
+<div class="modal" id="leaveWaitListModal" role="dialog" aria-modal="true"
+     aria-labelledby="leaveWaitListTitle" hidden>
+
+    <button type="button" class="modal__backdrop" data-modal-close aria-label="Close"></button>
+
+    <div class="modal__box modal__box--narrow">
+
+        <div class="modal__header">
+            <h2 class="modal__title" id="leaveWaitListTitle">Leave the wait list?</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="modal__note">
+            You'll lose your place in line. If you join again later, you
+            start at the back.
+        </p>
+
+        <form action="${pageContext.request.contextPath}/waitList/leave" method="post">
+            <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
+            <input type="hidden" name="waitListId" id="leaveWaitListId" value="">
+            <div class="modal__actions">
+                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Stay in Line</button>
+                <button type="submit" class="btn-action btn-danger">Yes, Leave It</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/js/waitListLookup.js?v=${applicationScope.assetVersion}" defer></script>
+</c:if>
 
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
 

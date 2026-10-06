@@ -152,6 +152,12 @@
     color: var(--color-text-muted);
 }
 
+/* Leave Wait List sits under the card's details, not in a paragraph, so
+   the last-child margin rule above doesn't reach it. */
+.waitlist-entry-card .js-open-leave {
+    margin-top: 0.5rem;
+}
+
 
 /* =========================================================
    RESPONSIVE LAYOUT

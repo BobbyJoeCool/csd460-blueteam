@@ -8,7 +8,7 @@ stand up a database.**
 To build the database, run the consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../MoffatBayMarinaDB_V1-9-0.sql
+mysql -u root -p < ../../MoffatBayMarinaDB_V1-10-0.sql
 ```
 
 That single file produces the same schema these four produce in sequence (on

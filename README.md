@@ -14,7 +14,7 @@
 
 <p align="center">
   <img alt="Status" src="https://img.shields.io/badge/status-all%20pages%20built-2a9d8f?style=flat-square">
-  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.9.0-0a6e8c?style=flat-square">
+  <img alt="Schema" src="https://img.shields.io/badge/schema-v1.10.0-0a6e8c?style=flat-square">
   <img alt="Module" src="https://img.shields.io/badge/module-9-ff6f59?style=flat-square">
   <img alt="Team" src="https://img.shields.io/badge/team-Blue-16262e?style=flat-square">
 </p>
@@ -155,13 +155,13 @@ DB_PASSWORD=<in the committed file>
 One script builds everything from scratch:
 
 ```bash
-mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-9-0.sql
+mysql -u root -p < databasescripts/MoffatBayMarinaDB_V1-10-0.sql
 ```
 
 > [!WARNING]
 > **This script is destructive.** It drops `MoffatBayMarinaDB` if it already exists and rebuilds it with only the seed data. That's the intent for a fresh setup, but don't run it against a database holding work you want to keep.
 
-`MoffatBayMarinaDB_V1-9-0.sql` builds all thirteen tables (including `Rate` and the `DatabaseVersion` ledger) and their seed data in one pass, at the schema's current version. It replaces the step-by-step path that actually built the schema: `V1-0-0` plus every update through `V1-9-0`. Those files live under `databasescripts/Legacy/` (`Week4/` through `Week7/`) purely as history, and running them one by one is not the way to stand a database up. Each week's folder has a README explaining what its scripts did.
+`MoffatBayMarinaDB_V1-10-0.sql` builds all thirteen tables (including `Rate` and the `DatabaseVersion` ledger) and their seed data in one pass, at the schema's current version. It replaces the step-by-step path that actually built the schema: `V1-0-0` plus every update through `V1-10-0`. Those files live under `databasescripts/Legacy/` (`Week4/` through `Week9/`) purely as history, and running them one by one is not the way to stand a database up. Each week's folder has a README explaining what its scripts did.
 
 Every seeded account's password follows one pattern, so you don't need to open the script to sign in as a test user:
 
