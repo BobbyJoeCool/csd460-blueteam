@@ -37,19 +37,17 @@ public class ReservationWaitlistServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            writeJson(response, "{\"ok\":false,\"error\":\"Please sign in to join the wait list.\"}");
+            Utils.writeJson(response, false, "error", "Please sign in to join the wait list.");
             return;
         }
 
         Integer slipSizeFt = Utils.parseInt(request.getParameter("slipSizeFt"));
         if (!Utils.isSlipSize(slipSizeFt)) {
-            writeJson(response, "{\"ok\":false,\"error\":\"Choose a valid slip size.\"}");
+            Utils.writeJson(response, false, "error", "Choose a valid slip size.");
             return;
         }
 
@@ -64,7 +62,7 @@ public class ReservationWaitlistServlet extends HttpServlet {
 
                 if (waitListDAO.isWaiting(conn, customerId, slipSizeFt)) {
                     conn.rollback();
-                    writeJson(response, "{\"ok\":false,\"alreadyWaiting\":true}");
+                    Utils.writeJson(response, false, "alreadyWaiting", true);
                     return;
                 }
 
@@ -75,14 +73,10 @@ public class ReservationWaitlistServlet extends HttpServlet {
                 throw e;
             }
 
-            writeJson(response, "{\"ok\":true}");
+            Utils.writeJson(response, true);
 
         } catch (SQLException e) {
             throw new ServletException("Could not join the wait list.", e);
         }
-    }
-
-    private void writeJson(HttpServletResponse response, String json) throws IOException {
-        response.getWriter().write(json);
     }
 }

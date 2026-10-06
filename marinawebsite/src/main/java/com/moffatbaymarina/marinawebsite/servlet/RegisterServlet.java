@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.BoatValidator;
 import com.moffatbaymarina.marinawebsite.util.CustomerSession;
+import com.moffatbaymarina.marinawebsite.util.CustomerValidator;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -45,10 +47,10 @@ public class RegisterServlet extends HttpServlet {
 	 * the boat length/beam/year limits followed later, for the same reason -
 	 * this copy of the Registration Number pattern had drifted from the
 	 * Reservation page's and the browser's (see Utils.REG_NUMBER_PATTERN).
+	 * The customer field checks themselves, and the list of valid
+	 * countries, now live in CustomerValidator, shared with Edit User Info
+	 * (#284).
 	 */
-
-	private static final java.util.Set<String> VALID_COUNTRIES =
-			java.util.Set.of("US", "CA", "OTHER");
 
     //Data access objects for customer and boat operations----------------------------------------------------------
 
@@ -121,6 +123,7 @@ public class RegisterServlet extends HttpServlet {
 				phoneCountryCode,
 				phone,
 				streetAddress,
+				streetAddress2,
 				city,
 				state,
 				zipCode,
@@ -309,6 +312,14 @@ public class RegisterServlet extends HttpServlet {
 
     //Customer Validation-----------------------------------------------------------------------------------------
 
+	/**
+	 * The customer's own details go through CustomerValidator, the same
+	 * rules and wording as Edit User Info (#284); the password boxes are
+	 * this page's alone. The form shows one message in its banner, so
+	 * this returns the first, in form order.
+	 *
+	 * @return the message to show, or {@code null} when everything passes
+	 */
 	private String validateCustomer(
 			String firstName,
 			String lastName,
@@ -316,6 +327,7 @@ public class RegisterServlet extends HttpServlet {
 			String phoneCountryCode,
 			String phone,
 			String streetAddress,
+			String streetAddress2,
 			String city,
 			String state,
 			String zipCode,
@@ -323,59 +335,26 @@ public class RegisterServlet extends HttpServlet {
 			String password,
 			String confirmPassword) {
 
-		if (Utils.isBlank(firstName)
-				|| Utils.isBlank(lastName)
-				|| Utils.isBlank(email)
-				|| Utils.isBlank(phoneCountryCode)
-				|| Utils.isBlank(phone)
-				|| Utils.isBlank(streetAddress)
-				|| Utils.isBlank(city)
-				|| Utils.isBlank(zipCode)
-				|| Utils.isBlank(country)
-				|| Utils.isBlank(password)
-				|| Utils.isBlank(confirmPassword)) {
+		Map<String, String> fields = new LinkedHashMap<>();
+		fields.put("firstName", firstName);
+		fields.put("lastName", lastName);
+		fields.put("email", email);
+		fields.put("phoneCountryCode", phoneCountryCode);
+		fields.put("phone", phone);
+		fields.put("streetAddress", streetAddress);
+		fields.put("streetAddress2", streetAddress2);
+		fields.put("city", city);
+		fields.put("state", state);
+		fields.put("zipCode", zipCode);
+		fields.put("country", country);
 
+		Map<String, String> errors = CustomerValidator.validate(fields, country, true);
+		if (!errors.isEmpty()) {
+			return errors.values().iterator().next();
+		}
+
+		if (Utils.isBlank(password) || Utils.isBlank(confirmPassword)) {
 			return "Please complete all required fields.";
-		}
-
-		if (!VALID_COUNTRIES.contains(country)) {
-			return "Select a valid Country.";
-		}
-
-		// State/Province follows Country, the same way Registration
-		// State/Province does for a boat (see BoatValidator): OTHER
-		// has no state/province concept, so the field is disabled
-		// client-side and not required here - see the Registration
-		// contract's "Country" section.
-		if (!"OTHER".equals(country) && Utils.isBlank(state)) {
-			return "Please complete all required fields.";
-		}
-
-		if (firstName.length() > 50 || lastName.length() > 50) {
-			return "First and last names cannot exceed 50 characters.";
-		}
-
-		if (email.length() > 100
-				|| !Utils.EMAIL_PATTERN.matcher(email).matches()) {
-			return "Enter a valid email address.";
-		}
-
-		if (!Utils.COUNTRY_CODE_PATTERN.matcher(phoneCountryCode).matches()) {
-			return "Enter a valid country code.";
-		}
-
-		if (!Utils.PHONE_PATTERN.matcher(phone).matches()) {
-			return "Phone number must contain exactly 10 digits.";
-		}
-
-		if (streetAddress.length() > 100
-				|| city.length() > 50
-				|| (!Utils.isBlank(state) && state.length() != 2)) {
-			return "Enter valid address information.";
-		}
-
-		if (!Utils.ZIP_PATTERN.matcher(zipCode).matches()) {
-			return "Enter a valid ZIP code.";
 		}
 
 		if (!Utils.PASSWORD_PATTERN.matcher(password).matches()) {

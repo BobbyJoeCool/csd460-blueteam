@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.moffatbaymarina.marinawebsite.dao.ReservationDAO;
 import com.moffatbaymarina.marinawebsite.model.DockAvailability;
@@ -69,35 +69,21 @@ public class ReservationAvailabilityServlet extends HttpServlet {
     }
 
     /**
-     * The docks as the JSON array {@code reservation.js} reads:
+     * The docks as the JSON array {@code reservation.js} reads, both from
+     * this endpoint and from the page's {@code dockAvailability} block:
      * {@code [{"dockId":1,"dockNumber":"A","available":{"26":2,"40":0,"50":1}}, ...]}.
      *
      * @param docks every dock, with its counts
      * @return the JSON text
      */
     public static String docksJson(List<DockAvailability> docks) {
-        StringBuilder json = new StringBuilder("[");
-
-        for (int i = 0; i < docks.size(); i++) {
-            DockAvailability dock = docks.get(i);
-            if (i > 0) {
-                json.append(',');
-            }
-            json.append("{\"dockId\":").append(dock.getDockId())
-                .append(",\"dockNumber\":\"").append(Utils.jsonEscape(dock.getDockNumber()))
-                .append("\",\"available\":{");
-
-            boolean first = true;
-            for (Map.Entry<String, Integer> size : dock.getAvailable().entrySet()) {
-                if (!first) {
-                    json.append(',');
-                }
-                first = false;
-                json.append('"').append(size.getKey()).append("\":").append(size.getValue());
-            }
-            json.append("}}");
+        List<String> objects = new ArrayList<>();
+        for (DockAvailability dock : docks) {
+            objects.add(Utils.jsonObject(
+                    "dockId", dock.getDockId(),
+                    "dockNumber", dock.getDockNumber(),
+                    "available", dock.getAvailable()));
         }
-
-        return json.append(']').toString();
+        return "[" + String.join(",", objects) + "]";
     }
 }

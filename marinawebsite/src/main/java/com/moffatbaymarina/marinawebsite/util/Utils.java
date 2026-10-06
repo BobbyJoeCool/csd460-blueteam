@@ -1,5 +1,6 @@
 package com.moffatbaymarina.marinawebsite.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -10,10 +11,14 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -597,6 +602,10 @@ public class Utils {
     /**
      * Escapes a value for use inside a JSON string literal.
      *
+     * <p>{@code <} becomes {@code \u003c}, which JSON reads as the same
+     * character, so a value can never close the {@code <script>} block a
+     * JSP embeds JSON in ({@code reservation.jsp}).
+     *
      * @param value the text; may be {@code null}
      * @return the escaped text, or "" for {@code null}
      */
@@ -612,6 +621,7 @@ public class Utils {
                 case '\r' -> out.append("\\r");
                 case '\n' -> out.append("\\n");
                 case '\t' -> out.append("\\t");
+                case '<' -> out.append("\\u003c");
                 default -> {
                     if (c < 0x20) {
                         out.append(String.format("\\u%04x", (int) c));
@@ -622,5 +632,102 @@ public class Utils {
             }
         }
         return out.toString();
+    }
+
+    /**
+     * Writes a JSON response for a page script's {@code fetch}:
+     * {@code {"ok":true|false, ...}}, then the given name/value pairs in
+     * order (issue #283). Every servlet that answers a script uses this, so
+     * none of them builds JSON by joining strings.
+     *
+     * <pre>
+     *   Utils.writeJson(response, false, "dateError", "Choose a start date.");
+     *   Utils.writeJson(response, true, "confirmationNumber", confirmation);
+     * </pre>
+     *
+     * @param response the response; content type and UTF-8 are set here
+     * @param ok whether the request did what was asked
+     * @param keyValues names and values, alternating; see {@link #toJson}
+     *        for how each value is written
+     * @throws IOException if the response can't be written
+     */
+    public static void writeJson(HttpServletResponse response, boolean ok, Object... keyValues)
+            throws IOException {
+        Object[] withOk = new Object[keyValues.length + 2];
+        withOk[0] = "ok";
+        withOk[1] = ok;
+        System.arraycopy(keyValues, 0, withOk, 2, keyValues.length);
+
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        response.getWriter().write(jsonObject(withOk));
+    }
+
+    /**
+     * A JSON object from name/value pairs, in the order given.
+     *
+     * @param keyValues names and values, alternating
+     * @return the JSON text
+     * @throws IllegalArgumentException if a name has no value
+     */
+    public static String jsonObject(Object... keyValues) {
+        if (keyValues.length % 2 != 0) {
+            throw new IllegalArgumentException("JSON needs name/value pairs.");
+        }
+        Map<Object, Object> fields = new LinkedHashMap<>();
+        for (int i = 0; i < keyValues.length; i += 2) {
+            fields.put(keyValues[i], keyValues[i + 1]);
+        }
+        return toJson(fields);
+    }
+
+    /**
+     * Any value as JSON: {@code null} as null, numbers and booleans as
+     * themselves ({@code BigDecimal} without an exponent), a {@code Map} as
+     * an object, a {@code Collection} as an array, and anything else as an
+     * escaped string.
+     *
+     * @param value the value
+     * @return the JSON text
+     */
+    public static String toJson(Object value) {
+        StringBuilder json = new StringBuilder();
+        appendJson(json, value);
+        return json.toString();
+    }
+
+    private static void appendJson(StringBuilder json, Object value) {
+        if (value == null) {
+            json.append("null");
+        } else if (value instanceof BigDecimal decimal) {
+            json.append(decimal.toPlainString());
+        } else if (value instanceof Number || value instanceof Boolean) {
+            json.append(value);
+        } else if (value instanceof Map<?, ?> map) {
+            json.append('{');
+            boolean first = true;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (!first) {
+                    json.append(',');
+                }
+                first = false;
+                json.append('"').append(jsonEscape(String.valueOf(entry.getKey()))).append("\":");
+                appendJson(json, entry.getValue());
+            }
+            json.append('}');
+        } else if (value instanceof Collection<?> items) {
+            json.append('[');
+            boolean first = true;
+            for (Object item : items) {
+                if (!first) {
+                    json.append(',');
+                }
+                first = false;
+                appendJson(json, item);
+            }
+            json.append(']');
+        } else {
+            json.append('"').append(jsonEscape(value.toString())).append('"');
+        }
     }
 }

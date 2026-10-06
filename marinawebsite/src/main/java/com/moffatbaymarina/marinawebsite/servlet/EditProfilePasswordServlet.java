@@ -63,13 +63,11 @@ public class EditProfilePasswordServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            writeError(response, "Please sign in before changing your password.");
+            Utils.writeJson(response, false, "error", "Please sign in before changing your password.");
             return;
         }
 
@@ -77,19 +75,19 @@ public class EditProfilePasswordServlet extends HttpServlet {
         String newPassword = Utils.orEmpty(request.getParameter("newPassword"));
 
         if (currentPassword.isEmpty() || newPassword.isEmpty()) {
-            writeError(response, "Enter your current password and a new password.");
+            Utils.writeJson(response, false, "error", "Enter your current password and a new password.");
             return;
         }
 
         try {
             String currentHash = Utils.hashPassword(currentPassword);
             if (!customerDAO.verifyPassword(customerId, currentHash)) {
-                writeError(response, "Current password is incorrect.");
+                Utils.writeJson(response, false, "error", "Current password is incorrect.");
                 return;
             }
 
             if (!Utils.PASSWORD_PATTERN.matcher(newPassword).matches()) {
-                writeError(response, "New password does not meet the required rules.");
+                Utils.writeJson(response, false, "error", "New password does not meet the required rules.");
                 return;
             }
 
@@ -110,14 +108,11 @@ public class EditProfilePasswordServlet extends HttpServlet {
             // Anyone still signed in with the old password, elsewhere, is out.
             CustomerSession.endOtherSessions(customerId, request.getSession(false));
 
-            response.getWriter().write("{\"ok\":true}");
+            Utils.writeJson(response, true);
 
         } catch (SQLException e) {
             throw new ServletException("Password change failed.", e);
         }
     }
 
-    private void writeError(HttpServletResponse response, String message) throws IOException {
-        response.getWriter().write("{\"ok\":false,\"error\":\"" + Utils.jsonEscape(message) + "\"}");
-    }
 }

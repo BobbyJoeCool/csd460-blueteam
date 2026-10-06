@@ -78,6 +78,13 @@ public class ReservationServlet extends HttpServlet {
             request.setAttribute("docks", docks);
             request.setAttribute("perFootCents", Utils.toCents(perFootRate));
             request.setAttribute("electricCents", Utils.toCents(electricRate));
+            // The two JSON blocks reservation.js reads on load, built here
+            // with the shared writer rather than assembled in the JSP (#283).
+            request.setAttribute("dockAvailabilityJson",
+                    ReservationAvailabilityServlet.docksJson(docks));
+            request.setAttribute("reservationRatesJson", Utils.jsonObject(
+                    "perFootCents", Utils.toCents(perFootRate),
+                    "electricCents", Utils.toCents(electricRate)));
             // BR-26: the date picker's max, so the page never types its own 12.
             request.setAttribute("latestStartDate", Utils.latestLeaseStartDate(LocalDate.now()));
             request.getRequestDispatcher(VIEW).forward(request, response);
@@ -92,13 +99,11 @@ public class ReservationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            writeJson(response, "{\"ok\":false,\"error\":\"Please sign in to reserve a slip.\"}");
+            Utils.writeJson(response, false, "error", "Please sign in to reserve a slip.");
             return;
         }
 
@@ -114,25 +119,25 @@ public class ReservationServlet extends HttpServlet {
         * then search that list for submitted boatId
         */
         if (boatId == null) {
-            writeJson(response, "{\"ok\":false,\"boatError\":\"Select a boat for this reservation.\"}");
+            Utils.writeJson(response, false, "boatError", "Select a boat for this reservation.");
             return;
         }
         if (dockId == null) {
-            writeJson(response, "{\"ok\":false,\"dockError\":\"Choose which dock you'd like to be on.\"}");
+            Utils.writeJson(response, false, "dockError", "Choose which dock you'd like to be on.");
             return;
         }
         if (startDate == null) {
-            writeJson(response, "{\"ok\":false,\"dateError\":\"Choose a start date.\"}");
+            Utils.writeJson(response, false, "dateError", "Choose a start date.");
             return;
         }
         // Same wording reservation.js shows under the field for a past date.
         if (startDate.isBefore(LocalDate.now())) {
-            writeJson(response, "{\"ok\":false,\"dateError\":\"Start date can't be in the past. Choose today or later.\"}");
+            Utils.writeJson(response, false, "dateError", "Start date can't be in the past. Choose today or later.");
             return;
         }
         // BR-26, same wording reservation.js shows under the field.
         if (startDate.isAfter(Utils.latestLeaseStartDate(LocalDate.now()))) {
-            writeJson(response, "{\"ok\":false,\"dateError\":\"Start date must be within 12 months of today.\"}");
+            Utils.writeJson(response, false, "dateError", "Start date must be within 12 months of today.");
             return;
         }
 
@@ -164,15 +169,14 @@ public class ReservationServlet extends HttpServlet {
 
                 if (boat == null) {
                     conn.rollback();
-                    writeJson(response, "{\"ok\":false,\"boatError\":\"Select a boat for this reservation.\"}");
+                    Utils.writeJson(response, false, "boatError", "Select a boat for this reservation.");
                     return;
                 }
 
                 if (boat.getHasActiveReservation()) {
                     conn.rollback();
-                    writeJson(response, "{\"ok\":false,\"boatError\":\""
-                            + Utils.jsonEscape(boat.getBoatName())
-                            + " already has an active reservation.\"}");
+                    Utils.writeJson(response, false, "boatError",
+                            boat.getBoatName() + " already has an active reservation.");
                     return;
                 }
 
@@ -180,9 +184,9 @@ public class ReservationServlet extends HttpServlet {
 
                 if (slipSizeFt == 0) {
                     conn.rollback();
-                    writeJson(response,
-                            "{\"ok\":false,\"boatError\":\"We don't have a slip that fits a boat over 50 feet. Please call the marina at "
-                            + MarinaInfo.PHONE + ".\"}");
+                    Utils.writeJson(response, false, "boatError",
+                            "We don't have a slip that fits a boat over 50 feet. Please call the marina at "
+                            + MarinaInfo.PHONE + ".");
                     return;
                 }
 
@@ -200,13 +204,11 @@ public class ReservationServlet extends HttpServlet {
                     conn.rollback();
 
                     if (marinaWide == 0) {
-                        writeJson(response,
-                                "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
-                                        + slipSizeFt + "}");
+                        Utils.writeJson(response, false,
+                                "sizeFull", true, "slipSizeFt", slipSizeFt);
                     } else {
-                        writeJson(response,
-                                "{\"ok\":false,\"sizeFull\":true,\"slipSizeFt\":"
-                                        + slipSizeFt + ",\"dockId\":" + dockId + "}");
+                        Utils.writeJson(response, false,
+                                "sizeFull", true, "slipSizeFt", slipSizeFt, "dockId", dockId);
                     }
 
                     return;
@@ -247,9 +249,7 @@ public class ReservationServlet extends HttpServlet {
                 // what lets it show this one reservation.
                 ReservationSummaryServlet.grantAccess(request, confirmation);
 
-                writeJson(response,
-                        "{\"ok\":true,\"confirmationNumber\":\""
-                                + Utils.jsonEscape(confirmation) + "\"}");
+                Utils.writeJson(response, true, "confirmationNumber", confirmation);
 
             } catch (SQLException e) {
                 conn.rollback();
@@ -268,9 +268,5 @@ public class ReservationServlet extends HttpServlet {
     private void fillReservationValues(Boat boat, BigDecimal perFootRate) {
         boat.setSlipSizeFt(Utils.slipSizeFor(boat.getBoatLength()));
         boat.setMonthlyCents(Utils.toCents(boat.getBoatLength().multiply(perFootRate)));
-    }
-
-    private void writeJson(HttpServletResponse response, String json) throws IOException {
-        response.getWriter().write(json);
     }
 }
