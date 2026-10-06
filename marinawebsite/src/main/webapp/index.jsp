@@ -175,7 +175,7 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 					<figure class="lodge-card__figure">
 						<img
 							class="lodge-card__image"
-							src="${pageContext.request.contextPath}/images/MoffatBayLodge.png"
+							src="${pageContext.request.contextPath}/images/MoffatBayLodge.jpg"
 							alt="Moffat Bay Lodge at dusk: a timber lodge with lit windows and balconies, stone paths and gardens, set against tall evergreens">
 						<figcaption class="lodge-card__caption">
 							Image created with Google Gemini

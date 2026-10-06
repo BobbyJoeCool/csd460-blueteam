@@ -373,8 +373,8 @@
             <jsp:include page="/WEB-INF/includes/csrfField.jsp" />
             <input type="hidden" name="boatId" id="removeBoatId" value="">
             <div class="modal__actions">
-                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Cancel</button>
-                <button type="submit" class="btn-action btn-danger" id="confirmRemove">Yes, remove it</button>
+                <button type="button" class="btn-outline" data-modal-close data-modal-initial>Keep Boat</button>
+                <button type="submit" class="btn-action btn-danger" id="confirmRemove">Yes, Remove It</button>
             </div>
         </form>
 

@@ -304,8 +304,8 @@
             </div>
 
             <div class="modal__actions">
-                <button type="button" class="btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn-action btn-danger">Yes, delete my account</button>
+                <button type="button" class="btn-outline" data-modal-close>Keep My Account</button>
+                <button type="submit" class="btn-action btn-danger">Yes, Delete My Account</button>
             </div>
         </form>
 

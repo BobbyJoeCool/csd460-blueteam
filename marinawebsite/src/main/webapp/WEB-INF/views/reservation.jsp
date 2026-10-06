@@ -255,7 +255,7 @@
                         <div class="field-error" id="dockError" data-error-for="dockChoices"></div>
 
                         <figure class="marina-map">
-                            <img src="${pageContext.request.contextPath}/images/marina_a.png"
+                            <img src="${pageContext.request.contextPath}/images/marina_a.webp"
                                  alt="Map of Moffat Bay Marina showing Dock A (Eastern Dock) closest
                                       to the Ship Store, Dock B (Central Dock) closest to the Office
                                       &amp; Restaurant, and Dock C (Western Dock) closest to the

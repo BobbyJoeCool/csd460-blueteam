@@ -94,7 +94,7 @@
             </div>
 
             <figure class="about-story__figure">
-                <img src="${pageContext.request.contextPath}/images/Slip_Closeup.png"
+                <img src="${pageContext.request.contextPath}/images/Slip_Closeup.jpg"
                      alt="A boat tied up at a Moffat Bay Marina slip at sunset,
                           with a shore power pedestal on the dock beside it.">
                 <figcaption>Every slip has fresh water, and shore power is available.</figcaption>
@@ -190,7 +190,7 @@
             <h2 id="mapHeading">The docks</h2>
 
             <figure>
-                <img src="${pageContext.request.contextPath}/images/marina_a.png"
+                <img src="${pageContext.request.contextPath}/images/marina_a.webp"
                      alt="Map of Moffat Bay Marina showing three linear docks
                           labelled A, B and C, each with twenty-four numbered
                           slips. On every dock, slips 8 to 12 and 20 to 24 are

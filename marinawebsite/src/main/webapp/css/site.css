@@ -414,7 +414,7 @@ main,
    -------------------------------------------------------------------------- */
 
 /* Registration, About Us, My Reservations, Waitlist Lookup, Privacy,
-   Accessibility: Marina.png, 60% overlay. */
+   Accessibility: Marina.jpg, 60% overlay. */
 #registrationHero,
 #aboutHero,
 #lookUpReservationHero,
@@ -423,18 +423,18 @@ main,
 #accessibilityHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
-        url("../images/Marina.png");
+        url("../images/Marina.jpg");
 }
 
-/* Reservation: Slip_Closeup.png, 48-62% gradient (the sunset horizon is
+/* Reservation: Slip_Closeup.jpg, 48-62% gradient (the sunset horizon is
    bright orange right where the heading sits). */
 #reservationHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
-        url("../images/Slip_Closeup.png");
+        url("../images/Slip_Closeup.jpg");
 }
 
-/* My Fleet + Your Account: BoatYard_Sunset.png, a 58-70% gradient - heavier
+/* My Fleet + Your Account: BoatYard_Sunset.jpg, a 58-70% gradient - heavier
    than any other hero on the site, and measured rather than guessed. The
    sun sits dead centre on the horizon, exactly where the heading goes, so
    this is the hardest backdrop any of our heroes has to carry light text
@@ -450,10 +450,10 @@ main,
 #accountHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.58), rgba(13, 59, 77, 0.7)),
-        url("../images/BoatYard_Sunset.png");
+        url("../images/BoatYard_Sunset.jpg");
 }
 
-/* Landing page: the one hero allowed to break the pattern. Marina.png with
+/* Landing page: the one hero allowed to break the pattern. Marina.jpg with
    a light 22-32% overlay so the photo dominates, taller, and a bigger
    heading to anchor the first impression. Its description, tagline and
    call-to-action button are styled in index.css. */
@@ -461,7 +461,7 @@ main,
     min-height: 400px;
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.22), rgba(13, 59, 77, 0.32)),
-        url("../images/Marina.png");
+        url("../images/Marina.jpg");
 }
 
 #landingHero .hero-band__content {

@@ -62,7 +62,7 @@ The three docks sit in different parts of the marina, which is a real difference
 
 **It only ever shows counts for the size the chosen boat needs.** A dock with three 26 ft slips free is no use to a 40 ft boat, so showing its total would be actively misleading. Until a boat is picked the cards can't say anything useful and sit greyed out. A dock with nothing of the right size can't be picked, and says so on the card rather than just fading.
 
-The marina map (`Source_Information/marina_a.png`, copied to `webapp/images/marina_a.png`) sits underneath the cards in that same step, since that's where someone is deciding and it's the thing that makes the choice mean anything. It carries a caption repeating which slip numbers are which size, because that information is only in the image otherwise, and a long alt description saying the same thing for anyone who can't see it.
+The marina map (`Source_Information/marina_a.png`, copied to `webapp/images/`, now as `marina_a.webp`) sits underneath the cards in that same step, since that's where someone is deciding and it's the thing that makes the choice mean anything. It carries a caption repeating which slip numbers are which size, because that information is only in the image otherwise, and a long alt description saying the same thing for anyone who can't see it.
 
 This doesn't change slip assignment. The customer picks a dock, and the system still picks the actual slip within it.
 
