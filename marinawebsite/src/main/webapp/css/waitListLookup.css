@@ -120,42 +120,19 @@
     gap: 1rem;
 }
 
-.waitlist-entry-card {
-    padding: 1.5rem;
-    border: 1px solid
-        color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: var(--radius-inner);
-    background: var(--color-bg-surface);
-}
-
-.waitlist-entry-card h3 {
-    margin: 0 0 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid
-        color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    font-weight: normal;
-    color: var(--color-deep-marine);
-}
-
-.waitlist-entry-card p {
+/* Each entry is site.css's .detail-card .detail-card--nested (#287);
+   only the spacing of its lines is this page's. */
+.waitlist-entry p {
     margin: 0 0 0.75rem;
     line-height: 1.45;
 }
 
-.waitlist-entry-card p:last-child {
+.waitlist-entry p:last-of-type {
     margin-bottom: 0;
 }
 
-.waitlist-entry-card strong {
+.waitlist-entry strong {
     color: var(--color-text-muted);
-}
-
-/* Leave Wait List sits under the card's details, not in a paragraph, so
-   the last-child margin rule above doesn't reach it. */
-.waitlist-entry-card .js-open-leave {
-    margin-top: 0.5rem;
 }
 
 
@@ -181,8 +158,7 @@
         padding: 1.25rem;
     }
 
-    .waitlist-summary-card,
-    .waitlist-entry-card {
+    .waitlist-summary-card {
         padding: 1.25rem;
     }
 

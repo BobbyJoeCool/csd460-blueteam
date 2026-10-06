@@ -27,7 +27,7 @@ Pieces this page reuses, all of which already exist:
 - `BoatDAO.insertBoat()` and `BoatDAO.insertOwnership()` — adding a boat is the same two inserts the Reservation page already does.
 - `ReservationBoatServlet`'s validation rules — the rule set every add and edit on this page has to match (see [Validation Rules](#validation-rules)).
 - `includes/statusPopup.jsp` / `MoffatBay.statusPopup` — the success toasts.
-- `js/editUserInfo.js` — the touched-field tracking and old → new confirmation this page ports from Customer to Boat.
+- `js/editUserInfo.js` — the touched-field tracking and old → new confirmation this page ports from Customer to Boat. **Since 2026-10-06 (#285)** both pages share that code through `js/editTracker.js` instead of keeping a copy each; each page only says how its fields differ (Edit User Info ignores case on email, state and country; My Fleet never counts a locked field as changed).
 - `EditProfileServlet`'s session-flash pattern — what the post-save summary copies (see Amendment 4).
 
 ## Amendments

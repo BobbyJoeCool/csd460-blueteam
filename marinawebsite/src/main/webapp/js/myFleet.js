@@ -35,8 +35,9 @@
  * editable - see the Validation Rules section of the My Fleet contract.
  *
  * Requires formValidation.js (loaded on every page by WEB-INF/includes/loginModal.jsp
- * through the header), modal.js (loaded on every page by the header) and
- * boatFields.js, which myFleet.jsp loads first.
+ * through the header), modal.js (loaded on every page by the header), and
+ * boatFields.js and editTracker.js (the change tracking shared with Edit
+ * User Info), which myFleet.jsp loads first.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -105,16 +106,22 @@ MoffatBay.myFleet = (function () {
     };
 
     var mode = "add";          // "add" or "edit"
-    var originals = {};        // what each field held when the modal opened
 
-    function control(field) {
-        return document.getElementById(field);
-    }
+    var control = MoffatBay.editTracker.control;
+    var valueOf = MoffatBay.editTracker.valueOf;
 
-    function valueOf(field) {
-        var el = control(field);
-        return el ? el.value.trim() : "";
-    }
+    /* What each field held when the modal opened, and which fields now
+       differ from it (editTracker.js, shared with Edit User Info). A
+       disabled field can never differ: it is locked on this boat and is
+       not submitted. */
+    var tracker = MoffatBay.editTracker.create({
+        fields: FIELDS,
+        ignores: function (field) {
+            var el = control(field);
+            return !el || el.disabled;
+        }
+    });
+    var changedFields = tracker.changedFields;
 
     // The marina's phone number, from the header's data-marina-phone
     // (MarinaInfo on the server), so it's never typed into a script.
@@ -301,25 +308,7 @@ MoffatBay.myFleet = (function () {
      * a moment ago.
      */
     function snapshot() {
-        originals = {};
-        FIELDS.forEach(function (field) { originals[field] = valueOf(field); });
-    }
-
-    /**
-     * Whether this field differs from what is on file. A disabled field can
-     * never differ: it is not editable and is not submitted.
-     *
-     * @param {string} field
-     * @returns {boolean}
-     */
-    function hasChanged(field) {
-        var el = control(field);
-        if (!el || el.disabled) { return false; }
-        return valueOf(field) !== (originals[field] || "");
-    }
-
-    function changedFields() {
-        return FIELDS.filter(hasChanged);
+        tracker.snapshot();
     }
 
     /**
@@ -334,43 +323,13 @@ MoffatBay.myFleet = (function () {
     function showConfirmation(changed) {
         if (!confirmPanel || !confirmList) { return; }
 
-        confirmList.textContent = "";
-
-        changed.forEach(function (field) {
-            var row = document.createElement("div");
-            row.className = "change-summary__row";
-
-            var term = document.createElement("dt");
-            term.textContent = FIELD_LABELS[field] || field;
-
-            var detail = document.createElement("dd");
-
-            var before = document.createElement("span");
-            before.className = "change-summary__old";
-            setValueText(before, originals[field]);
-
-            var arrow = document.createElement("span");
-            arrow.className = "change-summary__arrow";
-            arrow.textContent = "→";
-            arrow.setAttribute("aria-label", "changing to");
-
-            var after = document.createElement("span");
-            after.className = "change-summary__new";
-            setValueText(after, valueOf(field));
-
-            detail.appendChild(before);
-            detail.appendChild(arrow);
-            detail.appendChild(after);
-            row.appendChild(term);
-            row.appendChild(detail);
-            confirmList.appendChild(row);
-        });
+        tracker.fillConfirmation(confirmList, changed, FIELD_LABELS);
 
         if (confirmLede) {
             confirmLede.textContent = "Nothing has been set yet. Only "
                 + (changed.length === 1 ? "this field" : "these " + changed.length + " fields")
                 + " will be saved — everything else on "
-                + (originals.boatName || "this boat") + " stays as it is.";
+                + (tracker.original("boatName") || "this boat") + " stays as it is.";
         }
 
         boatForm.hidden = true;
@@ -379,17 +338,6 @@ MoffatBay.myFleet = (function () {
            return to this page brings it back still disabled. */
         document.getElementById("confirmSaveBoat").disabled = false;
         document.getElementById("confirmSaveBoat").focus();
-    }
-
-    /** A blank value reads as "empty" rather than as nothing at all. */
-    function setValueText(el, text) {
-        if (!text) {
-            var em = document.createElement("em");
-            em.textContent = "empty";
-            el.appendChild(em);
-        } else {
-            el.textContent = text;
-        }
     }
 
     /**
@@ -460,40 +408,13 @@ MoffatBay.myFleet = (function () {
     }
 
     /**
-     * Builds the POST body by hand from the changed fields and submits it.
-     *
-     * Why by hand rather than letting the form submit itself: only changed
-     * fields may appear in the body, and an untouched field has to be
-     * absent rather than empty. Disabling every untouched control just
-     * before submitting would work too, but it is one mistake away from
-     * disabling something that then silently never saves.
-     *
-     * A touched field the customer blanked is sent as an explicit empty
-     * value - that is what tells the servlet to clear the column to NULL.
+     * Posts only the changed fields, plus boatId (editTracker.js explains
+     * why the body is built by hand rather than by the browser).
      *
      * @param {string[]} changed
      */
     function submitOnlyChanged(changed) {
-        var posted = document.createElement("form");
-        posted.method = "post";
-        posted.action = editAction;
-
-        MoffatBay.form.addCsrfField(posted);
-        posted.appendChild(hiddenField("boatId", boatIdInput.value));
-        changed.forEach(function (field) {
-            posted.appendChild(hiddenField(field, valueOf(field)));
-        });
-
-        document.body.appendChild(posted);
-        posted.submit();
-    }
-
-    function hiddenField(name, value) {
-        var input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value;
-        return input;
+        tracker.submitOnlyChanged(editAction, changed, { boatId: boatIdInput.value });
     }
 
     function handleSubmit(event) {
@@ -660,7 +581,7 @@ MoffatBay.myFleet = (function () {
             if (mode === "edit") {
                 FIELDS.forEach(function (field) {
                     var el = control(field);
-                    if (el && !el.disabled) { el.value = originals[field] || ""; }
+                    if (el && !el.disabled) { el.value = tracker.original(field); }
                 });
             } else {
                 FIELDS.forEach(function (field) {

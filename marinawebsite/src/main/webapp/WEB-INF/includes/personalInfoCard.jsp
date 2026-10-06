@@ -133,9 +133,9 @@
         <%--
           State/Province follows the Country field above: CA swaps in
           provinceOptions.jsp and the "Province" label, OTHER disables the
-          field (no state/province concept applies) - see registration.js's
-          applyCountryToAddressSection and the Registration contract's
-          "Country" section.
+          field (no state/province concept applies) - see formValidation.js's
+          applyCountryToRegion (shared with Edit User Info) and the
+          Registration contract's "Country" section.
         --%>
         <div class="form-group" id="stateGroup">
             <label for="state" id="stateLabel">${countryValue == 'CA' ? 'Province' : 'State'}</label>

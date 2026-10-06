@@ -135,7 +135,7 @@
 
                     <c:forEach var="entry" items="${myWaitListEntries}">
 
-                        <article class="waitlist-entry-card"
+                        <article class="detail-card detail-card--nested waitlist-entry"
                                  data-wait-list-id="${entry.waitListId}"
                                  data-size="${entry.sizeFt}">
 
@@ -158,9 +158,11 @@
                                 ${entry.estimateLabel}
                             </p>
 
-                            <button type="button" class="btn-outline btn-danger js-open-leave">
-                                Leave Wait List
-                            </button>
+                            <div class="detail-card__actions">
+                                <button type="button" class="btn-outline btn-danger js-open-leave">
+                                    Leave Wait List
+                                </button>
+                            </div>
 
                         </article>
 

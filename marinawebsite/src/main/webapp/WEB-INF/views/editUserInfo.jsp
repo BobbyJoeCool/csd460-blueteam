@@ -322,6 +322,7 @@
 <c:if test="${not requestScope.signInRequired}">
 <jsp:include page="/WEB-INF/includes/changePasswordModal.jsp" />
 
+<script src="${pageContext.request.contextPath}/js/editTracker.js?v=${applicationScope.assetVersion}" defer></script>
 <script src="${pageContext.request.contextPath}/js/editUserInfo.js?v=${applicationScope.assetVersion}" defer></script>
 </c:if>
 

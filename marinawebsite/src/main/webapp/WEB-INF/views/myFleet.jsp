@@ -387,6 +387,7 @@
 
 <c:if test="${not requestScope.signInRequired}">
     <script src="${ctx}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
+    <script src="${ctx}/js/editTracker.js?v=${applicationScope.assetVersion}" defer></script>
     <script src="${ctx}/js/myFleet.js?v=${applicationScope.assetVersion}" defer></script>
 </c:if>
 

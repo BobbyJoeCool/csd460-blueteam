@@ -12,6 +12,11 @@
             <jsp:param name="fieldName" value="state" />
         </jsp:include>
     </select>
+
+  This is the list the page is first rendered with. When Country changes,
+  formValidation.js rebuilds the options from its own US_STATES list
+  (MoffatBay.form.applyCountryToRegion), so the two lists must match: a
+  change here needs the same change there.
 --%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
