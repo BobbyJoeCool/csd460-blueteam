@@ -37,37 +37,46 @@ public class ReservationWaitlistServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            writeJson(response, "{\"ok\":false,\"error\":\"Please sign in to join the wait list.\"}");
+            Utils.writeJson(response, false, "error", "Please sign in to join the wait list.");
             return;
         }
 
         Integer slipSizeFt = Utils.parseInt(request.getParameter("slipSizeFt"));
         if (!Utils.isSlipSize(slipSizeFt)) {
-            writeJson(response, "{\"ok\":false,\"error\":\"Choose a valid slip size.\"}");
+            Utils.writeJson(response, false, "error", "Choose a valid slip size.");
             return;
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            if (waitListDAO.isWaiting(conn, customerId, slipSizeFt)) {
-                writeJson(response, "{\"ok\":false,\"alreadyWaiting\":true}");
-                return;
+            // One entry per size per customer. The lock makes a second
+            // join from the same customer wait for the first, so the check
+            // and the insert can't interleave (a double-click, two tabs).
+            conn.setAutoCommit(false);
+
+            try {
+                waitListDAO.lockForCustomer(conn, customerId);
+
+                if (waitListDAO.isWaiting(conn, customerId, slipSizeFt)) {
+                    conn.rollback();
+                    Utils.writeJson(response, false, "alreadyWaiting", true);
+                    return;
+                }
+
+                waitListDAO.insert(conn, customerId, slipSizeFt);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
 
-            waitListDAO.insert(conn, customerId, slipSizeFt);
-            writeJson(response, "{\"ok\":true}");
+            Utils.writeJson(response, true);
 
         } catch (SQLException e) {
             throw new ServletException("Could not join the wait list.", e);
         }
-    }
-
-    private void writeJson(HttpServletResponse response, String json) throws IOException {
-        response.getWriter().write(json);
     }
 }

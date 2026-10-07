@@ -16,9 +16,10 @@ import com.moffatbaymarina.marinawebsite.model.WaitListEntry;
  * Data access for the {@code WaitList} table.
  *
  * <p>Two pages read this table. The Reservation page's "all slips full"
- * prompt joins the wait list ({@link #isWaiting} and {@link #insert}); the
- * Wait List Lookup page reads it back ({@link #countInLineBySize} and
- * {@link #findOpenEntriesForCustomer}).
+ * prompt joins the wait list ({@link #lockForCustomer}, {@link #isWaiting}
+ * and {@link #insert}); the Wait List Lookup page reads it back
+ * ({@link #countInLineBySize} and {@link #findOpenEntriesForCustomer}) and
+ * lets a customer leave ({@link #cancelEntryForCustomer}).
  *
  * <p><strong>In line</strong> means {@code Waiting} or {@code Offered}
  * throughout. An offered customer hasn't answered yet and is still ahead of
@@ -38,13 +39,45 @@ import com.moffatbaymarina.marinawebsite.model.WaitListEntry;
 public class WaitListDAO {
 
     /**
-     * Whether the customer already has an open ({@code Waiting}) entry for
-     * the given slip size.
+     * Locks the customer's row until the caller's transaction ends, so two
+     * joins from the same customer at once (a double-click, two tabs) run
+     * one after the other. Without it both could pass {@link #isWaiting}
+     * before either inserted, and the customer would stand in line twice.
+     *
+     * <p>Call it before {@link #isWaiting}, with auto-commit off. MySQL
+     * takes a transaction's snapshot at its first plain read, so a check
+     * made after this lock is released to it sees whatever the other join
+     * committed.
+     *
+     * @param conn an open connection with auto-commit off
+     * @param customerId the customer joining
+     * @throws SQLException if the lock fails
+     */
+    public void lockForCustomer(Connection conn, int customerId) throws SQLException {
+        String sql = "SELECT customerID FROM Customer WHERE customerID = ? FOR UPDATE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+            }
+        }
+    }
+
+    /**
+     * Whether the customer is already in line for the given slip size: one
+     * entry per size per customer.
+     *
+     * <p>In line means {@code Waiting} or {@code Offered}, the same as
+     * everywhere else in this class. Checking {@code Waiting} alone let a
+     * customer who had been offered a slip join the same list again and be
+     * counted twice.
      *
      * @param conn an open connection
      * @param customerId the customer to check
      * @param slipSizeFt the slip size category in feet, e.g. {@code 40}
-     * @return {@code true} if a {@code Waiting} entry already exists
+     * @return {@code true} if a {@code Waiting} or {@code Offered} entry
+     *         already exists
      * @throws SQLException if the lookup fails
      */
     public boolean isWaiting(Connection conn, int customerId, int slipSizeFt) throws SQLException {
@@ -54,7 +87,7 @@ public class WaitListDAO {
                 JOIN SlipSize sz ON sz.slipSizeID = w.slipSizeID
                 WHERE w.customerID = ?
                   AND sz.sizeFt = ?
-                  AND w.status = 'Waiting'
+                  AND w.status IN ('Waiting', 'Offered')
                 """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -192,6 +225,39 @@ public class WaitListDAO {
         }
 
         return entries;
+    }
+
+    /**
+     * Takes one entry off the list when the customer leaves it from the
+     * Wait List page (issue #346). The entry becomes {@code Cancelled}
+     * rather than being deleted, the same as on account deletion, so the
+     * order the list was in can still be checked.
+     *
+     * <p>The {@code customerID} condition is the ownership check: an ID
+     * edited in the form that belongs to someone else matches no row.
+     *
+     * @param conn an open connection
+     * @param waitListId the entry to close, as posted by the page
+     * @param customerId the signed-in customer, taken from the session and
+     *        never from the request
+     * @return {@code true} if the entry was theirs and still in line
+     * @throws SQLException if the update fails
+     */
+    public boolean cancelEntryForCustomer(Connection conn, int waitListId, int customerId)
+            throws SQLException {
+        String sql = """
+                UPDATE WaitList
+                SET status = 'Cancelled', timeClosed = CURRENT_TIMESTAMP
+                WHERE waitListID = ?
+                  AND customerID = ?
+                  AND status IN ('Waiting', 'Offered')
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, waitListId);
+            stmt.setInt(2, customerId);
+            return stmt.executeUpdate() == 1;
+        }
     }
 
     /**

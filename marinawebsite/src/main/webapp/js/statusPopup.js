@@ -74,6 +74,10 @@ MoffatBay.statusPopup = (function () {
             return size ? "You're on the wait list for a " + size + " ft slip"
                         : null;
         },
+        /* WaitListLeaveServlet, after closing the customer's entry. */
+        leftWaitList: function () {
+            return "You've left the wait list";
+        },
 
         contactSent: function () {
             return "Thanks — we'll be in touch as soon as we can.";

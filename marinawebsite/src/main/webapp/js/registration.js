@@ -45,36 +45,6 @@
     var clearBoatInfoBtn = document.getElementById("clearBoatInfo");
     var clearPersonalInfoBtn = document.getElementById("clearPersonalInfo");
 
-    /*
-     * Registration State/Province's option list swaps with Country
-     * without a page reload - boatInfoCard.jsp renders the right list
-     * server-side on first load/round-trip, this just mirrors the same
-     * two option sets (see WEB-INF/includes/stateOptions.jsp and
-     * WEB-INF/includes/provinceOptions.jsp) so the swap can happen client-side.
-     */
-    var US_STATES = [
-        ["AL", "Alabama"], ["AK", "Alaska"], ["AZ", "Arizona"], ["AR", "Arkansas"],
-        ["CA", "California"], ["CO", "Colorado"], ["CT", "Connecticut"], ["DE", "Delaware"],
-        ["DC", "District of Columbia"], ["FL", "Florida"], ["GA", "Georgia"], ["HI", "Hawaii"],
-        ["ID", "Idaho"], ["IL", "Illinois"], ["IN", "Indiana"], ["IA", "Iowa"],
-        ["KS", "Kansas"], ["KY", "Kentucky"], ["LA", "Louisiana"], ["ME", "Maine"],
-        ["MD", "Maryland"], ["MA", "Massachusetts"], ["MI", "Michigan"], ["MN", "Minnesota"],
-        ["MS", "Mississippi"], ["MO", "Missouri"], ["MT", "Montana"], ["NE", "Nebraska"],
-        ["NV", "Nevada"], ["NH", "New Hampshire"], ["NJ", "New Jersey"], ["NM", "New Mexico"],
-        ["NY", "New York"], ["NC", "North Carolina"], ["ND", "North Dakota"], ["OH", "Ohio"],
-        ["OK", "Oklahoma"], ["OR", "Oregon"], ["PA", "Pennsylvania"], ["RI", "Rhode Island"],
-        ["SC", "South Carolina"], ["SD", "South Dakota"], ["TN", "Tennessee"], ["TX", "Texas"],
-        ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"], ["WA", "Washington"],
-        ["WV", "West Virginia"], ["WI", "Wisconsin"], ["WY", "Wyoming"]
-    ];
-
-    var CA_PROVINCES = [
-        ["AB", "Alberta"], ["BC", "British Columbia"], ["MB", "Manitoba"],
-        ["NB", "New Brunswick"], ["NL", "Newfoundland and Labrador"], ["NS", "Nova Scotia"],
-        ["NT", "Northwest Territories"], ["NU", "Nunavut"], ["ON", "Ontario"],
-        ["PE", "Prince Edward Island"], ["QC", "Quebec"], ["SK", "Saskatchewan"], ["YT", "Yukon"]
-    ];
-
     /**
      * Updates Registration Number's label, placeholder, and disabled
      * state to match the given country - "US" or "CA" (enabled, format
@@ -91,56 +61,14 @@
     }
 
     /**
-     * Mirrors applyCountryToBoatSection, but for the mailing address's
-     * own State/Province field (#state in personalInfoCard.jsp) instead
-     * of Boat Registration's - same three-way swap (US states / CA
-     * provinces / disabled "not applicable" for OTHER), just without a
-     * Registration Number or badge to go with it. See the Registration
-     * contract's "Country" section.
+     * The mailing address's State/Province (#state in personalInfoCard.jsp)
+     * follows Country: US states, Canadian provinces, or disabled for
+     * OTHER. The lists and the swap are shared with Edit User Info in
+     * formValidation.js (MoffatBay.form.applyCountryToRegion). See the
+     * Registration contract's "Country" section.
      */
     function applyCountryToAddressSection() {
-        var value = country.value;
-        var previousValue = state.value;
-
-        if (value === "CA") {
-            stateLabel.textContent = "Province";
-            state.disabled = false;
-            rebuildRegionOptions(state, CA_PROVINCES, previousValue);
-        } else if (value === "OTHER") {
-            stateLabel.textContent = "State";
-            state.disabled = true;
-            rebuildRegionOptions(state, [], previousValue);
-        } else {
-            stateLabel.textContent = "State";
-            state.disabled = false;
-            rebuildRegionOptions(state, US_STATES, previousValue);
-        }
-    }
-
-    /**
-     * Replaces select's <option> children with the given [value, label]
-     * pairs (plus a disabled placeholder), keeping previousValue selected
-     * if it's still one of the options.
-     */
-    function rebuildRegionOptions(select, regions, previousValue) {
-        select.innerHTML = "";
-
-        var stillValid = regions.some(function (region) { return region[0] === previousValue; });
-
-        var placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.disabled = true;
-        placeholder.textContent = regions.length === 0 ? "Not applicable" : "Select…";
-        placeholder.selected = !stillValid;
-        select.appendChild(placeholder);
-
-        regions.forEach(function (region) {
-            var option = document.createElement("option");
-            option.value = region[0];
-            option.textContent = region[1];
-            option.selected = region[0] === previousValue;
-            select.appendChild(option);
-        });
+        MoffatBay.form.applyCountryToRegion(country, state, stateLabel);
     }
 
     function syncPhoneFromDisplay() {

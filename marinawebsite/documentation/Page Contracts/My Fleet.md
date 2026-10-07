@@ -27,7 +27,7 @@ Pieces this page reuses, all of which already exist:
 - `BoatDAO.insertBoat()` and `BoatDAO.insertOwnership()` — adding a boat is the same two inserts the Reservation page already does.
 - `ReservationBoatServlet`'s validation rules — the rule set every add and edit on this page has to match (see [Validation Rules](#validation-rules)).
 - `includes/statusPopup.jsp` / `MoffatBay.statusPopup` — the success toasts.
-- `js/editUserInfo.js` — the touched-field tracking and old → new confirmation this page ports from Customer to Boat.
+- `js/editUserInfo.js` — the touched-field tracking and old → new confirmation this page ports from Customer to Boat. **Since 2026-10-06 (#285)** both pages share that code through `js/editTracker.js` instead of keeping a copy each; each page only says how its fields differ (Edit User Info ignores case on email, state and country; My Fleet never counts a locked field as changed).
 - `EditProfileServlet`'s session-flash pattern — what the post-save summary copies (see Amendment 4).
 
 ## Amendments
@@ -92,7 +92,7 @@ A signed-in customer lands on My Fleet and sees **one card per boat they current
 
 - [x] **The card's Clear button.** `#clearBoatInfo` reads "Clear Boat Info" in Add mode and **"Revert Changes"** in Edit mode, where it re-fills every field from the card's stored values instead of blanking them. Clearing in Edit would blank `boatName`, which is a structural rejection with no user-facing message — a dead end.
 - [x] **Edit confirmation step.** Same rule as Edit User Info: before submitting, the modal shows every changed field as "Field: old value → new value" and the customer confirms. Nothing is sent until they do. Rendered inside the modal, since the form already is.
-- [x] **Remove confirmation step.** Clicking Remove opens a confirmation popup naming the boat ("Remove *Black Pearl* from your fleet?"), with an explicit confirm button and a cancel. Only the confirm button submits.
+- [x] **Remove confirmation step.** Clicking Remove opens a confirmation popup naming the boat ("Remove *Black Pearl* from your fleet?"), with an explicit confirm button and a cancel. Only the confirm button submits. **Labels (2026-10-06, #269):** **Keep Boat** (focused first) and a red **Yes, Remove It**, the same pattern as every destructive confirmation on the site.
 - [x] **Remove on a reserved boat.** The Remove button renders disabled, with a hint beside it ("This boat can't be removed from your account while it's part of an active reservation." - **reworded 2026-09-24**; a started lease can no longer simply be cancelled, so the old "cancel it first" wording was wrong). The server enforces this regardless — see [Removing a Boat](#removing-a-boat).
 - [x] **One shared client-side validator.** `js/registration.js` and `js/reservation.js` each carry their own copy of the HIN pattern, the country → `regNumber` format switch, the year check and the "HIN or Registration Number" rule; `reservation.js:802` has a comment explaining why it couldn't just load the other file. Rather than make a third copy, these move to a shared **`js/boatFields.js`** used by all three pages: `hinIsValid(value)`, `regNumberIsValid(value, country)`, `boatYearIsValid(value)`, `identificationRule(hin, regNumber)`, `applyCountry(country)`.
 
@@ -136,7 +136,7 @@ A signed-in customer lands on My Fleet and sees **one card per boat they current
 
 ### Which Fields Are Editable
 
-Every column on the `Boat` table (`databasescripts/MoffatBayMarinaDB_V1-9-0.sql`), whether the customer can change it on this page, and why.
+Every column on the `Boat` table (`databasescripts/MoffatBayMarinaDB_V1-10-0.sql`), whether the customer can change it on this page, and why.
 
 | Column | Editable? | Notes |
 | --- | --- | --- |

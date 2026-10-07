@@ -5,7 +5,7 @@ These two files are how the database was actually built during Module 9: the fro
 To build the database, run the consolidated script two directories up:
 
 ```
-mysql -u root -p < ../../MoffatBayMarinaDB_V1-9-0.sql
+mysql -u root -p < ../../MoffatBayMarinaDB_V1-10-0.sql
 ```
 
 That single file produces the same schema and seed data these two produce in sequence, and it is the one that gets maintained going forward.

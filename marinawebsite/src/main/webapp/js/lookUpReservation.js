@@ -36,7 +36,7 @@
      * Opens one of the popups for the card a button sits in: sets which
      * reservation its form posts, and the sentence naming it.
      * @param {HTMLElement} modal - #cancelModal or #noticeModal
-     * @param {HTMLElement} card - the .reservation-card that was clicked
+     * @param {HTMLElement} card - the .detail-card that was clicked
      * @param {string} questionId - the element that names the reservation
      * @param {string} text - that sentence
      */
@@ -51,7 +51,7 @@
     /**
      * Describes a card's reservation in one phrase, e.g.
      * "MB-00061 for Second Wind at Dock A, Slip 4".
-     * @param {HTMLElement} card - the .reservation-card
+     * @param {HTMLElement} card - the .detail-card
      * @returns {string}
      */
     function describe(card) {
@@ -84,7 +84,7 @@
 
     document.querySelectorAll(".js-open-cancel").forEach(function (button) {
         button.addEventListener("click", function () {
-            var card = button.closest(".reservation-card");
+            var card = button.closest(".detail-card");
             openFor(cancelModal, card, "cancelQuestion",
                 "Cancel reservation " + describe(card) + ", starting "
                 + (card.dataset.start || "soon") + "?");
@@ -93,7 +93,7 @@
 
     document.querySelectorAll(".js-open-notice").forEach(function (button) {
         button.addEventListener("click", function () {
-            var card = button.closest(".reservation-card");
+            var card = button.closest(".detail-card");
             lastDay.value = lastDay.min;
             checkLastDay();
             openFor(noticeModal, card, "noticeQuestion",
@@ -103,7 +103,7 @@
 
     document.querySelectorAll(".js-open-withdraw").forEach(function (button) {
         button.addEventListener("click", function () {
-            var card = button.closest(".reservation-card");
+            var card = button.closest(".detail-card");
             var ending = card.dataset.lastDay ? ", ending " + card.dataset.lastDay : "";
             openFor(withdrawModal, card, "withdrawQuestion",
                 "Withdraw the notice on reservation " + describe(card) + ending + "?");

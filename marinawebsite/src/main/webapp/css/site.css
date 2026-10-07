@@ -414,7 +414,7 @@ main,
    -------------------------------------------------------------------------- */
 
 /* Registration, About Us, My Reservations, Waitlist Lookup, Privacy,
-   Accessibility: Marina.png, 60% overlay. */
+   Accessibility: Marina.jpg, 60% overlay. */
 #registrationHero,
 #aboutHero,
 #lookUpReservationHero,
@@ -423,18 +423,18 @@ main,
 #accessibilityHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.6), rgba(13, 59, 77, 0.6)),
-        url("../images/Marina.png");
+        url("../images/Marina.jpg");
 }
 
-/* Reservation: Slip_Closeup.png, 48-62% gradient (the sunset horizon is
+/* Reservation: Slip_Closeup.jpg, 48-62% gradient (the sunset horizon is
    bright orange right where the heading sits). */
 #reservationHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.48), rgba(13, 59, 77, 0.62)),
-        url("../images/Slip_Closeup.png");
+        url("../images/Slip_Closeup.jpg");
 }
 
-/* My Fleet + Your Account: BoatYard_Sunset.png, a 58-70% gradient - heavier
+/* My Fleet + Your Account: BoatYard_Sunset.jpg, a 58-70% gradient - heavier
    than any other hero on the site, and measured rather than guessed. The
    sun sits dead centre on the horizon, exactly where the heading goes, so
    this is the hardest backdrop any of our heroes has to carry light text
@@ -450,10 +450,10 @@ main,
 #accountHero {
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.58), rgba(13, 59, 77, 0.7)),
-        url("../images/BoatYard_Sunset.png");
+        url("../images/BoatYard_Sunset.jpg");
 }
 
-/* Landing page: the one hero allowed to break the pattern. Marina.png with
+/* Landing page: the one hero allowed to break the pattern. Marina.jpg with
    a light 22-32% overlay so the photo dominates, taller, and a bigger
    heading to anchor the first impression. Its description, tagline and
    call-to-action button are styled in index.css. */
@@ -461,7 +461,7 @@ main,
     min-height: 400px;
     background-image:
         linear-gradient(rgba(13, 59, 77, 0.22), rgba(13, 59, 77, 0.32)),
-        url("../images/Marina.png");
+        url("../images/Marina.jpg");
 }
 
 #landingHero .hero-band__content {
@@ -1003,11 +1003,10 @@ main:focus {
 
 /* --------------------------------------------------------------------------
    Detail card — a bordered panel about one record.
-   Used by: myFleet.jsp (one per boat)
-
-   The same object as .reservation-card on Look Up Reservation, which sits
-   inside a results panel and so takes --radius-inner; merging the two into
-   one class is #287.
+   Used by: myFleet.jsp (one per boat), lookUpReservation.jsp (one per
+   reservation) and waitListLookup.jsp (one per wait list the customer is
+   on). One class for all three since #287; the two that sit inside a
+   results panel add --nested.
    -------------------------------------------------------------------------- */
 
 .detail-card {
@@ -1020,6 +1019,59 @@ main:focus {
     background: color-mix(in srgb, var(--color-bg-card) 50%, transparent);
     box-shadow: 0 6px 14px
         color-mix(in srgb, var(--color-charcoal-navy) 10%, transparent);
+}
+
+/* A card nested inside a tinted results panel (My Reservations, Your Place
+   in Line): one radius step tighter, solid rather than see-through since
+   the panel behind it is already a card, and no shadow. Its title is ruled
+   off from the details under it. */
+.detail-card--nested {
+    padding: 1.5rem;
+    border-radius: var(--radius-inner);
+    background: var(--color-bg-surface);
+    box-shadow: none;
+}
+
+.detail-card--nested h3 {
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: var(--color-deep-marine);
+}
+
+/* The buttons that act on the record (Cancel Reservation, Leave Wait List),
+   ruled off along the bottom of the card, with an optional hint beside
+   them. The buttons are .btn-outline (+ .btn-danger). */
+.detail-card__actions {
+    margin-top: 1.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid
+        color-mix(in srgb, var(--color-border) 18%, transparent);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.detail-card__hint {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+}
+
+@media (max-width: 40rem) {
+    .detail-card--nested {
+        padding: 1.25rem;
+    }
+
+    .detail-card__actions > button {
+        flex: 1 1 100%;
+    }
 }
 
 /* --------------------------------------------------------------------------

@@ -94,9 +94,12 @@
                  lets a full size be flagged the moment a boat is picked, rather
                  than after Submit. The totals on the size cards above are summed
                  from this, so there is only one availability figure to keep
-                 right. --%>
-            <script id="dockAvailability" type="application/json">[<c:forEach var="d" items="${docks}" varStatus="st">{"dockId":${d.dockId},"dockNumber":"${d.dockNumber}","available":{"26":${d.available['26']},"40":${d.available['40']},"50":${d.available['50']}}}<c:if test="${not st.last}">,</c:if></c:forEach>]</script>
-            <script id="reservationRates" type="application/json">{"perFootCents":${perFootCents},"electricCents":${electricCents}}</script>
+                 right. Both blocks are built in ReservationServlet with the
+                 shared JSON writer (Utils.jsonObject, #283), which escapes
+                 every value - including "<", so nothing can end the script
+                 block early. --%>
+            <script id="dockAvailability" type="application/json">${dockAvailabilityJson}</script>
+            <script id="reservationRates" type="application/json">${reservationRatesJson}</script>
 
             <%-- ===== Slip availability, full width ===== =====================
                  Not a picker. These show what is free; the vessel chosen in
@@ -255,7 +258,7 @@
                         <div class="field-error" id="dockError" data-error-for="dockChoices"></div>
 
                         <figure class="marina-map">
-                            <img src="${pageContext.request.contextPath}/images/marina_a.png"
+                            <img src="${pageContext.request.contextPath}/images/marina_a.webp"
                                  alt="Map of Moffat Bay Marina showing Dock A (Eastern Dock) closest
                                       to the Ship Store, Dock B (Central Dock) closest to the Office
                                       &amp; Restaurant, and Dock C (Western Dock) closest to the

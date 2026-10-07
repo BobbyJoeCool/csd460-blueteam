@@ -20,7 +20,9 @@
  * see the contract's Validation Rules.
  *
  * Requires formValidation.js first (MoffatBay.form.*), which
- * WEB-INF/includes/loginModal.jsp already loads on every page.
+ * WEB-INF/includes/loginModal.jsp already loads on every page, and
+ * editTracker.js (the change tracking shared with My Fleet), which
+ * editUserInfo.jsp loads just before this file.
  */
 var MoffatBay = window.MoffatBay || {};
 
@@ -58,30 +60,34 @@ MoffatBay.editUserInfo = (function () {
      */
     var ERROR_ELEMENT_IDS = { zipCode: "zipError" };
 
-    /* The value each field held when the page loaded, which is what's
-       actually on file. Everything else is measured against this. */
-    var initialValues = {};
+    var control = MoffatBay.editTracker.control;
+
+    /* A field's current value, trimmed. Reads the hidden #phone rather than
+       the formatted display, so what's compared is what would be sent. */
+    var currentValue = MoffatBay.editTracker.valueOf;
 
     /*
-     * And how each of those values READ at that moment - "Washington", not
-     * "WA". Captured rather than looked up later, because a select can't
-     * always be asked afterwards: switching country rebuilds the
-     * state/province list, and Washington stops being one of the options at
-     * all. Without this the confirmation panel has no way to name the value
-     * it is about to overwrite.
+     * What's on file, and which fields now differ from it (editTracker.js,
+     * shared with My Fleet). Compared the way EditProfileServlet normalizes
+     * before it builds its own diff - email lowercased, state and country
+     * uppercased - so retyping an address in a different case isn't mistaken
+     * for an edit and doesn't enable Save on its own. A disabled field still
+     * counts: State is disabled for country OTHER and still has to travel.
      */
-    var initialLabels = {};
-
-    /**
-     * The control carrying a field's submitted value. Phone is the odd one:
-     * the visible box is #phoneDisplay (formatted, unnamed) and the value
-     * that travels is in the hidden #phone.
-     * @param {string} field - a name from FIELDS
-     * @returns {Element|null} the input or select, or null if absent
-     */
-    function control(field) {
-        return document.getElementById(field);
-    }
+    var tracker = MoffatBay.editTracker.create({
+        fields: FIELDS,
+        same: function (field, before, after) {
+            if (field === "email") {
+                return before.toLowerCase() === after.toLowerCase();
+            }
+            if (field === "state" || field === "country") {
+                return before.toUpperCase() === after.toUpperCase();
+            }
+            return before === after;
+        },
+        describe: currentLabel
+    });
+    var changedFields = tracker.changedFields;
 
     /**
      * The box a message for this field belongs in.
@@ -106,46 +112,6 @@ MoffatBay.editUserInfo = (function () {
      */
     function clearErrors() {
         FIELDS.forEach(function (field) { setFieldError(field, ""); });
-    }
-
-    /**
-     * A field's current value, trimmed. Reads the hidden #phone rather than
-     * the formatted display, so what's compared is what would be sent.
-     * @param {string} field - a name from FIELDS
-     * @returns {string} the value, or "" if the field isn't on the page
-     */
-    function currentValue(field) {
-        var el = control(field);
-        return el ? el.value.trim() : "";
-    }
-
-    /**
-     * Whether this field differs from what's on file. Comparison is
-     * normalized the same way EditProfileServlet normalizes before it
-     * builds its own diff - email lowercased, state and country uppercased -
-     * so retyping an address in a different case isn't mistaken for an edit
-     * and doesn't enable the Save button on its own.
-     * @param {string} field - a name from FIELDS
-     * @returns {boolean} true if the value has actually changed
-     */
-    function hasChanged(field) {
-        var before = initialValues[field] || "";
-        var after = currentValue(field);
-        if (field === "email") {
-            return before.toLowerCase() !== after.toLowerCase();
-        }
-        if (field === "state" || field === "country") {
-            return before.toUpperCase() !== after.toUpperCase();
-        }
-        return before !== after;
-    }
-
-    /**
-     * Every field that currently differs from what's on file.
-     * @returns {string[]} field names, in FIELDS order
-     */
-    function changedFields() {
-        return FIELDS.filter(hasChanged);
     }
 
     /*
@@ -191,11 +157,8 @@ MoffatBay.editUserInfo = (function () {
 
     /**
      * Fills the confirmation popup with one row per changed field, old on
-     * the left and new on the right, and opens it (modal.js).
-     *
-     * Built from the form as it stands at this moment rather than from
-     * anything captured earlier, so what is listed here and what gets
-     * submitted cannot drift apart.
+     * the left and new on the right (editTracker.js), and opens it
+     * (modal.js).
      *
      * @param {string[]} changed - the fields about to be saved
      */
@@ -204,47 +167,7 @@ MoffatBay.editUserInfo = (function () {
         var list = document.getElementById("confirmChangesList");
         if (!modal || !list) { return; }
 
-        list.textContent = "";
-
-        changed.forEach(function (field) {
-            var wrapper = document.createElement("div");
-            wrapper.className = "change-summary__row";
-
-            var term = document.createElement("dt");
-            term.textContent = FIELD_LABELS[field] || field;
-
-            var detail = document.createElement("dd");
-
-            var before = document.createElement("span");
-            before.className = "change-summary__old";
-            var beforeText = initialLabels[field] || "";
-            if (beforeText === "") {
-                before.innerHTML = "<em>empty</em>";
-            } else {
-                before.textContent = beforeText;
-            }
-
-            var arrow = document.createElement("span");
-            arrow.className = "change-summary__arrow";
-            arrow.textContent = "\u2192";
-            arrow.setAttribute("aria-label", "changing to");
-
-            var after = document.createElement("span");
-            after.className = "change-summary__new";
-            var afterText = currentLabel(field);
-            if (afterText === "") {
-                after.innerHTML = "<em>empty</em>";
-            } else {
-                after.textContent = afterText;
-            }
-
-            detail.appendChild(before);
-            detail.appendChild(arrow);
-            detail.appendChild(after);
-            wrapper.appendChild(term);
-            wrapper.appendChild(detail);
-            list.appendChild(wrapper);
-        });
+        tracker.fillConfirmation(list, changed, FIELD_LABELS);
 
         document.getElementById("confirmSave").disabled = false;
         MoffatBay.modal.open(modal);
@@ -357,10 +280,7 @@ MoffatBay.editUserInfo = (function () {
      * keystroke ago.
      */
     function captureInitialValues() {
-        FIELDS.forEach(function (field) {
-            initialValues[field] = currentValue(field);
-            initialLabels[field] = currentLabel(field);
-        });
+        tracker.snapshot();
     }
 
     /**
@@ -438,42 +358,12 @@ MoffatBay.editUserInfo = (function () {
     }
 
     /**
-     * Builds the POST body by hand from the changed fields and submits
-     * that, instead of letting the browser serialize the form.
-     *
-     * The form itself can't be trusted to serialize correctly here. Only
-     * changed fields may appear in the body - that's how
-     * EditProfileServlet tells "leave this alone" from "clear this" - and
-     * the obvious way to arrange that, stripping the name off every
-     * untouched control just before submitting, turned out to depend on
-     * exactly when the browser reads the form back. It also can't send a
-     * disabled control at all, which is a problem the moment state needs
-     * to travel after a country switch.
-     *
-     * So the body is assembled here and posted through a throwaway form:
-     * every changed field, by name, with the value read straight off its
-     * control - disabled or not. What goes over the wire is then exactly
-     * what this function decided, with nothing in between.
-     *
+     * Posts only the changed fields (editTracker.js explains why the body
+     * is built by hand rather than by the browser).
      * @param {string[]} changed - the fields to send
      */
     function submitOnlyChanged(changed) {
-        var carrier = document.createElement("form");
-        carrier.method = "post";
-        carrier.action = form.action;
-        carrier.style.display = "none";
-        MoffatBay.form.addCsrfField(carrier);
-
-        changed.forEach(function (field) {
-            var input = document.createElement("input");
-            input.type = "hidden";
-            input.name = field;
-            input.value = currentValue(field);
-            carrier.appendChild(input);
-        });
-
-        document.body.appendChild(carrier);
-        carrier.submit();
+        tracker.submitOnlyChanged(form.action, changed);
     }
 
     removeClearButton();

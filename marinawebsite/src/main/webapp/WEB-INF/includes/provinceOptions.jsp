@@ -12,11 +12,11 @@
         </jsp:include>
     </select>
 
-  registration.js keeps a matching array of these same 13 entries to
-  rebuild this <select> client-side when Country changes without a page
-  reload - see js/registration.js's CA_PROVINCES data and the Registration
-  contract's "Country" section for why the option list has to swap with
-  Country instead of being fixed.
+  This is the list the page is first rendered with. When Country changes,
+  formValidation.js rebuilds the options from its own CA_PROVINCES list
+  (MoffatBay.form.applyCountryToRegion), so the two lists must match: a
+  change here needs the same change there. See the Registration
+  contract's "Country" section for why the list swaps with Country.
 --%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>

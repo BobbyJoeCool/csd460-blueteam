@@ -10,6 +10,7 @@ import java.util.Map;
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
 import com.moffatbaymarina.marinawebsite.util.CustomerSession;
+import com.moffatbaymarina.marinawebsite.util.CustomerValidator;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
 import com.moffatbaymarina.marinawebsite.util.Utils;
 
@@ -58,13 +59,6 @@ public class EditProfileServlet extends HttpServlet {
             "firstName", "lastName", "email", "phoneCountryCode", "phone",
             "streetAddress", "streetAddress2", "city", "state", "zipCode", "country"
     };
-
-    private static final java.util.Set<String> REQUIRED_FIELDS = java.util.Set.of(
-            "firstName", "lastName", "email", "phoneCountryCode", "phone",
-            "streetAddress", "city", "zipCode", "country"
-    );
-
-    private static final java.util.Set<String> VALID_COUNTRIES = java.util.Set.of("US", "CA", "OTHER");
 
     private final CustomerDAO customerDAO = new CustomerDAO();
 
@@ -142,7 +136,7 @@ public class EditProfileServlet extends HttpServlet {
                 continue;
             }
             String value = Utils.clean(request.getParameter(field));
-            if (value.isEmpty() && REQUIRED_FIELDS.contains(field)) {
+            if (value.isEmpty() && CustomerValidator.REQUIRED_FIELDS.contains(field)) {
                 request.setAttribute("formError",
                         "That request could not be processed. Please reload the page and try again.");
                 request.getRequestDispatcher("/WEB-INF/views/editUserInfo.jsp").forward(request, response);
@@ -181,7 +175,10 @@ public class EditProfileServlet extends HttpServlet {
             submitted.put("state", "");
         }
 
-        Map<String, String> fieldErrors = validate(submitted, effectiveCountry);
+        // The same rules and wording as Registration (CustomerValidator,
+        // #284). Only the touched fields are in submitted.
+        Map<String, String> fieldErrors =
+                CustomerValidator.validate(submitted, effectiveCountry, false);
 
         if (!fieldErrors.isEmpty()) {
             request.setAttribute("fieldErrors", fieldErrors);
@@ -304,80 +301,5 @@ public class EditProfileServlet extends HttpServlet {
             default -> null;
         };
         return value == null ? "" : value;
-    }
-
-    /**
-     * Per-field format validation for every touched field, collecting
-     * every failure rather than stopping at the first (contract's
-     * "Validate Everything First, Then Write Nothing or Write Everything").
-     * Mirrors the same rules {@code RegisterServlet.validateCustomer()}
-     * already enforces for these columns.
-     *
-     * @param submitted touched field name -> submitted value (already trimmed)
-     * @param effectiveCountry the country this submission will end up with -
-     *        either the touched value, or the customer's existing one
-     * @return field name -> message, empty if every touched field is valid
-     */
-    private Map<String, String> validate(Map<String, String> submitted, String effectiveCountry) {
-        Map<String, String> errors = new LinkedHashMap<>();
-
-        putIf(errors, submitted, "firstName", v -> v.length() > 50, "First name cannot exceed 50 characters.");
-        putIf(errors, submitted, "lastName", v -> v.length() > 50, "Last name cannot exceed 50 characters.");
-
-        putIf(errors, submitted, "email",
-                v -> v.length() > 100 || !Utils.EMAIL_PATTERN.matcher(v).matches(),
-                "Enter a valid email address.");
-
-        putIf(errors, submitted, "phoneCountryCode",
-                v -> !Utils.COUNTRY_CODE_PATTERN.matcher(v).matches(),
-                "Enter a valid country code.");
-
-        putIf(errors, submitted, "phone",
-                v -> !Utils.PHONE_PATTERN.matcher(v).matches(),
-                "Phone number must contain exactly 10 digits.");
-
-        putIf(errors, submitted, "streetAddress", v -> v.length() > 100, "Street address cannot exceed 100 characters.");
-        putIf(errors, submitted, "streetAddress2", v -> v.length() > 100, "Address line 2 cannot exceed 100 characters.");
-        putIf(errors, submitted, "city", v -> v.length() > 50, "City cannot exceed 50 characters.");
-
-        if (submitted.containsKey("state") && !submitted.get("state").isEmpty()
-                && submitted.get("state").length() != 2) {
-            errors.put("state", "State/Province must be a 2-letter code.");
-        }
-        if (submitted.containsKey("state") && submitted.get("state").isEmpty()
-                && !"OTHER".equals(effectiveCountry)) {
-            errors.put("state", "State/Province is required.");
-        }
-
-        putIf(errors, submitted, "zipCode",
-                v -> !Utils.ZIP_PATTERN.matcher(v).matches(),
-                "Enter a valid ZIP code.");
-
-        if (submitted.containsKey("country") && !VALID_COUNTRIES.contains(submitted.get("country").toUpperCase(Locale.ROOT))) {
-            errors.put("country", "Select a valid country.");
-        }
-
-        return errors;
-    }
-
-    private interface FieldCheck {
-        boolean fails(String value);
-    }
-
-    private void putIf(Map<String, String> errors, Map<String, String> submitted,
-                        String field, FieldCheck check, String message) {
-        if (!submitted.containsKey(field)) {
-            return;
-        }
-        String value = submitted.get(field);
-        // Blank is handled up front as a structural error for required
-        // fields, and as "clear it" for optional ones - format checks
-        // below only apply once there's an actual value to check.
-        if (value.isEmpty()) {
-            return;
-        }
-        if (check.fails(value)) {
-            errors.put(field, message);
-        }
     }
 }

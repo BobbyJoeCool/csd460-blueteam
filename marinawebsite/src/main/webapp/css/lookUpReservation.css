@@ -120,28 +120,10 @@
    INDIVIDUAL RESERVATION CARD
    ========================================================= */
 
-.reservation-card {
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-    border: 1px solid
-        color-mix(in srgb, var(--color-border) 22%, transparent);
-    border-radius: var(--radius-inner);
-    background: var(--color-bg-surface);
-}
-
-.reservation-card:last-child {
-    margin-bottom: 0;
-}
-
-.reservation-card h3 {
-    margin: 0 0 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid
-        color-mix(in srgb, var(--color-border) 18%, transparent);
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    font-weight: normal;
-    color: var(--color-deep-marine);
+/* The card itself is site.css's .detail-card .detail-card--nested (#287);
+   only the gap between one reservation and the next is this page's. */
+.reservation-results > .detail-card + .detail-card {
+    margin-top: 1rem;
 }
 
 
@@ -176,29 +158,8 @@
 }
 
 
-/* =========================================================
-   CARD ACTIONS (Cancel Reservation / Submit 30-Day Notice)
-   The buttons are site.css's .btn-outline (+ .btn-danger), and
-   the popups they open are site.css's shared .modal.
-   ========================================================= */
-
-.reservation-card__actions {
-    margin-top: 1.25rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid
-        color-mix(in srgb, var(--color-border) 18%, transparent);
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-}
-
-.reservation-card__hint {
-    font-size: 0.8rem;
-    line-height: 1.4;
-    color: var(--color-text-muted);
-    opacity: 0.85;
-}
+/* The card's Cancel Reservation / Submit 30-Day Notice row is site.css's
+   .detail-card__actions, and the popups they open are its shared .modal. */
 
 /* A turned-down cancel or notice, above the list. */
 .lookup-banner {
@@ -259,9 +220,5 @@
     .reservation-details {
         grid-template-columns: 1fr;
         gap: 1rem;
-    }
-
-    .reservation-card__actions > button {
-        flex: 1 1 100%;
     }
 }

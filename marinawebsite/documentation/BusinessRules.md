@@ -72,6 +72,10 @@ ________________________________________
     A slip may be considered available for a future date only if there are no 
     conflicting reservations and the current occupant is scheduled to leave 
     before that date.
+    Built 2026-10-06 (#324): leases are month to month, so a slip is free for a
+    start date only when every Active lease on it has a live termination notice
+    whose last day is before that date. Book a Slip's counts and the booking check
+    both use the chosen start date (ReservationDAO.SLIP_TAKEN_ON).
 
 
 ### Reservation Rules
@@ -122,6 +126,9 @@ ________________________________________
 #### BR-24 — Termination and Slip Availability
     A valid termination notice must be considered when determining when an occupied slip may become available. 
     A withdrawn termination notice must not cause the slip to be treated as becoming available.
+    Built 2026-10-06 (#324): a Submitted, Pending, Approved or Completed notice frees the slip
+    from the day after its last day, and the Wait List estimate uses those days as known
+    openings. A Withdrawn notice frees nothing.
     
 
 ### Status Rules

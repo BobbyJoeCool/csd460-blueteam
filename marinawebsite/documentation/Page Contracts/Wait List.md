@@ -17,7 +17,7 @@ Module 9 / Week 7 (Sep 21 – Sep 27, 2026)
 
 **Not started.** `waitListLookup.jsp` is the Coming Soon stub. What already exists and this page builds on:
 
-- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-9-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
+- `WaitList` table (`databasescripts/MoffatBayMarinaDB_V1-10-0.sql`): `waitListID`, `customerID`, `slipSizeID`, `timeJoined`, `timeClosed`, `status` (`Waiting` / `Offered` / `Fulfilled` / `Cancelled`).
 - `TerminationNotice` table: `reservationID`, `noticeDate`, `terminationDate`, `noticeStatus` (`Submitted` / `Pending` / `Approved` / `Withdrawn` / `Completed`). Nothing on the site writes to it yet, but it is the only place the schema records **when a slip tenancy ends** — which is what the wait estimate needs.
 - `WaitListDAO.isWaiting()` / `insert()` — joining happens on the Reservation page's "all slips full" prompt (`/reservation/waitlist`). This page doesn't change that.
 - `ReservationDAO.countAvailableForSize()` — open slips right now, by size.
@@ -37,7 +37,7 @@ One page, two layers:
 - [ ] **Public summary layout.** One card or table row per slip size: size, number in line, estimated wait for a new joiner. If that size has open slips right now, show "Slips available now" with a Book a Slip link instead of a wait estimate.
 - [ ] **"Your place in line" section.** Shown only when signed in and only if the customer has at least one open entry. Signed in with no entries → a one-line "You're not on the wait list." Signed out → a "Sign in to see your place in line" prompt that opens the login modal.
 - [x] **Estimates are labeled as estimates.** Every wait shown reads "about …" / "estimated", never as a promise. Use the pre-formatted `estimateLabel` from the Bean rather than doing any math in the JSP.
-- [ ] **Leave the wait list button** on each of the customer's entries, behind a confirmation popup — only if Back End's open question below is a yes.
+- [x] **Leave the wait list button** on each of the customer's entries, behind a confirmation popup (issue #346, built 2026-10-06). The card's **Leave Wait List** button opens "Leave the 40 ft wait list?" with **Stay in Line** (focused first) and **Yes, Leave It**. `js/waitListLookup.js` fills in the entry and size from the card.
 
 ### Back End Owns
 
@@ -46,9 +46,10 @@ One page, two layers:
 - [x] **Order of the line (BR-20).** By `timeJoined`, oldest first; `waitListID` breaks a tie. Your position = the number of in-line entries for the same slip size ahead of you + 1.
 - [x] **The estimate is computed in one place.** A plain Java class, `util/WaitEstimator`, with no database access — the DAOs fetch the inputs, the servlet hands them to the estimator, and the estimator returns the number and the display label. Keeps the formula unit-testable and out of both the SQL and the JSP.
 - [ ] **Default average tenure.** The formula needs to know how long a slip tenancy lasts on average. Until the database has enough finished tenancies to measure (it has none today), it falls back to a fixed value. **Proposed: 24 months**, as a named constant in `WaitEstimator`. The team (or the "marina") should confirm the number.
-- [ ] **Leave the wait list.** Recommend yes: `POST /waitList/leave` sets that entry to `Cancelled` with `timeClosed = NOW()`, only if it belongs to the session customer and is still `Waiting`. BR-20 already excludes cancelled entries from average-wait math, so this doesn't distort anything.
+- [x] **Leave the wait list.** Built 2026-10-06 (issue #346): `POST /waitList/leave` sets that entry to `Cancelled` with `timeClosed = NOW()`, only if it belongs to the session customer and is still in line (`Waiting` or `Offered`). BR-20 already excludes cancelled entries from average-wait math, so this doesn't distort anything.
+- [x] **One entry per size per customer.** Joining checks for an existing `Waiting` **or** `Offered` entry of that size, and locks the customer's row first so a double-click or a second tab can't add a second entry (2026-10-06).
 - [ ] **Seed history for the estimate.** The seed data has no `Completed` termination notices, so every estimate will use the fallback. Optional V1-10-0 update (1.9.0 went to the My Fleet test boats): add a handful of past, completed tenancies (a reservation with an end, plus its `Completed` notice) so testers can see the measured path run.
-- [x] **Servlet URL mapping.** `/waitList` (GET, `WaitListServlet`, forwards to `waitListLookup.jsp`) and, if approved, `/waitList/leave` (POST, `WaitListLeaveServlet`) — the same one-URL-per-servlet split as `/reservation` + `/reservation/waitlist`.
+- [x] **Servlet URL mapping.** `/waitList` (GET, `WaitListServlet`, forwards to `waitListLookup.jsp`) and `/waitList/leave` (POST, `WaitListLeaveServlet`) — the same one-URL-per-servlet split as `/reservation` + `/reservation/waitlist`.
 
 ---
 
@@ -66,11 +67,7 @@ Example: 24 slips of 40 ft, average tenancy 24 months → about **1 slip opens p
 
 Some openings aren't guesses: a tenant who has filed a termination notice is leaving on a known date. BR-24 says a valid notice must be counted when predicting availability, and a withdrawn one must not. So before falling back to the average, the estimate uses those known dates first:
 
-1. List the **known upcoming openings** for that slip size, soonest first — every `TerminationNotice` on a slip of that size whose reservation is still `Active` and whose status is:
-   - `Approved` → opens on `terminationDate`.
-   - `Submitted` or `Pending` → no date set yet, so assume the earliest date BR-21 allows: `noticeDate + 30 days`.
-   - `Withdrawn` / `Completed` → ignored.
-   - Any date already in the past counts as today.
+1. List the **known upcoming openings** for that slip size, soonest first. **As built (2026-10-06, #324):** a slip opens the day after its lease's last day, counted only when every `Active` reservation on the slip has a live notice (`Submitted`, `Pending`, `Approved` or `Completed`). One open-ended lease, including one booked to start later, keeps the slip taken. The last day is the notice's `terminationDate`; the site always records one, and an older notice without one uses the earliest date BR-21 allows, `noticeDate + 30 days`. `Withdrawn` never counts. A last day already passed means the slip is free now, so it shows as available rather than as an opening. `ReservationDAO.findUpcomingOpenings()` builds the list; it uses the same last-day rule as every availability count on the site.
 2. Let **K** = how many known openings there are, and **P** = your position.
 3. **If P ≤ K**, your wait ends on the **P-th known opening date**. Wait = that date − today.
 4. **If P > K**, the known openings cover the first K people. The rest wait on the average rate, starting from the last known opening (or today, if K = 0):
@@ -131,14 +128,14 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
 | *(none on GET)* | | | The page takes no input; everything comes from the database and the session |
-| `waitListId` | hidden | Yes, Leave only | The entry to leave. Only if Leave is approved |
+| `waitListId` | hidden | Yes, Leave only | The entry to leave |
 
 ## Back End Parameters
 
 | Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
 | `customerId` | `Integer` | Session (`sessionScope.customerId`) | Optional on GET — absent means signed out, and only the public summary is built. Required on Leave |
-| `waitListId` | `int` | Form field (Leave only) | Untrusted — only acted on if it belongs to the session customer and is still `Waiting` |
+| `waitListId` | `int` | Form field (Leave only) | Untrusted — only acted on if it belongs to the session customer and is still `Waiting` or `Offered`. Missing or not a number → 400 |
 | `notice` | `String` | Query string | `leftWaitList` after a successful Leave, drives the `statusPopup` toast |
 
 ## Database Returns
@@ -147,11 +144,11 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 | --- | --- | --- | --- |
 | *(new)* `WaitListDAO.countInLineBySize()` | `Connection` | `Map<Integer, Integer>` (sizeFt → count) | Every slip size present, `0` when nobody's waiting (`SlipSize LEFT JOIN WaitList`). Counts `Waiting` + `Offered` |
 | *(new)* `WaitListDAO.findOpenEntriesForCustomer()` | `Connection`, `int customerId` | `List<WaitListEntry>`, **empty list** if none | The customer's `Waiting`/`Offered` entries, each with `peopleAhead` computed in SQL (count of in-line entries for the same size with an earlier `timeJoined`, `waitListID` breaking ties) |
-| *(new)* `WaitListDAO.leave()` | `Connection`, `int waitListId`, `int customerId` | `boolean` | `true` if one row changed. `false` = not theirs, not `Waiting`, or doesn't exist — all treated the same |
+| `WaitListDAO.cancelEntryForCustomer()` | `Connection`, `int waitListId`, `int customerId` | `boolean` | `true` if one row changed. `false` = not theirs, no longer in line, or doesn't exist — all treated the same |
 | *(new)* `ReservationDAO.countOperationalSlipsBySize()` | `Connection` | `Map<Integer, Integer>` (sizeFt → N) | `slipStatus = 'operational'` only |
 | *(new)* `ReservationDAO.findTenureStats()` | `Connection` | `Map<Integer, TenureStats>` (sizeFt → average months + sample size) | From `Completed` termination notices joined to their reservations and slips. A size with no history is absent from the map. The estimator pools them for the whole-marina fallback |
-| *(new)* `ReservationDAO.findUpcomingOpenings()` | `Connection` | `Map<Integer, List<LocalDate>>` (sizeFt → dates, soonest first) | Rules in [Using the openings we already know about](#using-the-openings-we-already-know-about-br-24). Empty list for a size with none |
-| `ReservationDAO.countAvailableForSize()` | `Connection`, `int slipSizeFt` | `int` | Already exists |
+| `ReservationDAO.findUpcomingOpenings()` | `Connection`, `LocalDate today` | `Map<Integer, List<LocalDate>>` (sizeFt → dates, soonest first) | Built 2026-10-06 (#324). Rules in [Using the openings we already know about](#using-the-openings-we-already-know-about-br-24). A size with none is missing from the map |
+| `ReservationDAO.countAvailableForSize()` | `Connection`, `int slipSizeFt`, `LocalDate onDate` | `int` | Passed today. A slip whose tenant's last day has passed counts as free (#324) |
 
 ### Beans Used by the JSP
 
@@ -181,8 +178,8 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** Nothing to validate on GET. Leave, if built, confirms in a popup before posting.
-- **Server-side (source of truth):** The customer section is built only from the session `customerId`. Leave requires a session, and only changes a `Waiting` entry owned by that customer. The public section never includes customer IDs, names or join times — counts only.
+- **Client-side (UX only, not trusted):** Nothing to validate on GET. Leave confirms in a popup before posting.
+- **Server-side (source of truth):** The customer section is built only from the session `customerId`. Leave requires a session, and only changes a `Waiting` or `Offered` entry owned by that customer. The public section never includes customer IDs, names or join times — counts only.
 
 ## Error Handling
 
@@ -192,7 +189,8 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 | Signed in, not on any list | "You're not on the wait list." | "Your place in line" section |
 | All slips of a size out of service (N = 0) | "No estimate available right now." | That size's summary row |
 | Leave succeeds | "You've left the wait list." | `statusPopup` toast after redirect |
-| Leave fails (not theirs / already closed / bad id) | "That wait list entry couldn't be found." — same text every case | `statusPopup` toast |
+| Leave fails (not theirs / already closed) | None — the page reloads as it is. The status popup is not for errors, and the only ways here are an edited form or a card already left in another tab | — |
+| Leave with a missing or non-numeric `waitListId` | Standard 400 page | `error.jsp` |
 | Database failure | Standard servlet error page | `error.jsp` |
 
 ## Login State Differences
@@ -202,5 +200,5 @@ BR-20 notes that fulfilled entries let the marina track real wait times. Once th
 | Wait list counts per slip size | Shown | Shown |
 | Estimated wait for a new joiner | Shown | Shown |
 | Your position, people ahead, your estimate | Shown for each of your open entries | Replaced by a sign-in prompt |
-| Leave the wait list | Available on your own `Waiting` entries (if approved) | Not available |
+| Leave the wait list | Available on each of your own entries | Not available |
 | Joining the wait list | On the Reservation page, when a size is full (unchanged) | Not available — Reservation requires sign-in |

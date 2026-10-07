@@ -60,13 +60,11 @@ public class ReservationBoatServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
 
         Integer customerId = Utils.signedInCustomerId(request);
         if (customerId == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            writeError(response, "Please sign in before registering a boat.");
+            Utils.writeJson(response, false, "error", "Please sign in before registering a boat.");
             return;
         }
 
@@ -99,7 +97,7 @@ public class ReservationBoatServlet extends HttpServlet {
         }
         if (!errors.isEmpty()) {
             // The panel shows one message, so send the first, in form order.
-            writeError(response, errors.values().iterator().next());
+            Utils.writeJson(response, false, "error", errors.values().iterator().next());
             return;
         }
 
@@ -124,19 +122,19 @@ public class ReservationBoatServlet extends HttpServlet {
                 int slipSizeFt = Utils.slipSizeFor(boatLength);
                 int monthlyCents = Utils.toCents(boatLength.multiply(perFootRate));
 
-                response.getWriter().write(
-                        "{\"ok\":true,"
-                        + "\"boatId\":" + boatId + ","
-                        + "\"boatName\":\"" + Utils.jsonEscape(boatName) + "\","
-                        + "\"boatLength\":\"" + boatLength.toPlainString() + "\","
-                        + "\"slipSizeFt\":" + slipSizeFt + ","
-                        + "\"monthlyCents\":" + monthlyCents
-                        + "}");
+                // boatLength travels as text ("30.50"), as reservation.js
+                // has always read it.
+                Utils.writeJson(response, true,
+                        "boatId", boatId,
+                        "boatName", boatName,
+                        "boatLength", boatLength.toPlainString(),
+                        "slipSizeFt", slipSizeFt,
+                        "monthlyCents", monthlyCents);
 
             } catch (SQLException e) {
                 conn.rollback();
                 if (Utils.isDuplicateKey(e)) {
-                    writeError(response, "That HIN or boat registration is already in use.");
+                    Utils.writeJson(response, false, "error", "That HIN or boat registration is already in use.");
                     return;
                 }
                 throw e;
@@ -147,10 +145,4 @@ public class ReservationBoatServlet extends HttpServlet {
             throw new ServletException("Boat could not be saved.", e);
         }
     }
-
-    private void writeError(HttpServletResponse response, String message) throws IOException {
-        response.getWriter().write("{\"ok\":false,\"error\":\""
-                + Utils.jsonEscape(message) + "\"}");
-    }
-
 }

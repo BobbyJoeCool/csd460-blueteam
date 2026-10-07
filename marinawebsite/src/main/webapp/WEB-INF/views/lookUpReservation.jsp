@@ -213,7 +213,7 @@
 
                     <c:forEach var="reservation" items="${reservations}">
 
-                        <article class="reservation-card"
+                        <article class="detail-card detail-card--nested"
                                  data-confirmation="${fn:escapeXml(reservation.confirmationNumber)}"
                                  data-boat-name="${fn:escapeXml(reservation.boatName)}"
                                  data-location="Dock ${fn:escapeXml(reservation.dockNumber)}, Slip ${reservation.slipNumber} (${fn:escapeXml(reservation.slipCode)})"
@@ -296,19 +296,19 @@
                                  until the cutoff before its last day (BR-23).
                                  Each button opens a popup below. --%>
                             <c:if test="${reservation.cancellable or reservation.noticeAllowed or (reservation.active and reservation.noticeOpen)}">
-                                <div class="reservation-card__actions">
+                                <div class="detail-card__actions">
                                     <c:choose>
                                         <c:when test="${reservation.cancellable}">
                                             <button type="button" class="btn-outline btn-danger js-open-cancel">Cancel Reservation</button>
-                                            <span class="reservation-card__hint">Available until your lease starts.</span>
+                                            <span class="detail-card__hint">Available until your lease starts.</span>
                                         </c:when>
                                         <c:when test="${reservation.noticeAllowed}">
                                             <button type="button" class="btn-outline js-open-notice">Submit 30-Day Notice</button>
-                                            <span class="reservation-card__hint">Your lease has started, so ending it takes at least 30 days' notice.</span>
+                                            <span class="detail-card__hint">Your lease has started, so ending it takes at least 30 days' notice.</span>
                                         </c:when>
                                         <c:when test="${reservation.noticeWithdrawable}">
                                             <button type="button" class="btn-outline js-open-withdraw">Withdraw Notice</button>
-                                            <span class="reservation-card__hint">
+                                            <span class="detail-card__hint">
                                                 <c:choose>
                                                     <c:when test="${not empty reservation.withdrawDeadlineDisplay}">Changed your mind? You may withdraw this notice until ${noticeWithdrawalCutoffDays} days before your lease end date (<c:out value="${reservation.withdrawDeadlineDisplay}" />).</c:when>
                                                     <c:otherwise>Changed your mind? You may withdraw this notice until ${noticeWithdrawalCutoffDays} days before your lease end date.</c:otherwise>
@@ -316,7 +316,7 @@
                                             </span>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="reservation-card__hint">This notice can no longer be withdrawn. A notice may be withdrawn until ${noticeWithdrawalCutoffDays} days before the lease end date, which was <c:out value="${reservation.withdrawDeadlineDisplay}" />.</span>
+                                            <span class="detail-card__hint">This notice can no longer be withdrawn. A notice may be withdrawn until ${noticeWithdrawalCutoffDays} days before the lease end date, which was <c:out value="${reservation.withdrawDeadlineDisplay}" />.</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>

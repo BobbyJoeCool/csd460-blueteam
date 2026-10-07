@@ -80,9 +80,12 @@ public class WaitListServlet extends HttpServlet {
             Map<Integer, Integer> inLine = waitListDAO.countInLineBySize(conn);
             Map<Integer, Integer> operationalSlips =
                     reservationDAO.countOperationalSlipsBySize(conn);
+            // Slips whose tenants have given notice, by size (BR-24).
+            Map<Integer, List<LocalDate>> openings =
+                    reservationDAO.findUpcomingOpenings(conn, today);
 
             List<WaitListSummary> summaries =
-                    buildSummaries(conn, inLine, operationalSlips, today);
+                    buildSummaries(conn, inLine, operationalSlips, openings, today);
             request.setAttribute("waitListSummaries", summaries);
 
             if (customerId != null) {
@@ -92,6 +95,7 @@ public class WaitListServlet extends HttpServlet {
                 for (WaitListEntry entry : entries) {
                     entry.setEstimateLabel(estimateFor(
                             entry.getPosition(),
+                            openings.getOrDefault(entry.getSizeFt(), List.of()),
                             operationalSlips.getOrDefault(entry.getSizeFt(), 0),
                             today));
                 }
@@ -119,6 +123,7 @@ public class WaitListServlet extends HttpServlet {
             Connection conn,
             Map<Integer, Integer> inLine,
             Map<Integer, Integer> operationalSlips,
+            Map<Integer, List<LocalDate>> openings,
             LocalDate today) throws SQLException {
 
         List<WaitListSummary> summaries = new ArrayList<>();
@@ -133,17 +138,19 @@ public class WaitListServlet extends HttpServlet {
 
             /*
              * Free right now is a different question from how fast slips
-             * turn over: this counts slips with no Active reservation, while
+             * turn over: this counts slips no lease holds today, while
              * the estimate's N counts every operational slip, occupied ones
              * included, because those are the ones that come free later.
              */
-            boolean availableNow = reservationDAO.countAvailableForSize(conn, sizeFt) > 0;
+            boolean availableNow =
+                    reservationDAO.countAvailableForSize(conn, sizeFt, today) > 0;
             summary.setAvailableNow(availableNow);
 
             if (!availableNow) {
                 // Someone joining today would stand behind everyone in line.
                 summary.setEstimateLabel(estimateFor(
                         inLineCount + 1,
+                        openings.getOrDefault(sizeFt, List.of()),
                         operationalSlips.getOrDefault(sizeFt, 0),
                         today));
                 summary.setTenureSource(TENURE_SOURCE_DEFAULT);
@@ -158,16 +165,15 @@ public class WaitListServlet extends HttpServlet {
     /**
      * Runs the estimator for one position.
      *
-     * <p>The known-openings list is empty for now, so every estimate comes
-     * from the average turnover rate. Once
-     * {@code ReservationDAO.findUpcomingOpenings()} exists, its dates are
-     * passed here and the BR-24 path starts running - the estimator already
-     * handles them, so nothing else changes.
+     * <p>Known openings come first: the P-th person in line gets the P-th
+     * slip whose tenant has given notice (BR-24). Anyone past those waits
+     * on the average turnover rate from the last known opening.
      */
-    private String estimateFor(int position, int operationalSlips, LocalDate today) {
+    private String estimateFor(int position, List<LocalDate> knownOpenings,
+            int operationalSlips, LocalDate today) {
         return WaitEstimator.estimate(
                 position,
-                List.of(),
+                knownOpenings,
                 operationalSlips,
                 WaitEstimator.DEFAULT_TENURE_MONTHS,
                 today).label();
