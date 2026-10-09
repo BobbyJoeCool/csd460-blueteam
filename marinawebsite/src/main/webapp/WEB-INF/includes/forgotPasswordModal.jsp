@@ -134,16 +134,20 @@
 
             <div class="form-group">
                 <label for="forgotNewPassword">New password</label>
+                <%-- pattern and minlength mirror Utils.PASSWORD_PATTERN for the
+                     browser; passwordrules tells password generators (Safari,
+                     iCloud Keychain, 1Password) the same rules, since they
+                     don't read pattern. --%>
                 <input type="password"
-                        id="forgotNewPassword"
-                        name="newPassword"
-                        autocomplete="new-password"
-                        required
-                        minlength="10"
-                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
-                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
-                        aria-describedby="passwordRules"    
-                    >
+                       id="forgotNewPassword"
+                       name="newPassword"
+                       autocomplete="new-password"
+                       required
+                       minlength="10"
+                       pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                       passwordrules="minlength: 10; required: lower; required: upper; required: digit; required: [!$%*#];"
+                       title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                       aria-describedby="forgotPasswordRules">
                 <p class="field-error" id="forgotNewPasswordError"></p>
             </div>
 
@@ -153,31 +157,28 @@
                      exists to catch a typo before the password is changed to
                      something the customer didn't mean to type. --%>
                 <input type="password"
-                        id="forgotConfirmPassword"
-                        autocomplete="new-password"
-                        required
-                        minlength="10"
-                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
-                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
-                        aria-describedby="passwordRules"    
-                    >
+                       id="forgotConfirmPassword"
+                       autocomplete="new-password"
+                       required>
                 <p class="field-error" id="forgotConfirmPasswordError"></p>
             </div>
 
             <%--
               A checklist of its own rather than <jsp:include> of
-              WEB-INF/includes/passwordRules.jsp, and deliberately without ids.
-              passwordRules.js looks its rules up by element id and caches
-              them on load, so a second copy of that markup anywhere on the
-              same page gives two boxes sharing one set of ids and only the
+              WEB-INF/includes/passwordRules.jsp, and deliberately without
+              its ids. passwordRules.js looks its rules up by element id and
+              caches them on load, so a second copy of that markup anywhere on
+              the same page gives two boxes sharing one set of ids and only the
               first one in the document ever ticks. This modal ships with
               the login modal, which the header pulls into every page -
               including Registration, which has its own checklist. The ids
               are what collide, so these are keyed on data-rule instead and
               ticked by accountModals.js. Same classes, so passwordRules.css
-              styles it identically.
+              styles it identically. The container's own id is unique to this
+              modal and is only there for the New password field's
+              aria-describedby.
             --%>
-            <div class="password-rules" data-password-rules>
+            <div class="password-rules" id="forgotPasswordRules" data-password-rules>
                 <p>Your password must contain:</p>
                 <ul>
                     <li data-rule="length">At least 10 characters</li>

@@ -93,12 +93,16 @@
             <div class="password-fields">
                 <div class="form-group">
                     <label for="password">Password <span class="required-mark">*</span></label>
+                    <%-- pattern and minlength mirror Utils.PASSWORD_PATTERN for the
+                         browser; passwordrules tells password generators (Safari,
+                         iCloud Keychain, 1Password) the same rules, since they
+                         don't read pattern. --%>
                     <input type="password" id="password" name="password" required autocomplete="new-password"
                         minlength="10"
                         pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        passwordrules="minlength: 10; required: lower; required: upper; required: digit; required: [!$%*#];"
                         title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
-                        aria-describedby="passwordRules"    
-                    >
+                        aria-describedby="passwordRules">
                     <div class="field-error" id="passwordError">
                         <c:if test="${not empty requestScope.passwordError}">${fn:escapeXml(requestScope.passwordError)}</c:if>
                     </div>
@@ -106,12 +110,7 @@
 
                 <div class="form-group">
                     <label for="confirmPassword">Re-type Password <span class="required-mark">*</span></label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password"
-                        minlength="10"
-                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
-                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
-                        aria-describedby="passwordRules"    
-                    >
+                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
                     <div class="field-error" id="confirmPasswordError"></div>
                 </div>
             </div>
