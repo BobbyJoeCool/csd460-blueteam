@@ -135,10 +135,15 @@
             <div class="form-group">
                 <label for="forgotNewPassword">New password</label>
                 <input type="password"
-                       id="forgotNewPassword"
-                       name="newPassword"
-                       autocomplete="new-password"
-                       required>
+                        id="forgotNewPassword"
+                        name="newPassword"
+                        autocomplete="new-password"
+                        required
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                 <p class="field-error" id="forgotNewPasswordError"></p>
             </div>
 
@@ -148,9 +153,14 @@
                      exists to catch a typo before the password is changed to
                      something the customer didn't mean to type. --%>
                 <input type="password"
-                       id="forgotConfirmPassword"
-                       autocomplete="new-password"
-                       required>
+                        id="forgotConfirmPassword"
+                        autocomplete="new-password"
+                        required
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                 <p class="field-error" id="forgotConfirmPasswordError"></p>
             </div>
 

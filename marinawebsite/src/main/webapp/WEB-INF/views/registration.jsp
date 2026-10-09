@@ -93,7 +93,12 @@
             <div class="password-fields">
                 <div class="form-group">
                     <label for="password">Password <span class="required-mark">*</span></label>
-                    <input type="password" id="password" name="password" required autocomplete="new-password">
+                    <input type="password" id="password" name="password" required autocomplete="new-password"
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                     <div class="field-error" id="passwordError">
                         <c:if test="${not empty requestScope.passwordError}">${fn:escapeXml(requestScope.passwordError)}</c:if>
                     </div>
@@ -101,7 +106,12 @@
 
                 <div class="form-group">
                     <label for="confirmPassword">Re-type Password <span class="required-mark">*</span></label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password"
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                     <div class="field-error" id="confirmPasswordError"></div>
                 </div>
             </div>

@@ -68,10 +68,15 @@
             <div class="form-group">
                 <label for="newPassword">New password</label>
                 <input type="password"
-                       id="newPassword"
-                       name="newPassword"
-                       autocomplete="new-password"
-                       required>
+                        id="newPassword"
+                        name="newPassword"
+                        autocomplete="new-password"
+                        required
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                 <p class="field-error" id="newPasswordError"></p>
             </div>
 
@@ -80,9 +85,14 @@
                 <%-- Never submitted - checked here only, so a typo can't
                      become the password. --%>
                 <input type="password"
-                       id="confirmNewPassword"
-                       autocomplete="new-password"
-                       required>
+                        id="confirmNewPassword"
+                        autocomplete="new-password"
+                        required
+                        minlength="10"
+                        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!$%*#]).{10,}"
+                        title="Password must be at least 10 characters and contain an uppercase letter, a lowercase letter, a number, and one special character (! $ % * #)."
+                        aria-describedby="passwordRules"    
+                    >
                 <p class="field-error" id="confirmNewPasswordError"></p>
             </div>
 
