@@ -67,7 +67,12 @@ public class Utils {
     /** A 5-digit ZIP, optionally followed by a hyphen and the ZIP+4 suffix. */
     public static final Pattern ZIP_PATTERN = Pattern.compile("^\\d{5}(-\\d{4})?$");
 
-    /** 10+ characters, at least one uppercase, one lowercase, one digit, one of {@code ! $ % * #}. */
+    /**
+     * 10+ characters, at least one uppercase, one lowercase, one digit, one of {@code ! $ % * #}.
+     * Twins in formValidation.js (PASSWORD_RULES) and in the pattern/passwordrules
+     * attributes on the new-password fields in registration.jsp,
+     * changePasswordModal.jsp and forgotPasswordModal.jsp - keep all in step.
+     */
     public static final Pattern PASSWORD_PATTERN = Pattern.compile(
         "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!$%*#]).{10,}$");
 

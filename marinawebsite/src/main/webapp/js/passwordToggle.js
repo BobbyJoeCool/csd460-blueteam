@@ -52,6 +52,15 @@ MoffatBay.passwordToggle = (function () {
      */
     function setVisible(input, button, visible) {
         input.type = visible ? "text" : "password";
+        if (visible && input.value) {
+            // Safari marks a password it autofilled as "autofilled and
+            // obscured" and masks it with an !important UA style that
+            // survives the switch to type="text", so the field would still
+            // show dots. Any value set from script clears that state, so
+            // write the same value back. That also drops Safari's yellow
+            // "Strong Password" styling; the password itself is unchanged.
+            input.value = input.value;
+        }
         button.innerHTML = visible ? EYE_OPEN : EYE_CLOSED;
         button.setAttribute("aria-pressed", visible ? "true" : "false");
         button.setAttribute("aria-label", visible ? "Hide password" : "Show password");

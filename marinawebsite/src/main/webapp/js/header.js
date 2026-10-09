@@ -4,7 +4,8 @@
  * CSD 460 - Capstone Project - Marina Website Project
  *
  * Open/close behavior for the mobile hamburger menu in the shared header
- * and its dropdowns (Plan Your Stay, and the signed-in Welcome menu).
+ * and its dropdowns (Plan Your Stay, and the signed-in Welcome menu). On
+ * a desktop the dropdowns open on hover and stay open once clicked.
  */
 
 var MoffatBay = window.MoffatBay || {};
@@ -66,9 +67,39 @@ MoffatBay.headerNav = (function () {
 MoffatBay.dropdowns = (function () {
     "use strict";
 
-    // Wires one [data-dropdown]: its [data-dropdown-toggle] button opens
-    // and closes it, and Escape, a click outside, or tabbing out of it
-    // closes it.
+    // How long a hover-opened menu waits before closing once the mouse
+    // leaves, so it survives the small gap between the button and the
+    // panel, or a slightly wobbly move down into it.
+    var HOVER_CLOSE_DELAY_MS = 200;
+
+    // A real mouse - not a touch screen, which only "hovers" on tap.
+    var mouseQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    // Twin of header.css's mobile breakpoint. At this width Plan Your Stay
+    // opens in place inside the hamburger list, where opening on hover
+    // would shove the links below it up and down as the mouse passes.
+    var hamburgerQuery = window.matchMedia("(max-width: 40rem)");
+
+    function hoverOpens() {
+        return mouseQuery.matches && !hamburgerQuery.matches;
+    }
+
+    var menus = [];
+
+    function closeOthers(keep) {
+        menus.forEach(function (menu) {
+            if (menu !== keep) {
+                menu.close();
+            }
+        });
+    }
+
+    // Wires one [data-dropdown]. On a desktop, hovering over it opens it
+    // and moving the mouse away closes it again. Clicking its
+    // [data-dropdown-toggle] button pins it open until the button is
+    // clicked again, Escape is pressed, something outside it is clicked,
+    // or focus tabs out of it. On a touch screen it's click-only, so a tap
+    // opens it and the next tap closes it.
     function init(dropdown) {
         var toggle = dropdown.querySelector("[data-dropdown-toggle]");
 
@@ -76,17 +107,68 @@ MoffatBay.dropdowns = (function () {
             return null;
         }
 
+        var closeTimer = null;
+
+        var menu = {
+            close: function () {
+                setOpen(false);
+            }
+        };
+
         function isOpen() {
             return dropdown.classList.contains("is-open");
         }
 
+        // .is-pinned marks a menu that was clicked open, so the mouse
+        // leaving doesn't close it. header.css also keeps its button
+        // highlighted while it's pinned.
+        function isPinned() {
+            return dropdown.classList.contains("is-pinned");
+        }
+
         function setOpen(open) {
+            clearTimeout(closeTimer);
             dropdown.classList.toggle("is-open", open);
+            if (!open) {
+                dropdown.classList.remove("is-pinned");
+            }
             toggle.setAttribute("aria-expanded", open ? "true" : "false");
         }
 
+        // A click on a menu the mouse already opened pins it rather than
+        // closing it out from under the pointer.
         toggle.addEventListener("click", function () {
-            setOpen(!isOpen());
+            if (isPinned()) {
+                setOpen(false);
+                return;
+            }
+            closeOthers(menu);
+            setOpen(true);
+            dropdown.classList.add("is-pinned");
+        });
+
+        // The panel is inside the dropdown, so moving from the button down
+        // into the menu never counts as leaving. Together with Escape
+        // below, that meets WCAG 1.4.13 (Content on Hover or Focus): the
+        // menu can be moved into, stays put, and can be dismissed.
+        dropdown.addEventListener("mouseenter", function () {
+            if (!hoverOpens()) {
+                return;
+            }
+            clearTimeout(closeTimer);
+            if (!isOpen()) {
+                closeOthers(menu);
+                setOpen(true);
+            }
+        });
+
+        dropdown.addEventListener("mouseleave", function () {
+            if (!hoverOpens() || isPinned() || !isOpen()) {
+                return;
+            }
+            closeTimer = setTimeout(function () {
+                setOpen(false);
+            }, HOVER_CLOSE_DELAY_MS);
         });
 
         document.addEventListener("keydown", function (event) {
@@ -114,14 +196,8 @@ MoffatBay.dropdowns = (function () {
             }
         });
 
-        return {
-            close: function () {
-                setOpen(false);
-            }
-        };
+        return menu;
     }
-
-    var menus = [];
 
     document.querySelectorAll("[data-dropdown]").forEach(function (dropdown) {
         var menu = init(dropdown);

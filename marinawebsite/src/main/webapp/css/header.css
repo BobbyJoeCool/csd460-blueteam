@@ -196,12 +196,15 @@
     height: 2px;
     background-color: var(--color-nav-text-active);
 }
+/* A dropdown clicked open (.is-pinned, set by js/header.js) keeps its
+   button in the hover highlight until it closes. */
 .header-nav__links a:hover,
 .header-nav__links a:focus-visible,
 .nav-dropdown__menu a:hover,
 .nav-dropdown__menu a:focus-visible,
 .nav-dropdown__trigger:hover,
-.nav-dropdown__trigger:focus-visible {
+.nav-dropdown__trigger:focus-visible,
+.nav-dropdown.is-pinned .nav-dropdown__trigger {
     background-color: var(--color-golden-hour);
     color: var(--color-charcoal-navy);
 }
