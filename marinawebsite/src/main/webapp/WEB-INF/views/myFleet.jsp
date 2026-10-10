@@ -99,16 +99,16 @@
             </div>
         </c:if>
 
+        <%-- Add Boat sits on its own line under the heading, still above
+             the rule that closes the header. --%>
         <div class="fleet-header">
-            <div class="fleet-header_heading">
             <h2 class="fleet-header__title">
                 Your Boats
                 <c:if test="${not empty fleet}">
                     <span class="fleet-count-badge">${fn:length(fleet)} ${fn:length(fleet) == 1 ? 'boat' : 'boats'}</span>
                 </c:if>
             </h2>
-            
-            <button type="button" class="btn-primary" id="openAddBoat">Add Boat</button></div>
+            <button type="button" class="btn-primary fleet-header__add" id="openAddBoat">Add Boat</button>
         </div>
 
         <c:choose>

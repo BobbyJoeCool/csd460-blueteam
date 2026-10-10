@@ -14,223 +14,191 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 - Back End: Carolina
 - Testing:
 
+## Current Status (2026-10-10)
+
+**Built.** Registration creates the customer's account only. **Since 2026-10-09 it no longer takes a boat**: the boat column was removed, and a customer who wants to register a boat straight away uses the **Create Account & Go to My Fleet** button, which creates the account, signs them in and lands them on My Fleet with the Add Boat button waiting. Boat fields, their rules and their messages are documented in the My Fleet contract now.
+
 ## Open Questions / Decisions Needed
 
 ### Front End Owns
 
 - [x] **Form field `name` attributes:** Decided, see [What the Form Collects](#what-the-form-collects) below.
-- [x] **Confirm-password handling:** Checked client-side only. See [Confirm Password](#confirm-password) below.
-- [x] **Input length limits (HTML side):** Set, see the table below. Matched against the Customer and Boat columns from Module 3/4.
-- [x] **Address field shape:** Decided, splitting into four separate fields instead of one box. See [The Address Field](#the-address-field) below.
-- [x] **Boat registration fields:** Decided, adding every column the Boat table has, not just Boat Name and Boat Length. See [Boat Fields](#boat-fields) below.
+- [x] **Confirm-password handling:** Checked live in the browser and again by the server. See [Confirm Password](#confirm-password) below.
+- [x] **Input length limits (HTML side):** Set, see the table below. Matched against the Customer columns.
+- [x] **Address field shape:** Decided, four separate fields instead of one box. See [The Address Field](#the-address-field) below.
 - [x] **Country field:** Decided, 2026-09-04. See [Country](#country) below.
+- [x] **Boat registration:** **Moved to My Fleet, 2026-10-09.** See [Registering a Boat](#registering-a-boat) below.
 
 ---
 
 ### What the Form Collects
 
-The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) is the starting point, but the address and boat fields below go beyond what's on that mockup, see [The Address Field](#the-address-field) and [Boat Fields](#boat-fields) for why. The form ends up collecting:
+The Module 2 wireframe (`Module-2/Finalized WireFrames/Registration Page.pdf`) is the starting point; the address fields go beyond it, see [The Address Field](#the-address-field). The page has two columns, **Personal Information** (the shared `WEB-INF/includes/personalInfoCard.jsp`) and **User Information**, under a "* Required field" note:
 
 - First Name
 - Last Name
-- E-mail
 - Country Code (defaults to 1)
 - Phone
-- Street Address (Optional)
-- Address Line 2 (Optional, apartment/suite/PO box)
-- City (Optional)
-- State (Optional)
-- Zip Code (Optional)
 - Country
-- Boat Name
-- Registration Number (includes the state/province prefix)
-- Boat Length
-- Hull ID Number / HIN (Optional)
-- Boat Type (Optional)
-- Boat Beam (Optional)
-- Boat Year (Optional)
+- Street Address
+- Address Line 2 (Optional, apartment/suite/PO box)
+- City
+- State / Province (not applicable when Country is `OTHER`)
+- Zip Code
+- Email
 - Password
 - Re-type Password
-- a Submit button
+- Two submit buttons: **Create Account**, and **Create Account & Go to My Fleet** under "Want to register a boat?"
 
-Field names I'm using, matched to what they map to later: `firstName`, `lastName`, `email`, `phoneCountryCode`, `phone`, `streetAddress`, `streetAddress2`, `city`, `state`, `zipCode`, `country`, `boatName`, `regNumber`, `boatLength`, `hin`, `boatType`, `boatBeam`, `boatYear`, `password`, `confirmPassword`.
+Field names, matched to what they map to: `firstName`, `lastName`, `phoneCountryCode`, `phone`, `country`, `streetAddress`, `streetAddress2`, `city`, `state`, `zipCode`, `email`, `password`, `confirmPassword`, plus the hidden `redirectTo` and the second button's `registerBoatNext`.
+
+A **Clear Personal Info** button under the left column empties that column and puts Country back to US and Country Code back to 1. Under the buttons: "By creating an account you agree to our Privacy Policy" (linking `/privacy`), and "Already have an account? Log in".
 
 ### Password Rules
 
-The wireframe spells out the password rule right on the page: at least 10 characters, one uppercase letter, one lowercase letter, one number, and one special character from `! $ % * #`. As the user types, the page checks the password against these rules live and shows whichever specific rule isn't met yet right under the field (the mockup shows "Password must contain at least one uppercase letter" as an example). This is all client-side JavaScript, just for the user's benefit while typing. The back end still has to enforce the same rule when the password actually gets submitted, since a request can always skip the browser entirely.
+At least 10 characters, one uppercase letter, one lowercase letter, one number, and one special character from `! $ % * #`. The shared checklist (`WEB-INF/includes/passwordRules.jsp` + `js/passwordRules.js`) sits under the password fields and ticks each rule off live as the customer types. Both submit buttons stay disabled until every rule is met.
+
+The Password field also carries `minlength="10"`, a `pattern` matching `Utils.PASSWORD_PATTERN`, and a `passwordrules` attribute, so the browser and password managers (Safari, iCloud Keychain, 1Password) suggest a password that already passes. This is all for the customer's benefit; `RegisterServlet` enforces the same rule on submit, since a request can always skip the browser.
 
 ### Confirm Password
 
-The `confirmPassword` field is checked client-side to give the user immediate feedback and is also submitted to the Back End. `RegisterServlet` verifies that it matches `password`. The confirmation value is used only for validation and is never stored in the database.
+`confirmPassword` is checked live against `password` ("Passwords do not match." under Re-type Password) and is also submitted, so `RegisterServlet` checks the two match before creating the account. It is never stored.
 
 ### Phone Number
 
-The visible Phone box always shows the number formatted as `(###)-###-####` no matter how it's typed in, pasted, with dashes, dots, spaces, parens, or none of that, since a little JavaScript strips everything down to digits on every keystroke and rebuilds the display from those digits. Only digits ever matter; anything else typed just gets thrown away.
+The visible Phone box always shows the number formatted as `(###)-###-####` however it's typed or pasted; JavaScript strips it to digits on every keystroke and rebuilds the display (`MoffatBay.form.bindPhoneDisplay`, shared with Your Account). Backspacing over a bracket or dash removes the digit before it.
 
-What actually gets submitted isn't that visible field though. The formatted text is just for the user to look at. Underneath it there's a hidden field, still named `phone`, that always holds just the raw 10 digits, no parens or dashes, kept in sync with the visible one on every keystroke. So Back End always gets a clean 10-digit `phone`, never has to deal with parsing out a formatted string.
+What's submitted isn't that visible box. A hidden field named `phone` always holds just the raw 10 digits, kept in sync with the display, so Back End always gets a clean 10-digit `phone`. The visible box has no `name`.
 
-Country Code is a separate small box in front of Phone, defaulting to `1`, since that's not really part of the 10-digit number itself. Comes across as its own `phoneCountryCode` field, not bundled into `phone`.
-
-The 10-digit `phone` value fits fine in the existing `Customer.phone` column. `phoneCountryCode` now has its own column too — `Customer.phoneCountryCode VARCHAR(3) NOT NULL DEFAULT '1'`, added in `MoffatBayMarinaDB_V1-1-0_update.sql`.
+Country Code is a separate small box in front of Phone, defaulting to `1`, sent as its own `phoneCountryCode` field: 1 to 3 digits, no leading zero. It has its own column, `Customer.phoneCountryCode VARCHAR(3) NOT NULL DEFAULT '1'`.
 
 ### The Address Field
 
-The wireframe has one "Address (Optional)" text box, but the Customer table needs `streetAddress`, `city`, `state`, and `zipCode` as separate columns. Rather than have the back end try to parse one free-text box into four pieces, the form is splitting it into four separate fields up front: Street Address, City, State, and Zip Code. All four stay optional, matching both the wireframe's "(Optional)" tag and the fact that none of those columns are required on the Customer table.
+The wireframe has one "Address (Optional)" text box, but the Customer table stores `streetAddress`, `city`, `state` and `zipCode` separately, so the form asks for them separately rather than parsing one box. A second line, `streetAddress2`, holds an apartment, suite or PO box and has its own column.
 
-There's also a second line under Street Address (`streetAddress2`) for apartment number, suite, PO box, that kind of thing, since that's a standard part of any address form and the single Street Address box shouldn't have to carry both. This one doesn't have a column on the Customer table yet at all, not even a single combined one, so it needs a new `streetAddress2` column added alongside the schema change already flagged above. Always optional.
-
-**Update, built form deviates from this section:** `registration.jsp` as built marks Street Address, City, State, and Zip Code `required` — only `streetAddress2` is actually optional. That's a change from "(Optional)" on the Module 2 wireframe and from what this section originally said; flagging it here since it wasn't a documented decision. Confirm with the team whether that's intentional before Back End writes server-side validation against it.
+**Required, not optional.** The built form, and `CustomerValidator` on the server, require Street Address, City and Zip Code, and State unless Country is `OTHER`. Only Address Line 2 is optional. This replaced the wireframe's "(Optional)".
 
 ### Country
 
-**Added 2026-09-04**, not on the original Module 2 wireframe. A required `country` `<select>` in `personalInfoCard.jsp` — one of three options: `US` (United States, the default), `CA` (Canada), or `OTHER`. `OTHER` deliberately doesn't capture which country the customer is actually in; it exists only to drive things elsewhere on the page:
+**Added 2026-09-04**, not on the original wireframe. A required `country` `<select>` right after Phone, with three options: `US` (United States, the default), `CA` (Canada) or `OTHER`. `OTHER` doesn't record which country; it only changes the State field below it:
 
-- **Moved 2026-09-04** to right after Phone, before the address fields, since Country now also drives the mailing address's own State/Province field immediately below it — reads more naturally decided before the fields it affects instead of after.
-- A badge above Boat Registration (`#foreignRegistrationBadge` in `boatInfoCard.jsp`), shown only when Country is `OTHER`: *"If your boat is not registered in the United States or Canada, please call the Marina to register your boat after you make an account."*
-- Which option list, label, and Registration Number format Boat Registration's Registration State/Province field uses — see [Boat Fields](#boat-fields) below.
-- **Added 2026-09-04:** which option list, label, and required/disabled state the mailing address's own State field uses — same three-way swap as Registration State/Province: `US` shows `includes/stateOptions.jsp` labeled "State" (required); `CA` shows `includes/provinceOptions.jsp` labeled "Province" (required); `OTHER` disables the field entirely (labeled "State", not applicable — no state/province concept for an unspecified country) and it's not required server-side in that case. `registration.js`'s `applyCountryToAddressSection` mirrors `applyCountryToBoatSection` for this field (since 2026-10-06, #281, it calls the shared `MoffatBay.form.applyCountryToRegion` in `formValidation.js`, the same code Edit User Info uses, instead of keeping its own copy of the lists); `RegisterServlet.validateCustomer` only requires `state` when `country` isn't `OTHER`, and stores it as `NULL` when blank. **Since 2026-10-06 (#284)** the customer-field checks themselves are `util/CustomerValidator`, shared with Edit User Info, so both pages accept the same values and word each mistake the same way (Edit User Info's per-field wording, e.g. "First name cannot exceed 50 characters.", "Select a valid country."). Registration still shows one message in its banner: "Please complete all required fields." first if anything required is blank, otherwise the first problem in form order.
+| Country | State field label | Options | Required? |
+| --- | --- | --- | --- |
+| `US` | "State" | `WEB-INF/includes/stateOptions.jsp` | Yes |
+| `CA` | "Province" | `WEB-INF/includes/provinceOptions.jsp` | Yes |
+| `OTHER` | "State" | "Not applicable", field disabled | No; stored as `NULL` |
 
-`Customer.country VARCHAR(5) NOT NULL DEFAULT 'US'` was added in `MoffatBayMarinaDB_V1-2-0_update.sql` (`VARCHAR(5)`, not `CHAR(2)`, since `OTHER` is a literal stored value, not an ISO country code). `RegisterServlet.validateCustomer` requires it be one of the three values (`CustomerValidator.VALID_COUNTRIES` since #284).
+`registration.js` swaps the label, list and disabled state live through the shared `MoffatBay.form.applyCountryToRegion` in `formValidation.js`, the same code Your Account uses (#281).
 
-**Zip Code is not similarly affected — flagging for the team:** Canada doesn't have "zip codes"; it uses alphanumeric postal codes (e.g. `V8V 3K1`), a different shape than the US's 5-digit/ZIP+4 format. `zipCode`'s validation (`ZIP_PATTERN` client- and server-side) still only accepts the US shape regardless of Country, so a real Canadian or foreign postal code currently fails registration. Not fixed as part of this change — decide with the team whether Zip Code should become format-aware per Country (or just relabeled/loosened for `CA`/`OTHER`) before it comes up for a real customer.
+`Customer.country VARCHAR(5) NOT NULL DEFAULT 'US'` (`VARCHAR(5)`, not `CHAR(2)`, since `OTHER` is a stored value, not an ISO code). The customer's country also picks the Registration Number format on My Fleet and Book a Slip.
 
-### Boat Fields
+**Zip Code is not format-aware, flagged for the team:** Canada uses alphanumeric postal codes (e.g. `V8V 3K1`), but `zipCode` (`ZIP_PATTERN` client- and server-side) only accepts the US 5-digit or ZIP+4 shape regardless of Country, so a real Canadian or foreign postal code fails registration. Not fixed; decide whether Zip Code should follow Country before it comes up for a real customer.
 
-The wireframe only asked for Boat Name and Boat Length, but the Boat table has more columns than that, and some of them are required to insert a row at all. So the form is collecting every column the Boat table has, not just the two from the original mockup:
+### Registering a Boat
 
-- **Boat Name and Boat Length are always required.** The Boat table won't accept a row without them.
-- **Boat Type and Boat Beam are always optional**, no conditions attached.
-- **HIN is the primary/default way to identify a boat; Registration Number is the fallback** for an owner without a HIN handy — labeled and ordered that way in `boatInfoCard.jsp` (HIN field comes first).
+**Moved to My Fleet, 2026-10-09.** Registration used to have an optional Boat Information column (the shared `boatInfoCard.jsp`), saved in the same transaction as the account. It's gone. Instead:
 
-**Update 2026-09-04, supersedes this section's original identification rule:** identification used to depend on the boat's year (pre-1972 boats required Registration State + Number; 1972-or-later boats could use either). That rule is gone. **Neither HIN nor Registration Number is ever required to submit** — each one is still validated for format *if provided*, but a boat with neither is saved as-is. When the Boat Info card has been touched but has neither, `#identificationNote` shows instead of a validation error: *"If you don't have a HIN or Boat Registration, you can call the Marina at (360) 555-0142 for other options."* A "Clear Boat Info" button (`#clearBoatInfo`) lets someone who started the card without ID handy drop it in one click instead of getting stuck on the Boat Name/Length requirement with a half-filled card. Boat Year has no bearing on any of this anymore — it's just an optional field with no attached identification logic.
-
-**Update 2026-09-06, supersedes this section's original Registration State/Province design:** there's no longer a separate Registration State/Province `<select>`. The owner types the state/province prefix as part of Registration Number itself, and the format required follows the Country field above:
-
-| Country | Field label | Registration Number format |
-| --- | --- | --- |
-| `US` (default) | "Registration Number (State)" | `[A-Za-z]{2}[- ]?\d{4,7}[- ]?[A-Za-z]{2}` — leading 2 letters are the state code, e.g. `WN1234 AB` |
-| `CA` | "Registration Number (Province)" | `C\d{4,8}[- ]?[A-Za-z]{2}` — leading `C` is literal (Canada's country code, unchanged from before this update), e.g. `C1234 AB` |
-| `OTHER` | "Registration Number (State)" (unchanged) | *(field disabled — not applicable)* |
-
-`registration.js` swaps `#regNumberLabel`'s text and the field's `disabled`/placeholder live when Country changes, mirroring whichever format `boatInfoCard.jsp` rendered server-side for the initial load/round-trip. `RegisterServlet.validateBoat` takes the same `country` value to decide which pattern (`REG_NUMBER_PATTERN` or `CA_REG_NUMBER_PATTERN`) to check Registration Number against.
-
-Registration Number alone has to be unique on the Boat table (previously it was the `regState`+`regNumber` pair) — since the state prefix is now embedded in the string itself, a single-column `UNIQUE` is correct again. See the ERD's Design Decisions for the V1-3-0 schema change that dropped `Boat.regState`.
+- **Create Account & Go to My Fleet** (`name="registerBoatNext" value="true"`) is a second submit button for the same form. It creates the account exactly like Create Account, then lands on `/myFleet?registered=true` instead of the `redirectTo` page.
+- A boat is added on My Fleet (Add Boat) or from Book a Slip's Register a Boat panel. Both require a HIN or a Registration Number.
 
 ### Duplicate Email
 
-Email has to be unique on the Customer table, so submitting with an email that's already registered has to fail. The front end has no way to know ahead of time what emails are taken, it can't catch this one live like the password fields, so this depends entirely on the back end actually checking for it and telling the front end it happened. Carolina needs a function on her end that checks the email against existing accounts (either a lookup before the INSERT, or catching the database's unique constraint if the INSERT is attempted anyway) and reports back specifically that it was a duplicate email, not some other failure.
+Email is unique on the Customer table, so a second account with the same email has to fail, and the page can't know in advance which emails are taken.
 
-**Update, built form deviates from this section:** this section originally called for a popup. What's actually built in `registration.jsp` is a plain sticky-form redisplay instead — the form re-shows itself with every field's value carried over from `param.*` (works with a server-side forward, not a redirect, since a forward preserves the original request's parameters), plus three request-scope attributes the JSP already reads:
+**As built (since 2026-10-09):** `RegisterServlet` no longer looks the email up first. The insert hits the column's `UNIQUE` constraint, and the servlet forwards back with **"That email is already in use."** in the banner at the top of the page (`formError`), with everything typed still in the form. `emailError` (the message box under the Email field) is still on the page but nothing sets it now.
 
-- `formError` — a general banner at the top of the form (`role="alert"`)
-- `emailError` — shown inline under the Email field; this is where a duplicate-email message would go
-- `passwordError` — shown inline under the Password field
-
-So the concrete answer to "what attribute name and message does Back End set" (still an open checklist item below) is: **Back End should set `emailError`** on a duplicate-email failure and forward back to `registration.jsp` (not redirect), so the request parameters and this attribute are both still available to render. Whether that should instead be a popup, per the original plan, is a question for the team — the same modal-vs-page discussion that came up for the Login error display. There's a static "Already have an account? Log in" link on the page already, but it's just a placeholder (`preventDefault()`, does nothing yet) and isn't wired to the duplicate-email case specifically — the "opens the Login modal with `redirectTo` set to the landing page" behavior described below isn't implemented yet either way.
+The "Log in" link under the buttons opens the Login modal, carrying the page's `redirectTo` (or `/`), so a customer who already has an account can sign in from here instead.
 
 ### Back End Owns
 
-
-- [x] **Password hashing:** `RegisterServlet` hashes the submitted password with `Utils.hashPassword()` before inserting it. `LoginServlet` uses the same hashing method when checking a password.
+- [x] **Password hashing:** `RegisterServlet` hashes the password with `Utils.hashPassword()` (SHA-256), the same method `LoginServlet` uses to check it.
 - [x] **Customer table column mapping:** Form values are placed into a `Customer` object and inserted by `CustomerDAO.insertCustomer()`.
-- [x] **DAO method signature:** `CustomerDAO.insertCustomer(Connection, Customer, String)` returns the generated `customerID`.
-- [x] **Duplicate email response:** `CustomerDAO.findByEmail()` checks for an existing account. On a match, Back End sets `emailError` to `"An account with this email already exists."` and forwards to `registration.jsp`.
-- [x] **Optional boat registration:** When any boat information is entered, `RegisterServlet` validates the boat and uses `BoatDAO.insertBoat()` to return the generated `boatID`.
-- [x] **Boat ownership:** After inserting a boat, `BoatDAO.insertOwnership()` connects its `boatID` to the new `customerID` through the `BoatOwnership` table.
-- [x] **Auto-login after registration:** **Changed 2026-09-30 (#299, beta test):** the customer **is** signed in automatically. `RegisterServlet` loads the new account back by email and calls `CustomerSession.start()`, the same method `LoginServlet` uses. It was originally "not automatically logged in", but in beta testing a tester who clicked Book a Slip, registered, and landed on the home page signed out said it lost their place. If loading the account back fails, the account still exists, so registration falls back to the old behaviour (home page, signed out) rather than an error page.
-- [x] **Post-registration redirect/forward:** Success redirects to the `redirectTo` the customer arrived with (see the field table), checked with `Utils.safeRedirectTarget`, plus `registered=true` so the status popup says "Account created — welcome aboard" there. No `redirectTo`, an unsafe one, or one pointing back at `/register` goes to `/`. Validation or database failures forward to `registration.jsp` so request parameters and error attributes remain available.
-- [ ] **Input length limits:** Most database limits are enforced server-side. Validation still needs to confirm `streetAddress2` does not exceed 100 characters and `boatType` does not exceed 30 characters.
-- [x] **Servlet URL mapping:** `/register`.
+- [x] **DAO method signature:** `CustomerDAO.insertCustomer(Connection, Customer, String passwordHash)` returns the generated `customerID`.
+- [x] **Customer field validation:** `util/CustomerValidator.validate(fields, country, true)`, shared with Your Account (#284), so both pages accept the same values and word each mistake the same way. The banner shows one message: "Please complete all required fields." if anything required is blank, otherwise the first problem in form order. The password checks are this page's own.
+- [x] **Duplicate email response:** see [Duplicate Email](#duplicate-email) above.
+- [x] **Auto-login after registration:** **Changed 2026-09-30 (#299, beta test):** the customer is signed in automatically. `RegisterServlet` loads the new account back by email and calls `CustomerSession.start()`, the same method `LoginServlet` uses. If loading the account back fails, the account still exists, so it falls back to the home page, signed out, rather than an error page.
+- [x] **Post-registration redirect:** Create Account redirects to the `redirectTo` the customer arrived with (checked with `Utils.safeRedirectTarget`); Create Account & Go to My Fleet redirects to `/myFleet`. Either way `registered=true` is added, so the status popup says "Account created — welcome aboard" there. No `redirectTo`, an unsafe one, or one pointing back at `/register` goes to `/`. Validation and database failures forward back to `registration.jsp`, so the typed values and the message are still there.
+- [x] **Input length limits:** Checked server-side by `CustomerValidator`, including `streetAddress2` (100 characters).
+- [x] **Servlet URL mapping:** `/register` (GET shows the page, POST creates the account).
+- [x] **Abuse limits:** `/register` is one of the forms `PostRateLimitFilter` covers (10 posts a minute per address, then 429), and like every POST it needs `CsrfFilter`'s token.
 
 ## Front End Variables
 
-Every field or control the page's UI sends to the Back End (form fields, query-string params on a lookup page, etc.).
-
 | Field Name | Input Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| `firstName` | text | Yes | `maxlength="50"`, matches `Customer.firstName` |
-| `lastName` | text | Yes | `maxlength="50"`, matches `Customer.lastName` |
-| `email` | email | Yes | `maxlength="100"`, matches `Customer.email`; also gets checked client-side for a valid email shape |
-| `phoneCountryCode` | text | Yes, defaults to `"1"` | `inputmode="numeric"`, `maxlength="3"`; 1 to 3 digits, no leading zero; matches `Customer.phoneCountryCode`, see [Phone Number](#phone-number) above |
-| `phone` | text (hidden, formatted display shown separately) | Yes on the wireframe (not marked optional like Address is) | Always exactly 10 raw digits, no formatting characters; matches `Customer.phone`, see [Phone Number](#phone-number) above |
-| `streetAddress` | text | **Yes** — built as required, deviating from this contract's original "Optional," see [The Address Field](#the-address-field) above | `maxlength="100"`, matches `Customer.streetAddress` |
-| `streetAddress2` | text | **No, Optional** | `maxlength="100"`, matches `Customer.streetAddress2`, see [The Address Field](#the-address-field) above |
-| `city` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="50"`, matches `Customer.city` |
-| `state` | select | **Conditionally required** — required unless Country is `OTHER` (disabled, not applicable, in that case); see [Country](#country) above | `maxlength="2"`, matches `Customer.state` (2-letter state/province code); option list, label ("State"/"Province"), and disabled state follow `country` |
-| `zipCode` | text | **Yes** — built as required, see [The Address Field](#the-address-field) above | `maxlength="10"`, matches `Customer.zipCode` (allows the 5+4 format) |
-| `country` | select | Yes, defaults to `"US"` | One of `US` / `CA` / `OTHER`; matches `Customer.country`, see [Country](#country) above |
-| `boatName` | text | Yes, when adding a boat | `maxlength="50"`, matches `Boat.boatName` (NOT NULL on that table) |
-| `regNumber` | text | **No, Optional** — see [Boat Fields](#boat-fields) above | `maxlength="20"`, matches `Boat.regNumber`; includes the state/province prefix the owner types; format depends on `country`, see [Boat Fields](#boat-fields) above; unique on its own when supplied |
-| `boatLength` | number | Yes, when adding a boat | Matches `Boat.boatLength`, a decimal up to 999.9 feet, one decimal place |
-| `hin` | text | **No, Optional** | `maxlength="12"`, matches `Boat.HIN`; the primary/default identifier, see [Boat Fields](#boat-fields) above |
-| `boatType` | text | **No, Optional** | `maxlength="30"`, matches `Boat.boatType` (e.g. sailboat, powerboat, catamaran) |
-| `boatBeam` | number | **No, Optional** | Matches `Boat.boatBeam`, a decimal up to 999.9 feet, one decimal place |
-| `boatYear` | number | **No, Optional** | Matches `Boat.boatYear`, a whole number model year |
-| `password` | password | Yes | 10+ characters, needs an uppercase letter, a lowercase letter, a number, and one of `! $ % * #`. Checked live as the user types |
-| `confirmPassword` | password | Yes, client-side only | Never submitted, see [Confirm Password](#confirm-password) above |
-| `redirectTo` | hidden | No | **Added 2026-09-30 (#299).** Where to land after registering, as a context-relative path. Set by the Login modal's Register here link (`/register?redirectTo=/reservation`, or `/myFleet` after a signed-out visit there) and kept through failed attempts, because those forward. The page's own "Log in" link opens the Login modal with this value too, falling back to `/`, so signing in from here doesn't land back on this form. |
+| `firstName` | text | Yes | Matches `Customer.firstName` (50) |
+| `lastName` | text | Yes | Matches `Customer.lastName` (50) |
+| `phoneCountryCode` | text | Yes, defaults to `"1"` | `inputmode="numeric"`, `maxlength="3"`; 1 to 3 digits, no leading zero |
+| `phone` | hidden (formatted display shown separately) | Yes | Always exactly 10 raw digits, see [Phone Number](#phone-number) |
+| `country` | select | Yes, defaults to `"US"` | `US` / `CA` / `OTHER`, see [Country](#country) |
+| `streetAddress` | text | Yes | Matches `Customer.streetAddress` (100) |
+| `streetAddress2` | text | No | Matches `Customer.streetAddress2` (100) |
+| `city` | text | Yes | Matches `Customer.city` (50) |
+| `state` | select | Unless Country is `OTHER` | 2-letter state or province code; list, label and disabled state follow `country` |
+| `zipCode` | text | Yes | `maxlength="10"`, 5 digits or ZIP+4 |
+| `email` | email | Yes | Matches `Customer.email` (100); checked in the browser for a valid shape |
+| `password` | password | Yes | 10+ characters with an uppercase letter, a lowercase letter, a number and one of `! $ % * #`; checked live |
+| `confirmPassword` | password | Yes | Must match `password`; checked live and by the server |
+| `redirectTo` | hidden | No | **Added 2026-09-30 (#299).** Where to land after registering, as a context-relative path. Set by the Login modal's Register here link (`/register?redirectTo=/reservation`, for example) and kept through failed attempts, because those forward. Ignored when `registerBoatNext` is sent |
+| `registerBoatNext` | submit button value | No | **Added 2026-10-09.** `true` when the customer pressed Create Account & Go to My Fleet |
 
-**Boat column note and placeholders (updated 2026-09-30, #304, beta test):** the boat column's note reads "You can add a boat now or later. If you add one, the starred fields are required.", so the red stars on Boat Name and Boat Length make sense in an optional section. The pirate-themed placeholders (Jack, Sparrow, Tortuga, Black Pearl, `jack.sparrow@blackpearl.sea`) are gone: name and city fields have none, email shows `you@example.com`, and the rest read as examples (`e.g. 45`). A site-wide `::placeholder` colour in `site.css` keeps example text lighter than typed text at 4.9:1 contrast. The placeholders live in the shared `personalInfoCard.jsp` and `boatInfoCard.jsp`, so Your Account, Book a Slip and My Fleet show the same ones.
+**Placeholders (updated 2026-09-30, #304, beta test):** name and city fields have none, email shows `you@example.com`, and the rest read as examples (`e.g. 123 Harbor Rd`, `e.g. 98250`). A site-wide `::placeholder` colour in `site.css` keeps example text lighter than typed text at 4.9:1 contrast.
 
 ## Back End Parameters
 
-What the Back End reads for each Front End field, plus anything it pulls from elsewhere (session, query string) rather than the form itself.
-
 | Parameter Name | Type | Source (form field / session / query string) | Notes |
 | --- | --- | --- | --- |
-| `firstName` | `String` | Form field | Required; maximum 50 characters |
-| `lastName` | `String` | Form field | Required; maximum 50 characters |
-| `email` | `String` | Form field | Required; converted to lowercase; maximum 100 characters |
+| `firstName` | `String` | Form field | Trimmed; required; maximum 50 characters |
+| `lastName` | `String` | Form field | Trimmed; required; maximum 50 characters |
+| `email` | `String` | Form field | Trimmed and lowercased; required; maximum 100 characters; must match `Utils.EMAIL_PATTERN` |
 | `phoneCountryCode` | `String` | Form field | Required; 1–3 digits with no leading zero |
 | `phone` | `String` | Form field | Required; exactly 10 digits |
-| `streetAddress` | `String` | Form field | Required by the currently built form and servlet |
-| `streetAddress2` | `String` | Form field | Optional; blank value stored as `NULL` |
+| `streetAddress` | `String` | Form field | Required; maximum 100 characters |
+| `streetAddress2` | `String` | Form field | Optional; maximum 100 characters; blank stored as `NULL` |
 | `city` | `String` | Form field | Required; maximum 50 characters |
-| `state` | `String` | Form field | Required unless `country` is `OTHER`; converted to uppercase; exactly two characters if supplied; blank value stored as `NULL` |
-| `zipCode` | `String` | Form field | Required; five-digit or ZIP+4 format |
-| `country` | `String` | Form field | Required; converted to uppercase; must be `US`, `CA`, or `OTHER` |
-| `boatName` | `String` | Form field | Conditionally required when adding a boat |
-| `regNumber` | `String` | Form field | Converted to uppercase; optional, but if supplied its format (including the leading state/province prefix) is checked against `country`'s pattern (see [Boat Fields](#boat-fields) above) |
-| `boatLength` | `BigDecimal` | Form field | Conditionally required; must be greater than zero and no more than 999.9 |
-| `hin` | `String` | Form field | Optional; if supplied, converted to uppercase and checked against the HIN format |
-| `boatType` | `String` | Form field | Optional |
-| `boatBeam` | `BigDecimal` | Form field | Optional; if supplied, must be greater than zero and no more than 999.9 |
-| `boatYear` | `Integer` | Form field | Optional; if supplied, must be between 1800 and the current year |
-| `password` | `String` | Form field | Required; validated and hashed before storage |
-| `confirmPassword` | `String` | Form field | Required by the current servlet; must equal `password` |
+| `state` | `String` | Form field | Uppercased; required unless `country` is `OTHER`; exactly two characters if supplied; blank stored as `NULL` |
+| `zipCode` | `String` | Form field | Required; five digits or ZIP+4 |
+| `country` | `String` | Form field | Uppercased; required; `US`, `CA` or `OTHER` |
+| `password` | `String` | Form field | Required; must match `Utils.PASSWORD_PATTERN`; hashed before storage |
+| `confirmPassword` | `String` | Form field | Required; must equal `password` |
+| `redirectTo` | `String` | Form field (hidden) | Passed through `Utils.safeRedirectTarget`, falling back to `/` |
+| `registerBoatNext` | `String` | Form field (submit button) | `"true"` sends the new customer to `/myFleet` |
 
 ## Database Returns
 
-Every query or DAO method the Back End calls for this page, and its exact return shape — including what it returns on "no match" (null vs. empty object vs. exception).
-
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| `CustomerDAO.findByEmail()` | `String email` | `Customer` or `null` | Used to detect an already registered email |
-| `CustomerDAO.insertCustomer()` | `Connection`, `Customer`, `String passwordHash` | Generated `customerID` as `int` | Uses the registration transaction connection |
-| `BoatDAO.insertBoat()` | `Connection`, `Boat` | Generated `boatID` as `int` | Called only when boat information was entered |
-| `BoatDAO.insertOwnership()` | `Connection`, `boatID`, `customerID` | No return value | Inserts the customer/boat relationship into `BoatOwnership` |
-| Registration transaction | Customer and optional boat data | Commit or `SQLException` | All inserts commit together; any failure rolls back the complete registration |
+| `CustomerDAO.insertCustomer()` | `Connection`, `Customer`, `String passwordHash` | Generated `customerID` as `int` | Runs in its own transaction; a duplicate email throws a duplicate-key `SQLException` (see [Duplicate Email](#duplicate-email)) |
+| `CustomerDAO.findByEmail()` | `String email` | `Customer` or `null` | Called after the insert commits, to load the new account for `CustomerSession.start()` |
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** First name, last name, email, phone, country code, country, boat name, and boat length (the last two only once any boat field is touched) are required before the form lets you submit. Everything else (street address, address line 2, city, state, zip, HIN, registration number, boat type, boat beam, boat year) is optional. Email gets checked for a valid shape. Phone isn't submittable until all 10 digits are entered, formatting happens live as you type, see [Phone Number](#phone-number) above. Password gets checked live against all five rules above (length, uppercase, lowercase, number, special character). Re-type Password gets checked live against the password field for a match. Registration Number's label/placeholder/disabled state (Boat Fields) and the mailing address's own State/Province field's option list, label, required-ness, and disabled state both switch live with Country, see [Country](#country) and [Boat Fields](#boat-fields) above.
-- **Server-side (source of truth):** `RegisterServlet` validates all required customer fields, email format, country code, 10-digit phone number, address lengths, state length (only enforced/required when supplied — see [Country](#country) above), ZIP format, country value, password rules, and matching passwords. Boat registration is optional. If every boat field is blank, no boat is created. If any boat field is entered, Boat Name and Boat Length are required. HIN, if supplied, must match the HIN format. Registration Number, if supplied, must match the format for the customer's `country`, including its leading state/province prefix (see [Boat Fields](#boat-fields) above) — but neither HIN nor Registration is ever required outright. Boat length, beam, and year must also be valid numeric values within the accepted ranges.
-- **Boat fields, updated 2026-10-01 (#253):** `RegisterServlet` no longer has its own boat checks. It calls the shared `BoatValidator.validateAdd(...)`, the same rules Book a Slip and My Fleet use, with `requireIdentifier = false`, so a boat with neither a HIN nor a Registration Number is still saved, with the call-the-marina note (BR-08). The banner shows the first failing field's message. This fixed a boat name over 50 characters being reported as a bad length, and a boat type over 30 characters failing at the database.
-- **Re-adding a removed boat, added 2026-10-01 (#254):** removing a boat keeps its row, so a boat whose HIN or Registration Number is already on file is now handled by who owns it. If **nobody owns it now** (its owner removed it, or sold it), adding it **reuses the existing row**: `BoatDAO.addOrReclaim` updates the details and opens a new ownership, so the boat keeps one ID and its reservation history. If **this customer** already owns it: "That boat is already in your fleet." If **another customer** owns it: "This boat is registered to another account. Please contact the marina office." (never saying whose). A HIN and Registration Number that belong to two different boats, or a Registration Number whose boat on file has a different HIN, are refused with a call-the-office message. The same rules apply on Registration, Book a Slip and My Fleet. Edit still refuses any HIN or Registration Number another boat row uses.
+- **Client-side (UX only, not trusted):** Both submit buttons stay disabled until every required field is filled (a disabled State counts as filled), the email has a valid shape, the phone has all 10 digits, the country code is valid, the ZIP is 5 digits or ZIP+4, all five password rules pass, and Re-type Password matches. Phone formats as you type. The State field's label, list and disabled state follow Country live.
+- **Server-side (source of truth):** `RegisterServlet` runs `CustomerValidator` over every customer field with every required field required, then checks the password fields itself: both filled, the password matches the rules, and the two match. The first failure is shown in the banner and nothing is saved.
 
 ## Error Handling
 
-Every user-facing error condition this page can hit, and exactly what the user sees.
-
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| Password missing one of the five rules while typing | "Password must contain at least [whichever rule isn't met yet]." (e.g. "Password must contain at least one uppercase letter") | Directly under the Password field, live as the user types |
-| Re-type Password doesn't match Password | "Passwords do not match." | Directly under the Re-type Password field, live as the user types |
-| A required field is left blank on submit | Browser's default "please fill out this field" prompt (native HTML `required` validation) | Next to the empty field |
-| Email already registered (caught by Back End on submit, not something Front End can check ahead of time) | Popup: something like "An account with this email already exists." Exact wording is Back End's call, see [Duplicate Email](#duplicate-email) above. Popup also includes a "Log In" button | Popup, shown once the submit response comes back. "Log In" opens the Login modal with `redirectTo` set to the landing page, so a successful login lands there |
+| Password still missing a rule, while typing | The rule stays unticked in the "Your password must contain" checklist | Under the password fields, live |
+| Re-type Password doesn't match | "Passwords do not match." | Under Re-type Password, live |
+| Phone incomplete, while typing | "Phone number needs all 10 digits." | Under Phone, live |
+| Country code invalid, while typing | "Enter a 1 to 3 digit country code (no leading zero)." | Under the country code box, live |
+| ZIP invalid, while typing | "Enter a 5-digit ZIP, or ZIP+4 like 12345-6789." | Under Zip Code, live |
+| Email invalid, while typing | "Enter a valid email address." | Under Email, live |
+| A required field blank on submit (JavaScript off, or a hand-made request) | "Please complete all required fields." | Red banner under the hero (`formError`) |
+| State missing for US or CA | "State/Province is required." | Banner |
+| A customer field fails its format check | `CustomerValidator`'s message for it, e.g. "Enter a valid ZIP code." or "First name cannot exceed 50 characters." | Banner |
+| Password doesn't meet the rules | "Password does not meet the required rules." | Banner |
+| Passwords don't match | "Passwords do not match." | Banner |
+| Email already registered | "That email is already in use." | Banner |
+| Any other database failure | "Registration could not be completed. Please try again." | Banner |
+| Too many posts from one address | "Easy Does It" page: "That form has been sent a lot in the last minute, so we've paused it…" (429) | `error.jsp` |
+| Account created | "Account created — welcome aboard" | Shared status popup, on the page the customer lands on |
 
 ## Login State Differences
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Registration page | Page can be opened normally (no gate preventing access) | Page can be opened normally |
+| Registration page | Opens normally; nothing stops a signed-in customer from making a second account. Registering signs the browser in as the new account | Opens normally |
+| Header | Welcome menu and Log Out | Log In button |

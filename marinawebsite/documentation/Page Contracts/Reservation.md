@@ -46,11 +46,13 @@ A dropdown of boats they already own, by name with the length next to it, like "
 
 Boat name and length aren't typed in by hand, which covers two of the three things the assignment asks for. If someone can retype them then someone can claim their 44 ft boat is 24 ft and book a slip it doesn't fit in, and it'd mean a second version of "this boat" floating around that never connects to the real one.
 
-Boat details are optional at signup, so a customer can arrive owning nothing. In that case the dropdown is greyed out, the button is off, and a Register a Boat panel opens by itself. If they do have boats there's a "Register another boat" button next to the dropdown.
+Registration doesn't take a boat (since 2026-10-09), so a new customer can arrive owning nothing. In that case the dropdown is greyed out, the button is off, and a Register a Boat panel opens by itself, saying "You'll need a registered boat before you can reserve a slip." If they do have boats there's a "Register another boat" button next to the dropdown.
 
-That panel reuses the boat fields off the Registration page rather than me building a second copy of the same form. **Saving from it doesn't reload the page**, which is the important part. The boat gets saved in the background, turns up in the dropdown already selected, and anything already filled in is still sitting there. It's the first thing on the site that saves without reloading, and it's why the shared status popup in the header exists at all, since there's no new page for a confirmation to appear on.
+**Arriving from My Fleet.** Each unreserved boat on My Fleet has a **Book a Slip →** link to `/reservation?boatId=NN`. `reservation.js` reads that on load and selects the boat if it's in the dropdown; any other id is ignored, and the server re-checks the boat on submit as always.
 
-**Fixed since first built:** the panel's page-behind-it originally kept scrolling while the panel was open (and the mouse wheel would inconsistently scroll the panel or the page underneath it). The main page's scroll is now locked for as long as the panel is open (`document.body.style.overflow = "hidden"`, cleared on close), and the panel's own header (close button, title) is pinned with `position: sticky` so it stays visible even if the form inside scrolls.
+The panel reuses the shared boat fields (`WEB-INF/includes/boatInfoCard.jsp`, the same card My Fleet uses) rather than a second copy of the same form. **Saving from it doesn't reload the page**, which is the important part. The boat gets saved in the background, turns up in the dropdown already selected, and anything already filled in is still sitting there. It's the first thing on the site that saves without reloading, and it's why the shared status popup in the header exists at all, since there's no new page for a confirmation to appear on.
+
+The panel is the site's shared `.modal` (`#boatPanel`): a fixed overlay over the page that scrolls on its own when the form is taller than the window, closed by its ×, the backdrop or Escape.
 
 ### Choosing a Dock
 
@@ -84,9 +86,9 @@ If the size is full they're told, then asked whether they want the wait list for
 
 It's a courtesy though, not a promise. If the page sits open while someone else takes the last 40 ft slip, what's on screen is out of date, so the server has the final say on submit and can still come back and say the size went. Same message and same question either way, so from the customer's side it's one behaviour that turned up a bit later than usual.
 
-**Boats over 50 ft are a separate case and get no wait list offer.** There's no size bigger to wait for, so offering it would be offering something that can never happen. They get the marina's phone number instead. Registration accepts a length up to 999.9 ft, so a 60 ft boat can genuinely exist on an account.
+**Boats over 50 ft are a separate case and get no wait list offer.** There's no size bigger to wait for, so offering it would be offering something that can never happen. They get the marina's phone number instead. A boat can be registered up to 999.9 ft (with a warning past 50 ft), so a 60 ft boat can genuinely exist on an account.
 
-The assignment asks to be able to cancel a reservation, which should exists on the Reservation Lookup Page or the Reservation Summary Page (probably the Reservation Summary Page, as the Reservation Lookup can redirect to the Reservation Summary Page when a reservation is found).
+Cancelling a reservation, and giving 30 days' notice once a lease has started, happen on My Reservations. See that contract.
 
 ### Back End Owns
 
@@ -99,7 +101,7 @@ The assignment asks to be able to cancel a reservation, which should exists on t
 - [x] **Saving a boat from the panel:** Built — `ReservationBoatServlet` (`/reservation/boat`). Success: `{"ok":true,"boatId":...,"boatName":...,"boatLength":...,"slipSizeFt":...,"monthlyCents":...}` — the same shape as one entry in the page-load boat list, as asked for below. Failure: `{"ok":false,"error":"..."}`, plain enough to show as-is. **Also since fixed:** the servlet originally had no `@MultipartConfig`, so `reservation.js` posting this form as `FormData` (always `multipart/form-data`) meant the server never actually saw any of the submitted fields — every save looked like a blank submission and failed with "required" errors no matter what was typed. Fixed by adding `@MultipartConfig` to both this servlet and `ReservationServlet`. Also added: saving now requires at least one of HIN or Registration Number (previously neither was ever required, matching Registration's rule — this page's rule is deliberately stricter, since you can't reserve a slip for a boat nobody can identify).
 - [x] **A successful booking:** Built — `{"ok":true,"confirmationNumber":"MB-00061"}`, and the page redirects (`window.location.href`, not a form submit) to `/reservationSummary?confirmation=MB-00061` — **note: no `.jsp`** (see the correction under [Handing over to the summary page](#handing-over-to-the-summary-page) below, this section originally said `reservationSummary.jsp`, which is wrong).
 - [x] **A failed booking:** Built, and told apart exactly as asked: `{"ok":false,"boatError":"..."}`, `{"ok":false,"dockError":"..."}`, `{"ok":false,"dateError":"..."}`, and for a full size, `{"ok":false,"sizeFull":true,"slipSizeFt":40}` (marina-wide) or the same plus `"dockId":3` (just that one dock, so the page greys out only that dock's card for that size instead of the whole size).
-- [x] **Joining the wait list:** Built (this was the last piece finished) — `ReservationWaitlistServlet` (`/reservation/waitlist`), takes `slipSizeFt`, answers `{"ok":true}`, `{"ok":false,"alreadyWaiting":true}`, or `{"ok":false,"error":"..."}`. `WaitListDAO.isWaiting()` is checked before `WaitListDAO.insert()` specifically so a double-click (or the "already waiting" case) can't write a second `Waiting` row for the same customer/size. **Scope note:** only the "join" side is built. There's no way yet to look the wait list up, see your position in it, or cancel an entry — that's the separate, not-yet-built Wait List Lookup page (see its own contract).
+- [x] **Joining the wait list:** Built (this was the last piece finished) — `ReservationWaitlistServlet` (`/reservation/waitlist`), takes `slipSizeFt`, answers `{"ok":true}`, `{"ok":false,"alreadyWaiting":true}`, or `{"ok":false,"error":"..."}`. `WaitListDAO.lockForCustomer()` then `WaitListDAO.isWaiting()` (a `Waiting` **or** `Offered` entry) are checked before `WaitListDAO.insert()`, so a double-click or a second tab can't write a second entry for the same customer and size. On success the page goes to the Wait List page (`/waitList?notice=waitListJoined&size=40`), where the customer sees their place in line and can leave the list. See the Wait List contract.
 - [x] **Is electric its own figure or folded into the total?** Its own. The summary shows it on a separate line, only when the box is ticked.
 - [x] **Servlet URL mappings:** Built — `/reservation` (page load + booking), `/reservation/boat` (boat save), `/reservation/waitlist` (wait list join).
 - [x] **Cancelling a reservation:** Built, and landed where this section guessed it would — on the Reservation Summary page (`ReservationSummaryServlet`, `POST` with `action=cancel`), not the Reservation Lookup page. **Moved 2026-09-24:** cancelling is now on My Reservations (`POST /reservations/cancel`), only before the lease starts; after that the customer gives 30 days' notice there instead. The Summary page is only the confirmation screen. See the Look Up Reservation and Reservation Summary contracts.
@@ -142,13 +144,13 @@ Send the price already worked out, and as a whole number of cents rather than do
 ## Scaffold Include
 
 ```jsp
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
 <!-- Reservation page content -->
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 ```
 
 > The `activePage` value `"reservation"` must match what the header checks.
@@ -166,7 +168,7 @@ What the page sends when someone books.
 
 No boat name, no boat length, no slip number, no customer ID, no price. Name and length belong to the boat record, nobody picks a slip, only a dock, we know who they are because they're signed in, and sending a price from the page would just invite somebody to send a different one.  THe slip size is already calculated.
 
-**The Register a Boat panel** posts on its own and never rides along with a booking. Same fields and same names as the Registration page's boat card, so nothing needs renaming, see that contract's Front End Variables for the full list.
+**The Register a Boat panel** posts on its own to `/reservation/boat` and never rides along with a booking. Same fields and same names as My Fleet's Add Boat, since both use `boatInfoCard.jsp`; see the My Fleet contract's Front End Variables for the full list.
 
 **Joining the wait list** sends one thing, `slipSizeFt`, which is `26`, `40` or`50`. It needs an answer back rather than just doing it, see the wait list item in [Back End Owns](#back-end-owns).
 
@@ -196,22 +198,23 @@ No boat name, no boat length, no slip number, no customer ID, no price. Name and
 | `ReservationDAO.findAvailableSlip()` | `Connection`, `dockId`, `slipSizeFt`, `LocalDate startDate` | `Integer` slip id, or `null` | `null` means that dock has nothing free of that size for that start date. Locks the returned row with `FOR UPDATE` |
 | `ReservationDAO.countAvailableForSize()` | `Connection`, `slipSizeFt`, `LocalDate onDate` | `int` | Marina-wide count for that start date, used to tell "just this dock is full" from "the whole size is gone" |
 | `ReservationDAO.insert()` | `Connection`, `Reservation` | `String` confirmation number | Inserts with a temporary placeholder, then updates to the final `MB-#####` format once the generated `reservationID` is known |
-| `WaitListDAO.isWaiting()` | `Connection`, `customerId`, `slipSizeFt` | `boolean` | Checked before `insert()` so a customer can't end up with two `Waiting` rows for the same size |
+| `WaitListDAO.lockForCustomer()` | `Connection`, `customerId` | — | Locks the customer's row first, so two join requests take turns |
+| `WaitListDAO.isWaiting()` | `Connection`, `customerId`, `slipSizeFt` | `boolean` | `true` for a `Waiting` or `Offered` entry. Checked before `insert()` so a customer can't end up with two entries for the same size |
 | `WaitListDAO.insert()` | `Connection`, `customerId`, `slipSizeFt` | none (throws on failure) | |
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** A boat has to be picked, then a dock, **then a start date** (**updated** — originally only boat + dock gated the button; the date is now checked too, both on boat/dock change and on the date field's own `change` event, not just at submit time) before the button turns on. The date picker won't offer anything earlier than today. Availability is checked against the on-screen numbers every time the boat changes, and the button switches off when the size is full or nothing is picked yet. **Added:** a status line under the button (`#submitBlockedReason`) now names whichever one of those is still missing ("Choose a dock to continue.", "Choose a start date to continue.", etc.), instead of just a disabled button with no explanation. **Updated 2026-09-30 (#301, beta test):** a start date in the past has its own reason, "Start date can't be in the past.", and the field shows "Start date can't be in the past. Choose today or later." as soon as the date is entered. The picker's `min` stops the calendar offering a past day, but not a date typed in by hand, and a tester who typed one was told only "Choose a start date to continue." In the boat panel, name and length are required, and HIN, registration number and boat year get format-checked if they're filled in; **also now required: at least one of HIN or Registration Number** (previously neither was ever required — this page is deliberately stricter than Registration here, since a boat with no identifier at all shouldn't be reservable). Those are the same checks Registration does, and literally the same code: `registration.js` can't be loaded on this page (it wires up elements that only exist over there and would throw), but `formValidation.js` is already here via the header, so the rules are shared rather than copied.
+- **Client-side (UX only, not trusted):** A boat has to be picked, then a dock, **then a start date** (**updated** — originally only boat + dock gated the button; the date is now checked too, both on boat/dock change and on the date field's own `change` event, not just at submit time) before the button turns on. The date picker won't offer anything earlier than today. Availability is checked against the on-screen numbers every time the boat changes, and the button switches off when the size is full or nothing is picked yet. **Added:** a status line under the button (`#submitBlockedReason`) now names whichever one of those is still missing ("Choose a dock to continue.", "Choose a start date to continue.", etc.), instead of just a disabled button with no explanation. **Updated 2026-09-30 (#301, beta test):** a start date in the past has its own reason, "Start date can't be in the past.", and the field shows "Start date can't be in the past. Choose today or later." as soon as the date is entered. The picker's `min` stops the calendar offering a past day, but not a date typed in by hand, and a tester who typed one was told only "Choose a start date to continue." In the boat panel, name and length are required, and HIN, registration number and boat year get format-checked if they're filled in; **also now required: at least one of HIN or Registration Number** (previously neither was ever required — this page is deliberately stricter than Registration here, since a boat with no identifier at all shouldn't be reservable). Those are the same checks My Fleet does, and literally the same code: both pages load the shared `js/boatFields.js`, so the rules are shared rather than copied.
 - **Confirm before booking (added 2026-09-30, #302, beta test):** Once the client-side checks pass, Reserve My Slip opens a "Book this slip?" popup (the shared `.modal`, `#confirmBookingModal`) instead of booking straight away, e.g. "Book a 50 ft slip on Dock B, starting Oct 15, 2026, for $483.00/mo?", with **Book Slip** and **Go Back**. The question is read from the Reservation Summary card's own text, so the two can't disagree, and it names the dock and size, not a slip number, because the server assigns the slip. Only Book Slip sends the `POST`; Go Back, the x, the backdrop and Escape leave the form as it was.
 - **Server-side (source of truth):** Built, in `ReservationServlet.doPost()` and `ReservationBoatServlet.doPost()` — everything the client-side list above checks gets checked again. Boat ownership is re-verified against a fresh DB lookup (never trusts a submitted `boatId` just because it parsed), the slip pick is re-derived from boat length server-side, and two requests racing for the last slip of a size can't both win: the booking locks the size first (`lockSlipSize()`, #323) and checks availability for the requested start date. None of the client-side conveniences (greyed-out button, date picker's minimum, the boat panel's HIN-or-reg-number nudge) are trusted as protection on their own.
 - **Register a Boat panel, updated 2026-10-01 (#253):** `ReservationBoatServlet` no longer has its own boat checks. It calls the shared `BoatValidator.validateAdd(...)` with `requireIdentifier = true` (a boat about to be booked needs a HIN or Registration Number), and the panel shows the first failing field's message. Duplicate HINs and registration numbers are now caught with a clear message before saving, not only by the database.
-- **Re-adding a removed boat, added 2026-10-01 (#254):** removing a boat keeps its row, so a boat whose HIN or Registration Number is already on file is now handled by who owns it. If **nobody owns it now** (its owner removed it, or sold it), adding it **reuses the existing row**: `BoatDAO.addOrReclaim` updates the details and opens a new ownership, so the boat keeps one ID and its reservation history. If **this customer** already owns it: "That boat is already in your fleet." If **another customer** owns it: "This boat is registered to another account. Please contact the marina office." (never saying whose). A HIN and Registration Number that belong to two different boats, or a Registration Number whose boat on file has a different HIN, are refused with a call-the-office message. The same rules apply on Registration, Book a Slip and My Fleet. Edit still refuses any HIN or Registration Number another boat row uses.
+- **Re-adding a removed boat, added 2026-10-01 (#254):** removing a boat keeps its row, so a boat whose HIN or Registration Number is already on file is now handled by who owns it. If **nobody owns it now** (its owner removed it, or sold it), adding it **reuses the existing row**: `BoatDAO.addOrReclaim` updates the details and opens a new ownership, so the boat keeps one ID and its reservation history. If **this customer** already owns it: "That boat is already in your fleet." If **another customer** owns it: "This boat is registered to another account. Please contact the marina office." (never saying whose). A HIN and Registration Number that belong to two different boats, or a Registration Number whose boat on file has a different HIN, are refused with a call-the-office message. The same rules apply on Book a Slip and My Fleet, the two places a boat can be added. Edit still refuses any HIN or Registration Number another boat row uses.
 
 ## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| Not signed in | "Please sign in to reserve a slip." | The sign-in popup, opened for them, returning them here |
+| Not signed in | "Sign In to Reserve a Slip" panel with a Sign In button (HTTP 401), in place of the form; signing in returns here (#257). A booking POST without a session answers "Please sign in to reserve a slip." | The page / the form's banner |
 | They own no boats | "You'll need a registered boat before you can reserve a slip." | Above the boat panel, which opens on its own |
 | No boat picked | "Select a boat for this reservation." | Under the dropdown |
 | The boat isn't theirs | "Select a boat for this reservation." | Under the dropdown. Same message on purpose, so a probed boat id can't be told from an empty one |
@@ -227,7 +230,9 @@ No boat name, no boat length, no slip number, no customer ID, no price. Name and
 | Wait list joined | "You're on the wait list for a 40 ft slip." | The wait list page, after they're sent there |
 | Boat panel details wrong | Whatever was wrong with it | Inside the panel, which stays open |
 | Boat panel has neither HIN nor Registration Number (**new**) | "Enter either a HIN or a Registration Number." | Inside the panel, both client- and server-side |
-| Boat already registered | "That HIN or boat registration is already in use." | Inside the panel |
+| Boat already in this customer's fleet | "That boat is already in your fleet." | Inside the panel |
+| Boat owned by another customer | "This boat is registered to another account. Please contact the marina office." | Inside the panel |
+| HIN or registration taken some other way (a duplicate the checks above didn't catch) | "That HIN or boat registration is already in use." | Inside the panel |
 | Booking couldn't be saved | "Your reservation could not be completed. Please try again." | Banner at the top of the form |
 | Boat couldn't be saved | "Your boat could not be saved. Please try again." | Inside the panel |
 
@@ -237,4 +242,5 @@ Confirmations go through the shared status popup in the header. Errors don't, an
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| The Page | Comes up normally, pulling a the list of boats the customer owns | pulls the login popup, blocking the page |
+| The page | Comes up normally, with the list of boats the customer owns | Shows the shared sign-in panel ("Sign In to Reserve a Slip", 401) in place of the form; signing in comes back here |
+| Book a Slip links (header, footer, home page) | Go straight to the page | The header and footer links go to the page, which shows the sign-in panel; the home page's Book a Slip opens the login modal first |
