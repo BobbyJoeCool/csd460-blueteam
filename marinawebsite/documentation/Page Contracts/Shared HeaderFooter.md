@@ -16,152 +16,109 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 
 ## Open Questions / Decisions Needed
 
-> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
+> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `WEB-INF/includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere. `lodge.jsp` (Moffat Bay Lodge) is the one stub left.
 
+**Every nav link goes through a servlet**, never at a JSP directly (`/reservation`, not `reservation.jsp`). Going straight at a JSP skips the servlet's `doGet()` and the page renders with none of its data. The page JSPs live under `WEB-INF/views/`, so they can't be reached directly anyway.
 
+## How a Page Uses the Scaffold
 
-## Active Page Highlighting — Reference Implementation
-
-Each page passes its identity to the header via `<jsp:param>` when including it:
+Three includes, all under `WEB-INF/includes/`:
 
 ```jsp
-<jsp:include page="/includes/header.jsp">
+<head>
+    ...
+    <jsp:include page="/WEB-INF/includes/styles.jsp" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/myPage.css?v=${applicationScope.assetVersion}">
+</head>
+<body>
+
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
+
+<!-- page content, with <main id="main" tabindex="-1"> -->
+
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
+</body>
 ```
 
-The header uses the walrus operator to conditionally apply a CSS class on the matching nav link:
+- **`styles.jsp`** — the shared stylesheets (`site.css`, `header.css`, `footer.css`, `loginModal.css`, `statusPopup.css`, `passwordToggle.css`), the site icon, and the anti-forgery token as `<meta name="csrf-token">` for scripts (`MoffatBay.form.csrfToken()`). Page stylesheets go after it. Every stylesheet and script carries `?v=${applicationScope.assetVersion}` so a new deploy isn't served from the browser's cache.
+- **`header.jsp`** — the skip link, the header and nav, and the pieces every page shares (below).
+- **`footer.jsp`** — the footer.
+
+Every page's `<main>` carries `id="main"` and `tabindex="-1"`, the target of the header's **Skip to main content** link (WCAG 2.4.1).
+
+## Active Page Highlighting
+
+Each page passes its identity to the header with `<jsp:param name="activePage">`. The header adds `nav-active` to the matching link, and to the dropdown trigger that holds it:
 
 ```jsp
-<nav>
-    <a href="index.jsp"
-       class="${param.activePage == 'home' ? 'nav-active' : ''}">Home</a>
-    <a href="about.jsp"
-       class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
-    <a href="reservation.jsp"
-       class="${param.activePage == 'reservation' ? 'nav-active' : ''}">Reservations</a>
-    <a href="contact.jsp"
-       class="${param.activePage == 'contact' ? 'nav-active' : ''}">Contact</a>
-</nav>
-```
-
-The CSS handles the visual distinction:
-
-```css
-.nav-active {
-    border-bottom: 2px solid #fff;
-    font-weight: bold;
-}
+<a href="${pageContext.request.contextPath}/about"
+   class="${param.activePage == 'about' ? 'nav-active' : ''}">About Us</a>
 ```
 
 ### Agreed `activePage` Values
 
 Every page must use its assigned string exactly. Update this table as pages are built.
 
-| Page | `activePage` value |
-| --- | --- |
-| Landing | `home` |
-| About Us | `about` |
-| Reservation (Book a Slip) | `reservation` — the nav link reads **Book a Slip** (**renamed from "Reservations" 2026-09-24**, so it can't be confused with My Reservations). Planned: once Wait List ships, a **Reservations** dropdown holding My Reservations, Book a Slip and Wait List. |
-| Reservation Summary | *(none — not a nav link)* |
-| Contact Us | *(retired — `contact.jsp` deleted 2026-09-14, see the update note below)* |
-| My Reservations (Look Up Reservation) | `lookup` — shown only when signed in, and in **both** menus: Plan Your Stay and the Welcome menu (**updated 2026-09-30**, beta test #292). On this page both menu triggers show as active. |
-| Wait List Lookup | `waitlist` — **View Wait List** in Plan Your Stay |
-| Edit User Info | `editprofile` — **Your Account** in the Welcome menu (**updated 2026-09-30, #267:** was "User Profile", renamed to match the page title) |
-| My Fleet | `myfleet` — **My Fleet** in the Welcome menu |
-| Registration | `register` — not a nav link, so nothing is highlighted |
+| Page | `activePage` value | What's highlighted |
+| --- | --- | --- |
+| Landing | `home` | Home |
+| About Us | `about` | About Us |
+| Reservation (Book a Slip) | `reservation` | Plan Your Stay → **Book a Slip** (renamed from "Reservations" 2026-09-24, so it can't be confused with My Reservations) |
+| Reservation Summary | `reservation` | Plan Your Stay → Book a Slip, since it's the confirmation that follows a booking |
+| Wait List Lookup | `waitlist` | Plan Your Stay → **View Wait List** |
+| My Reservations (Look Up Reservation) | `lookup` | **My Reservations**, which is in both menus (Plan Your Stay and Welcome, beta test #292), so both triggers show as active |
+| Edit User Info | `editprofile` | Welcome → **Your Account** (renamed from "User Profile" 2026-09-30, #267, to match the page title) |
+| My Fleet | `myfleet` | Welcome → **My Fleet** |
+| Registration | `register` | Nothing (not a nav link) |
+| Privacy Policy, Accessibility, Moffat Bay Lodge, error page | *(none)* | Nothing |
 
-> Login is a modal, not a nav destination — it doesn't set `activePage`.
+> Login is a modal, not a nav destination — it doesn't set `activePage`. Contact Us was cut as a page (2026-09-07); the contact form lives on About Us, and the footer's **Contact** link goes to `/about#formHeading`.
 
-**Update, 2026-09-04:** the header/footer `About Us` / `Reservations` /
-`Contact` links no longer use the placeholder `href="#"` from the general
-rule above — they now point at `aboutUs.jsp` / `reservation.jsp` /
-`contact.jsp`, since those pages exist (as "Coming Soon" placeholders, see
-`includes/comingSoon.jsp`). `Reservation Summary`, `Look Up Reservation`,
-`Wait List Lookup`, and `Edit User Info` also have placeholder pages now,
-but were never nav links to begin with, so nothing to rewire for those
-four.
+## The Header
 
-**Update, current build has moved past the note above:** `About Us` and
-`Reservations` now point at `/about` and `/reservation` (the servlets),
-not the raw JSPs — going straight at `aboutUs.jsp` or `reservation.jsp`
-skips the servlet's `doGet()` and the page loses whatever it was supposed
-to load (owned boats/docks/pricing on Reservation; nothing extra on About
-Us, but the site's convention is now "every nav link goes through a
-servlet"). Both `includes/header.jsp` and `includes/footer.jsp` were
-updated to match.
+Left to right:
 
-**Resolved, 2026-09-14:** the above turned out to be based on a stale
-assumption — by the time it was checked, neither `header.jsp` nor
-`footer.jsp` actually had a `Contact` nav link pointing at `contact.jsp`
-(or anywhere else); that must have been dropped at some earlier point
-without this note being updated to say so. Since there was no live link
-to repoint, and `contact.jsp` itself was still the original "Coming Soon"
-placeholder with `DevNotes/Contracts/contact-us-contract.md` (referenced
-in its own header) never created, `contact.jsp` has now been deleted
-outright rather than kept as an orphaned stub. The site's real, working
-contact form lives at `/about` (via `ContactServlet`, mapped to
-`/contact` for the form's own `POST`/redirect target) — nothing else on
-the site references the old `contact.jsp` path, confirmed by a repo-wide
-grep before deleting it.
+- **Logo** — the anchor icon and "Moffat Bay Marina", linking to the site root `/`.
+- **Home** and **About Us** links.
+- **Plan Your Stay** dropdown — **Book a Slip** (`/reservation`), **View Wait List** (`/waitList`), and, signed in only, **My Reservations** (`/reservations`).
+- **Account control** — signed out, a **Log In** button (`data-sign-in`, which opens the login modal and returns to the current page). Signed in, a **Welcome, {displayName}** dropdown holding **My Reservations**, **My Fleet** and **Your Account** (`/editProfile`), in that order, followed by a **Log Out** button.
 
-## Signed-In vs Signed-Out Header
+**Log Out is a form, not a link.** Logging out changes state, so it POSTs to `/logout`, with the anti-forgery field (`WEB-INF/includes/csrfField.jsp`) like every POST on the site. `LogoutServlet` invalidates the session and redirects to `/?notice=loggedOut`. `.nav-logout-form` is `display: inline-flex` in `header.css` so the form doesn't break the nav's flex row.
 
-**Added 2026-09-06.** The header is on every page, so it is where the site
-shows whether someone is signed in — no page has to check the session for
-itself.
+**On a phone** a hamburger button (`.nav-toggle`) shows the links as a dropdown; the Welcome menu stays a popup in the compact row.
 
-Signed out, the nav ends with the **Log In** button that opens the login
-modal. Signed in, that is replaced by:
+**Both dropdowns** are one component (`js/header.js`, `MoffatBay.dropdowns`). Each closes on Escape, on a click outside it, or when keyboard focus tabs out of it (#260), so an open menu never sits over content a keyboard user has moved on to.
 
-```jsp
-<c:choose>
-    <c:when test="${sessionScope.loggedIn}">
-        <a class="nav-welcome" href="${pageContext.request.contextPath}/editProfile">
-            Welcome, ${sessionScope.displayName}
-        </a>
-        <form class="nav-logout-form" action="${pageContext.request.contextPath}/logout" method="post">
-            <button type="submit" class="nav-cta">Log Out</button>
-        </form>
-    </c:when>
-    <c:otherwise>
-        <!-- Log In button -->
-    </c:otherwise>
-</c:choose>
-```
+The header also carries `data-marina-phone` (from `MarinaInfo`), so page scripts can quote the marina's phone number without typing it themselves.
 
-**Updated 2026-09-14 (Edit User Info build).** The greeting used to be plain
-text (`<span>`) with no way to actually reach an account page from anywhere
-on the site - there was no Edit User Info page built yet to link to. It's
-now a link to `/editProfile`, since that page exists. This was a Back End
-fix to a real reachability gap, not a reviewed Front End placement
-decision - see `DevNotes/Plans/edit-user-info-front-end-blockers.md`, item 9.
+### What the Header Brings With It
 
-Both attributes come from `LoginServlet` (see the Login contract's "What the
-Session Remembers"). `displayName` already arrives formatted as `"Elena M."`,
-so the header doesn't build it.
+Because the header is on every page, it's where the site-wide pieces live, so no page has to include them itself:
 
-Two notes on the shape of this:
+- `js/header.js` (menus), `js/modal.js` (the shared `.modal` popup), and `js/passwordToggle.js` (the show/hide eye on every password field).
+- `WEB-INF/includes/loginModal.jsp` — the login modal, which brings `forgotPasswordModal.jsp`, `formValidation.js`, `loginModal.js` and `accountModals.js` with it. See the Login contract.
+- `WEB-INF/includes/statusPopup.jsp` — the shared status popup, the "that worked" message. Any page can fill it with `MoffatBay.statusPopup.show("...")`, or by redirecting with a `?notice=` keyword that `js/statusPopup.js` turns into wording.
 
-- **Log Out is a form, not a link.** Logging out changes state, so it POSTs
-  to `/logout`. `.nav-logout-form` is `display: inline-flex` in `header.css`
-  purely so the form doesn't break the nav's flex row.
-- **The header now needs the JSTL core taglib**
-  (`<%@ taglib prefix="c" uri="jakarta.tags.core" %>`), since it has a
-  conditional in it.
+### What the Header Reads
 
-Pages with their own signed-in/signed-out controls handle those themselves —
-`index.jsp`'s hero button and reservation CTA both change target when
-`sessionScope.loggedIn` is true.
+| Name | Source | Use |
+| --- | --- | --- |
+| `param.activePage` | `<jsp:param>` from the page | Which link and trigger to highlight |
+| `sessionScope.loggedIn` | Set by `CustomerSession.start()` | Log In vs. Welcome + Log Out |
+| `sessionScope.displayName` | Set by `CustomerSession.start()`, refreshed after a profile save | The greeting, already formatted "Elena M." |
+| `sessionScope.customerId` | Set by `CustomerSession.start()` | Whether Plan Your Stay shows My Reservations |
+| `marina.phone` | `MarinaInfo`, an application attribute | `data-marina-phone` |
 
-## Front/Back End
+## The Footer
 
-The header checks `sessionScope.loggedIn` (set by `LoginServlet`) to swap between two states:
+Three columns, then a bottom bar. Address, phone and hours come from `MarinaInfo` (the `marina` application attribute), not typed into the footer:
 
-- **Logged out:** a "Log In" button that opens the login modal.
-- **Logged in:** a "Welcome, {displayName}" menu holding **My Reservations**, **My Fleet** and **Your Account**, in that order (**updated 2026-09-30**; it was a plain link to `/editProfile` as of the 2026-09-14 update above), plus a "Log Out" button. Log Out is a POST form (not a link), pointing at `/logout`. The `LogoutServlet` invalidates the session and redirects to the landing page.
-
-Both header menus (Plan Your Stay and Welcome) are the same dropdown component (`js/header.js`, `MoffatBay.dropdowns`). Each closes on Escape, on a click outside it, or when keyboard focus tabs out of it (#260), so an open menu never sits over content a keyboard user has moved on to.
+- **Moffat Bay Marina** — street, city/state/ZIP, and the phone number as a `tel:` link.
+- **Office Hours** — one line per day group, plus the slip holders' after-hours access note.
+- **Quick Links** — Home, About Us, Book a Slip (`/reservation`, #327), Wait List (`/waitList`), Contact (`/about#formHeading`), Moffat Bay Lodge (`/lodge.jsp`).
+- **Bottom bar** — Privacy Policy (`/privacy`) and Accessibility (`/accessibility`), then "© 2026 Moffat Bay Marina. All rights reserved."
 
 The footer has no login-state behavior.
 
@@ -169,6 +126,7 @@ The footer has no login-state behavior.
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Header account control | Shows the "Welcome, {displayName}" menu (My Reservations, My Fleet, Your Account) plus Log Out button | Shows Log In button |
+| Header account control | "Welcome, {displayName}" menu (My Reservations, My Fleet, Your Account) plus Log Out | Log In button |
 | Plan Your Stay menu | Book a Slip, View Wait List, My Reservations | Book a Slip, View Wait List |
-| Login modal include | Still included (available for any page that needs it) | Still included |
+| Login modal include | Still included (a page can still open it) | Included; opened by Log In and by any `data-sign-in` control |
+| Footer | Same | Same |

@@ -19,8 +19,8 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 ### Front End Owns
 
 - [x] **Login field `name` attributes:** Decided — `email` and `password`, matching what `LoginServlet` already reads. Full list in [Front End Variables](#front-end-variables) below.
-- [x] **Form submission method:** Decided — standard form POST. Login is a modal that can be opened from any page, so Back End forwards (not redirects) back to whichever page the modal was submitted from on failure, keeping the URL unchanged. See [What the Front End Sees on Failure](#what-the-front-end-sees-on-failure).
-- [x] **Error display location:** Decided — inline in the modal itself, on the same page it was opened from. There is no separate error page/JSP. Front End reads `loginError` (and `accountLocked`, for the lockout case) as request attributes on that forwarded request and re-opens the modal with the message shown inline.
+- [x] **Form submission method:** Decided — standard form POST to `/login`. Login is a modal that can be opened from any page, so on failure Back End **redirects** back to whichever page the modal was submitted from (its `redirectTo`), and the modal reopens there. It used to forward; that stopped working once `redirectTo` named servlet paths instead of raw JSPs, because forwarding re-ran the target servlet with the login POST. See [What the Front End Sees on Failure](#what-the-front-end-sees-on-failure).
+- [x] **Error display location:** Decided — a banner inside the modal itself, on the same page it was opened from. There is no separate error page. Because the failure redirects, the message travels in the session for exactly one read: `LoginServlet` sets `loginFlashError`, `loginFlashAccountLocked`, `loginFlashLockoutThreshold` and `loginFlashEmail`, and `loginModal.jsp` reads them into `loginError`, `accountLocked`, `lockoutThreshold` and `loginEmail`, removes them, and renders the modal already open.
 - [x] **Client-side email format validation:** Decided — `MoffatBay.form.isValidEmail` from the shared `js/formValidation.js`, checked on submit. It uses the same pattern as `Utils.isValidEmail` on the server, so the two can't disagree about what counts as a valid address. UX only; the back end still re-checks and treats a bad format exactly like a non-match.
 
 ### Back End Owns
@@ -39,7 +39,7 @@ The "username" on this login form is really just the customer's email. There's n
 
 ### How Passwords Are Checked
 
-Passwords get hashed before we compare them, SHA-256, no salt (predecided). We never compare raw text, and the raw password never gets stored or logged anywhere. Whatever hashing method I use here has to match what Registration uses exactly, or nobody who just signed up will be able to log back in. I need to check that with Carolina instead of assuming it lines up.
+Passwords get hashed before we compare them, SHA-256, no salt (predecided). We never compare raw text, and the raw password never gets stored or logged anywhere. There is one hashing method, `Utils.hashPassword()`, and Registration, Change Password, the password reset and account deletion all call it, so a password set on any of them is checked the same way here.
 
 ### Locking an Account After Repeated Failures
 
@@ -53,7 +53,7 @@ That means each customer's record needs to track two things it doesn't right now
 
 That placeholder is retired, along with `CustomerDAO.unlockAccount()`. Per the Edit User Profile contract's "Password Change and the Lockout Model," a locked account is meant to unlock itself only by successfully completing a simulated forgot-password reset: the account's email, a fake verification code (`12345`, standing in for the email-a-code step this project can't actually do), and a new password. `ForgotPasswordServlet` (`/forgotPassword`) is built and working - it looks the account up by email, verifies the code, then calls `CustomerDAO.resetPasswordAndUnlock()`, which changes the password *and* clears both `accountLocked` and `failedLoginAttempts` in one transaction. No auto-login happens - the customer signs back in with the new password same as after any other password change.
 
-**Built (updated 2026-09-30):** the reset UI is `includes/forgotPasswordModal.jsp`, included at the foot of the login modal so it's on every page. Two controls open it, sharing one script (`[data-forgot-trigger]` in `loginModal.jsp`):
+**Built (updated 2026-09-30):** the reset UI is `WEB-INF/includes/forgotPasswordModal.jsp`, included at the foot of the login modal so it's on every page. Two controls open it, sharing one script (`[data-forgot-trigger]` in `loginModal.jsp`):
 
 - **Forgot password?** under the Password field of the normal sign-in form (#300, beta test). It pre-fills the reset's email with whatever is typed in the sign-in Email field. Before this, a customer who had only forgotten their password had to fail three times and lock the account to reach the reset.
 - **Reset your password** in the locked-out state, pre-filled with the address that was just locked.
@@ -75,26 +75,13 @@ Logging out clears all of it at once.
 
 **Updated 2026-09-30:** these four are set in one place, `CustomerSession.start()` (`util/CustomerSession.java`), which also starts a fresh session first so the session ID changes on sign-in. `LoginServlet` calls it on a successful login, and `RegisterServlet` calls it right after a new account is created, so signing in and registering can't drift apart.
 
-**Added 2026-09-06.** "Logging out" is now an actual endpoint: `LogoutServlet`
-at `/logout`, POST only, which invalidates the session and redirects to the
-landing page. Invalidating clears all four attributes in one step rather than
-removing them individually and leaving the session (and its ID) alive.
+**Logging out (2026-09-06).** `LogoutServlet` at `/logout`, POST only, invalidates the session and redirects to `/?notice=loggedOut`, so the status popup says "You've been logged out". Invalidating clears all four attributes in one step rather than removing them individually and leaving the session (and its ID) alive.
 
-POST rather than a link because logging out changes state — the header submits
-a small form. And it always lands on the landing page rather than wherever the
-user was: "back where you were" is right for logging *in*, but the page someone
-logs out from may well be one that requires a session, and returning there
-signed out would just bounce them.
+POST rather than a link because logging out changes state — the header submits a small form. And it always lands on the landing page rather than wherever the user was: "back where you were" is right for logging *in*, but the page someone logs out from may well be one that requires a session.
 
-**Update 2026-09-04:** `LoginServlet.logInAndRedirect` now invalidates any
-pre-existing session and starts a fresh one before setting the four
-attributes above, rather than reusing whatever session the browser
-already had. This is session ID regeneration on authentication, per
-OWASP's Session Management Cheat Sheet — without it, a session ID an
-attacker fixed in the visitor's browser before login (session fixation)
-would carry straight through into their now-authenticated session.
-`RegisterServlet` doesn't log the new customer in, so it has no session to
-regenerate.
+**Session ID regeneration (2026-09-04).** `CustomerSession.start()` invalidates any pre-existing session and starts a fresh one before setting the four attributes, rather than reusing whatever session the browser already had. This is session ID regeneration on authentication, per OWASP's Session Management Cheat Sheet — without it, a session ID an attacker fixed in the visitor's browser before login (session fixation) would carry straight through into their now-authenticated session. Registration gets the same protection, since it calls the same method.
+
+**Signed out everywhere after a password change.** `CustomerSession` keeps track of each customer's signed-in sessions. A password change (Your Account) or a reset (Forgot Password) calls `CustomerSession.endOtherSessions()`, so a browser still signed in with the old password is put out on its next click. Deleting an account ends every session, the current one included.
 
 ### Customer Data Passed to the Front End
 
@@ -123,7 +110,7 @@ The front end tells the back end where to send the user afterward, by including 
 - If the user got blocked from doing something (like trying to reserve a slip while logged out), this points to that page, so once they log in they land right back where they were headed.
 - If the user just clicked "Log In" on their own, this points to whatever page they were already on.
 
-The back end doesn't need to know which case it is, it just sends the user wherever `redirectTo` points once login succeeds, and falls back to the homepage if that value is missing or looks like it points off the site.
+The back end doesn't need to know which case it is, it just sends the user wherever `redirectTo` points once login succeeds, and falls back to the homepage if that value is missing or looks like it points off the site (`Utils.safeRedirectTarget`). A successful sign-in adds `notice=loggedIn`, so the page they land on says "Logged in successfully".
 
 **Added 2026-09-30 (#299, beta test):**
 
@@ -144,14 +131,9 @@ Every field or control the page's UI sends to the Back End (form fields, query-s
 | --- | --- | --- | --- |
 | `email` | email | Yes | `maxlength="100"`, matches `Customer.email`. Trimmed before submit and checked with `MoffatBay.form.isValidEmail` |
 | `password` | password | Yes | No `maxlength` — the stored value is a hash, and Registration's rule is a *minimum* of 10 characters, not a maximum |
-| `redirectTo` | hidden | Yes | Context-relative path (`/reservation`, never `/marinawebsite/reservation`), since the servlet prepends `getContextPath()`. Defaults to `param.redirectTo`, then `param.signIn`, then the current page; reuses the submitted value on a retry so a failed attempt doesn't reset the target to `/login` |
+| `redirectTo` | hidden | Yes | Context-relative path (`/reservation`, never `/marinawebsite/reservation`), since the servlet prepends `getContextPath()`. Rendered as `param.redirectTo` if the request has one, otherwise the page's own path (the original request URI, not a forwarded JSP's). A control that names somewhere else overrides it when it opens the modal: `data-sign-in="/reservation"`, or the sign-in panel's `signInRedirectTo` |
 
-**Retired 2026-09-14:** the `action=reset` hidden field and the Unlock Account
-form that sent it no longer exist - see [Locking an Account After Repeated
-Failures](#locking-an-account-after-repeated-failures). The locked-out state's
-button now opens the forgot-password modal instead, which is a separate form
-posting to `/forgotPassword` (documented in the Edit User Profile contract,
-not here) rather than another submission of this page's own login form.
+The locked-out state's **Reset your password** button, and **Forgot password?** under the Password field, open the Forgot Password modal, a separate form posting to `/forgotPassword` (documented in the Edit User Profile contract). The old `action=reset` Unlock Account form was retired 2026-09-14.
 
 ## Back End Parameters
 
@@ -163,11 +145,11 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 | `password` | text | Form field | Compared as a hash, never as plain text |
 | `redirectTo` | text | Form field (hidden) | Fixed name, required for [Where the User Lands After Login](#where-the-user-lands-after-login) to work. Front End sets its value, not its name |
 
-**Retired 2026-09-14:** `action` (the Unlock Account submit's marker) is gone along with that button - see the Front End Variables table above.
+Like every POST on the site, the form also carries the anti-forgery field (`WEB-INF/includes/csrfField.jsp`, checked by `CsrfFilter`), and `/login` is one of the forms `PostRateLimitFilter` covers: 10 posts a minute per address, then 429.
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** Front End's call, but probably just "both fields filled in, username looks like an email" before it lets you submit.
+- **Client-side (UX only, not trusted):** On submit, `loginModal.js` trims the email and checks it: "Enter your email address." if blank, "Enter a valid email address." if it fails `MoffatBay.form.isValidEmail`, and "Enter your password." if the password is blank. The message sits under its field, focus moves to the first problem, and typing clears them.
 - **Server-side (source of truth):**
   - Both fields are required. A missing field gets treated the same as a failed login (generic invalid-credentials error), not its own message, so it doesn't give away which one was empty.
   - The email format gets re-checked here too, see [Email Format Check on the Back End](#email-format-check-on-the-back-end).
@@ -180,13 +162,15 @@ Every user-facing error condition this page can hit, and exactly what the user s
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Inline in the login modal, on the page it was submitted from. No separate error page — Back End forwards back to that same page with `loginError` set as a request attribute. |
+| Unknown email, or wrong password with fewer than 3 prior failures | "The username or password you entered is incorrect." | Banner in the login modal, reopened on the page it was submitted from. No separate error page — Back End redirects back to that page with the message in the session for one read. The email field refills. |
 | Any failed sign-in that hasn't locked the account | "Accounts are locked after 3 unsuccessful attempts." | Directly under the error message in the modal, driven by the `lockoutThreshold` request attribute. Shown on every failure, including for emails that aren't registered — a notice that only appeared for real accounts would identify them |
-| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same as above, plus `accountLocked` is set `true` as a request attribute so the modal shows the "Reset Password" button (opens the forgot-password modal - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures)) |
+| Wrong password on the 3rd try in a row, or a login attempt against an account that's already locked | "This account has been locked after multiple failed login attempts." | Same banner, plus `accountLocked`, so the modal swaps the form for a note and a **Reset your password** button (opens the Forgot Password modal, pre-filled with that email - see [Locking an Account After Repeated Failures](#locking-an-account-after-repeated-failures)) |
+| Too many sign-in posts from one address | "Easy Does It" page (429) | `error.jsp` |
+| Sign-in succeeds | "Logged in successfully" | Shared status popup, via `?notice=loggedIn` |
 | Session expires mid-use on another page (not really this page's failure, but downstream pages depend on the session attributes this page sets) | N/A, out of scope for this contract. Each page that consumes the session defines its own logged-out fallback behavior | N/A |
 
 ## Login State Differences
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Login modal | Still available (included on every page), but typically not triggered — the user is already signed in | Primary way to sign in; opened by the Log In button or by gated actions like "Reserve a Slip" |
+| Login modal | Still included on every page, but nothing opens it — the header shows the Welcome menu instead of Log In | Opened by the header's Log In, the home page's Book a Slip, the Sign In button on any customer-only page's sign-in panel, and Wait List's Sign In |

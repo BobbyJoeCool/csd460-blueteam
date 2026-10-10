@@ -15,43 +15,48 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 - Shared Header/Footer Scaffold: Sara
 - Testing:
 
+## What the Page Shows
+
+Top to bottom: the hero ("Your Harbor Between Horizons") with a **Book a Slip** button; **Why Moffat Bay?** (three cards: Three Slip Sizes, Prime Location, Full-Service Amenities); the **Slip Pricing** card with the reservation call to action at its foot; and **Stay Ashore at Moffat Bay Lodge**, a photo card linking to `/lodge.jsp` (a Coming Soon page).
+
 ## Open Questions / Decisions Needed
 
-> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
+> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `WEB-INF/includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere. `lodge.jsp` is one.
 
-- [x] **CTA link targets:** Decided. **Update:** both CTAs now point at the `/reservation` servlet, not `reservation.jsp` directly — going straight at the JSP skips `ReservationServlet.doGet()` and the page loads with no boat/dock/pricing data (same fix applied everywhere else on the site). "Reserve a Slip" links to `/reservation` (logged in) or opens the login modal with `redirectTo` set to `/reservation` (logged out), so a fresh sign-in lands the customer straight on the reservation page instead of back on the landing page. Bottom CTA links to `/reservation` as "Book a Slip" (logged in) or `registration.jsp` as "Create an Account" (logged out).
-- [x] **Session attribute name for login state:** `sessionScope.loggedIn` (boolean), set by `LoginServlet`. Matches the Login contract.
-- [x] **User display name attribute:** `sessionScope.displayName` — a pre-formatted "First L." greeting name (e.g. "Elena M."), built by the Customer bean and set by `LoginServlet`.
-- [x] **Does the landing page need a servlet?** ~~No.~~ **Update (issue #349, Miguel):** yes. `LandingServlet` (mapped to the site root `""`, and to `/index.jsp` so the old address still works) reads the slip and electric rates from the `Rate` table for the Slip Pricing card, then forwards to `/WEB-INF/views/index.jsp`. The JSP moved under `WEB-INF` like every other page, so it can't be loaded without its data.
-- [x] **Slip Pricing card (issue #349):** Decided. The free-floating "Ready to Reserve Your Slip?" section is now a card showing the per-foot rate, the most each slip size can cost (a boat that fills the slip: size × per-foot rate), and the flat electric fee, with the reservation call to action at the bottom. Rent follows the boat's length, so each size says "Up to" rather than a fixed price. Tier names (Standard, Premier, Grand) match Book a Slip.
+- [x] **CTA link targets:** Decided. Every link goes through a servlet, never at a JSP directly (going straight at a JSP skips the servlet's `doGet()` and the page loads with none of its data). The hero's **Book a Slip** links to `/reservation` when signed in; signed out it opens the login modal with `redirectTo` set to `/reservation`, so a fresh sign-in lands straight on Book a Slip. The pricing card's button is **Book a Slip** (`/reservation`) when signed in and **Create an Account** (`/register`) when signed out.
+- [x] **Session attribute name for login state:** `sessionScope.loggedIn` (boolean), set by `CustomerSession.start()` on sign-in or registration. Matches the Login contract.
+- [x] **User display name attribute:** `sessionScope.displayName` — a pre-formatted "First L." greeting name (e.g. "Elena M."), built by the Customer bean. Read by the shared header, not this page.
+- [x] **Does the landing page need a servlet?** **Yes (issue #349, Miguel).** `LandingServlet` (mapped to the site root `""`, and to `/index.jsp` so the old address still works) reads the slip and electric rates from the `Rate` table for the Slip Pricing card, then forwards to `/WEB-INF/views/index.jsp`. The JSP lives under `WEB-INF` like every other page, so it can't be loaded without its data.
+- [x] **Slip Pricing card (issue #349):** Decided. The card shows the per-foot rate, the most each slip size can cost (a boat that fills the slip: size × per-foot rate), the flat electric fee, and "Month-to-month leases. 30 days' notice to leave.", with the reservation call to action ("Ready to Reserve Your Slip?") at the bottom. Rent follows the boat's length, so each size says "Up to" rather than a fixed price. Tier names (Standard, Premier, Grand) match Book a Slip.
 
 ## Scaffold Include
 
 This page includes the shared header/footer and identifies itself for nav highlighting:
 
 ```jsp
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="home" />
 </jsp:include>
 
 <!-- Landing page content -->
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 ```
 
-> The `activePage` value `"home"` must match what the header checks. See the scaffold contract for the full reference table.
+> The `activePage` value `"home"` must match what the header checks. See the Shared Header/Footer contract for the full reference table.
 
 ## Front End Variables
 
-The landing page does not contain a form and does not submit landing-page fields to a servlet.
+The landing page has no form and submits nothing.
 
 | Field or Control | Type | Required? | Format / Notes |
 | --- | --- | --- | --- |
-| `activePage` | JSP include parameter | Yes | Passes `"home"` to `header.jsp` so Home can be highlighted |
-| Reserve a Slip (logged out) | Button | No | Calls `MoffatBay.loginModal.open('/reservation')`; does not submit form data, just sets where the modal redirects to after a successful sign-in |
-| Reserve a Slip (logged in) | Link | No | Navigates to `/reservation` (the servlet — **updated**, was `reservation.jsp` directly) |
-| Create an Account (logged out) | Link | No | Navigates to `registration.jsp` |
-| Book a Slip (logged in) | Link | No | Navigates to `/reservation` (the servlet — **updated**, was `reservation.jsp` directly) |
+| `activePage` | JSP include parameter | Yes | Passes `"home"` to `header.jsp` so Home is highlighted |
+| Hero Book a Slip (signed out) | Button | No | `data-sign-in="/reservation"`; `loginModal.js` opens the login modal with that as the return page. No `onclick` — the Content-Security-Policy blocks inline script |
+| Hero Book a Slip (signed in) | Link | No | `/reservation` |
+| Create an Account (signed out) | Link | No | `/register` |
+| Book a Slip, pricing card (signed in) | Link | No | `/reservation` |
+| Visit Moffat Bay Lodge | Link | No | `/lodge.jsp` (Coming Soon) |
 
 ## Back End Parameters
 
@@ -62,8 +67,8 @@ The landing page reads no form values. `LandingServlet` sets two request attribu
 | `activePage` | `String` | JSP include parameter | Passed to `header.jsp` with the value `"home"` |
 | `perFootRate` | `BigDecimal` | Request attribute (`LandingServlet`) | `SLIP_PER_FOOT_MONTHLY` from `Rate`. Unset if the lookup failed |
 | `electricRate` | `BigDecimal` | Request attribute (`LandingServlet`) | `ELECTRIC_MONTHLY` from `Rate`. Unset if the lookup failed |
-| `registered` | `String` | Query string | `RegisterServlet` redirects with `registered=true`. **Update:** this is now read and displayed — `js/statusPopup.js` special-cases `registered=true` (treating it the same as `?notice=registered`) and shows "Account created — welcome aboard" via the shared status popup on whichever page it lands on, then strips both params from the URL |
-| Login session attribute | TBD | HTTP session | Read by the shared header; exact name must match `LoginServlet` |
+| `loggedIn` | `Boolean` | Session (`sessionScope.loggedIn`) | Picks the hero button and the pricing card's call to action |
+| `registered` | `String` | Query string | `registered=true` (from `RegisterServlet`) makes `js/statusPopup.js` show "Account created — welcome aboard", then strips it from the URL. The same file handles `?notice=` keywords that land here: `loggedOut`, `accountDeleted`, and `loggedIn` / `passwordReset` when that's where the customer was |
 
 ## Database Returns
 
@@ -73,22 +78,24 @@ The landing page reads no form values. `LandingServlet` sets two request attribu
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** The landing page has no input fields requiring validation. Button and modal behavior is handled by `loginModal.js`.
-- **Server-side (source of truth):** The landing page submits no data and requires no server-side validation. Login and registration validation are handled by their respective servlets.
+- **Client-side (UX only, not trusted):** No input fields. Button and modal behavior is handled by `loginModal.js`.
+- **Server-side (source of truth):** The page submits no data. Login and registration validation are handled by their own servlets.
 
 ## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| Login fails | Defined by the Login page contract | Reusable login modal |
-| Registration succeeds | "Account created — welcome aboard" (**updated** — this used to say no message was displayed) | Shared status popup (`includes/statusPopup.jsp`), triggered by `?registered=true` on the redirect from `RegisterServlet` |
-| Hero image cannot load | No message; background color remains visible | Hero section |
-| Rates can't be read from the database | No error. The card leaves out its figures and says the exact price is shown when booking; the rest of the page loads normally, and the failure goes to the server log | Slip Pricing card |
-| Landing page fails to load | Standard Tomcat error response | Browser |
+| Login fails | Defined by the Login contract | Login modal, reopened on this page |
+| Registration succeeds with no other page to return to | "Account created — welcome aboard" | Shared status popup, via `?registered=true` |
+| Logged out | "You've been logged out" | Shared status popup, via `?notice=loggedOut` |
+| Account deleted | "Your account has been deleted" | Shared status popup, via `?notice=accountDeleted` |
+| Hero image cannot load | No message; the background colour stays | Hero |
+| Rates can't be read from the database | No error. The card leaves out its figures and says "You'll see the exact price for your boat when you book."; the rest of the page loads normally, and the failure goes to the server log | Slip Pricing card |
+| Anything else fails while loading | The site's error page ("Rough Seas" for a 500) | `error.jsp`, per `web.xml` |
 
 ## Login State Differences
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Hero "Reserve a Slip" | Direct link to `/reservation` (**updated**, was `reservation.jsp`) | Opens the login modal with `redirectTo` set to `/reservation` |
-| Bottom CTA | "Book a Slip" linking to `/reservation` (**updated**, was `reservation.jsp`), with "Check availability and book your spot today." | "Create an Account" linking to `registration.jsp`, with "Create an account or sign in to check availability and book your spot today." |
+| Hero "Book a Slip" | Link to `/reservation` | Opens the login modal with `redirectTo` set to `/reservation` |
+| Pricing card call to action | "Check availability and book your spot today." with **Book a Slip** (`/reservation`) | "Create an account or sign in to check availability and book your spot today." with **Create an Account** (`/register`) |

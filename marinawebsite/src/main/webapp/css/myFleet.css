@@ -43,12 +43,10 @@
     text-align: center;
 }
 
-
-.fleet-header__heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+/* Add Boat on its own line under the title, centred with it. */
+.fleet-header__add {
+    display: block;
+    margin: 0.75rem auto 0;
 }
 
 .fleet-header__title {
@@ -276,17 +274,12 @@
     .fleet-empty {
         width: 100%;
     }
-    
-    .fleet-header__heading {
-    flex-direction: column;
-    align-items: stretch;
-    }
 
     .fleet-header__title {
         font-size: 1.5rem;
     }
 
-    .fleet-header__heading .btn-primary {
+    .fleet-header__add {
         width: 100%;
     }
 

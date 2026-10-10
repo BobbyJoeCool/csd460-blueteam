@@ -68,24 +68,11 @@ Sections below that describe direct access, the POST, or the Cancel button are *
   straight after booking. Look Up Reservation will redirect here next module,
   so building it any other way would mean rewriting it in a week.
 
-- [x] **Authentication check:** Yes, both of them.
+- [x] **Authentication check:** Yes, all three.
 
-  1. **Signed in.** No session, no reservation shown. The servlet forwards to
-     the page rather than redirecting, so the page's own "Sign in to view your
-     reservation" panel renders and the URL — confirmation number included —
-     survives. `signInRedirectTo` is set as a request attribute for the sign-in
-     button to hand the login modal, since the modal builds its own
-     `redirectTo` from the request URI, which carries no query string.
-  2. **Theirs.** The reservation's `customerID` is checked against
-     `sessionScope.customerId` on every request. This is not optional:
-     confirmation numbers run in sequence from MB-00001, so without it anyone
-     could read a stranger's booking by editing the address bar. Robert raised
-     this in the Reservation contract and he is right.
-
-  Cancellation checks ownership **twice** — once to choose the message, and
-  again inside the `UPDATE`'s `WHERE` clause so the database is what actually
-  enforces it. Checking and then updating leaves a gap between the two where
-  the answer could change.
+  1. **Signed in.** No session, no reservation. `CustomerSession.showSignInPanel` answers 401 and forwards to the page, which shows the shared sign-in panel ("Sign In to View Your Reservation", as the page's `h1`, since this page has no hero). Its Sign In button returns to `/reservations`, not here: a fresh session has no access grant, so this page would only redirect anyway.
+  2. **Just changed.** The confirmation number must be the one in the session's `reservationSummaryAccess` grant (see the amendment above). Any other number redirects to `/reservations?reservationNumber=...`.
+  3. **Theirs.** The reservation's `customerID` is checked against `sessionScope.customerId` on every request. Confirmation numbers run in sequence from MB-00001, so without it anyone could read a stranger's booking by editing the address bar.
 
 - [x] **Missing/invalid reservation handling:** Decided — a missing
   confirmation number, one that matches nothing, and one that belongs to
@@ -98,18 +85,7 @@ Sections below that describe direct access, the POST, or the Cancel button are *
 
 ### Cancelling a Reservation
 
-**Superseded 2026-09-24.** Cancelling moved to My Reservations (`POST /reservations/cancel`), and only a reservation whose lease hasn't started can be cancelled. The rules below still hold there. Originally: the Reservation contract put cancellation here, since this is the one place a
-customer already has a reservation in front of them.
-
-- **POST** to `/reservationSummary` with `action=cancel` and `confirmation`.
-- Sets `reservationStatus` to `Cancelled` — the row is never deleted. The
-  marina still needs to know the booking happened, and BR-16 keeps a
-  reservation tied to the customer who made it.
-- Only an `Active` reservation can be cancelled. Cancelling one twice does
-  nothing the second time and says so.
-- Redirects back to this page afterwards rather than forwarding, so the
-  customer sees the cancelled state re-read from the database, and a refresh
-  cannot re-submit the cancellation.
+**Moved 2026-09-24** to My Reservations (`POST /reservations/cancel`), and only a reservation whose lease hasn't started can be cancelled. Cancelling sets `reservationStatus` to `Cancelled` — the row is never deleted (BR-16) — and then lands here as the confirmation. See the Look Up Reservation contract.
 
 ### What the Bean Carries
 
@@ -133,12 +109,14 @@ live across four tables and the DAO joins them once.
 | `${reservation.noticeDate}` / `${reservation.terminationDate}` | java.util.Date | **Added 2026-09-24.** When notice was given / the chosen last day |
 | `${reservation.cancelled}` | boolean | Convenience for the cancelled styling |
 | `${reservation.boatName}` | String | |
-| `${reservation.boatType}` | String | Sailboat, powerboat and so on. May be null - optional at registration |
+| `${reservation.boatType}` | String | Sailboat, powerboat and so on. May be null - optional when the boat is added |
 | `${reservation.boatLength}` | BigDecimal | Feet, one decimal |
 | `${reservation.regNumber}` | String | May be null — boats can have a HIN instead |
 | `${reservation.dockNumber}` | String | `A`, `B` or `C` |
 | `${reservation.dockDescription}` | String | Where it sits in the marina |
 | `${reservation.slipNumber}` | int | Within its dock |
+| `${reservation.slipCode}` | String | The code painted on the slip, e.g. `A-02`; shown as "Dock A, Slip 2 (A-02)" |
+| `${reservation.noticeWithdrawalCutoffDays}` | int | 14 — how long before the last day a notice can still be withdrawn, for the "Your Lease End Date Is Set" text |
 | `${reservation.slipSizeFt}` | int | 26, 40 or 50 |
 | `${reservation.monthlyRate}` | BigDecimal | The blended total the customer pays |
 | `${reservation.electricalHookup}` | boolean | Whether electric is included. Named for the database column |
@@ -160,28 +138,20 @@ worked out, so there is nothing to add up and no reason to convert twice.
 This page includes the shared header/footer and identifies itself for nav highlighting:
 
 ```jsp
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="reservation" />
 </jsp:include>
 
 <!-- Reservation Summary page content -->
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 ```
 
 > The `activePage` value `"reservation"` must match what the header checks. See the scaffold contract for the full reference table.
 
 ## Front End Variables
 
-**Amended 2026-09-24:** the page submits nothing; the table below is historical. Originally: the page displays a reservation; the only thing it submits is a cancellation.
-
-| Field Name | Input Type | Required? | Format / Notes |
-| --- | --- | --- | --- |
-| `confirmation` | hidden | Yes | The confirmation number being cancelled |
-| `action` | hidden | Yes | Fixed value `cancel` |
-
-The Cancel control is a POST form, not a link — cancelling changes state, so it
-must not sit on something a browser could follow on its own.
+**None (amended 2026-09-24).** The page submits nothing. Its only control is **Go to My Reservations**, a plain link to `/reservations`, where changes are made.
 
 ## Back End Parameters
 
@@ -189,40 +159,37 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
-| `confirmation` | text | Query string (GET) or form field (POST) | Which reservation to show or cancel |
-| `action` | text | Form field (POST only) | Value `cancel` |
-| `customerId` | int | HTTP session | Set by `LoginServlet`. Never read off the form — that would let anyone claim to be anyone |
+| `confirmation` | text | Query string | Which reservation to show |
+| `notice` | text | Query string | Read by `statusPopup.js` only, not the servlet |
+| `customerId` | int | HTTP session | Set by `CustomerSession.start()`. Never read off the form — that would let anyone claim to be anyone |
+| `reservationSummaryAccess` | String | HTTP session | The one confirmation number this session may view, set by `grantAccess()` |
 
 ## Database Returns
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
 | `ReservationDAO.findDetailsByConfirmation` | `String confirmationNumber` | `ReservationDetails`, or `null` on no match | Joins Reservation to Boat, Slip, Dock, SlipSize and Rate. Deliberately does not filter by customer — the servlet checks ownership, so "no such reservation" and "not yours" stay separate outcomes in code even though they look identical to the user |
-| `ReservationDAO.cancel` | `int reservationId, int customerId` | `boolean` — `true` if a row was cancelled | `customerId` is in the `WHERE` clause, so the database enforces ownership. `false` means not theirs, not there, or already cancelled |
 
 ## Validation Rules
 
-- **Client-side (UX only, not trusted):** A confirm prompt before cancelling,
-  since it can't be undone from the site. Front End's call.
+- **Client-side (UX only, not trusted):** None; the page takes no input.
 - **Server-side (source of truth):**
   - A session is required. No `customerId`, no page.
-  - The reservation must belong to the signed-in customer, checked on every
-    GET and POST.
-  - Only an `Active` reservation can be cancelled, enforced in the `UPDATE`'s
-    `WHERE` clause rather than checked beforehand.
-  - A missing, unknown or someone else's confirmation number all produce the
-    same message.
+  - The confirmation number must match the session's access grant, or the request goes to My Reservations instead.
+  - The reservation must belong to the signed-in customer, checked on every GET.
+  - A missing, unknown or someone else's confirmation number all produce the same message.
 
 ## Error Handling
 
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
-| No `confirmation` parameter | "We couldn't find that reservation. Check the confirmation number, or contact the marina office at (360) 555-0142." | On the page via `reservationSummaryError`; HTTP 404 |
+| No `confirmation` parameter | "We couldn't find that reservation. Check the confirmation number, or contact the marina office at (360) 555-0142." | On the page, under a "Reservation Not Found" heading with a Go to My Reservations button, via `reservationSummaryError`; HTTP 404 |
 | Confirmation number matches nothing | Same message | Same |
 | Reservation belongs to another customer | Same message | Same — deliberately indistinguishable from the two above, so the page can't be used to discover which confirmation numbers exist |
-| Not signed in | No message on this page | **Corrected** — this used to say "redirected to the landing page," which doesn't match what's built. `ReservationSummaryServlet` forwards (doesn't redirect) to this same page, HTTP 401, with `signInRedirectTo` set as a request attribute. `reservationSummary.jsp` renders its own "Sign in to view your reservation" panel and hands `signInRedirectTo` to the login modal, so the confirmation number in the URL survives and a successful sign-in lands right back here — a redirect to the landing page would have thrown that away |
+| Not signed in | "Sign In to View Your Reservation" panel with a Sign In button | On this page, HTTP 401. Signing in goes to My Reservations |
 | Cancel succeeded | "Reservation cancelled" | Shared status popup, via `?notice=reservationCancelled` |
 | 30-day notice submitted | "30-day notice submitted" | Shared status popup, via `?notice=terminationNoticeSubmitted` |
+| 30-day notice withdrawn | "30-day notice withdrawn" | Shared status popup, via `?notice=terminationNoticeWithdrawn` |
 | Confirmation number not the one just changed | No message | **Added 2026-09-24.** Redirect to My Reservations, filtered to that number |
 | Database failure | Standard error page | `error.jsp`, per `web.xml` |
 
@@ -230,6 +197,6 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Item | Logged In | Logged Out |
 | --- | --- | --- |
-| Reservation summary | Shown, if the reservation is theirs | **Corrected** — this page's own sign-in panel is shown (forward, not a redirect to the landing page), with the login modal opened from there; returns here after signing in |
+| Reservation summary | Shown, if it's the reservation just booked or changed, and it's theirs | The shared sign-in panel; signing in goes to My Reservations |
 | Someone else's reservation | Same "couldn't find that reservation" message as one that doesn't exist | n/a |
 | Cancel button | **Removed 2026-09-24** - cancelling is on My Reservations | n/a |

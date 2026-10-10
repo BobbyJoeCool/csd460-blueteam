@@ -16,9 +16,13 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 
 > **Update (Sep 7):** Professor-directed change — Contact Us is cut as a standalone page; its contact info and backend fold into this page instead. This is no longer a back-end-lite page, so it's now a real Front End/Back End pair (previously Miguel solo, Sara testing). Robert picks up testing since he wasn't involved building either half.
 
+## What the Page Shows
+
+Top to bottom: **A working harbor in the San Juans** (the marina's story); **The marina at a glance** (Docks, Slips, Slip sizes: 26 ft ×30, 40 ft ×24, 50 ft ×18); **Find us and reach us** (address, phone, email, VHF channel, office hours and fuel dock hours, and the slip holders' after-hours note, all from `MarinaInfo`, the `marina` application attribute); **The docks** (the marina map); and **Send us a message**, the contact form (`#formHeading`, where the footer's Contact link lands).
+
 ## Open Questions / Decisions Needed
 
-> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
+> **General rule:** any page that doesn't have real content yet should still exist as a JSP — use `WEB-INF/includes/comingSoon.jsp` (pass `pageName` as a param) to create a stub page with the shared header/footer, so the link works instead of going nowhere.
 
 ### Front End Owns
 
@@ -62,14 +66,14 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 
 ### Back End Owns
 
-- [x] **Does this page need a servlet at all?** Decided, and built: two servlets. `AboutServlet` (`/about`) just forwards to `aboutUs.jsp` — the page itself needs no server-side data. `ContactServlet` (`/contact`) is the separate one that actually handles the form submission.
-- [x] **Servlet mapping:** Decided — the form POSTs to `/contact` (`ContactServlet`). `ContactServlet` also now answers `GET /contact` (forwards to `/aboutUs.jsp`), so navigating there directly no longer 405s.
+- [x] **Does this page need a servlet at all?** Decided, and built: two servlets. `AboutServlet` (`/about`) just forwards to `/WEB-INF/views/aboutUs.jsp` — the page's marina details come from the `marina` application attribute, so it needs no lookup of its own. `ContactServlet` (`/contact`) handles the form submission.
+- [x] **Servlet mapping:** Decided — the form POSTs to `/contact` (`ContactServlet`). `ContactServlet` also answers `GET /contact` (forwards to the same About Us view), so navigating there directly doesn't 405. `/contact` is one of the forms `PostRateLimitFilter` covers (10 posts a minute per address), and like every POST it needs `CsrfFilter`'s token.
 - [x] **What does Back End do with the submission:** Stores it. `ContactServlet` validates, builds a `Contact` object, and calls `ContactDAO.insert()` to write a row to the `Contact` table. No email is sent.
 - [x] **Pre-fill for logged-in users:** Nothing needed from Back End. The page
   reads the `Customer` bean `LoginServlet` already puts in session, so a
   signed-in customer's name and email arrive filled in with no GET handler
   involved. Answered by Front End — one less thing on this list.
-- [x] **Success response:** **Decided, and changed since first built.** Originally forwarded back to `aboutUs.jsp` with a `contactSuccess` request attribute (see the Error Handling table's note below) — that let a page refresh right after submitting resubmit the same contact message. Now `ContactServlet` **redirects** (not forwards) to `/aboutUs.jsp?notice=contactSent` on success, so a refresh just reloads the page instead of resubmitting the form. `aboutUs.jsp` shows the success banner off that query param now, not off `contactSuccess`.
+- [x] **Success response:** **Decided, and changed since first built.** Originally forwarded back with a `contactSuccess` request attribute, which let a refresh resubmit the same message. Now `ContactServlet` **redirects** to `/about?notice=contactSent` on success, so a refresh just reloads the page, and the shared status popup says "Thanks — we'll be in touch as soon as we can."
 - [x] **Error attributes:** Decided — `contactError`, a request attribute, set on validation failure. That path still forwards (not redirects), since a forward is what lets the rejected submission redisplay with everything the customer typed still in it (see the note under Error Handling below).
 
 ## Scaffold Include
@@ -77,13 +81,13 @@ Module 7 / Week 5 (Sep 7 – Sep 13, 2026)
 This page includes the shared header/footer and identifies itself for nav highlighting:
 
 ```jsp
-<jsp:include page="/includes/header.jsp">
+<jsp:include page="/WEB-INF/includes/header.jsp">
     <jsp:param name="activePage" value="about" />
 </jsp:include>
 
 <!-- About Us page content -->
 
-<jsp:include page="/includes/footer.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 ```
 
 > The `activePage` value `"about"` must match what the header checks. See the scaffold contract for the full reference table.
@@ -111,7 +115,14 @@ What the Back End reads for each Front End field, plus anything it pulls from el
 
 | Parameter Name | Type | Source (form field / session / query string) | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `firstName` | `String` | Form field | Trimmed; required; maximum 50 characters |
+| `lastName` | `String` | Form field | Trimmed; required; maximum 50 characters |
+| `email` | `String` | Form field | Trimmed; required; maximum 255 characters; must pass `Utils.isValidEmail` |
+| `boatName` | `String` | Form field | Trimmed; optional; maximum 100 characters; blank stored as `NULL` |
+| `boatLength` | `BigDecimal` | Form field | Optional; if filled in, a positive number within `Utils.MAX_BOAT_DIMENSION` (999.9); blank stored as `NULL` |
+| `reasonForContact` | `String` | Form field | Required; one of the six values in `ContactServlet.VALID_REASONS` |
+| `message` | `String` | Form field | Trimmed; required; maximum 2000 characters |
+| `customer` | `Customer` | Session (`sessionScope.customer`) | Read by the JSP only, to pre-fill name and email. The servlet never reads the session; a message is stored the same whether or not anyone is signed in |
 
 ## Database Returns
 
@@ -119,7 +130,7 @@ Every query or DAO method the Back End calls for this page, and its exact return
 
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| | | | |
+| `ContactDAO.insert()` | `Connection`, `Contact` | `int` new `contactID` | Writes one `Contact` row, with the time it was sent. Throws `SQLException` if no row is inserted or no ID comes back |
 
 ## Validation Rules
 
@@ -128,9 +139,7 @@ Every query or DAO method the Back End calls for this page, and its exact return
   reason chosen, and the message within 2000 characters. Errors appear under
   the field they belong to and focus moves to the first one. All of this is
   convenience — turning JavaScript off skips every bit of it.
-- **Server-side (source of truth):** Back End's, but it has to re-check the
-  same set, because the list above can be bypassed entirely. Two that matter
-  more than the rest:
+- **Server-side (source of truth):** `ContactServlet` re-checks the same set, because the list above can be bypassed entirely, and returns the first failure. Two that matter more than the rest:
   - `reasonForContact` must be one of the six ENUM values. The page offers a
     `<select>`, but a hand-made POST can carry anything, and the database will
     reject an unknown value with an error the customer shouldn't have to see.
@@ -139,17 +148,15 @@ Every query or DAO method the Back End calls for this page, and its exact return
 
 ## Error Handling
 
-Front End renders whatever Back End sets; the attribute names below are a
-proposal, rename them and I'll follow.
-
 | Condition | Message Shown | Where Displayed |
 | --- | --- | --- |
 | A required field is empty | "Enter your first name." and equivalents | Under the field, client-side, before submit |
 | Email isn't a valid shape | "Enter a valid email address." | Under the email field, client-side |
 | `boatLength` filled in but not a number | "Enter a length in feet, or leave this blank." | Under the field, client-side |
 | Message over 2000 characters | Counter turns red past 1800; message on submit | Under the message box |
-| Server-side validation rejects the submission | Back End's wording, shown as-is | `contactError` request attribute, as a banner above the form. The form comes back with what was typed still in it |
-| Submission saved | "Thanks — we'll be in touch." | **Updated:** shown based on `?notice=contactSent` in the URL after a redirect, not a `contactSuccess` request attribute after a forward (see [Back End Owns](#back-end-owns) above for why this changed) |
+| Server-side validation rejects the submission | The first failure, e.g. "Enter your first name.", "Choose a reason so we can route your message.", "That length is longer than any boat we can moor.", "Please keep your message under 2000 characters." | `contactError`, as a banner above the form. The form comes back with what was typed still in it |
+| Too many messages from one address | "Easy Does It" page (429) | `error.jsp` |
+| Submission saved | "Thanks — we'll be in touch as soon as we can." | Shared status popup, via `?notice=contactSent` after the redirect |
 | Database failure | Standard error page | `error.jsp`, per `web.xml` |
 
 **The form redisplays from `param` values on a rejection**, so a rejected submission comes back
