@@ -22,7 +22,8 @@ Module 5 / Week 4 (Aug 31 – Sep 6, 2026)
 - [x] **CTA link targets:** Decided. **Update:** both CTAs now point at the `/reservation` servlet, not `reservation.jsp` directly — going straight at the JSP skips `ReservationServlet.doGet()` and the page loads with no boat/dock/pricing data (same fix applied everywhere else on the site). "Reserve a Slip" links to `/reservation` (logged in) or opens the login modal with `redirectTo` set to `/reservation` (logged out), so a fresh sign-in lands the customer straight on the reservation page instead of back on the landing page. Bottom CTA links to `/reservation` as "Book a Slip" (logged in) or `registration.jsp` as "Create an Account" (logged out).
 - [x] **Session attribute name for login state:** `sessionScope.loggedIn` (boolean), set by `LoginServlet`. Matches the Login contract.
 - [x] **User display name attribute:** `sessionScope.displayName` — a pre-formatted "First L." greeting name (e.g. "Elena M."), built by the Customer bean and set by `LoginServlet`.
-- [x] **Does the landing page need a servlet?** No. The only dynamic elements are login-state checks using `<c:choose>` in the JSP and the scaffold's session-driven header swap. No dedicated servlet.
+- [x] **Does the landing page need a servlet?** ~~No.~~ **Update (issue #349, Miguel):** yes. `LandingServlet` (mapped to the site root `""`, and to `/index.jsp` so the old address still works) reads the slip and electric rates from the `Rate` table for the Slip Pricing card, then forwards to `/WEB-INF/views/index.jsp`. The JSP moved under `WEB-INF` like every other page, so it can't be loaded without its data.
+- [x] **Slip Pricing card (issue #349):** Decided. The free-floating "Ready to Reserve Your Slip?" section is now a card showing the per-foot rate, the most each slip size can cost (a boat that fills the slip: size × per-foot rate), and the flat electric fee, with the reservation call to action at the bottom. Rent follows the boat's length, so each size says "Up to" rather than a fixed price. Tier names (Standard, Premier, Grand) match Book a Slip.
 
 ## Scaffold Include
 
@@ -54,21 +55,21 @@ The landing page does not contain a form and does not submit landing-page fields
 
 ## Back End Parameters
 
-The landing page does not currently read form values or call a dedicated servlet.
+The landing page reads no form values. `LandingServlet` sets two request attributes for the Slip Pricing card.
 
 | Parameter Name | Type | Source | Notes |
 | --- | --- | --- | --- |
 | `activePage` | `String` | JSP include parameter | Passed to `header.jsp` with the value `"home"` |
+| `perFootRate` | `BigDecimal` | Request attribute (`LandingServlet`) | `SLIP_PER_FOOT_MONTHLY` from `Rate`. Unset if the lookup failed |
+| `electricRate` | `BigDecimal` | Request attribute (`LandingServlet`) | `ELECTRIC_MONTHLY` from `Rate`. Unset if the lookup failed |
 | `registered` | `String` | Query string | `RegisterServlet` redirects with `registered=true`. **Update:** this is now read and displayed — `js/statusPopup.js` special-cases `registered=true` (treating it the same as `?notice=registered`) and shows "Account created — welcome aboard" via the shared status popup on whichever page it lands on, then strips both params from the URL |
 | Login session attribute | TBD | HTTP session | Read by the shared header; exact name must match `LoginServlet` |
 
 ## Database Returns
 
-The landing page does not query the database directly.
-
 | Method / Query | Parameters In | Returns | Notes |
 | --- | --- | --- | --- |
-| None | None | None | Authentication and database operations are handled by the login and registration servlets |
+| `ReservationDAO.getRate(conn, rateCode)` | `SLIP_PER_FOOT_MONTHLY`, then `ELECTRIC_MONTHLY` | `BigDecimal` rate amount | The same lookup Book a Slip uses, so a price change in `Rate` shows on both pages |
 
 ## Validation Rules
 
@@ -82,6 +83,7 @@ The landing page does not query the database directly.
 | Login fails | Defined by the Login page contract | Reusable login modal |
 | Registration succeeds | "Account created — welcome aboard" (**updated** — this used to say no message was displayed) | Shared status popup (`includes/statusPopup.jsp`), triggered by `?registered=true` on the redirect from `RegisterServlet` |
 | Hero image cannot load | No message; background color remains visible | Hero section |
+| Rates can't be read from the database | No error. The card leaves out its figures and says the exact price is shown when booking; the rest of the page loads normally, and the failure goes to the server log | Slip Pricing card |
 | Landing page fails to load | Standard Tomcat error response | Browser |
 
 ## Login State Differences

@@ -4,13 +4,16 @@ Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
 Primary Author/Owner - Carolina Rodriguez
 Description: Provides the public landing page for the Moffat Bay Marina website. 
 The page contains the main navigation, marina branding, hero section, slip and amenity highlights, 
-registration call to action, contact information, office hours, and footer navigation. 
-It also includes the reusable login modal and uses the application context path to ensure that stylesheets, 
+slip pricing card with the reservation call to action, contact information, office hours, and footer navigation.
+It also includes the reusable login modal and uses the application context path to ensure that stylesheets,
 scripts, images, and internal links work correctly when deployed to Tomcat.
+Served by LandingServlet, which sets perFootRate and electricRate from the Rate table
+for the pricing card (issue #349, Miguel Fernandez).
 -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,48 +126,115 @@ scripts, images, and internal links work correctly when deployed to Tomcat.
 			</div>
 		</section>
 
-		<!-- Reservation call to action -->
+		<!-- Slip pricing and reservation call to action (issue #349) -->
 		<section
 			class="reservation-section"
-			aria-labelledby="reservationHeading">
+			aria-labelledby="pricingHeading">
 
 			<div class="section-container">
-				<h2 id="reservationHeading">
-					Ready to Reserve Your Slip?
-				</h2>
+				<article class="benefit-card pricing-card">
+					<h2 id="pricingHeading">Slip Pricing</h2>
 
-				<%-- Someone already signed in has no use for "create an
-				     account" - they have one. Same section, different
-				     wording and destination. --%>
-				<c:choose>
-					<c:when test="${sessionScope.loggedIn}">
+					<%-- Rent follows the BOAT's length, not the slip's size,
+					     so each size shows the most it can cost: a boat that
+					     fills the slip. The rates come from the Rate table via
+					     LandingServlet; if they couldn't be read, the figures
+					     are left out rather than guessed. --%>
+					<c:choose>
+						<c:when test="${not empty perFootRate and not empty electricRate}">
 
-						<p>
-							Check availability and book your spot today.
-						</p>
+							<p class="pricing-card__lede">
+								<strong><fmt:formatNumber value="${perFootRate}" type="currency" /> per foot</strong>
+								of your boat's length, per month. You pay for
+								your boat, not the size of the slip it sits in.
+							</p>
 
-						<a
-							class="btn-action"
-							href="${pageContext.request.contextPath}/reservation">
-							Book a Slip
-						</a>
+							<ul class="pricing-grid">
+								<li class="pricing-tier">
+									<span class="pricing-tier__size">26 ft Slip</span>
+									<span class="pricing-tier__name">Standard</span>
+									<span class="pricing-tier__fits">Boats up to 26 ft</span>
+									<span class="pricing-tier__price">
+										Up to <strong><fmt:formatNumber value="${26 * perFootRate}" type="currency" /></strong>/mo
+									</span>
+								</li>
+								<li class="pricing-tier">
+									<span class="pricing-tier__size">40 ft Slip</span>
+									<span class="pricing-tier__name">Premier</span>
+									<span class="pricing-tier__fits">Boats up to 40 ft</span>
+									<span class="pricing-tier__price">
+										Up to <strong><fmt:formatNumber value="${40 * perFootRate}" type="currency" /></strong>/mo
+									</span>
+								</li>
+								<li class="pricing-tier">
+									<span class="pricing-tier__size">50 ft Slip</span>
+									<span class="pricing-tier__name">Grand</span>
+									<span class="pricing-tier__fits">Boats up to 50 ft</span>
+									<span class="pricing-tier__price">
+										Up to <strong><fmt:formatNumber value="${50 * perFootRate}" type="currency" /></strong>/mo
+									</span>
+								</li>
+							</ul>
 
-					</c:when>
-					<c:otherwise>
+							<p class="pricing-card__extra">
+								<span class="pricing-card__extra-label">Electric hookup</span>
+								<strong><fmt:formatNumber value="${electricRate}" type="currency" /> a month</strong>,
+								the same for any size boat.
+							</p>
 
-						<p>
-							Create an account or sign in to check availability
-							and book your spot today.
-						</p>
+							<p class="pricing-card__terms">
+								Month-to-month leases. 30 days' notice to leave.
+							</p>
 
-						<a
-							class="btn-action"
-							href="${pageContext.request.contextPath}/register">
-							Create an Account
-						</a>
+						</c:when>
+						<c:otherwise>
 
-					</c:otherwise>
-				</c:choose>
+							<p class="pricing-card__lede">
+								Slip rent is charged per foot of your boat's
+								length, per month. You'll see the exact price
+								for your boat when you book.
+							</p>
+
+						</c:otherwise>
+					</c:choose>
+
+					<div class="pricing-card__cta">
+						<h3>Ready to Reserve Your Slip?</h3>
+
+						<%-- Someone already signed in has no use for "create an
+						     account" - they have one. Same section, different
+						     wording and destination. --%>
+						<c:choose>
+							<c:when test="${sessionScope.loggedIn}">
+
+								<p>
+									Check availability and book your spot today.
+								</p>
+
+								<a
+									class="btn-action"
+									href="${pageContext.request.contextPath}/reservation">
+									Book a Slip
+								</a>
+
+							</c:when>
+							<c:otherwise>
+
+								<p>
+									Create an account or sign in to check availability
+									and book your spot today.
+								</p>
+
+								<a
+									class="btn-action"
+									href="${pageContext.request.contextPath}/register">
+									Create an Account
+								</a>
+
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</article>
 			</div>
 		</section>
 
