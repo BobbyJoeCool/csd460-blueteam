@@ -43,6 +43,14 @@
     text-align: center;
 }
 
+
+.fleet-header__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
 .fleet-header__title {
     margin: 0;
     display: inline-flex;
@@ -65,21 +73,6 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--color-deep-marine);
-}
-
-/* ==========================================================================
-   Add a Boat
-
-   Below the fleet, not beside the heading: adding one is what you do after
-   reading the list, and putting the page's single primary CTA at the top
-   made it compete with the boats it was sitting above.
-   ========================================================================== */
-
-.fleet-add-row {
-    width: 70%;
-    margin: 1.5rem auto 0;
-    display: flex;
-    justify-content: center;
 }
 
 /* ==========================================================================
@@ -280,17 +273,20 @@
 
     .fleet-header,
     .fleet-list,
-    .fleet-empty,
-    .fleet-add-row {
+    .fleet-empty {
         width: 100%;
+    }
+    
+    .fleet-header__heading {
+    flex-direction: column;
+    align-items: stretch;
     }
 
     .fleet-header__title {
         font-size: 1.5rem;
     }
 
-    /* Full width, so the one thing you came here to do is easy to hit. */
-    .fleet-add-row .btn-primary {
+    .fleet-header__heading .btn-primary {
         width: 100%;
     }
 

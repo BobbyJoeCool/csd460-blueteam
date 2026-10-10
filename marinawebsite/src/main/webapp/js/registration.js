@@ -16,6 +16,7 @@
     var confirmPassword = document.getElementById("confirmPassword");
     var confirmError = document.getElementById("confirmPasswordError");
     var submitBtn = document.getElementById("submitBtn");
+    var myFleetSubmitBtn = document.getElementById("myFleetSubmitBtn");
     var phoneDisplay = document.getElementById("phoneDisplay");
     var phoneHidden = document.getElementById("phone");
     var phoneError = document.getElementById("phoneError");
@@ -27,38 +28,7 @@
     var state = document.getElementById("state");
     var stateLabel = document.getElementById("stateLabel");
 
-    var boatCoreIds = ["boatName", "regNumber", "boatLength"];
-    var boatOptionalIds = ["hin", "boatType", "boatBeam", "boatYear"];
-    var boatFields = {};
-    boatCoreIds.concat(boatOptionalIds).forEach(function (id) {
-        boatFields[id] = document.getElementById(id);
-    });
-    var boatSectionError = document.getElementById("boatSectionError");
-    var identificationNote = document.getElementById("identificationNote");
-    var foreignRegistrationBadge = document.getElementById("foreignRegistrationBadge");
-    var regNumberLabel = document.getElementById("regNumberLabel");
-    var hinError = document.getElementById("hinError");
-    var regNumberError = document.getElementById("regNumberError");
-    var boatYearError = document.getElementById("boatYearError");
-    var boatLengthError = document.getElementById("boatLengthError");
-    var boatBeamError = document.getElementById("boatBeamError");
-    var clearBoatInfoBtn = document.getElementById("clearBoatInfo");
     var clearPersonalInfoBtn = document.getElementById("clearPersonalInfo");
-
-    /**
-     * Updates Registration Number's label, placeholder, and disabled
-     * state to match the given country - "US" or "CA" (enabled, format
-     * differs) or "OTHER" (disabled, nothing applies). The field no
-     * longer has a separate State/Province <select>; the owner types
-     * the state/province prefix as part of the number itself.
-     */
-    function applyCountryToBoatSection() {
-        boat.applyCountry(country.value, {
-            regNumberLabel: regNumberLabel,
-            regNumberInput: boatFields.regNumber,
-            foreignBadge: foreignRegistrationBadge
-        });
-    }
 
     /**
      * The mailing address's State/Province (#state in personalInfoCard.jsp)
@@ -120,83 +90,6 @@
         return value.length > 0 && valid;
     }
 
-    /*
-     * The boat rules and their wording now live in js/boatFields.js, shared
-     * with the Reservation page's boat panel and My Fleet. What stays here
-     * is this page's way of reporting them: mark the field invalid for the
-     * browser, and write the message into that field's own error box only
-     * once the person has typed something.
-     */
-    var boat = MoffatBay.boatFields;
-
-    function reportBoat(field, errorEl, valid, message) {
-        field.setCustomValidity(valid ? "" : message);
-        errorEl.textContent = (field.value.trim().length > 0 && !valid) ? message : "";
-        return valid;
-    }
-
-    function hinIsValid() {
-        return reportBoat(boatFields.hin, hinError,
-            boat.hinIsValid(boatFields.hin.value), boat.MESSAGES.hin);
-    }
-
-    function regNumberIsValid() {
-        return reportBoat(boatFields.regNumber, regNumberError,
-            boat.regNumberIsValid(boatFields.regNumber.value, country.value),
-            boat.regNumberMessage(country.value));
-    }
-
-    // Length and beam share one rule (MoffatBay.form.isValidBoatDimension,
-    // same as the server's Utils.isValidBoatDimension). Blank passes here -
-    // boatSectionValid below is what makes Length required once the boat
-    // section is started.
-    function boatDimensionIsValid(field, errorEl, label) {
-        return reportBoat(field, errorEl,
-            boat.boatDimensionIsValid(field.value), boat.MESSAGES.dimension(label));
-    }
-
-    function boatYearIsValid() {
-        return reportBoat(boatFields.boatYear, boatYearError,
-            boat.boatYearIsValid(boatFields.boatYear.value), boat.MESSAGES.boatYear());
-    }
-
-    // HIN is the primary/default way to identify a boat, Registration
-    // Number is the fallback - but as of the Registration contract's
-    // HIN-first rework, neither is ever required to submit.
-    // #identificationNote just tells an owner who has neither that they
-    // can call the Marina, instead of blocking the form.
-    function identificationMissing() {
-        return !boat.identificationSatisfied(boatFields.hin.value, boatFields.regNumber.value);
-    }
-
-    function boatSectionTouched() {
-        return boatCoreIds.concat(boatOptionalIds).some(function (id) {
-            return boatFields[id].value.trim() !== "";
-        });
-    }
-
-    function updateIdentificationNote() {
-        identificationNote.hidden = !(boatSectionTouched() && identificationMissing());
-    }
-
-    // The boat section is entirely optional - skip every field and
-    // there's nothing to register. But the moment any one of them is
-    // filled in, Boat Name and Boat Length become required, since the
-    // Boat table won't accept a half-filled row. Identification is never
-    // required - see updateIdentificationNote above.
-    function boatSectionValid() {
-        if (!boatSectionTouched()) {
-            boatSectionError.textContent = "";
-            return true;
-        }
-
-        var valid = boatFields.boatName.value.trim() !== ""
-            && boatFields.boatLength.value.trim() !== "";
-        boatSectionError.textContent = valid
-            ? ""
-            : "Fill in Boat Name and Boat Length to register a boat, or use Clear Boat Info to skip it.";
-        return valid;
-    }
 
     function updateFormState() {
         var pwValue = password.value;
@@ -207,13 +100,6 @@
         var countryCodeValid = countryCodeIsValid();
         var emailValid = emailIsValid();
         var zipValid = zipIsValid();
-        var hinValid = hinIsValid();
-        var regNumberValid = regNumberIsValid();
-        var boatYearValid = boatYearIsValid();
-        var boatLengthValid = boatDimensionIsValid(boatFields.boatLength, boatLengthError, "Boat Length");
-        var boatBeamValid = boatDimensionIsValid(boatFields.boatBeam, boatBeamError, "Boat Beam");
-        updateIdentificationNote();
-        var boatValid = boatSectionValid();
 
         confirmError.textContent = (confirmValue.length > 0 && !matches)
             ? "Passwords do not match."
@@ -225,11 +111,13 @@
             if (!field.value || field.value.trim() === "") { requiredFieldsFilled = false; }
         });
 
-        submitBtn.disabled = !(
+        var formValid = (
             pwValid && matches && phoneComplete && countryCodeValid && emailValid && zipValid &&
-            hinValid && regNumberValid && boatYearValid && boatLengthValid && boatBeamValid &&
-            boatValid && requiredFieldsFilled
+            requiredFieldsFilled
         );
+
+        submitBtn.disabled = !formValid;
+        myFleetSubmitBtn.disabled = !formValid; 
     }
 
     // Formatting as you type, and Backspace over a bracket or dash - shared
@@ -242,27 +130,10 @@
     zipCode.addEventListener("input", updateFormState);
     form.addEventListener("input", updateFormState);
 
-    // Country drives Registration State/Province's label, option list,
-    // and disabled state over in boatInfoCard.jsp, plus the mailing
-    // address's own State/Province field right below it here - see
-    // applyCountryToBoatSection / applyCountryToAddressSection above and
-    // the Registration contract's "Country" and "Boat Fields" sections.
+    // Country controls the mailing address State/Province label,
+    // option list, and disabled state.
     country.addEventListener("change", function () {
-        applyCountryToBoatSection();
         applyCountryToAddressSection();
-        updateFormState();
-    });
-
-    // Lets someone who started the (entirely optional) Boat Info card
-    // and doesn't have identification handy - or changes their mind -
-    // drop it in one click instead of fighting the Boat Name/Length
-    // requirement with a half-filled card.
-    clearBoatInfoBtn.addEventListener("click", function () {
-        boatCoreIds.concat(boatOptionalIds).forEach(function (id) {
-            boatFields[id].value = "";
-            boatFields[id].setCustomValidity("");
-        });
-        MoffatBay.boatFields.updateLengthNotice();
         updateFormState();
     });
 
@@ -280,7 +151,6 @@
         phoneDisplay.value = "";
         phoneHidden.value = "";
         country.value = "US";
-        applyCountryToBoatSection();
         applyCountryToAddressSection();
         updateFormState();
     });
@@ -296,10 +166,10 @@
     });
 
     form.addEventListener("submit", function (event) {
-        if (!form.checkValidity() || submitBtn.disabled) {
-            event.preventDefault();
-            form.reportValidity();
-        }
+    if (!form.checkValidity()) {
+        event.preventDefault();
+        form.reportValidity();
+    }
     });
 
     // Signing in from here goes where registering would have: the page
@@ -311,7 +181,7 @@
         MoffatBay.loginModal.open(back || "/");
     });
 
-    applyCountryToBoatSection();
+
     applyCountryToAddressSection();
     updateFormState();
 })();

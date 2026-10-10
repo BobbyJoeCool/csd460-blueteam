@@ -14,13 +14,20 @@
  */
 
 /* ==========================================================================
-   Registration form layout - three columns
+   Registration form layout - two columns
    ========================================================================== */
 
 .registration-form {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	gap: 2rem;
+}
+
+.required-note {
+    grid-column: 1 / -1;
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
 }
 
 @media (max-width: 56rem) {
@@ -28,33 +35,6 @@
 		grid-template-columns: 1fr;
 		gap: 1rem;
 	}
-}
-
-/* "Optional" tag and note at the top of the Boat Information column. */
-.column-intro {
-	display: flex;
-	flex-direction: column;
-	gap: 0.35rem;
-	margin-bottom: 0.15rem;
-}
-
-.column-intro .optional-mark {
-	align-self: flex-start;
-	background: var(--color-golden-hour);
-	color: var(--color-charcoal-navy);
-	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	padding: 0.2rem 0.6rem;
-	border-radius: var(--radius-pill);
-}
-
-.column-note {
-	margin: 0;
-	font-size: 0.85rem;
-	color: var(--color-text-muted);
-	opacity: 0.8;
 }
 
 /* Password column */
@@ -65,7 +45,21 @@
 	gap: 0.4rem;
 }
 
+.boat-next-step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.boat-next-step p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+}
+
 .login-link {
-	font-size: 0.9rem;
-	color: var(--color-text-body);
+    font-size: 0.9rem;
+    color: var(--color-text-body);
 }

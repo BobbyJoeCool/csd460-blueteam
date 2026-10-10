@@ -54,26 +54,12 @@
              parameters, so this survives any number of retries. --%>
         <input type="hidden" name="redirectTo" value="${fn:escapeXml(param.redirectTo)}">
 
+        <p class="required-note">
+            <span class="required-mark">*</span> Required field
+        </p>
+        
         <!-- Left column: name & mailing info -->
         <jsp:include page="/WEB-INF/includes/personalInfoCard.jsp" />
-
-        <!-- Middle column: boat info, entirely optional. The wrapper and
-             the "Optional" note live here rather than in the shared card:
-             a boat is optional on this page, but required over on the
-             Reservation page's Register a Boat panel, which includes the
-             same fields. -->
-        <div class="form-column" id="boatInfoColumn">
-
-            <h2 class="column-heading">Boat Information</h2>
-
-            <div class="column-intro">
-                <p class="optional-mark">Optional</p>
-                <p class="column-note">You can add a boat now or later. If you add one, the starred fields are required.</p>
-            </div>
-
-            <jsp:include page="/WEB-INF/includes/boatInfoCard.jsp" />
-
-        </div>
 
         <!-- Right column: email & password -->
         <div class="form-column">
@@ -119,6 +105,10 @@
 
             <div class="submit-row">
                 <button type="submit" class="btn-primary" id="submitBtn" disabled>Create Account</button>
+                <div class="boat-next-step">        
+                    <p>Want to register a boat?</p><button type="submit" class="btn-primary" id="myFleetSubmitBtn" name="registerBoatNext" value="true" disabled>
+                        Create Account & Go to My Fleet </button></div>
+
                 <p class="login-link" id="privacyConsent">By creating an account you agree to our <a href="${pageContext.request.contextPath}/privacy">Privacy Policy</a>.</p>
                 <p class="login-link">Already have an account? <a href="#" id="loginLinkTrigger">Log in</a></p>
             </div>
@@ -131,7 +121,6 @@
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/js/passwordRules.js?v=${applicationScope.assetVersion}"></script>
-<script src="${pageContext.request.contextPath}/js/boatFields.js?v=${applicationScope.assetVersion}"></script>
 <script src="${pageContext.request.contextPath}/js/registration.js?v=${applicationScope.assetVersion}"></script>
 
 </body>

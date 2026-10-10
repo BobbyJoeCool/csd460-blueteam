@@ -100,12 +100,15 @@
         </c:if>
 
         <div class="fleet-header">
+            <div class="fleet-header_heading">
             <h2 class="fleet-header__title">
                 Your Boats
                 <c:if test="${not empty fleet}">
                     <span class="fleet-count-badge">${fn:length(fleet)} ${fn:length(fleet) == 1 ? 'boat' : 'boats'}</span>
                 </c:if>
             </h2>
+            
+            <button type="button" class="btn-primary" id="openAddBoat">Add Boat</button></div>
         </div>
 
         <c:choose>
@@ -225,17 +228,10 @@
             <c:otherwise>
                 <div class="detail-card fleet-empty">
                     <p class="fleet-empty__message">You haven't registered any boats yet.</p>
-                    <button type="button" class="btn-primary" id="openAddBoatEmpty">Add a Boat</button>
                 </div>
             </c:otherwise>
 
         </c:choose>
-
-        <c:if test="${not empty fleet}">
-            <div class="fleet-add-row">
-                <button type="button" class="btn-primary" id="openAddBoat">Add a Boat</button>
-            </div>
-        </c:if>
 
     </div>
 
