@@ -1,18 +1,14 @@
 package com.moffatbaymarina.marinawebsite.servlet;
 
-import com.moffatbaymarina.marinawebsite.model.Boat;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import com.moffatbaymarina.marinawebsite.dao.BoatDAO;
 import com.moffatbaymarina.marinawebsite.dao.CustomerDAO;
 import com.moffatbaymarina.marinawebsite.model.Customer;
-import com.moffatbaymarina.marinawebsite.util.BoatValidator;
 import com.moffatbaymarina.marinawebsite.util.CustomerSession;
 import com.moffatbaymarina.marinawebsite.util.CustomerValidator;
 import com.moffatbaymarina.marinawebsite.util.DBConnection;
@@ -25,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Handles customer and optional boat registration.
+ * Handles customer account registration.
  * Ai assisted with JavaDoc comments in this file.
  * @author Carolina Rodriguez
  * Blue Team - Robert Breutzmann, Miguel Fernandez, Carolina Rodriguez, Sara White
@@ -39,23 +35,15 @@ public class RegisterServlet extends HttpServlet {
     //Validation patterns for form fields
 
 	/*
-	 * Email/phone/country-code/zip/password patterns used to be defined
-	 * here too - consolidated onto the single copy in Utils (used by
-	 * every page that now touches Customer fields, not just Registration)
-	 * as part of the Edit User Info build. See Utils' own comment on
-	 * EMAIL_PATTERN for why. The HIN and Registration Number patterns and
-	 * the boat length/beam/year limits followed later, for the same reason -
-	 * this copy of the Registration Number pattern had drifted from the
-	 * Reservation page's and the browser's (see Utils.REG_NUMBER_PATTERN).
-	 * The customer field checks themselves, and the list of valid
-	 * countries, now live in CustomerValidator, shared with Edit User Info
-	 * (#284).
-	 */
+ 	* Email, phone, country code, ZIP code, and password validation rules are
+	* shared through Utils and CustomerValidator instead of being duplicated
+	* in this servlet. This keeps Registration consistent with other pages
+	* that work with customer information, such as Edit User Info.
+ 	*/
 
-    //Data access objects for customer and boat operations----------------------------------------------------------
+    //Data access objects for customer operations----------------------------------------------------------
 
 	private final CustomerDAO customerDAO = new CustomerDAO();
-	private final BoatDAO boatDAO = new BoatDAO();
 
     //Display the registration page
 
@@ -99,19 +87,6 @@ public class RegisterServlet extends HttpServlet {
 		String country = Utils.clean(request.getParameter("country"))
 				.toUpperCase(Locale.ROOT);
 
-		String boatName = Utils.clean(request.getParameter("boatName"));
-		String regNumber = Utils.clean(request.getParameter("regNumber"))
-				.toUpperCase(Locale.ROOT);
-		String boatLengthText =
-				Utils.clean(request.getParameter("boatLength"));
-		String hin = Utils.clean(request.getParameter("hin"))
-				.toUpperCase(Locale.ROOT);
-		String boatType = Utils.clean(request.getParameter("boatType"));
-		String boatBeamText =
-				Utils.clean(request.getParameter("boatBeam"));
-		String boatYearText =
-				Utils.clean(request.getParameter("boatYear"));
-
 		String password = Utils.orEmpty(request.getParameter("password"));
 		String confirmPassword =
 				Utils.orEmpty(request.getParameter("confirmPassword"));
@@ -140,63 +115,7 @@ public class RegisterServlet extends HttpServlet {
 			return;
 		}
 
-		BigDecimal boatLength = Utils.parseDecimal(boatLengthText);
-		BigDecimal boatBeam = Utils.parseDecimal(boatBeamText);
-		Integer boatYear = Utils.parseInt(boatYearText);
-
-		boolean boatEntered = anyPresent(
-				boatName,
-				regNumber,
-				boatLengthText,
-				hin,
-				boatType,
-				boatBeamText,
-				boatYearText);
-
-		if (boatEntered) {
-			/*
-			 * The shared rules every add-a-boat path uses. Registration
-			 * passes requireIdentifier = false: a boat with neither a HIN
-			 * nor a Registration Number is saved, and the page suggests
-			 * calling the marina instead (BR-08). The form shows one banner
-			 * message, so the first failure, in form order, is the one shown.
-			 */
-			String boatError;
-			try (Connection conn = DBConnection.getConnection()) {
-				Map<String, String> boatErrors = BoatValidator.validateAdd(
-						conn,
-						boatDAO,
-						BoatValidator.cleanBoatValues(request),
-						country,
-						false,
-						null);
-				boatError = boatErrors.isEmpty()
-						? null
-						: boatErrors.values().iterator().next();
-			} catch (SQLException exception) {
-				getServletContext().log("Boat validation failed.", exception);
-				boatError = "Registration could not be completed. Please try again.";
-			}
-
-			if (boatError != null) {
-				forwardWithError(
-						request,
-						response,
-						"formError",
-						boatError);
-				return;
-			}
-		}
-
 		try {
-			if (customerDAO.findByEmail(email) != null) {
-				forwardWithError(
-						request,
-						response,
-						"emailError",
-						"An account with this email already exists.");
-				return;
-			}
 
 			/*
 			 * This method name must match the method already used by
@@ -219,15 +138,8 @@ public class RegisterServlet extends HttpServlet {
 
             saveRegistration(
                 customer,
-                passwordHash,
-                boatEntered,
-                boatName,
-                regNumber,
-                boatLength,
-                hin,
-                boatType,
-                boatBeam,
-                boatYear);
+                passwordHash
+				);
 
             signInAndRedirect(request, response, email);
 
@@ -237,7 +149,7 @@ public class RegisterServlet extends HttpServlet {
 					exception);
 
 			String message = Utils.isDuplicateKey(exception)
-					? "That email or boat registration is already in use."
+					? "That email is already in use."
 					: "Registration could not be completed. Please try again.";
 
 			forwardWithError(
@@ -263,40 +175,16 @@ public class RegisterServlet extends HttpServlet {
 
 	private void saveRegistration(
 			Customer customer,
-			String passwordHash,
-			boolean boatEntered,
-			String boatName,
-			String regNumber,
-			BigDecimal boatLength,
-			String hin,
-			String boatType,
-			BigDecimal boatBeam,
-			Integer boatYear) throws SQLException {
+			String passwordHash) throws SQLException {
 
 		try (Connection conn = DBConnection.getConnection()) {
 			conn.setAutoCommit(false);
 
 			try {
-				int customerId =
 		            customerDAO.insertCustomer(
                         conn, 
                         customer, 
                         passwordHash);
-
-            if (boatEntered) {
-                Boat boat = new Boat();
-                boat.setBoatName(boatName);
-                boat.setRegNumber(regNumber);
-                boat.setBoatLength(boatLength);
-                boat.setHIN(Utils.emptyToNull(hin));
-                boat.setBoatType(Utils.emptyToNull(boatType));
-                boat.setBoatBeam(boatBeam);
-                boat.setBoatYear(boatYear);
-
-                // Reuses the boat's old row if it's on file and nobody
-                // owns it now, e.g. a new customer who bought it.
-                boatDAO.addOrReclaim(conn, boat, customerId);
-            }
 
             conn.commit();
 
@@ -419,11 +307,19 @@ public class RegisterServlet extends HttpServlet {
 
 		CustomerSession.start(request, registered);
 
-		String target = Utils.safeRedirectTarget(
-				request.getParameter("redirectTo"), "/");
-		if (target.startsWith("/register")) {
-			target = "/";
+		String target;
+
+		if ("true".equals(request.getParameter("registerBoatNext"))) {
+    		target = "/myFleet";
+		} else {
+    		target = Utils.safeRedirectTarget(
+            		request.getParameter("redirectTo"), "/");
 		}
+
+		if (target.startsWith("/register")) {
+    		target = "/";
+		}
+
 		target += (target.contains("?") ? "&" : "?") + "registered=true";
 
 		response.sendRedirect(request.getContextPath() + target);
@@ -441,16 +337,5 @@ public class RegisterServlet extends HttpServlet {
 		request.setAttribute(attribute, message);
 		request.getRequestDispatcher("/WEB-INF/views/registration.jsp")
 				.forward(request, response);
-	}
-
-    //Utility methods for string handling and validation-------------------------------------------------------------
-
-	private boolean anyPresent(String... values) {
-		for (String value : values) {
-			if (!Utils.isBlank(value)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

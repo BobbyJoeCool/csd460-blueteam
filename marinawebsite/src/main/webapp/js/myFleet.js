@@ -538,10 +538,11 @@ MoffatBay.myFleet = (function () {
        Wiring
        ------------------------------------------------------------------ */
 
-    ["openAddBoat", "openAddBoatEmpty"].forEach(function (id) {
-        var btn = document.getElementById(id);
-        if (btn) { btn.addEventListener("click", openAdd); }
-    });
+    var addBoatBtn = document.getElementById("openAddBoat");
+
+    if (addBoatBtn) {
+    addBoatBtn.addEventListener("click", openAdd);
+    }
 
     document.querySelectorAll(".js-edit-boat").forEach(function (btn) {
         btn.addEventListener("click", function () {
